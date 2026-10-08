@@ -90,7 +90,7 @@ export const CATEGORIES: Category[] = [
     name: 'Phone & Laptop Repair',
     icon: 'build',
     description: 'Screens, batteries, charging ports, water damage & OS installation',
-    color: '#9B0044',
+    color: '#335e41',
   },
   {
     id: 'printing-cyber',
@@ -98,7 +98,7 @@ export const CATEGORIES: Category[] = [
     name: 'Printing & Cyber',
     icon: 'print',
     description: 'Thesis binding, glossy color printing, passport photos & HELB loans',
-    color: '#0B6E70',
+    color: '#557c6a',
   },
   {
     id: 'hair-beauty-kinyozi',
@@ -106,7 +106,7 @@ export const CATEGORIES: Category[] = [
     name: 'Salons & Kinyozi',
     icon: 'content_cut',
     description: 'Knotless braids, dreadlocks retwist, fades, salon styling & pedicures',
-    color: '#795900',
+    color: '#8b795c',
   },
   {
     id: 'food-cafes',
@@ -114,7 +114,7 @@ export const CATEGORIES: Category[] = [
     name: 'Food & Cafes',
     icon: 'restaurant',
     description: 'Fast bites, loaded chips, layered chapo, smokies & hostel delivery',
-    color: '#C2185B',
+    color: '#945b36',
   },
   {
     id: 'laundry-mama-fua',
@@ -122,7 +122,7 @@ export const CATEGORIES: Category[] = [
     name: 'Laundry & Mama Fua',
     icon: 'local_laundry_service',
     description: 'Hostel pickup, clothes washing, duvet cleaning, pressing & folding',
-    color: '#005658',
+    color: '#557c6a',
   },
   {
     id: 'gas-groceries',
@@ -130,7 +130,7 @@ export const CATEGORIES: Category[] = [
     name: 'Cooking Gas & Groceries',
     icon: 'local_fire_department',
     description: '6kg & 13kg cooking gas refill delivery to hostel floor & fresh greens',
-    color: '#9B0044',
+    color: '#335e41',
   },
   {
     id: 'hostels-rooms',
@@ -138,7 +138,7 @@ export const CATEGORIES: Category[] = [
     name: 'Hostels & Vacancies',
     icon: 'apartment',
     description: 'Verified bedsitters, single rooms, token electricity & caretakers',
-    color: '#0B2545',
+    color: '#4d6350',
   },
   {
     id: 'photography-video',
@@ -146,7 +146,7 @@ export const CATEGORIES: Category[] = [
     name: 'Photography & Media',
     icon: 'photo_camera',
     description: 'Graduation shoots, studio portraits, events, video coverage & prints',
-    color: '#C2185B',
+    color: '#945b36',
   },
   {
     id: 'tutors-academics',
@@ -154,7 +154,7 @@ export const CATEGORIES: Category[] = [
     name: 'Tutors & Revision',
     icon: 'school',
     description: 'Engineering, Calculus, Medical sciences, Economics & past papers',
-    color: '#0B6E70',
+    color: '#557c6a',
   },
   {
     id: 'tailoring-fashion',
@@ -162,7 +162,7 @@ export const CATEGORIES: Category[] = [
     name: 'Tailoring & Alterations',
     icon: 'checkroom',
     description: 'Custom dresses, graduation suit sizing, zip repair & curtains',
-    color: '#795900',
+    color: '#8b795c',
   },
   {
     id: 'wifi-tech-gadgets',
@@ -170,7 +170,7 @@ export const CATEGORIES: Category[] = [
     name: 'Wi-Fi & Tech Gadgets',
     icon: 'router',
     description: 'Portable routers, original fast chargers, flash drives & cords',
-    color: '#001C3B',
+    color: '#183e35',
   },
   {
     id: 'cakes-bakes',
@@ -178,7 +178,7 @@ export const CATEGORIES: Category[] = [
     name: 'Cakes & Bakery',
     icon: 'cake',
     description: 'Custom birthday cakes, mini cupcakes & campus celebration snacks',
-    color: '#C2185B',
+    color: '#945b36',
   },
 ];
 

@@ -154,7 +154,7 @@ export default function PromoteCheckoutPage({
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 md:px-8 py-8 space-y-6">
         {/* Header */}
-        <div className="bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex items-center justify-between">
+        <div className="page-hero bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-[#667064] uppercase">Promote Merchant</div>
             <h1 className="font-display font-bold text-2xl md:text-3xl text-[#243b32] uppercase">

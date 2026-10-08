@@ -76,7 +76,7 @@ function SearchContent() {
   const currentCategoryObj = CATEGORIES.find((c) => c.slug === categoryParam);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F5F8]">
+    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
@@ -84,18 +84,18 @@ function SearchContent() {
         <section className="bg-white signboard-border rounded-xl p-4 md:p-5 signboard-shadow space-y-4">
           <form onSubmit={handleSearchSubmit} className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="w-5 h-5 text-[#594045] absolute left-3.5 top-3 pointer-events-none" />
+              <Search className="w-5 h-5 text-[#667064] absolute left-3.5 top-3 pointer-events-none" />
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search fundi, repair, braids, cyber, food..."
-                className="w-full bg-[#F0F3FF] signboard-border rounded-lg pl-11 pr-4 py-2.5 text-sm text-[#001C3B] focus:outline-none"
+                className="w-full bg-[#e9eedf] signboard-border rounded-lg pl-11 pr-4 py-2.5 text-sm text-[#243b32] focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="bg-[#9B0044] hover:bg-[#C2185B] text-white font-display font-bold text-sm uppercase px-5 py-2.5 rounded-lg signboard-border signboard-shadow press-action"
+              className="bg-[#183e35] hover:bg-[#335e41] text-white font-display font-bold text-sm uppercase px-5 py-2.5 rounded-lg signboard-border signboard-shadow press-action"
             >
               Search
             </button>
@@ -107,7 +107,7 @@ function SearchContent() {
             <select
               value={zoneParam}
               onChange={(e) => updateParam('zone', e.target.value)}
-              className="bg-[#F0F3FF] font-bold text-[#001C3B] signboard-border rounded-full px-3 py-1.5 focus:outline-none"
+              className="bg-[#e9eedf] font-bold text-[#243b32] signboard-border rounded-full px-3 py-1.5 focus:outline-none"
             >
               {ZONES.map((z) => (
                 <option key={z.slug} value={z.slug}>
@@ -120,7 +120,7 @@ function SearchContent() {
             <select
               value={categoryParam}
               onChange={(e) => updateParam('category', e.target.value)}
-              className="bg-[#F0F3FF] font-bold text-[#001C3B] signboard-border rounded-full px-3 py-1.5 focus:outline-none"
+              className="bg-[#e9eedf] font-bold text-[#243b32] signboard-border rounded-full px-3 py-1.5 focus:outline-none"
             >
               <option value="">All Categories</option>
               {CATEGORIES.map((c) => (
@@ -136,8 +136,8 @@ function SearchContent() {
               onClick={() => updateParam('availableNow', availableNowParam ? 'false' : 'true')}
               className={`font-bold px-3 py-1.5 rounded-full signboard-border press-action flex items-center gap-1.5 ${
                 availableNowParam
-                  ? 'bg-[#001C3B] text-white'
-                  : 'bg-[#F0F3FF] text-[#001C3B]'
+                  ? 'bg-[#243b32] text-white'
+                  : 'bg-[#e9eedf] text-[#243b32]'
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-[#25D366]"></span>
@@ -150,11 +150,11 @@ function SearchContent() {
               onClick={() => updateParam('verified', verifiedParam ? 'false' : 'true')}
               className={`font-bold px-3 py-1.5 rounded-full signboard-border press-action flex items-center gap-1 ${
                 verifiedParam
-                  ? 'bg-[#001C3B] text-white'
-                  : 'bg-[#F0F3FF] text-[#001C3B]'
+                  ? 'bg-[#243b32] text-white'
+                  : 'bg-[#e9eedf] text-[#243b32]'
               }`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#0B6E70]" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#335e41]" />
               Verified
             </button>
 
@@ -164,8 +164,8 @@ function SearchContent() {
               onClick={() => updateParam('discount', discountParam ? 'false' : 'true')}
               className={`font-bold px-3 py-1.5 rounded-full signboard-border press-action flex items-center gap-1 ${
                 discountParam
-                  ? 'bg-[#795900] text-white'
-                  : 'bg-[#F0F3FF] text-[#001C3B]'
+                  ? 'bg-[#526936] text-white'
+                  : 'bg-[#e9eedf] text-[#243b32]'
               }`}
             >
               <Tag className="w-3.5 h-3.5" />
@@ -177,7 +177,7 @@ function SearchContent() {
               <button
                 type="button"
                 onClick={() => router.push('/search')}
-                className="text-[#BA1A1A] font-bold hover:underline px-2 py-1"
+                className="text-[#a7302d] font-bold hover:underline px-2 py-1"
               >
                 Reset All
               </button>
@@ -188,16 +188,16 @@ function SearchContent() {
         {/* Results summary & sort */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
           <div>
-            <span className="font-bold text-[#001C3B] font-display text-lg">
+            <span className="font-bold text-[#243b32] font-display text-lg">
               {loading ? 'Searching...' : `${results.length} results`}
             </span>
             {queryParam && (
-              <span className="text-[#594045]"> for &ldquo;{queryParam}&rdquo;</span>
+              <span className="text-[#667064]"> for &ldquo;{queryParam}&rdquo;</span>
             )}
-            <span className="text-[#594045]"> near </span>
-            <span className="font-bold text-[#001C3B]">{currentZoneObj.name}</span>
+            <span className="text-[#667064]"> near </span>
+            <span className="font-bold text-[#243b32]">{currentZoneObj.name}</span>
             {currentCategoryObj && (
-              <span className="text-[#594045]"> in {currentCategoryObj.name}</span>
+              <span className="text-[#667064]"> in {currentCategoryObj.name}</span>
             )}
           </div>
 
@@ -205,17 +205,17 @@ function SearchContent() {
             <button
               type="button"
               onClick={() => setRankingModalOpen(true)}
-              className="text-xs text-[#594045] underline decoration-dotted hover:text-[#001C3B]"
+              className="text-xs text-[#667064] underline decoration-dotted hover:text-[#243b32]"
             >
               How ranking works
             </button>
 
             <div className="flex items-center gap-1 text-xs">
-              <span className="text-[#594045]">Sort:</span>
+              <span className="text-[#667064]">Sort:</span>
               <select
                 value={sortParam}
                 onChange={(e) => updateParam('sort', e.target.value)}
-                className="bg-white font-bold text-[#001C3B] signboard-border rounded px-2 py-1 text-xs focus:outline-none"
+                className="bg-white font-bold text-[#243b32] signboard-border rounded px-2 py-1 text-xs focus:outline-none"
               >
                 <option value="best_match">Best Match</option>
                 <option value="nearest">Nearest (Walk Time)</option>
@@ -247,31 +247,31 @@ function SearchContent() {
         ) : (
           /* EMPTY STATE */
           <div className="bg-white signboard-border-thick rounded-xl p-8 text-center space-y-4 signboard-shadow">
-            <AlertCircle className="w-12 h-12 text-[#8D6F75] mx-auto" />
-            <h3 className="font-display font-bold text-2xl text-[#001C3B] uppercase">
+            <AlertCircle className="w-12 h-12 text-[#758071] mx-auto" />
+            <h3 className="font-display font-bold text-2xl text-[#243b32] uppercase">
               Nothing matched &ldquo;{queryParam || 'your search'}&rdquo; near {currentZoneObj.name}
             </h3>
-            <p className="text-sm text-[#594045] max-w-md mx-auto">
+            <p className="text-sm text-[#667064] max-w-md mx-auto">
               We couldn&apos;t find an active listing for this search. Try searching across all zones or tell our campus scouts what you need!
             </p>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => updateParam('zone', 'all')}
-                className="bg-[#001C3B] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border press-action"
+                className="bg-[#243b32] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border press-action"
               >
                 Search All Campus Zones
               </button>
               <Link
                 href="/"
-                className="bg-[#F2F5F8] text-[#001C3B] text-xs font-bold px-4 py-2 rounded-full signboard-border press-action"
+                className="bg-[#f7f8f2] text-[#243b32] text-xs font-bold px-4 py-2 rounded-full signboard-border press-action"
               >
                 Browse Categories
               </Link>
               <button
                 type="button"
                 onClick={() => setDemandModalOpen(true)}
-                className="bg-[#9B0044] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border press-action"
+                className="bg-[#183e35] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border press-action"
               >
                 Tell Us What You Need
               </button>
@@ -280,9 +280,9 @@ function SearchContent() {
         )}
 
         {/* BOTTOM PROMOTED DISCLOSURE */}
-        <div className="p-3 bg-[#E7EEFF] rounded signboard-border text-xs text-[#594045] flex items-center justify-between">
+        <div className="p-3 bg-[#edf2e5] rounded signboard-border text-xs text-[#667064] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Info className="w-4 h-4 text-[#0B6E70] flex-shrink-0" />
+            <Info className="w-4 h-4 text-[#335e41] flex-shrink-0" />
             <span>
               Featured (yellow) & Recommended (teal) listings are promoted by local owners. Promoted shops never outrank better matches for queries they do not serve.
             </span>
@@ -290,7 +290,7 @@ function SearchContent() {
           <button
             type="button"
             onClick={() => setRankingModalOpen(true)}
-            className="font-bold text-[#001C3B] underline shrink-0 ml-2"
+            className="font-bold text-[#243b32] underline shrink-0 ml-2"
           >
             Learn more
           </button>
@@ -309,17 +309,17 @@ function SearchContent() {
 
       {/* HOW RANKING WORKS MODAL */}
       {rankingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#001C3B]/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-[#243b32]/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl max-w-lg w-full overflow-hidden">
-            <div className="bg-[#E7EEFF] px-4 py-3 border-b-2 border-[#001C3B] flex items-center justify-between">
-              <h3 className="font-display font-bold text-lg text-[#001C3B] uppercase">
+            <div className="bg-[#edf2e5] px-4 py-3 border-b-2 border-[#dfe5d8] flex items-center justify-between">
+              <h3 className="font-display font-bold text-lg text-[#243b32] uppercase">
                 How MoiMashinani Ranking Works
               </h3>
               <button onClick={() => setRankingModalOpen(false)}>
-                <X className="w-5 h-5 text-[#001C3B]" />
+                <X className="w-5 h-5 text-[#243b32]" />
               </button>
             </div>
-            <div className="p-4 md:p-6 text-sm text-[#001C3B] space-y-3 leading-relaxed">
+            <div className="p-4 md:p-6 text-sm text-[#243b32] space-y-3 leading-relaxed">
               <p>
                 <strong>1. Relevance First:</strong> A business only appears if it genuinely offers what you searched for (phone technician, braids, cyber, etc.). Paying cannot make an irrelevant shop show up.
               </p>
@@ -337,7 +337,7 @@ function SearchContent() {
               </p>
               <button
                 onClick={() => setRankingModalOpen(false)}
-                className="w-full mt-4 bg-[#001C3B] text-white py-2 rounded-full font-bold text-xs uppercase"
+                className="w-full mt-4 bg-[#243b32] text-white py-2 rounded-full font-bold text-xs uppercase"
               >
                 Close
               </button>

@@ -92,7 +92,7 @@ export default function AmbassadorFieldPage() {
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Header */}
-        <div className="bg-white border border-[#dfe5d8] rounded-2xl p-5 shadow-[0_10px_28px_#243b3212] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="page-hero bg-white border border-[#dfe5d8] rounded-2xl p-5 shadow-[0_10px_28px_#243b3212] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 bg-[#edf2e5] text-[#335e41] font-display text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#dfe5d8]">
               <Award className="w-3.5 h-3.5" />

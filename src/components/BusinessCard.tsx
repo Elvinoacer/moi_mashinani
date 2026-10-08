@@ -65,6 +65,7 @@ export function BusinessCard({
     .map((service) => service.priceFrom)
     .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price > 0);
   const lowestPrice = prices.length ? Math.min(...prices) : undefined;
+  const displayService = services.find((service) => lowestPrice !== undefined && service.priceFrom === lowestPrice) || firstService;
   const distance = distanceLabel || business.walkTime || 'Near campus';
 
   const recipient = (business.whatsapp || business.phone || '').replace(/\D/g, '');
@@ -151,11 +152,11 @@ export function BusinessCard({
             {business.isTemporarilyClosed && <span className={styles.closed}>Temporarily closed</span>}
           </div>
 
-          {firstService && (
+          {displayService && (
             <div className={styles.serviceRow}>
               <div className={styles.serviceCopy}>
                 <span className={styles.serviceEyebrow}>A LITTLE OF WHAT THEY DO</span>
-                <span className={styles.serviceName}>{firstService.name}</span>
+                <span className={styles.serviceName}>{displayService.name}</span>
               </div>
               <div className={styles.servicePrice}>
                 {lowestPrice === undefined ? (

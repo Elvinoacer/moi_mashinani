@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { BottomNav } from '@/components/BottomNav';
 import { Business, PaymentRecord } from '@/lib/types';
 import { useNow } from '@/lib/useNow';
 import {
@@ -717,6 +718,7 @@ export default function BusinessDashboardPage({
       </main>
 
       <Footer />
+      <BottomNav />
     </div>
   );
 }

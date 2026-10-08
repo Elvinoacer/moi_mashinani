@@ -6,10 +6,13 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { Business } from '@/lib/types';
+import { BusinessCard } from '@/components/BusinessCard';
+import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { CheckCircle2, Tag, Percent, ShieldCheck } from '@/components/icons';
 
 export default function DealsAndSafetyPage() {
   const [dealBusinesses, setDealBusinesses] = useState<Business[]>([]);
+  const [dealLoading, setDealLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/businesses?discount=true')
@@ -17,7 +20,8 @@ export default function DealsAndSafetyPage() {
       .then((data) => {
         setDealBusinesses(data.results || []);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setDealLoading(false));
   }, []);
 
   return (
@@ -49,45 +53,29 @@ export default function DealsAndSafetyPage() {
             <span className="text-xs text-[#667064]">Show Student ID to claim</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dealBusinesses.map((biz) => (
-              <div
-                key={biz.id}
-                className="bg-white border border-[#dfe5d8] rounded-xl p-4 shadow-[0_10px_28px_#243b3212] flex flex-col justify-between space-y-3"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase text-[#667064]">
-                      {biz.zone.replace('-', ' ')}
-                    </span>
-                    <span className="text-[11px] font-bold text-[#335e41] bg-[#edf2e5] px-2 py-0.5 rounded">
-                      Verified
-                    </span>
-                  </div>
-
-                  <h3 className="font-display font-bold text-lg text-[#243b32] mt-1">
-                    {biz.name}
-                  </h3>
-
-                  <div className="mt-2 p-2.5 bg-[#eff4da] border border-[#dfe5d8] rounded-lg text-xs font-bold text-[#526936] flex items-center gap-1.5">
-                    <Percent className="w-4 h-4 text-[#526936]" />
-                    <span>{biz.studentDiscount}</span>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-[#dfe5d8] flex items-center justify-between">
-                  <span className="text-xs text-[#667064]">{biz.walkTime || 'Near campus'}</span>
-                  <Link
-                    href={`/b/${biz.slug}`}
-                    className="bg-[#243b32] text-white text-xs font-bold px-4 py-1.5 rounded-full press-action"
-                  >
-                    View Shop
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          {dealLoading ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="h-[460px] animate-pulse rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf]" />
+              ))}
+            </div>
+          ) : dealBusinesses.length ? (
+            <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {dealBusinesses.map((biz) => (
+                <BusinessCard key={biz.id} business={biz} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[22px] border border-[#dce6d1] bg-white px-6 py-10 text-center">
+              <Tag className="mx-auto mb-3 h-9 w-9 text-[#6f8949]" />
+              <h3 className="text-lg font-bold text-[#183e35]">Fresh student deals are on their way.</h3>
+              <p className="mt-2 text-sm text-[#667064]">Explore nearby businesses while owners prepare their next offers.</p>
+              <Link href="/search" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#183e35] px-5 text-sm font-semibold text-white">Explore local businesses →</Link>
+            </div>
+          )}
         </section>
+
+        <JoinNeighborhoodCard />
 
         {/* TRUST & VERIFICATION LEVELS */}
         <section className="bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8 space-y-6">

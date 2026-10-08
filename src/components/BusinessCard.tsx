@@ -1,23 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import Link from 'next/link';
-import { useNow } from '@/lib/useNow';
-import { Business, Tier } from '@/lib/types';
+import { ArrowUpRight, BadgeCheck, Clock3, MapPin, MessageCircle, Navigation2, Phone, ShieldAlert, Sparkles, Store, Tag } from 'lucide-react';
 import { BookingModal } from './BookingModal';
 import { ReportModal } from './ReportModal';
+import { CATEGORIES, ZONES } from '@/lib/constants';
 import { buildGoogleMapsUrl } from '@/lib/geo';
-import {
-  Star,
-  CheckCircle2,
-  MapPin,
-  Footprints,
-  Tag,
-  Phone,
-  WhatsAppIcon,
-  MoreVertical,
-  Navigation,
-} from '@/components/icons';
+import { useNow } from '@/lib/useNow';
+import type { Business, Tier } from '@/lib/types';
+import styles from './BusinessCard.module.css';
 
 interface BusinessCardProps {
   business: Business;
@@ -29,6 +21,18 @@ interface BusinessCardProps {
   onWhatsAppClick?: () => void;
 }
 
+function getImageSource(source?: string) {
+  if (!source) return '';
+  if (source.startsWith('/') && !source.startsWith('//')) return source;
+  try {
+    const url = new URL(source);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : '';
+  } catch {
+    return '';
+  }
+}
+
+/** One card, shared across search, categories, suggestions and student deals. */
 export function BusinessCard({
   business,
   effectiveTier,
@@ -40,46 +44,56 @@ export function BusinessCard({
 }: BusinessCardProps) {
   const [bookingOpen, setBookingOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const now = useNow();
 
   const tier = effectiveTier || business.activeTier;
-  const isFeatured = tier === 'FEATURED';
-  const isRecommended = tier === 'RECOMMENDED';
-
-  const isAvailableNow = Boolean(
+  const promoted = tier === 'FEATURED' || tier === 'RECOMMENDED';
+  const available = !business.isTemporarilyClosed && Boolean(
     business.availableNowUntil && new Date(business.availableNowUntil).getTime() > now
   );
+  const category = CATEGORIES.find((item) => item.slug === business.primaryCategory);
+  const zone = ZONES.find((item) => item.slug === business.zone);
+  const categoryName = category?.name || 'Local business';
+  const zoneName = zone?.name || business.zone.replaceAll('-', ' ');
+  const categoryIndex = Math.max(0, CATEGORIES.findIndex((item) => item.slug === business.primaryCategory));
+  const tone = categoryIndex % 5;
+  const photo = getImageSource(business.coverPhoto || business.photos?.[0]);
+  const services = business.services || [];
+  const firstService = services.find((service) => service.name.trim()) || services[0];
+  const prices = services
+    .map((service) => service.priceFrom)
+    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price > 0);
+  const lowestPrice = prices.length ? Math.min(...prices) : undefined;
+  const displayService = services.find((service) => lowestPrice !== undefined && service.priceFrom === lowestPrice) || firstService;
+  const distance = distanceLabel || business.walkTime || 'Near campus';
 
-  const handleCall = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon(
-        '/api/events',
-        JSON.stringify({ businessId: business.id, type: 'call' })
-      );
-    }
-    if (onCallClick) onCallClick();
-  };
+  const recipient = (business.whatsapp || business.phone || '').replace(/\D/g, '');
+  const whatsappPhone = recipient.startsWith('0') ? '254' + recipient.slice(1) : recipient;
+  const whatsappMessage = encodeURIComponent(
+    'Habari ' + business.name + ', nimeona profile yako kwa MoiMashinani campus directory. Naomba kuuliza kuhusu huduma zenu.'
+  );
+  const whatsappUrl = 'https://wa.me/' + whatsappPhone + '?text=' + whatsappMessage;
 
-  const handleWhatsApp = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  function record(type: 'call' | 'whatsapp' | 'directions') {
     if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon(
-        '/api/events',
-        JSON.stringify({ businessId: business.id, type: 'whatsapp' })
-      );
+      navigator.sendBeacon('/api/events', JSON.stringify({ businessId: business.id, type }));
     }
-    if (onWhatsAppClick) onWhatsAppClick();
-  };
+  }
 
-  const handleDirections = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon(
-        '/api/events',
-        JSON.stringify({ businessId: business.id, type: 'directions' })
-      );
-    }
+  function handleCall() {
+    record('call');
+    onCallClick?.();
+  }
+
+  function handleWhatsApp() {
+    record('whatsapp');
+    onWhatsAppClick?.();
+  }
+
+  function handleDirections(event: MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    record('directions');
     const url = buildGoogleMapsUrl({
       destCoords: business.mapPin,
       originCoords: anchorCoordinates,
@@ -87,216 +101,113 @@ export function BusinessCard({
       landmark: business.landmark,
     });
     window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  // WhatsApp prefilled message
-  const prefilledMsg = encodeURIComponent(
-    `Habari ${business.name}, nimeona profile yako kwa MoiMashinani campus directory. Naomba kuuliza kuhusu huduma zenu.`
-  );
-  const cleanPhone = (business.whatsapp || business.phone).replace(/\D/g, '');
-  const waPhone = cleanPhone.startsWith('0') ? `254${cleanPhone.slice(1)}` : cleanPhone;
-  const whatsappUrl = `https://wa.me/${waPhone}?text=${prefilledMsg}`;
-
-  const validPrices = (business.services || [])
-    .map((s) => s.priceFrom || 0)
-    .filter((p) => p > 0);
-  const lowestPrice = validPrices.length > 0 ? Math.min(...validPrices) : 0;
-
-  const displayDistance = distanceLabel || business.walkTime || 'Near campus';
+  }
 
   return (
     <>
-      <div
-        className={`directory-card bg-white border border-[#dfe5d8] rounded-[19px] relative overflow-hidden flex flex-col justify-between ${
-          isFeatured ? 'border-l-[6px] border-l-[#d9f279]' : isRecommended ? 'border-l-[6px] border-l-[#335e41]' : ''
-        }`}
-      >
-        <div className="p-3.5 sm:p-4">
-          {/* Header Row: Badges & Tier stickers */}
-          <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {isFeatured && (
-                <span className="bg-[#d9f279] text-[#243b32] text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded-md border border-[#dfe5d8] flex items-center gap-1 uppercase tracking-tight">
-                  <Star className="w-3 h-3 fill-[#243b32]" />
-                  FEATURED
-                </span>
-              )}
-
-              {isRecommended && !isFeatured && (
-                <span className="bg-[#335e41] text-white text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] flex items-center gap-1 uppercase tracking-tight">
-                  <CheckCircle2 className="w-3 h-3" />
-                  RECOMMENDED
-                </span>
-              )}
-
-              {business.verificationLevel === 'L2' && (
-                <span
-                  className="bg-white text-[#243b32] text-[10px] sm:text-[11px] font-display font-bold px-1.5 py-0.5 rounded border border-[#dfe5d8] flex items-center gap-0.5"
-                  title="Team physically verified this shop exists"
-                >
-                  <CheckCircle2 className="w-3 h-3 text-[#335e41]" />
-                  Verified
-                </span>
-              )}
-
-              {isAvailableNow && (
-                <span className="bg-[#edf2e5] text-[#183e35] text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
-                  Available Now
-                </span>
-              )}
+      <article className={styles.card} data-tone={tone} data-tier={tier}>
+        <Link href={'/b/' + business.slug} className={styles.media} aria-label={'View ' + business.name + ' profile'}>
+          {photo && !imageFailed ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photo} alt="" loading="lazy" className={styles.cover} onError={() => setImageFailed(true)} />
+          ) : (
+            <div className={styles.fallback} aria-hidden="true">
+              <span className={styles.fallbackOrbit} />
+              <span className={styles.fallbackMark}><Store size={42} strokeWidth={1.4} /></span>
+              <span className={styles.fallbackCaption}>GOOD THINGS, NEARBY.</span>
             </div>
+          )}
+          <span className={styles.mediaShade} aria-hidden="true" />
+          <span className={styles.mediaCategory}>{categoryName}</span>
+          <span className={styles.mediaArrow} aria-hidden="true"><ArrowUpRight size={21} strokeWidth={1.8} /></span>
+          {promoted && (
+            <span className={styles.promoted}>
+              <Sparkles size={13} aria-hidden="true" />
+              {tier === 'FEATURED' ? 'Featured' : 'Recommended'}
+              <span className={styles.screenReaderOnly}>Promoted listing</span>
+            </span>
+          )}
+        </Link>
 
-            {/* Promoted Disclosure & Report */}
-            <div className="flex items-center gap-1 text-[11px] text-[#667064]">
-              {(isFeatured || isRecommended) && (
-                <span
-                  title="Promoted listing. Owner pays to rank higher; results still match relevance."
-                  className="cursor-help underline decoration-dotted text-[10px] text-[#667064]"
-                >
-                  Promoted
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={() => setReportOpen(true)}
-                className="text-[#758071] hover:text-[#a7302d] p-1 press-action rounded"
-                title="Report problem"
-              >
-                <MoreVertical className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Main Card Content */}
-          <div className="flex gap-3 items-start">
-            {/* Photo / Thumbnail */}
-            <Link href={`/b/${business.slug}`} className="relative shrink-0 block">
-              <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-[13px] border border-[#dfe5d8] overflow-hidden bg-[#e9eedf]">
-                {business.coverPhoto || business.photos[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={business.coverPhoto || business.photos[0]}
-                    alt={business.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#edf2e5] text-[#243b32] font-display font-black text-xl">
-                    {business.name.substring(0, 2).toUpperCase()}
-                  </div>
-                )}
-              </div>
-            </Link>
-
-            {/* Info details */}
-            <div className="flex-1 min-w-0">
-              <Link href={`/b/${business.slug}`} className="block group">
-                <h3 className="font-display font-bold text-base sm:text-lg text-[#243b32] group-hover:text-[#183e35] transition-colors leading-snug truncate">
-                  {business.name}
-                </h3>
-              </Link>
-
-              <div className="text-xs text-[#667064] mt-1 line-clamp-1">
-                {business.tagline || business.description}
-              </div>
-
-              {/* Location & Walk time */}
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5 text-xs text-[#243b32]">
-                <span className="flex items-center gap-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#335e41] flex-shrink-0" />
-                  <span className="font-semibold capitalize">{business.zone.replace('-', ' ')}</span>
-                </span>
-
-                <span className="flex items-center gap-0.5 text-[#667064] font-medium">
-                  <Footprints className="w-3.5 h-3.5 flex-shrink-0 text-[#335e41]" />
-                  <span>{displayDistance}</span>
-                </span>
-
-                {lowestPrice > 0 && (
-                  <span className="bg-[#e9eedf] px-1.5 py-0.5 rounded text-[11px] font-bold text-[#243b32] border border-[#dfe5d8]/20">
-                    from KSh {lowestPrice.toLocaleString()}
-                  </span>
-                )}
-              </div>
-
-              {/* Physical Landmark Tag */}
-              {business.landmark && (
-                <div className="mt-1 text-[11px] text-[#667064] bg-[#e9eedf] px-2 py-0.5 rounded border border-[#dfe5d8]/10 line-clamp-1 flex items-center gap-1">
-                  <span className="font-bold text-[#243b32]">Landmark:</span>
-                  <span className="truncate">{business.landmark}</span>
-                </div>
-              )}
-
-              {/* Student discount tag if exists */}
-              {business.studentDiscount && (
-                <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-[#526936] bg-[#e9eedf]/50 border border-[#526936]/30 px-1.5 py-0.5 rounded">
-                  <Tag className="w-3 h-3 text-[#526936] flex-shrink-0" />
-                  <span className="truncate">{business.studentDiscount}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Action Strip: Directions + Two-Tap Call & WhatsApp */}
-        <div className="border-t border-[#dfe5d8] bg-[#fafbf7] p-2 sm:p-2.5">
-          <div className="grid grid-cols-12 gap-2">
-            {/* Directions button */}
-            {showDirectionsButton && (
-              <button
-                type="button"
-                onClick={handleDirections}
-                title="Get walking directions in Google Maps"
-                className="col-span-4 bg-[#edf2e5] hover:bg-[#e9eedf] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1"
-              >
-                <Navigation className="w-3.5 h-3.5 text-[#335e41] flex-shrink-0" />
-                <span className="truncate">MAPS</span>
-              </button>
+        <div className={styles.body}>
+          <div className={styles.topline}>
+            <span className={styles.place}><MapPin size={14} aria-hidden="true" /> {zoneName}</span>
+            {business.verificationLevel === 'L2' && (
+              <span className={styles.verified} title="Physically verified by the MoiMashinani team">
+                <BadgeCheck size={16} aria-hidden="true" /> Verified
+              </span>
             )}
+          </div>
 
-            {/* Tap 1: Call */}
-            <a
-              href={`tel:${business.phone}`}
-              onClick={handleCall}
-              className={`${
-                showDirectionsButton ? 'col-span-4' : 'col-span-6'
-              } bg-[#335e41] hover:bg-[#2c5141] text-white text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1`}
-            >
-              <Phone className="w-3.5 h-3.5 flex-shrink-0" />
-              <span>CALL</span>
+          <Link href={'/b/' + business.slug} className={styles.titleLink}>
+            <h3 className={styles.title}>{business.name}</h3>
+          </Link>
+          <p className={styles.description}>
+            {business.tagline?.trim() || business.description?.trim() || 'Get in touch with this local business.'}
+          </p>
+
+          <div className={styles.detailRow}>
+            <span className={styles.distance}><Clock3 size={15} aria-hidden="true" /> {distance}</span>
+            {available && <span className={styles.available}><span className={styles.liveDot} /> Available now</span>}
+            {business.isTemporarilyClosed && <span className={styles.closed}>Temporarily closed</span>}
+          </div>
+
+          {displayService && (
+            <div className={styles.serviceRow}>
+              <div className={styles.serviceCopy}>
+                <span className={styles.serviceEyebrow}>A LITTLE OF WHAT THEY DO</span>
+                <span className={styles.serviceName}>{displayService.name}</span>
+              </div>
+              <div className={styles.servicePrice}>
+                {lowestPrice === undefined ? (
+                  <span className={styles.explorePrice}>See services</span>
+                ) : (
+                  <><span className={styles.from}>From</span><strong>KSh {lowestPrice.toLocaleString('en-KE')}</strong></>
+                )}
+              </div>
+            </div>
+          )}
+
+          {business.studentDiscount?.trim() && (
+            <div className={styles.discount}><Tag size={14} aria-hidden="true" /><span>{business.studentDiscount}</span></div>
+          )}
+
+          <div className={styles.actions}>
+            <a href={'tel:' + business.phone} onClick={handleCall} className={styles.call} aria-label={'Call ' + business.name}>
+              <Phone size={16} aria-hidden="true" /> <span>Call shop</span>
             </a>
-
-            {/* Tap 2: WhatsApp */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleWhatsApp}
-              className={`${
-                showDirectionsButton ? 'col-span-4' : 'col-span-6'
-              } bg-[#25D366] hover:bg-[#20ba5a] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1`}
-            >
-              <WhatsAppIcon className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate">WHATSAPP</span>
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={handleWhatsApp}
+              className={styles.whatsapp} aria-label={'WhatsApp ' + business.name}>
+              <MessageCircle size={17} aria-hidden="true" /> <span>WhatsApp</span> <ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>
+
+          <div className={styles.secondaryActions}>
+            <div className={styles.secondaryMain}>
+              {showDirectionsButton && (
+                <button type="button" onClick={handleDirections} className={styles.utility}>
+                  <Navigation2 size={15} aria-hidden="true" /> Directions
+                </button>
+              )}
+              {services.length > 0 && (
+                <button type="button" onClick={() => setBookingOpen(true)} className={styles.utility}>
+                  <Clock3 size={15} aria-hidden="true" /> Request booking
+                </button>
+              )}
+              <Link href={'/b/' + business.slug} className={styles.utility}>
+                View profile <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            </div>
+            <button type="button" onClick={() => setReportOpen(true)} title="Report an issue with this listing"
+              aria-label={'Report a problem with ' + business.name} className={styles.report}>
+              <ShieldAlert size={17} aria-hidden="true" />
+            </button>
+          </div>
         </div>
-      </div>
+      </article>
 
-      {bookingOpen && (
-        <BookingModal
-          business={business}
-          onClose={() => setBookingOpen(false)}
-        />
-      )}
-
-      {reportOpen && (
-        <ReportModal
-          business={business}
-          onClose={() => setReportOpen(false)}
-        />
-      )}
+      {bookingOpen && <BookingModal business={business} onClose={() => setBookingOpen(false)} />}
+      {reportOpen && <ReportModal business={business} onClose={() => setReportOpen(false)} />}
     </>
   );
 }

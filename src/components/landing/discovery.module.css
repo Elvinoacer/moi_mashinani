@@ -664,3 +664,66 @@
     transform: none;
   }
 }
+
+
+/* The home discovery cards echo the richer interior-card styling without
+   changing the approved homepage composition or its discovery behavior. */
+.card {
+  position: relative;
+  isolation: isolate;
+  border-color: #dfe8d6;
+  border-radius: 23px;
+  box-shadow: 0 5px 12px rgb(24 62 53 / 3%), 0 15px 30px rgb(24 62 53 / 5%);
+}
+.card::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #bedc76, #e4edca);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.card:hover::before,.card:focus-visible::before { opacity: 1; }
+.cardMedia { background: #e0e8d8; }
+.cardMedia::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgb(20 49 38 / 19%));
+  pointer-events: none;
+}
+.categoryPill,.cardArrow { z-index: 1; }
+.categoryPill {
+  padding: 8px 12px;
+  border: 1px solid #fff9;
+  background: #fffef6f2;
+  box-shadow: 0 4px 14px rgb(24 62 53 / 8%);
+}
+.cardArrow {
+  width: 36px;
+  height: 36px;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.card:hover .cardArrow { transform: rotate(45deg); background: #d9f279; }
+.cardContent { padding: 19px 19px 17px; }
+.cardTitle { font-size: 17px; letter-spacing: -.65px; line-height: 1.3; }
+.cardDescription { font-size: 12px; min-height: 39px; }
+.cardFooter { border-top-color: #e4eadb; padding-top: 14px; }
+.priceRow { min-height: 27px; }
+.price { color: #254b38; font-size: 12px; font-weight: 800; }
+.priceRow > svg { color: #5f8248; }
+.card:focus-visible { outline: 3px solid #84a14b; outline-offset: 4px; }
+@media (hover:hover) {
+  .card:hover { transform: translateY(-5px); box-shadow: 0 22px 42px rgb(24 62 53 / 12%); }
+}
+@media (max-width:580px) {
+  .cardContent { padding: 19px; }
+  .cardTitle { font-size: 19px; }
+  .cardDescription { min-height: 0; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .card::before,.cardArrow { transition: none; }
+  .card:hover,.card:hover .cardArrow { transform: none; }
+}

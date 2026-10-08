@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { BusinessCard } from '@/components/BusinessCard';
+import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { DemandModal } from '@/components/DemandModal';
 import { CATEGORIES, ZONES } from '@/lib/constants';
 import { Business, Tier } from '@/lib/types';
@@ -233,13 +234,13 @@ function SearchContent() {
 
         {/* RESULTS LIST */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-44 bg-white rounded-lg signboard-border animate-pulse"></div>
+              <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"></div>
             ))}
           </div>
         ) : results.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {results.map((biz) => (
               <BusinessCard
                 key={biz.id}
@@ -285,12 +286,14 @@ function SearchContent() {
           </div>
         )}
 
+        <JoinNeighborhoodCard />
+
         {/* BOTTOM PROMOTED DISCLOSURE */}
         <div className="p-3 bg-[#edf2e5] rounded signboard-border text-xs text-[#667064] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Info className="w-4 h-4 text-[#335e41] flex-shrink-0" />
             <span>
-              Featured (yellow) & Recommended (teal) listings are promoted by local owners. Promoted shops never outrank better matches for queries they do not serve.
+              Featured and Recommended listings are promoted by local owners. Promoted shops never outrank better matches for queries they do not serve.
             </span>
           </div>
           <button

@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { BusinessCard } from '@/components/BusinessCard';
+import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { CATEGORIES } from '@/lib/constants';
 import { Business } from '@/lib/types';
 import { CategoryIcon, Store } from '@/components/icons';
@@ -74,7 +75,7 @@ export default function CategoryPage({
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display font-bold text-lg md:text-xl text-[#243b32] uppercase">
-              {loading ? 'Finding shops...' : `${businesses.length} Verified Providers in Kesses`}
+              {loading ? 'Finding shops...' : `${businesses.length} local businesses in Kesses`}
             </h2>
             <Link
               href={`/search?category=${category}`}
@@ -85,13 +86,13 @@ export default function CategoryPage({
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-44 bg-white rounded-xl border border-[#dfe5d8] animate-pulse"></div>
+                <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"></div>
               ))}
             </div>
           ) : businesses.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {businesses.map((biz) => (
                 <BusinessCard key={biz.id} business={biz} />
               ))}
@@ -114,6 +115,8 @@ export default function CategoryPage({
             </div>
           )}
         </section>
+        <JoinNeighborhoodCard />
+
       </main>
 
       <Footer />

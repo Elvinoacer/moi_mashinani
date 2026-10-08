@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { BusinessCard } from '@/components/BusinessCard';
+import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { CATEGORIES } from '@/lib/constants';
 import { Business } from '@/lib/types';
 import { CategoryIcon, Store } from '@/components/icons';
@@ -114,6 +115,8 @@ export default function CategoryPage({
             </div>
           )}
         </section>
+        <JoinNeighborhoodCard />
+
       </main>
 
       <Footer />

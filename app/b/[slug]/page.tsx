@@ -212,7 +212,7 @@ export default function BusinessProfilePage({
         </div>
 
         {/* GALLERY SECTION */}
-        <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl overflow-hidden">
+        <div className="profile-gallery bg-white signboard-border-thick signboard-shadow-lg rounded-xl overflow-hidden">
           <div className="relative h-64 sm:h-80 md:h-96 w-full bg-[#edf2e5]">
             {business.photos.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element

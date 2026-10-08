@@ -81,7 +81,13 @@ function SearchContent() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Search header & filter strip */}
-        <section className="bg-white signboard-border rounded-xl p-4 md:p-5 signboard-shadow space-y-4">
+
+        <section className="page-hero bg-white signboard-border rounded-xl p-4 md:p-5 signboard-shadow space-y-4">
+          <div className="mb-5">
+            <div className="mb-2 text-[10px] font-bold tracking-[0.14em] text-[#526936]">NEIGHBORHOOD DISCOVERY · MOI UNIVERSITY</div>
+            <h1 className="text-2xl font-bold tracking-tight text-[#183e35] sm:text-4xl">Find your thing. <span className="text-[#557c6a]">Closer than you think.</span></h1>
+            <p className="mt-2 text-sm leading-relaxed text-[#667064]">Good food, a quick fix, a trusted local service. Your neighborhood has it.</p>
+          </div>
           <form onSubmit={handleSearchSubmit} className="flex gap-2">
             <div className="relative flex-1">
               <Search className="w-5 h-5 text-[#667064] absolute left-3.5 top-3 pointer-events-none" />

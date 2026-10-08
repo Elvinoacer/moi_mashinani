@@ -78,7 +78,7 @@ export default function BusinessProfilePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#F2F5F8]">
+      <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
         <Navbar />
         <main className="flex-1 max-w-4xl w-full mx-auto p-8 text-center">
           <div className="inline-block p-4 bg-white signboard-border rounded-xl animate-pulse">
@@ -91,19 +91,19 @@ export default function BusinessProfilePage({
 
   if (!business) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#F2F5F8]">
+      <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
         <Navbar />
         <main className="flex-1 max-w-md w-full mx-auto p-8 text-center space-y-4">
-          <Store className="w-16 h-16 text-[#8D6F75] mx-auto" />
-          <h1 className="font-display font-bold text-2xl text-[#001C3B]">
+          <Store className="w-16 h-16 text-[#758071] mx-auto" />
+          <h1 className="font-display font-bold text-2xl text-[#243b32]">
             Business Not Found
           </h1>
-          <p className="text-sm text-[#594045]">
+          <p className="text-sm text-[#667064]">
             This shop may have changed its address or been removed.
           </p>
           <Link
             href="/search"
-            className="inline-block bg-[#001C3B] text-white px-5 py-2 rounded-full font-bold text-xs uppercase"
+            className="inline-block bg-[#243b32] text-white px-5 py-2 rounded-full font-bold text-xs uppercase"
           >
             Browse All Shops
           </Link>
@@ -177,33 +177,33 @@ export default function BusinessProfilePage({
   const todayHours = business.hours[currentDayName];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F5F8] pb-24 md:pb-12">
+    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2] pb-24 md:pb-12">
       <Navbar />
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Breadcrumb & Share Header */}
-        <div className="flex items-center justify-between text-xs font-semibold text-[#594045]">
+        <div className="flex items-center justify-between text-xs font-semibold text-[#667064]">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <Link href="/" className="hover:text-[#9B0044]">Home</Link>
+            <Link href="/" className="hover:text-[#183e35]">Home</Link>
             <span>/</span>
-            <Link href={`/c/${business.primaryCategory}`} className="hover:text-[#9B0044] capitalize">
+            <Link href={`/c/${business.primaryCategory}`} className="hover:text-[#183e35] capitalize">
               {business.primaryCategory.replace(/-/g, ' ')}
             </Link>
             <span>/</span>
-            <span className="text-[#001C3B] font-bold truncate max-w-[150px]">{business.name}</span>
+            <span className="text-[#243b32] font-bold truncate max-w-[150px]">{business.name}</span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handleShare}
-              className="bg-white hover:bg-[#F0F3FF] signboard-border px-2.5 py-1 rounded-full text-xs font-bold text-[#001C3B] flex items-center gap-1 press-action"
+              className="bg-white hover:bg-[#e9eedf] signboard-border px-2.5 py-1 rounded-full text-xs font-bold text-[#243b32] flex items-center gap-1 press-action"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Share</span>
             </button>
             <button
               onClick={() => setReportModalOpen(true)}
-              className="text-[#8D6F75] hover:text-[#BA1A1A] p-1"
+              className="text-[#758071] hover:text-[#a7302d] p-1"
               title="Report issue"
             >
               <AlertCircle className="w-4 h-4" />
@@ -213,7 +213,7 @@ export default function BusinessProfilePage({
 
         {/* GALLERY SECTION */}
         <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl overflow-hidden">
-          <div className="relative h-64 sm:h-80 md:h-96 w-full bg-[#E7EEFF]">
+          <div className="relative h-64 sm:h-80 md:h-96 w-full bg-[#edf2e5]">
             {business.photos.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -222,14 +222,14 @@ export default function BusinessProfilePage({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#594045]">
+              <div className="w-full h-full flex items-center justify-center text-[#667064]">
                 No photos available
               </div>
             )}
 
             {/* Photo Counter Badge */}
             {business.photos.length > 1 && (
-              <div className="absolute bottom-3 right-3 bg-[#001C3B]/80 text-white font-display text-xs font-bold px-2.5 py-1 rounded-full signboard-border backdrop-blur-xs">
+              <div className="absolute bottom-3 right-3 bg-[#243b32]/80 text-white font-display text-xs font-bold px-2.5 py-1 rounded-full signboard-border backdrop-blur-xs">
                 {activePhotoIdx + 1} / {business.photos.length}
               </div>
             )}
@@ -237,14 +237,14 @@ export default function BusinessProfilePage({
 
           {/* Photo Thumbnails Strip */}
           {business.photos.length > 1 && (
-            <div className="p-3 bg-[#F9F9FF] border-t border-[#001C3B] flex gap-2 overflow-x-auto">
+            <div className="p-3 bg-[#ffffff] border-t border-[#dfe5d8] flex gap-2 overflow-x-auto">
               {business.photos.map((photo, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => setActivePhotoIdx(i)}
                   className={`w-16 h-16 rounded overflow-hidden signboard-border shrink-0 press-action ${
-                    activePhotoIdx === i ? 'ring-2 ring-[#9B0044]' : 'opacity-70'
+                    activePhotoIdx === i ? 'ring-2 ring-[#183e35]' : 'opacity-70'
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -259,28 +259,28 @@ export default function BusinessProfilePage({
         <div className="bg-white signboard-border-thick signboard-shadow rounded-xl p-5 md:p-6 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             {isFeatured && (
-              <span className="bg-[#FFC53D] text-[#001C3B] font-display font-black text-xs px-2.5 py-1 rounded signboard-border signboard-shadow-sm flex items-center gap-1 uppercase tracking-tight">
-                <Star className="w-3.5 h-3.5 fill-[#001C3B]" />
+              <span className="bg-[#d9f279] text-[#243b32] font-display font-black text-xs px-2.5 py-1 rounded signboard-border signboard-shadow-sm flex items-center gap-1 uppercase tracking-tight">
+                <Star className="w-3.5 h-3.5 fill-[#243b32]" />
                 FEATURED
               </span>
             )}
 
             {isRecommended && !isFeatured && (
-              <span className="bg-[#0B6E70] text-white font-display font-black text-xs px-2.5 py-1 rounded signboard-border signboard-shadow-sm flex items-center gap-1 uppercase tracking-tight">
+              <span className="bg-[#335e41] text-white font-display font-black text-xs px-2.5 py-1 rounded signboard-border signboard-shadow-sm flex items-center gap-1 uppercase tracking-tight">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 RECOMMENDED
               </span>
             )}
 
             {business.verificationLevel === 'L2' && (
-              <span className="bg-white text-[#001C3B] font-display font-bold text-xs px-2 py-0.5 rounded signboard-border flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#0B6E70]" />
+              <span className="bg-white text-[#243b32] font-display font-bold text-xs px-2 py-0.5 rounded signboard-border flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#335e41]" />
                 Verified by Team
               </span>
             )}
 
             {isAvailableNow && (
-              <span className="bg-[#E7EEFF] text-[#005658] font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5">
+              <span className="bg-[#edf2e5] text-[#183e35] font-bold text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
                 Available Right Now
               </span>
@@ -288,47 +288,47 @@ export default function BusinessProfilePage({
           </div>
 
           <div>
-            <h1 className="font-display font-black text-3xl md:text-4xl text-[#001C3B] uppercase tracking-tight">
+            <h1 className="font-display font-black text-3xl md:text-4xl text-[#243b32] uppercase tracking-tight">
               {business.name}
             </h1>
-            <p className="text-sm md:text-base text-[#594045] mt-1 font-body">
+            <p className="text-sm md:text-base text-[#667064] mt-1 font-body">
               {business.tagline}
             </p>
           </div>
 
           {/* Location & Status meta */}
-          <div className="pt-2 border-t border-[#D5DCE4] flex flex-wrap items-center gap-x-4 gap-y-2 text-xs md:text-sm text-[#001C3B]">
+          <div className="pt-2 border-t border-[#dfe5d8] flex flex-wrap items-center gap-x-4 gap-y-2 text-xs md:text-sm text-[#243b32]">
             <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4 text-[#C2185B] flex-shrink-0" />
+              <MapPin className="w-4 h-4 text-[#335e41] flex-shrink-0" />
               <span className="font-semibold">{business.landmark}</span>
               {business.walkTime && (
-                <span className="text-[#594045]">({business.walkTime})</span>
+                <span className="text-[#667064]">({business.walkTime})</span>
               )}
             </div>
 
             <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4 text-[#0B6E70] flex-shrink-0" />
+              <Clock className="w-4 h-4 text-[#335e41] flex-shrink-0" />
               {todayHours && !todayHours.closed ? (
                 <span>
-                  <strong className="text-[#0B6E70]">Open today:</strong> {todayHours.open} - {todayHours.close}
+                  <strong className="text-[#335e41]">Open today:</strong> {todayHours.open} - {todayHours.close}
                 </span>
               ) : (
-                <span className="text-[#BA1A1A] font-bold">Closed today</span>
+                <span className="text-[#a7302d] font-bold">Closed today</span>
               )}
             </div>
           </div>
 
           {/* Unclaimed Notice if applicable */}
           {!business.isClaimed && (
-            <div className="p-3 bg-[#FFF4DC] signboard-border rounded-lg flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-[#795900]">
+            <div className="p-3 bg-[#eff4da] signboard-border rounded-lg flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 text-[#526936]">
                 <Store className="w-4 h-4 flex-shrink-0" />
                 <span>Is this your shop? Claim it with your ambassador code to manage it.</span>
               </div>
               <button
                 type="button"
                 onClick={() => setClaimModalOpen(true)}
-                className="bg-[#001C3B] text-white px-3 py-1 rounded-full font-bold uppercase text-[10px]"
+                className="bg-[#243b32] text-white px-3 py-1 rounded-full font-bold uppercase text-[10px]"
               >
                 Claim Shop
               </button>
@@ -340,7 +340,7 @@ export default function BusinessProfilePage({
             <a
               href={`tel:${business.phone}`}
               onClick={handleCall}
-              className="bg-[#C2185B] hover:bg-[#9E1049] text-white font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
+              className="bg-[#335e41] hover:bg-[#2c5141] text-white font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
             >
               <Phone className="w-4 h-4" />
               <span>Call ({business.phone})</span>
@@ -351,7 +351,7 @@ export default function BusinessProfilePage({
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleWhatsApp}
-              className="bg-[#25D366] hover:bg-[#20ba5a] text-[#001C3B] font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
+              className="bg-[#25D366] hover:bg-[#20ba5a] text-[#243b32] font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
             >
               <WhatsAppIcon className="w-4 h-4" />
               <span>WhatsApp Message</span>
@@ -359,9 +359,9 @@ export default function BusinessProfilePage({
             <button
               type="button"
               onClick={() => setBookingModalOpen(true)}
-              className="bg-white hover:bg-[#F0F3FF] text-[#001C3B] font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
+              className="bg-white hover:bg-[#e9eedf] text-[#243b32] font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
             >
-              <Calendar className="w-4 h-4 text-[#9B0044]" />
+              <Calendar className="w-4 h-4 text-[#183e35]" />
               <span>Request Booking</span>
             </button>
           </div>
@@ -369,21 +369,21 @@ export default function BusinessProfilePage({
 
         {/* ABOUT SECTION */}
         <section className="bg-white signboard-border rounded-xl p-5 md:p-6 space-y-3 signboard-shadow">
-          <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase tracking-tight flex items-center gap-1.5">
-            <Info className="w-5 h-5 text-[#9B0044]" />
+          <h2 className="font-display font-bold text-xl text-[#243b32] uppercase tracking-tight flex items-center gap-1.5">
+            <Info className="w-5 h-5 text-[#183e35]" />
             About {business.name}
           </h2>
-          <p className="text-sm md:text-base text-[#001C3B] leading-relaxed whitespace-pre-line font-body">
+          <p className="text-sm md:text-base text-[#243b32] leading-relaxed whitespace-pre-line font-body">
             {business.description}
           </p>
 
           {/* Service modes chips */}
           <div className="pt-2 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-[#594045] uppercase">Mode:</span>
+            <span className="text-xs font-bold text-[#667064] uppercase">Mode:</span>
             {business.serviceModes.map((mode) => (
               <span
                 key={mode}
-                className="bg-[#F0F3FF] text-[#001C3B] text-xs font-semibold px-2.5 py-1 rounded-full signboard-border"
+                className="bg-[#e9eedf] text-[#243b32] text-xs font-semibold px-2.5 py-1 rounded-full signboard-border"
               >
                 {mode === 'at_shop'
                   ? 'At Shop'
@@ -400,22 +400,22 @@ export default function BusinessProfilePage({
         {/* SERVICES AND PRICES TABLE */}
         <section className="bg-white signboard-border rounded-xl p-5 md:p-6 space-y-4 signboard-shadow">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase tracking-tight flex items-center gap-1.5">
-              <Tag className="w-5 h-5 text-[#9B0044]" />
+            <h2 className="font-display font-bold text-xl text-[#243b32] uppercase tracking-tight flex items-center gap-1.5">
+              <Tag className="w-5 h-5 text-[#183e35]" />
               Services & Price List
             </h2>
-            <span className="text-xs text-[#594045]">Prices in KES</span>
+            <span className="text-xs text-[#667064]">Prices in KES</span>
           </div>
 
-          <div className="divide-y divide-[#D5DCE4]">
+          <div className="divide-y divide-[#dfe5d8]">
             {business.services.map((item) => (
               <div key={item.id} className="py-3 flex items-center justify-between gap-4">
                 <div>
-                  <div className="font-semibold text-sm text-[#001C3B]">{item.name}</div>
-                  {item.note && <div className="text-xs text-[#594045] mt-0.5">{item.note}</div>}
+                  <div className="font-semibold text-sm text-[#243b32]">{item.name}</div>
+                  {item.note && <div className="text-xs text-[#667064] mt-0.5">{item.note}</div>}
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="font-display font-bold text-base text-[#001C3B]">
+                  <div className="font-display font-bold text-base text-[#243b32]">
                     {item.priceFrom ? `KSh ${item.priceFrom.toLocaleString()}` : 'Contact for price'}
                     {item.unit ? ` / ${item.unit}` : ''}
                   </div>
@@ -426,11 +426,11 @@ export default function BusinessProfilePage({
 
           {/* Student discount banner */}
           {business.studentDiscount && (
-            <div className="bg-[#FFF4DC] signboard-border p-3 rounded-lg flex items-center gap-3">
-              <Tag className="w-6 h-6 text-[#795900] flex-shrink-0" />
+            <div className="bg-[#eff4da] signboard-border p-3 rounded-lg flex items-center gap-3">
+              <Tag className="w-6 h-6 text-[#526936] flex-shrink-0" />
               <div>
-                <div className="font-bold text-xs uppercase text-[#795900]">Student Discount Available</div>
-                <div className="text-sm font-semibold text-[#261900]">{business.studentDiscount}</div>
+                <div className="font-bold text-xs uppercase text-[#526936]">Student Discount Available</div>
+                <div className="text-sm font-semibold text-[#243b32]">{business.studentDiscount}</div>
               </div>
             </div>
           )}
@@ -438,8 +438,8 @@ export default function BusinessProfilePage({
 
         {/* OPENING HOURS */}
         <section className="bg-white signboard-border rounded-xl p-5 md:p-6 space-y-3 signboard-shadow">
-          <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase tracking-tight flex items-center gap-1.5">
-            <Clock className="w-5 h-5 text-[#9B0044]" />
+          <h2 className="font-display font-bold text-xl text-[#243b32] uppercase tracking-tight flex items-center gap-1.5">
+            <Clock className="w-5 h-5 text-[#183e35]" />
             Opening Hours
           </h2>
 
@@ -450,7 +450,7 @@ export default function BusinessProfilePage({
                 <div
                   key={day}
                   className={`p-2 rounded flex justify-between items-center ${
-                    isToday ? 'bg-[#FFDEA0] font-bold text-[#261900] signboard-border' : 'text-[#594045]'
+                    isToday ? 'bg-[#e9eedf] font-bold text-[#243b32] signboard-border' : 'text-[#667064]'
                   }`}
                 >
                   <span className="capitalize">{day}</span>
@@ -464,24 +464,24 @@ export default function BusinessProfilePage({
         {/* LOCATION & LANDMARK MAP */}
         <section className="bg-white signboard-border rounded-xl p-5 md:p-6 space-y-4 signboard-shadow">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase tracking-tight flex items-center gap-1.5">
-              <MapPin className="w-5 h-5 text-[#9B0044]" />
+            <h2 className="font-display font-bold text-xl text-[#243b32] uppercase tracking-tight flex items-center gap-1.5">
+              <MapPin className="w-5 h-5 text-[#183e35]" />
               Location & Campus Directions
             </h2>
             <button
               onClick={handleDirections}
-              className="bg-[#001C3B] text-white text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 press-action"
+              className="bg-[#243b32] text-white text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 press-action"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Open Google Maps</span>
             </button>
           </div>
 
-          <div className="p-3.5 bg-[#F0F3FF] rounded-lg signboard-border space-y-1.5 text-sm text-[#001C3B]">
+          <div className="p-3.5 bg-[#e9eedf] rounded-lg signboard-border space-y-1.5 text-sm text-[#243b32]">
             <div>
               <strong>Landmark:</strong> {business.landmark}
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-[#594045] pt-1 border-t border-[#001C3B]/10">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[#667064] pt-1 border-t border-[#dfe5d8]/10">
               {business.walkTime && (
                 <span>
                   <strong>Walk time:</strong> {business.walkTime} from campus
@@ -492,7 +492,7 @@ export default function BusinessProfilePage({
                   <strong>GPS:</strong> {business.mapPin.lat.toFixed(4)}° N, {business.mapPin.lng.toFixed(4)}° E
                 </span>
               )}
-              <span className="text-[#0B6E70] font-semibold">
+              <span className="text-[#335e41] font-semibold">
                 ✓ Physically verified on campus
               </span>
             </div>
@@ -501,15 +501,15 @@ export default function BusinessProfilePage({
           {/* Interactive Map Visual */}
           <div
             onClick={handleDirections}
-            className="h-48 md:h-64 bg-[#E7EEFF] signboard-border rounded-lg relative overflow-hidden flex items-center justify-center cursor-pointer group"
+            className="h-48 md:h-64 bg-[#edf2e5] signboard-border rounded-lg relative overflow-hidden flex items-center justify-center cursor-pointer group"
           >
             {/* Styled Map Background Representation */}
-            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#001C3B_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#243b32_1px,transparent_1px)] [background-size:16px_16px]"></div>
             <div className="z-10 bg-white signboard-border p-3.5 rounded-lg signboard-shadow text-center space-y-1">
-              <MapPin className="w-8 h-8 text-[#C2185B] mx-auto" />
-              <div className="font-bold text-sm text-[#001C3B]">{business.name}</div>
-              <div className="text-xs text-[#594045]">{business.landmark}</div>
-              <div className="text-[11px] text-[#9B0044] font-bold pt-1">
+              <MapPin className="w-8 h-8 text-[#335e41] mx-auto" />
+              <div className="font-bold text-sm text-[#243b32]">{business.name}</div>
+              <div className="text-xs text-[#667064]">{business.landmark}</div>
+              <div className="text-[11px] text-[#183e35] font-bold pt-1">
                 Tap to navigate with Google Maps
               </div>
             </div>
@@ -519,8 +519,8 @@ export default function BusinessProfilePage({
         {/* SIMILAR NEARBY BUSINESSES */}
         {similarBusinesses.length > 0 && (
           <section className="space-y-4 pt-4">
-            <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase tracking-tight flex items-center gap-1.5">
-              <ThumbsUp className="w-5 h-5 text-[#9B0044]" />
+            <h2 className="font-display font-bold text-xl text-[#243b32] uppercase tracking-tight flex items-center gap-1.5">
+              <ThumbsUp className="w-5 h-5 text-[#183e35]" />
               Similar Nearby Shops
             </h2>
 
@@ -534,11 +534,11 @@ export default function BusinessProfilePage({
       </main>
 
       {/* STICKY BOTTOM CONTACT BAR (MOBILE THUMB-REACH) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#001C3B] p-2.5 z-40 shadow-lg grid grid-cols-2 gap-2">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#dfe5d8] p-2.5 z-40 shadow-lg grid grid-cols-2 gap-2">
         <a
           href={`tel:${business.phone}`}
           onClick={handleCall}
-          className="w-full bg-[#C2185B] text-white font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-1.5"
+          className="w-full bg-[#335e41] text-white font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-1.5"
         >
           <Phone className="w-4 h-4" />
           <span>Call Now</span>
@@ -549,7 +549,7 @@ export default function BusinessProfilePage({
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleWhatsApp}
-          className="w-full bg-[#25D366] text-[#001C3B] font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-1.5"
+          className="w-full bg-[#25D366] text-[#243b32] font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-1.5"
         >
           <WhatsAppIcon className="w-4 h-4" />
           <span>WhatsApp</span>
@@ -583,7 +583,7 @@ export default function BusinessProfilePage({
 
       {/* Share Toast */}
       {shareToast && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#001C3B] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border signboard-shadow-lg z-50">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#243b32] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border signboard-shadow-lg z-50">
           Link copied to clipboard!
         </div>
       )}

@@ -4,6 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { BottomNav } from '@/components/BottomNav';
 import { BookingModal } from '@/components/BookingModal';
 import { ReportModal } from '@/components/ReportModal';
 import { ClaimModal } from '@/components/ClaimModal';
@@ -557,6 +558,7 @@ export default function BusinessProfilePage({
       </div>
 
       <Footer />
+      <BottomNav />
 
       {/* MODALS */}
       {bookingModalOpen && (

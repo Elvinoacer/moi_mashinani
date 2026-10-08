@@ -107,7 +107,7 @@ export function BusinessCard({
   return (
     <>
       <div
-        className={`bg-white border border-[#dfe5d8] rounded-xl shadow-[0_10px_28px_#243b3212] relative overflow-hidden transition-all duration-100 flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-[0_10px_28px_#243b3212] ${
+        className={`directory-card bg-white border border-[#dfe5d8] rounded-[19px] relative overflow-hidden flex flex-col justify-between ${
           isFeatured ? 'border-l-[6px] border-l-[#d9f279]' : isRecommended ? 'border-l-[6px] border-l-[#335e41]' : ''
         }`}
       >
@@ -116,7 +116,7 @@ export function BusinessCard({
           <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
             <div className="flex flex-wrap items-center gap-1.5">
               {isFeatured && (
-                <span className="bg-[#d9f279] text-[#243b32] text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] flex items-center gap-1 uppercase tracking-tight">
+                <span className="bg-[#d9f279] text-[#243b32] text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded-md border border-[#dfe5d8] flex items-center gap-1 uppercase tracking-tight">
                   <Star className="w-3 h-3 fill-[#243b32]" />
                   FEATURED
                 </span>
@@ -172,7 +172,7 @@ export function BusinessCard({
           <div className="flex gap-3 items-start">
             {/* Photo / Thumbnail */}
             <Link href={`/b/${business.slug}`} className="relative shrink-0 block">
-              <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-lg border border-[#dfe5d8] overflow-hidden bg-[#e9eedf]">
+              <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-[13px] border border-[#dfe5d8] overflow-hidden bg-[#e9eedf]">
                 {business.coverPhoto || business.photos[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -240,7 +240,7 @@ export function BusinessCard({
         </div>
 
         {/* Action Strip: Directions + Two-Tap Call & WhatsApp */}
-        <div className="border-t-[1.5px] border-[#dfe5d8] bg-[#ffffff] p-2 sm:p-2.5">
+        <div className="border-t border-[#dfe5d8] bg-[#fafbf7] p-2 sm:p-2.5">
           <div className="grid grid-cols-12 gap-2">
             {/* Directions button */}
             {showDirectionsButton && (
@@ -248,7 +248,7 @@ export function BusinessCard({
                 type="button"
                 onClick={handleDirections}
                 title="Get walking directions in Google Maps"
-                className="col-span-4 bg-[#edf2e5] hover:bg-[#e9eedf] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] press-action flex items-center justify-center gap-1"
+                className="col-span-4 bg-[#edf2e5] hover:bg-[#e9eedf] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1"
               >
                 <Navigation className="w-3.5 h-3.5 text-[#335e41] flex-shrink-0" />
                 <span className="truncate">MAPS</span>
@@ -261,7 +261,7 @@ export function BusinessCard({
               onClick={handleCall}
               className={`${
                 showDirectionsButton ? 'col-span-4' : 'col-span-6'
-              } bg-[#335e41] hover:bg-[#2c5141] text-white text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] press-action flex items-center justify-center gap-1`}
+              } bg-[#335e41] hover:bg-[#2c5141] text-white text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1`}
             >
               <Phone className="w-3.5 h-3.5 flex-shrink-0" />
               <span>CALL</span>
@@ -275,7 +275,7 @@ export function BusinessCard({
               onClick={handleWhatsApp}
               className={`${
                 showDirectionsButton ? 'col-span-4' : 'col-span-6'
-              } bg-[#25D366] hover:bg-[#20ba5a] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] press-action flex items-center justify-center gap-1`}
+              } bg-[#25D366] hover:bg-[#20ba5a] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1`}
             >
               <WhatsAppIcon className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">WHATSAPP</span>

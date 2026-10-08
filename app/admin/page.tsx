@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { BottomNav } from '@/components/BottomNav';
 import { Business, ProblemReport, ServiceRequest } from '@/lib/types';
 import {
   ShieldAlert,
@@ -397,6 +398,7 @@ export default function AdminConsolePage() {
       </main>
 
       <Footer />
+      <BottomNav />
     </div>
   );
 }

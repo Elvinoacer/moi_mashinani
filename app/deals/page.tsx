@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { Business } from '@/lib/types';
 import { BusinessCard } from '@/components/BusinessCard';
+import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { CheckCircle2, Tag, Percent, ShieldCheck } from '@/components/icons';
 
 export default function DealsAndSafetyPage() {
@@ -73,6 +74,8 @@ export default function DealsAndSafetyPage() {
             </div>
           )}
         </section>
+
+        <JoinNeighborhoodCard />
 
         {/* TRUST & VERIFICATION LEVELS */}
         <section className="bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8 space-y-6">

@@ -30,7 +30,7 @@ function NavbarInner() {
     const params = new URLSearchParams(searchParams.toString());
     if (zone === "all") params.delete("zone");
     else params.set("zone", zone);
-    router.push(\`\${pathname}\${params.size ? \`?\${params.toString()}\` : ""}\`);
+    router.push(`${pathname}${params.size ? `?${params.toString()}` : ""}`);
   }
 
   function submitSearch(event: React.FormEvent<HTMLFormElement>) {
@@ -39,7 +39,7 @@ function NavbarInner() {
     const params = new URLSearchParams({ q: query.trim() });
     if (currentZone !== "all") params.set("zone", currentZone);
     setMobileOpen(false);
-    router.push(\`/search?\${params.toString()}\`);
+    router.push(`/search?${params.toString()}`);
   }
 
   return (
@@ -62,7 +62,7 @@ function NavbarInner() {
                   <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#667064]">Look around campus</p>
                   {ZONES.map((zone) => (
                     <button key={zone.slug} type="button" onClick={() => selectZone(zone.slug)}
-                      className={\`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-xs hover:bg-[#f2f5eb] \${currentZone === zone.slug ? "bg-[#e9eedf] text-[#183e35]" : "text-[#667064]"}\`}>
+                      className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-xs hover:bg-[#f2f5eb] ${currentZone === zone.slug ? "bg-[#e9eedf] text-[#183e35]" : "text-[#667064]"}`}>
                       <span><strong className="block text-[#183e35]">{zone.name}</strong><small>{zone.landmarkHint}</small></span>
                       {currentZone === zone.slug && <Check size={17} className="shrink-0 text-[#335e41]" />}
                     </button>
@@ -82,7 +82,7 @@ function NavbarInner() {
         <nav aria-label="Main navigation" className="hidden items-center gap-5 md:flex lg:gap-6">
           {navLinks.map(({ href, label }) => (
             <Link key={href} href={href} aria-current={pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard")) ? "page" : undefined}
-              className={\`relative inline-flex min-h-11 items-center text-[12px] font-semibold transition-colors hover:text-[#183e35] \${pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard")) ? "text-[#183e35] after:absolute after:bottom-[7px] after:left-0 after:h-[2px] after:w-6 after:bg-[#335e41]" : "text-[#667064]"}\`}>
+              className={`relative inline-flex min-h-11 items-center text-[12px] font-semibold transition-colors hover:text-[#183e35] ${pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard")) ? "text-[#183e35] after:absolute after:bottom-[7px] after:left-0 after:h-[2px] after:w-6 after:bg-[#335e41]" : "text-[#667064]"}`}>
               {label}
             </Link>
           ))}

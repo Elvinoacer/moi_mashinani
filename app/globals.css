@@ -2,25 +2,25 @@
 
 @layer base {
   :root {
-    --chalk: #f2f5f8;
+    --chalk: #f7f8f2;
     --paper: #ffffff;
-    --surface: #f9f9ff;
-    --midnight: #001c3b;
-    --slate: #5b6b7f;
-    --line: #d5dce4;
-    --bougainvillea: #c2185b;
-    --bougainvillea-pressed: #9e1049;
-    --primary: #9b0044;
-    --primary-container: #c2185b;
-    --jua: #ffc53d;
-    --secondary: #795900;
-    --secondary-container: #fdc33b;
-    --teal: #0b6e70;
-    --tertiary: #005658;
+    --surface: #f7f8f2;
+    --midnight: #243b32;
+    --slate: #667064;
+    --line: #dfe5d8;
+    --bougainvillea: #335e41;
+    --bougainvillea-pressed: #2c5141;
+    --primary: #183e35;
+    --primary-container: #335e41;
+    --jua: #d9f279;
+    --secondary: #526936;
+    --secondary-container: #e9eedf;
+    --teal: #335e41;
+    --tertiary: #183e35;
     --whatsapp: #25d366;
     --danger: #b3261e;
-    --on-surface: #001c3b;
-    --on-surface-variant: #594045;
+    --on-surface: #243b32;
+    --on-surface-variant: #667064;
   }
 
   body {
@@ -43,34 +43,77 @@
   font-family: var(--font-manrope), Arial, sans-serif !important;
 }
 
-/* Vernacular Signboard Outlines & Shadows */
-.signboard-border {
-  border: 1.5px solid #001c3b;
-}
-
+/* Legacy class hooks remain for compatibility with existing commerce and moderation flows.
+   Their visual treatment now matches the approved soft-edged landing aesthetic. */
+.signboard-border,
 .signboard-border-thick {
-  border: 2px solid #001c3b;
+  border: 1px solid #dfe5d8;
 }
-
-.signboard-shadow {
-  box-shadow: 2px 2px 0px #001c3b;
-}
-
-.signboard-shadow-lg {
-  box-shadow: 4px 4px 0px #001c3b;
-}
-
 .signboard-shadow-sm {
-  box-shadow: 1px 1px 0px #001c3b;
+  box-shadow: 0 2px 8px #243b320c;
 }
-
+.signboard-shadow {
+  box-shadow: 0 7px 20px #243b3210;
+}
+.signboard-shadow-lg {
+  box-shadow: 0 12px 32px #243b3218;
+}
 .press-action {
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.press-action:hover {
+  transform: translateY(-1px);
+}
+.press-action:active {
+  transform: translateY(0);
 }
 
-.press-action:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px #001c3b !important;
+/* Shared inner-page design language. The landing page uses its own scoped module
+   and is intentionally not affected by any rules below. */
+.interior-page {
+  --forest: #183e35;
+  --ink: #243b32;
+  --lime: #d9f279;
+  min-height: 100vh;
+  background: #f7f8f2;
+  color: #243b32;
+}
+.interior-page :is(h1,h2,h3) {
+  font-family: var(--font-manrope), Arial, sans-serif;
+  text-transform: none;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+.interior-page h1 {
+  font-weight: 760;
+}
+.interior-page h2 {
+  font-weight: 740;
+}
+.interior-page h3 {
+  font-weight: 710;
+}
+.interior-page :is(button, input, select, textarea, a):focus-visible {
+  outline: 2px solid #708f42;
+  outline-offset: 3px;
+}
+.interior-page :is(input,select,textarea) {
+  accent-color: #335e41;
+}
+.interior-page :is(button, a, select, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+.interior-page main > :is(section,div).signboard-border,
+.interior-page main > :is(section,div).signboard-border-thick {
+  border-radius: 19px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .interior-page *,
+  .interior-page *::before,
+  .interior-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 /* Hide scrollbar for clean horizontal scrolls */

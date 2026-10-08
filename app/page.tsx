@@ -1,504 +1,503 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { BusinessCard } from '@/components/BusinessCard';
-import { DemandModal } from '@/components/DemandModal';
-import { CampusRadarDiscovery } from '@/components/CampusRadarDiscovery';
-import { CATEGORIES } from '@/lib/constants';
-import { Business } from '@/lib/types';
-import { useNow } from '@/lib/useNow';
+import Link from "next/link";
+import { connection } from "next/server";
 import {
-  Search,
-  ArrowRight,
-  CategoryIcon,
-  Star,
-  Percent,
-  ChevronRight,
-  HelpCircle,
-  Smartphone,
+  ArrowDown,
+  ArrowDownRight,
+  ArrowUpRight,
+  Check,
+  ChevronDown,
+  Compass,
+  Headphones,
+  MapPin,
+  MessageCircle,
+  Plus,
   Printer,
   Scissors,
-  Flame,
+  Search,
   Shirt,
-  Building2,
+  ShoppingBag,
+  Store as StoreIcon,
   UtensilsCrossed,
-  Tag,
-  WhatsAppIcon,
-} from '@/components/icons';
+  Wrench,
+  Building2,
+} from "lucide-react";
+import { Store } from "@/lib/store";
+import { CATEGORIES, ZONES } from "@/lib/constants";
+import {
+  LandingSearch,
+  LocalDiscoveries,
+  type LandingBusiness,
+} from "@/components/landing/Discovery";
+import styles from "./home.module.css";
 
-export default function HomePage() {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [demandModalOpen, setDemandModalOpen] = useState(false);
+const shortcuts = [
+  {
+    slug: "food-cafes",
+    label: "Food & drinks",
+    icon: UtensilsCrossed,
+    tone: "peach",
+  },
+  {
+    slug: "hair-beauty-kinyozi",
+    label: "Beauty & hair",
+    icon: Scissors,
+    tone: "pink",
+  },
+  {
+    slug: "wifi-tech-gadgets",
+    label: "Tech & gadgets",
+    icon: Headphones,
+    tone: "lavender",
+  },
+  {
+    slug: "phone-laptop-repair",
+    label: "Repairs & fundis",
+    icon: Wrench,
+    tone: "yellow",
+  },
+  {
+    slug: "printing-cyber",
+    label: "Printing & cyber",
+    icon: Printer,
+    tone: "blue",
+  },
+  { slug: "laundry-mama-fua", label: "Laundry", icon: Shirt, tone: "mint" },
+  {
+    slug: "hostels-rooms",
+    label: "Places to stay",
+    icon: Building2,
+    tone: "sand",
+  },
+];
 
-  // Inline demand capture
-  const [demandService, setDemandService] = useState('');
-  const [demandPhone, setDemandPhone] = useState('');
-  const [demandSent, setDemandSent] = useState(false);
-  const [demandSubmitting, setDemandSubmitting] = useState(false);
+function Brand() {
+  return (
+    <Link href="/" className={styles.brand} aria-label="MoiMashinani home">
+      <span className={styles.brandMark}>
+        <MapPin size={22} strokeWidth={2.6} />
+      </span>
+      <span>
+        moi<span className={styles.brandLight}>mashinani</span>
+        <span className={styles.brandDot}>.</span>
+      </span>
+    </Link>
+  );
+}
 
-  useEffect(() => {
-    fetch('/api/businesses')
-      .then((res) => res.json())
-      .then((data) => {
-        setBusinesses(data.results || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load businesses:', err);
-        setLoading(false);
-      });
-  }, []);
+function NeighborhoodScene() {
+  return (
+    <div className={styles.scene} aria-label="Explore businesses around campus">
+      <div className={styles.sceneGrid} aria-hidden="true" />
+      <svg
+        className={styles.streets}
+        viewBox="0 0 520 460"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M-30 240L160 130L345 230L540 115M155 -30L155 130L155 330L390 465M-20 425L155 330L345 230L345 -20"
+          stroke="#cfdbcb"
+          strokeWidth="34"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M-30 240L160 130L345 230L540 115M155 -30L155 130L155 330L390 465M-20 425L155 330L345 230L345 -20"
+          stroke="#f7faf0"
+          strokeWidth="26"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M155 330L155 130L345 230L435 179"
+          stroke="#689481"
+          strokeWidth="2"
+          strokeDasharray="5 7"
+          className={styles.routeLine}
+        />
+        <rect
+          x="208"
+          y="47"
+          width="90"
+          height="56"
+          rx="13"
+          fill="#cbdabd"
+          transform="rotate(29 208 47)"
+        />
+        <rect
+          x="342"
+          y="320"
+          width="112"
+          height="67"
+          rx="15"
+          fill="#d5dfc3"
+          transform="rotate(-28 342 320)"
+        />
+        <rect
+          x="24"
+          y="277"
+          width="63"
+          height="44"
+          rx="9"
+          fill="#ccdabc"
+          transform="rotate(-29 24 277)"
+        />
+        <circle cx="65" cy="117" r="27" fill="#d1dfc1" />
+        <circle cx="446" cy="281" r="21" fill="#c8d9b6" />
+        <circle cx="264" cy="364" r="12" fill="#d3dfbe" />
+        <circle cx="435" cy="77" r="15" fill="#c8d9b6" />
+      </svg>
+      <span className={styles.mapLabel}>A LITTLE CLOSER TO EVERYTHING</span>
+      <Link
+        href="/c/food-cafes"
+        className={`${styles.sceneCard} ${styles.foodCard}`}
+      >
+        <div className={styles.foodIllustration} aria-hidden="true">
+          <span className={styles.plate}>
+            <span className={styles.burger}>
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className={styles.fries}>
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+          </span>
+          <span className={styles.foodSpark}>✳</span>
+        </div>
+        <span className={styles.sceneCardBody}>
+          <span className={styles.tinyLabel}>FOOD & DRINKS</span>
+          <strong>Cravings, sorted.</strong>
+          <span>
+            Find your next bite <ArrowUpRight size={15} />
+          </span>
+        </span>
+      </Link>
+      <Link
+        href="/c/hair-beauty-kinyozi"
+        className={`${styles.miniCard} ${styles.beautyCard}`}
+      >
+        <span className={styles.beautyIcon}>
+          <Scissors size={23} />
+        </span>
+        <span>
+          <small>A FRESH LOOK</small>
+          <strong>Your next good hair day.</strong>
+        </span>
+        <ArrowUpRight size={17} />
+      </Link>
+      <Link
+        href="/c/phone-laptop-repair"
+        className={`${styles.miniCard} ${styles.repairCard}`}
+      >
+        <span className={styles.repairIcon}>
+          <Wrench size={23} />
+        </span>
+        <span>
+          <small>A QUICK FIX</small>
+          <strong>There’s a fundi for that.</strong>
+        </span>
+        <ArrowUpRight size={17} />
+      </Link>
+      <span className={styles.campusPin}>
+        <span>
+          <MapPin size={22} fill="currentColor" stroke="white" />
+        </span>
+        <strong>Moi University</strong>
+      </span>
+      <span className={styles.sceneSticker} aria-hidden="true">
+        GOOD
+        <br />
+        THINGS
+        <br />
+        NEARBY <ArrowDownRight size={25} />
+      </span>
+      <span className={styles.mapDot} aria-hidden="true">
+        <ShoppingBag size={17} />
+      </span>
+      <span className={styles.sceneCaption}>
+        <span /> Made for life around campus
+      </span>
+    </div>
+  );
+}
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-  };
-
-  const handleInlineDemandSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!demandService.trim() || !demandPhone.trim()) return;
-    setDemandSubmitting(true);
-    try {
-      await fetch('/api/demand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          serviceName: demandService.trim(),
-          phone: demandPhone.trim(),
-          zone: 'kesses-centre',
-        }),
-      });
-      setDemandSent(true);
-      setDemandService('');
-      setDemandPhone('');
-    } catch (err) {
-      console.error('Failed to submit demand:', err);
-    } finally {
-      setDemandSubmitting(false);
-    }
-  };
-
-  const quickShortcuts = [
-    { label: 'Phone & Laptop Repair', query: 'screen', icon: Smartphone },
-    { label: 'Printing & Cyber', query: 'printing', icon: Printer },
-    { label: 'Braids & Salon', query: 'braids', icon: Scissors },
-    { label: 'Food & Cafes', query: 'food', icon: UtensilsCrossed },
-    { label: 'Gas Refill Delivery', query: 'gas', icon: Flame },
-    { label: 'Mama Fua (Laundry)', query: 'mama fua', icon: Shirt },
-    { label: 'Hostel Vacancies', query: 'hostel', icon: Building2 },
-    { label: 'Student Deals', href: '/deals', icon: Tag },
+export default async function HomePage() {
+  await connection();
+  const active = Store.getBusinesses().filter(
+    (business) => business.status === "ACTIVE" && !business.isTemporarilyClosed,
+  );
+  // Only serialize the public fields needed by the discovery cards.
+  const businesses: LandingBusiness[] = active.map(
+    ({
+      id,
+      name,
+      slug,
+      tagline,
+      primaryCategory,
+      zone,
+      coverPhoto,
+      verificationLevel,
+      services,
+      studentDiscount,
+      serviceModes,
+    }) => ({
+      id,
+      name,
+      slug,
+      tagline,
+      primaryCategory,
+      zone,
+      coverPhoto,
+      verificationLevel,
+      services,
+      studentDiscount,
+      serviceModes,
+      categoryName:
+        CATEGORIES.find((category) => category.slug === primaryCategory)
+          ?.name ?? "Local business",
+      zoneName: ZONES.find((item) => item.slug === zone)?.name ?? zone,
+    }),
+  );
+  const firstCategories = [
+    "food-cafes",
+    "hair-beauty-kinyozi",
+    "wifi-tech-gadgets",
+    "printing-cyber",
+  ];
+  const leading = firstCategories.flatMap(
+    (category) =>
+      businesses.find((business) => business.primaryCategory === category) ??
+      [],
+  );
+  const ordered = [
+    ...leading,
+    ...businesses.filter(
+      (business) => !leading.some((item) => item.id === business.id),
+    ),
   ];
 
-  const now = useNow();
-  const campusAnchorCoords = { lat: 0.2831, lng: 35.2905 }; // Moi Main Gate default
-  const availableNowListings = businesses.filter(
-    (b) => b.availableNowUntil && new Date(b.availableNowUntil).getTime() > now
-  );
-  const featuredListings = businesses.filter(
-    (b) => b.activeTier === 'FEATURED'
-  );
-  const dealsListings = businesses.filter((b) => Boolean(b.studentDiscount));
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F5F8] text-[#001C3B]">
-      <Navbar />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 pb-20 md:pb-12">
-        {/* HERO / SEARCH BAR SIGNBOARD SECTION */}
-        <section className="bg-white border-2 border-[#001C3B] shadow-[4px_4px_0px_#001C3B] rounded-2xl p-6 sm:p-8 md:p-10 relative overflow-hidden">
-          {/* Subtle Corner Badge */}
-          <div className="absolute top-0 right-0 bg-[#FFC53D] text-[#001C3B] font-display font-black text-[10px] sm:text-xs uppercase px-3 py-1 border-b border-l border-[#001C3B] shadow-sm transform rotate-0">
-            KESSES DIRECTORY
-          </div>
-
-          <div className="max-w-4xl space-y-4">
-            {/* Campus Pill */}
-            <div className="inline-flex items-center gap-2 bg-[#E7EEFF] text-[#0B6E70] text-xs font-display font-bold px-3 py-1 rounded-full border border-[#001C3B]">
-              <span className="w-2 h-2 rounded-full bg-[#0B6E70]"></span>
-              <span>MOI UNIVERSITY MAIN CAMPUS HYPER-LOCAL HUB</span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="font-display font-black text-2xl sm:text-4xl md:text-5xl text-[#001C3B] uppercase tracking-tight leading-[1.08]">
-              FIND LOCAL FUNDIS, SALONS & CYBER SERVICES AROUND CAMPUS IN SECONDS.
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-sm sm:text-base text-[#594045] max-w-2xl leading-relaxed">
-              From Stage to Cheboiywo Gate, connect with verified student fundis and kiosk operators within walking distance. <strong className="text-[#001C3B]">Two taps to Call or WhatsApp.</strong>
-            </p>
-
-            {/* Primary Search Box */}
-            <form onSubmit={handleSearchSubmit} className="pt-2">
-              <div className="relative flex flex-col sm:flex-row gap-2">
-                <div className="relative flex-1">
-                  <Search className="w-5 h-5 text-[#594045] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Try: laptop repair, braids, cyber printing, gas refill..."
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#F0F3FF] border-2 border-[#001C3B] rounded-xl text-sm sm:text-base text-[#001C3B] placeholder:text-[#594045] focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#9B0044] transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-[#001C3B] hover:bg-[#0B2545] text-white font-display font-black text-sm sm:text-base uppercase px-7 py-3.5 rounded-xl border-2 border-[#001C3B] shadow-[2px_2px_0px_#001C3B] press-action flex items-center justify-center gap-2"
-                >
-                  <span>Tafuta</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </form>
-
-            {/* Quick Intent Shortcut Chips */}
-            <div className="pt-2">
-              <div className="text-[11px] font-bold text-[#594045] uppercase tracking-wider mb-2">
-                Quick Shortcuts:
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {quickShortcuts.map((chip) => {
-                  const Icon = chip.icon;
-                  return (
-                    <button
-                      key={chip.label}
-                      type="button"
-                      onClick={() => {
-                        if (chip.href) {
-                          router.push(chip.href);
-                        } else if (chip.query) {
-                          router.push(`/search?q=${encodeURIComponent(chip.query)}`);
-                        }
-                      }}
-                      className="bg-[#F0F3FF] hover:bg-[#DEE8FF] border-[1.5px] border-[#001C3B] text-[#001C3B] text-xs font-semibold px-3 py-1.5 rounded-lg press-action flex items-center gap-1.5 shadow-[1px_1px_0px_#001C3B]"
-                    >
-                      <Icon className="w-3.5 h-3.5 text-[#0B6E70]" />
-                      <span>{chip.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* INTERACTIVE CAMPUS LOCATION & ZONE RADAR DISCOVERY */}
-        <CampusRadarDiscovery businesses={businesses} loading={loading} />
-
-        {/* AVAILABLE RIGHT NOW SECTION (Live Pulse) */}
-        {availableNowListings.length > 0 && (
-          <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#25D366] animate-pulse"></span>
-                <h2 className="font-display font-black text-lg sm:text-2xl text-[#001C3B] uppercase tracking-tight">
-                  Available Right Now in Kesses
-                </h2>
-                <span className="text-[10px] sm:text-xs bg-[#25D366]/20 text-[#005658] border border-[#25D366]/40 font-bold px-2 py-0.5 rounded-full uppercase">
-                  LIVE
-                </span>
-              </div>
-              <Link
-                href="/search?availableNow=true"
-                className="text-xs sm:text-sm font-bold text-[#9B0044] hover:underline flex items-center gap-0.5"
-              >
-                <span>See all</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <p className="text-xs text-[#594045] -mt-1">
-              Open right now — walk in or get quick delivery directly to campus hostels.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {availableNowListings.slice(0, 4).map((biz) => (
-                <BusinessCard
-                  key={biz.id}
-                  business={biz}
-                  anchorCoordinates={campusAnchorCoords}
-                  showDirectionsButton={true}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* FEATURED VERIFIED FUNDIS & SHOPS */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between border-l-4 border-l-[#FFC53D] pl-3">
-            <div>
-              <h2 className="font-display font-black text-lg sm:text-2xl text-[#001C3B] uppercase tracking-tight flex items-center gap-2">
-                <Star className="w-5 h-5 text-[#FFC53D] fill-[#FFC53D]" />
-                Featured Verified Fundis & Local Shops
-              </h2>
-              <p className="text-xs text-[#594045]">
-                Top-rated campus providers with trusted track records and physical presence in Kesses.
-              </p>
-            </div>
-            <Link
-              href="/search"
-              className="text-xs sm:text-sm font-bold text-[#9B0044] hover:underline flex items-center gap-0.5 flex-shrink-0"
-            >
-              <span>View all</span>
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-44 bg-white rounded-xl border border-[#001C3B] animate-pulse"></div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(featuredListings.length > 0 ? featuredListings : businesses.slice(0, 6)).map((biz) => (
-                <BusinessCard
-                  key={biz.id}
-                  business={biz}
-                  effectiveTier="FEATURED"
-                  anchorCoordinates={campusAnchorCoords}
-                  showDirectionsButton={true}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* BROWSE KESSES SERVICES BY CATEGORY */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-display font-black text-lg sm:text-2xl text-[#001C3B] uppercase tracking-tight">
-                Browse Kesses Services by Category
-              </h2>
-              <p className="text-xs text-[#594045]">
-                Click any category to filter verified local fundis and student service operators.
-              </p>
-            </div>
-            <span className="text-[11px] font-display font-bold bg-[#E7EEFF] text-[#001C3B] px-2 py-0.5 rounded border border-[#001C3B]">
-              12 CATEGORIES
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {CATEGORIES.map((cat) => {
-              const count = businesses.filter(
-                (b) => b.primaryCategory === cat.slug || b.extraCategories.includes(cat.slug)
-              ).length;
-
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/c/${cat.slug}`}
-                  className="bg-white hover:bg-[#F0F3FF] p-3.5 rounded-xl border-[1.5px] border-[#001C3B] shadow-[2px_2px_0px_#001C3B] press-action flex flex-col justify-between group transition-all"
-                >
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center border border-[#001C3B] mb-2.5 transition-colors"
-                    style={{ backgroundColor: `${cat.color}15`, color: cat.color }}
-                  >
-                    <CategoryIcon slug={cat.slug} className="w-5 h-5" />
-                  </div>
-
-                  <div>
-                    <h3 className="font-display font-bold text-xs sm:text-sm text-[#001C3B] group-hover:text-[#9B0044] leading-tight">
-                      {cat.name}
-                    </h3>
-                    <div className="text-[10px] text-[#594045] mt-1 flex items-center justify-between">
-                      <span>{count} listings</span>
-                      <ChevronRight className="w-3 h-3 text-[#594045] group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* STUDENT DEALS CALLOUT SECTION */}
-        {dealsListings.length > 0 && (
-          <section className="bg-[#FFF8E1] border-2 border-[#001C3B] shadow-[3px_3px_0px_#001C3B] rounded-2xl p-5 sm:p-7">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-[#795900] text-xs font-bold uppercase tracking-wider bg-[#FFDEA0] px-2.5 py-0.5 rounded border border-[#001C3B] mb-1">
-                  <Percent className="w-3.5 h-3.5" />
-                  <span>Moi University Student Perks</span>
-                </div>
-                <h2 className="font-display font-black text-xl sm:text-2xl text-[#261900] uppercase">
-                  Moi Student Special Deals & Discounts
-                </h2>
-                <p className="text-xs text-[#6F5100]">
-                  Show your student ID card to unlock these verified campus discounts.
-                </p>
-              </div>
-              <Link
-                href="/deals"
-                className="bg-[#795900] hover:bg-[#5C4300] text-white font-display font-bold text-xs uppercase px-4 py-2 rounded-full border border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center gap-1 flex-shrink-0"
-              >
-                <span>View All Deals</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {dealsListings.slice(0, 3).map((biz) => (
-                <div
-                  key={biz.id}
-                  className="bg-white p-3.5 rounded-xl border border-[#001C3B] shadow-sm flex items-center justify-between gap-3"
-                >
-                  <div className="min-w-0">
-                    <span className="text-[10px] font-extrabold uppercase bg-[#FFEAEF] text-[#9B0044] px-1.5 py-0.5 rounded border border-[#9B0044]/30">
-                      DISCOUNT
-                    </span>
-                    <div className="font-display font-bold text-sm text-[#001C3B] truncate mt-1">
-                      {biz.name}
-                    </div>
-                    <div className="text-xs font-bold text-[#795900]">
-                      {biz.studentDiscount}
-                    </div>
-                  </div>
-                  <Link
-                    href={`/b/${biz.slug}`}
-                    className="shrink-0 bg-[#001C3B] text-white text-xs font-bold px-3 py-1.5 rounded-full border border-[#001C3B] press-action"
-                  >
-                    Claim
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* CAN'T FIND IT? INLINE DEMAND DESK */}
-        <section className="bg-[#E7EEFF] border-2 border-[#001C3B] shadow-[4px_4px_0px_#001C3B] rounded-2xl p-6 sm:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-7 space-y-2">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold bg-white px-2.5 py-1 rounded-full border border-[#001C3B] text-[#9B0044]">
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span>STUDENT COMMUNITY REQUEST DESK</span>
-              </div>
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-[#001C3B] uppercase leading-tight">
-                Can&apos;t find what you need around Kesses?
-              </h2>
-              <p className="text-xs sm:text-sm text-[#594045]">
-                Tell us which specific fundi, spare part, or service you are struggling to locate. Our campus field ambassadors will scout the local kiosks and notify you via SMS within 2 hours.
-              </p>
-            </div>
-
-            <div className="lg:col-span-5 bg-white p-5 rounded-xl border-2 border-[#001C3B] shadow-[2px_2px_0px_#001C3B]">
-              {demandSent ? (
-                <div className="text-center py-4 space-y-2">
-                  <div className="w-10 h-10 bg-[#E7F6F6] text-[#0B6E70] rounded-full mx-auto flex items-center justify-center border border-[#0B6E70]">
-                    ✓
-                  </div>
-                  <div className="font-display font-bold text-base text-[#001C3B]">Request Received!</div>
-                  <p className="text-xs text-[#594045]">
-                    Ambassadors are checking Stage and Kesses Centre shops now.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setDemandSent(false)}
-                    className="text-xs text-[#9B0044] font-bold underline"
-                  >
-                    Submit another request
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleInlineDemandSubmit} className="space-y-3">
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#001C3B] uppercase mb-1">
-                      What service or item are you looking for?
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={demandService}
-                      onChange={(e) => setDemandService(e.target.value)}
-                      placeholder="e.g. Type-C MacBook charger, sofa repair fundi..."
-                      className="w-full bg-[#F0F3FF] border border-[#001C3B] rounded-lg px-3 py-2 text-xs text-[#001C3B] focus:outline-none focus:bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#001C3B] uppercase mb-1">
-                      Your WhatsApp / Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={demandPhone}
-                      onChange={(e) => setDemandPhone(e.target.value)}
-                      placeholder="0712 345 678"
-                      className="w-full bg-[#F0F3FF] border border-[#001C3B] rounded-lg px-3 py-2 text-xs text-[#001C3B] focus:outline-none focus:bg-white"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={demandSubmitting}
-                    className="w-full bg-[#9B0044] hover:bg-[#C2185B] text-white font-display font-bold text-xs uppercase py-2.5 rounded-lg border border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center justify-center gap-1.5"
-                  >
-                    <span>{demandSubmitting ? 'Sending Request...' : 'Request Service from Campus Ambassadors'}</span>
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* BOTTOM MERCHANT RECRUITMENT CALLOUT */}
-        <section className="bg-white border-2 border-[#001C3B] shadow-[3px_3px_0px_#001C3B] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5">
-          <div className="space-y-1.5 text-center md:text-left">
-            <span className="text-[11px] font-extrabold uppercase bg-[#FFDEA0] text-[#795900] px-2 py-0.5 rounded border border-[#001C3B]">
-              100% FREE FOR LOCAL TRADERS
-            </span>
-            <h3 className="font-display font-black text-xl sm:text-2xl text-[#001C3B] uppercase">
-              Are you a fundi, salonist, or kiosk owner in Kesses?
-            </h3>
-            <p className="text-xs text-[#594045] max-w-xl">
-              Get your shop seen by over 12,000+ Moi University students walking past your door every day. We verify your location and add direct Two-Tap WhatsApp & Call buttons.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <a
-              href="https://wa.me/254700000000?text=Habari%20MoiMashinani%2C%20nataka%20kuweka%20biashara%20yangu%20kwa%20directory"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#25D366] hover:bg-[#20ba5a] text-[#001C3B] text-xs font-display font-bold px-4 py-2.5 rounded-full border border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center gap-1.5"
-            >
-              <WhatsAppIcon className="w-4 h-4" />
-              <span>Register on WhatsApp</span>
+    <div className={styles.page}>
+      <a href="#landing-query" className={styles.skipLink}>
+        Skip to search
+      </a>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <Brand />
+          <nav className={styles.desktopNav} aria-label="Main navigation">
+            <a href="#find" className={styles.activeNav}>
+              Find something
             </a>
-
-            <Link
-              href="/onboard"
-              className="bg-[#001C3B] hover:bg-[#0B2545] text-white text-xs font-display font-bold px-4 py-2.5 rounded-full border border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action"
-            >
-              Fill Web Form
+            <Link href="/deals">
+              Student deals <span className={styles.newDot} />
+            </Link>
+            <a href="#for-business">For your business</a>
+          </nav>
+          <Link href="/onboard" className={styles.headerCta}>
+            <Plus size={17} />
+            <span>List your business</span>
+            <span className={styles.freePill}>Free</span>
+          </Link>
+        </div>
+      </header>
+      <main className={styles.main}>
+        <section className={styles.hero} id="find" aria-labelledby="hero-title">
+          <div className={styles.heroCopy}>
+            <div className={styles.locationTag}>
+              <span>
+                <MapPin size={14} />
+              </span>{" "}
+              MOI UNIVERSITY & THE NEIGHBORHOOD
+            </div>
+            <h1 id="hero-title">
+              Big needs.
+              <br />
+              <span>
+                Local finds.
+                <svg
+                  viewBox="0 0 420 20"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 13Q191 -1 414 10M50 18Q234 5 389 17"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="7"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            </h1>
+            <p className={styles.heroDescription}>
+              Your next meal, a quick fix, that thing you need.
+              <br /> Find the people and places that have it.
+            </p>
+            <LandingSearch
+              zones={ZONES.map(({ slug, name }) => ({ slug, name }))}
+            />
+            <div className={styles.ownerNudge}>
+              <span className={styles.ownerNudgeIcon}>
+                <StoreIcon size={17} />
+              </span>
+              <span>
+                Got a business?{" "}
+                <Link href="/onboard">
+                  Let’s put you on the map. <ArrowUpRight size={15} />
+                </Link>
+              </span>
+            </div>
+          </div>
+          <NeighborhoodScene />
+        </section>
+        <section className={styles.categories} aria-labelledby="category-title">
+          <div className={styles.sectionHeading}>
+            <h2 id="category-title">What’s on your list?</h2>
+            <span>
+              A whole neighborhood of possibilities <ArrowDown size={14} />
+            </span>
+          </div>
+          <div className={styles.categoryGrid}>
+            {shortcuts.map(({ slug, label, icon: Icon, tone }) => (
+              <Link key={slug} href={`/c/${slug}`} className={styles.category}>
+                <span className={`${styles.categoryIcon} ${styles[tone]}`}>
+                  <Icon size={27} strokeWidth={1.65} />
+                </span>
+                <span>{label}</span>
+              </Link>
+            ))}
+            <Link href="/search" className={styles.category}>
+              <span className={`${styles.categoryIcon} ${styles.allIcon}`}>
+                <Compass size={27} strokeWidth={1.65} />
+              </span>
+              <span>
+                Explore all <ArrowUpRight size={13} />
+              </span>
             </Link>
           </div>
+          <details className={styles.moreCategories}>
+            <summary>
+              All {CATEGORIES.length} categories <ChevronDown size={15} />
+            </summary>
+            <div>
+              {CATEGORIES.map((category) => (
+                <Link href={`/c/${category.slug}`} key={category.slug}>
+                  {category.name}
+                  <ArrowUpRight size={14} />
+                </Link>
+              ))}
+            </div>
+          </details>
         </section>
+        <section
+          className={styles.discoverySection}
+          id="discover"
+          aria-label="Discover local businesses"
+        >
+          <LocalDiscoveries businesses={ordered} />
+        </section>
+        <section
+          className={styles.businessSection}
+          id="for-business"
+          aria-labelledby="business-title"
+        >
+          <div className={styles.businessCopy}>
+            <span className={styles.eyebrow}>
+              <span /> FOR THE PEOPLE WHO MAKE LOCAL HAPPEN
+            </span>
+            <h2 id="business-title">
+              You do your thing.
+              <br />
+              We’ll help people find it.
+            </h2>
+            <p>
+              A shop, a side hustle, a service. Give it a home where your next
+              customer is already looking.
+            </p>
+            <Link href="/onboard" className={styles.businessCta}>
+              List your business for free <ArrowUpRight size={19} />
+            </Link>
+            <div className={styles.businessBenefits}>
+              <span>
+                <Check size={15} /> Free to get listed
+              </span>
+              <span>
+                <Check size={15} /> Customers contact you directly
+              </span>
+            </div>
+            <Link href="/dashboard" className={styles.manageLink}>
+              Already listed? Manage your business <ArrowUpRight size={13} />
+            </Link>
+          </div>
+          <div className={styles.shopScene} aria-hidden="true">
+            <span className={styles.shopStar}>✳</span>
+            <div className={styles.shopRoof}>
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+            <div className={styles.shopFront}>
+              <span className={styles.shopSmall}>
+                YOUR BUSINESS, DISCOVERED.
+              </span>
+              <span className={styles.shopSign}>
+                Hello,
+                <br />
+                neighbor<span>↗</span>
+              </span>
+              <span className={styles.shopOpen}>
+                <span /> OPEN FOR BUSINESS
+              </span>
+            </div>
+            <span className={styles.shopNotification}>
+              <MessageCircle size={22} />
+              <span>
+                Your next customer?<strong>They’re around here.</strong>
+              </span>
+            </span>
+          </div>
+        </section>
+        <div className={styles.lastLine}>
+          <span>
+            <MapPin size={17} /> Local people. Real connections.
+          </span>
+          <Link href="/search">
+            Go find your thing <ArrowUpRight size={17} />
+          </Link>
+        </div>
       </main>
-
-      <Footer />
-      <BottomNav />
-
-      {demandModalOpen && (
-        <DemandModal
-          initialQuery={searchQuery}
-          onClose={() => setDemandModalOpen(false)}
-        />
-      )}
+      <footer className={styles.footer}>
+        <div>
+          <Brand />
+          <p>A little closer to everything.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <Link href="/search">Explore</Link>
+          <Link href="/deals">Student deals</Link>
+          <Link href="/dashboard">Business dashboard</Link>
+          <Link href="/ambassador">Become an ambassador</Link>
+        </nav>
+        <span className={styles.footerLocation}>
+          <MapPin size={13} /> Made for Moi. Rooted in Kesses.
+        </span>
+      </footer>
+      <nav className={styles.mobileNav} aria-label="Quick navigation">
+        <a href="#find">
+          <Search size={18} /> Find something
+        </a>
+        <Link href="/onboard">
+          <Plus size={18} /> List your business
+        </Link>
+      </nav>
     </div>
   );
 }

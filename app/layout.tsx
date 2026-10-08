@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
+
+const manrope = localFont({
+  src: "../public/fonts/manrope-latin-variable.woff2",
+  variable: "--font-manrope",
+  weight: "200 800",
+  style: "normal",
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
+});
 
 export const metadata: Metadata = {
   title: "MoiMashinani | Kesses Campus Business Directory — Moi University",
@@ -17,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="min-h-full flex flex-col bg-[#F2F5F8] text-[#001C3B] antialiased">
+      <body className={`${manrope.variable} min-h-full flex flex-col bg-[#F2F5F8] text-[#001C3B] antialiased`}>
         {children}
       </body>
     </html>

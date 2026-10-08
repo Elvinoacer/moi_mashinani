@@ -82,9 +82,9 @@ export interface ScoredCandidate {
 }
 
 export function computeRelevance(business: Business, query: string, targetCategory?: string): number {
-  if (!query && !targetCategory) return 0.8; // default browsable relevance
-
   const q = query.toLowerCase().trim();
+  if (!q && !targetCategory) return 0.8; // default browsable relevance
+
   const searchWords = q.split(/\s+/).filter(Boolean);
 
   let score = 0;
@@ -149,7 +149,7 @@ export function computeRelevance(business: Business, query: string, targetCatego
   for (const s of business.services || []) {
     const sName = (s.name || '').toLowerCase();
     const sNote = (s.note || '').toLowerCase();
-    if (sName.includes(q) || sNote.includes(q)) {
+    if (q && (sName.includes(q) || sNote.includes(q))) {
       score += 0.3;
       break;
     }
@@ -200,7 +200,10 @@ export function rankBusinesses(
 
   // Filter active and eligible
   const activeListings = businesses.filter(
-    (b) => b.status === 'ACTIVE' && (!b.isTemporarilyClosed || false)
+    (b) =>
+      b.status === 'ACTIVE' &&
+      !b.isTemporarilyClosed &&
+      (!targetCategory || b.primaryCategory === targetCategory || b.extraCategories.includes(targetCategory))
   );
 
   const scored: ScoredCandidate[] = activeListings.map((business) => {

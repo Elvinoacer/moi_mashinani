@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { BottomNav } from '@/components/BottomNav';
 import { Business, ProblemReport, ServiceRequest } from '@/lib/types';
 import {
   ShieldAlert,
@@ -81,25 +82,25 @@ export default function AdminConsolePage() {
   const openReports = reports.filter((r) => r.status === 'OPEN');
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F5F8]">
+    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
       <Navbar />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Header */}
-        <div className="bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex items-center justify-between">
+        <div className="page-hero bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex items-center justify-between">
           <div>
-            <div className="inline-flex items-center gap-1.5 bg-[#FFDAD6] text-[#93000A] font-display text-xs font-bold px-2.5 py-0.5 rounded signboard-border">
-              <ShieldAlert className="w-3.5 h-3.5 text-[#93000A]" />
+            <div className="inline-flex items-center gap-1.5 bg-[#fce7e1] text-[#8f2424] font-display text-xs font-bold px-2.5 py-0.5 rounded signboard-border">
+              <ShieldAlert className="w-3.5 h-3.5 text-[#8f2424]" />
               CAMPUS DIRECTORATE
             </div>
-            <h1 className="font-display font-bold text-2xl md:text-3xl text-[#001C3B] uppercase tracking-tight mt-1">
+            <h1 className="font-display font-bold text-2xl md:text-3xl text-[#243b32] uppercase tracking-tight mt-1">
               Admin Moderation & Renewal Queue
             </h1>
           </div>
 
           <button
             onClick={refreshData}
-            className="bg-[#001C3B] text-white text-xs font-bold px-3.5 py-2 rounded-full signboard-border press-action flex items-center gap-1.5"
+            className="bg-[#243b32] text-white text-xs font-bold px-3.5 py-2 rounded-full signboard-border press-action flex items-center gap-1.5"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>{loading ? 'Loading...' : 'Refresh'}</span>
@@ -107,7 +108,7 @@ export default function AdminConsolePage() {
         </div>
 
         {actionMessage && (
-          <div className="p-3 bg-[#E7EEFF] text-[#005658] font-bold text-xs rounded signboard-border">
+          <div className="p-3 bg-[#edf2e5] text-[#183e35] font-bold text-xs rounded signboard-border">
             {actionMessage}
           </div>
         )}
@@ -115,40 +116,40 @@ export default function AdminConsolePage() {
         {/* METRICS ROW */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-white p-4 rounded-xl signboard-border signboard-shadow">
-            <div className="text-xs text-[#594045] font-semibold">Pending Approval</div>
-            <div className="font-display font-bold text-3xl text-[#9B0044] mt-1">
+            <div className="text-xs text-[#667064] font-semibold">Pending Approval</div>
+            <div className="font-display font-bold text-3xl text-[#183e35] mt-1">
               {pendingListings.length}
             </div>
-            <div className="text-[11px] text-[#594045]">Target: &lt; 12h SLA</div>
+            <div className="text-[11px] text-[#667064]">Target: &lt; 12h SLA</div>
           </div>
 
           <div className="bg-white p-4 rounded-xl signboard-border signboard-shadow">
-            <div className="text-xs text-[#594045] font-semibold">Expiring in &le; 7 Days</div>
-            <div className="font-display font-bold text-3xl text-[#FFC53D] mt-1">
+            <div className="text-xs text-[#667064] font-semibold">Expiring in &le; 7 Days</div>
+            <div className="font-display font-bold text-3xl text-[#d9f279] mt-1">
               {expiringPromotions.length}
             </div>
-            <div className="text-[11px] text-[#594045]">1-Tap WhatsApp Nudge</div>
+            <div className="text-[11px] text-[#667064]">1-Tap WhatsApp Nudge</div>
           </div>
 
           <div className="bg-white p-4 rounded-xl signboard-border signboard-shadow">
-            <div className="text-xs text-[#594045] font-semibold">Open Reports</div>
-            <div className="font-display font-bold text-3xl text-[#BA1A1A] mt-1">
+            <div className="text-xs text-[#667064] font-semibold">Open Reports</div>
+            <div className="font-display font-bold text-3xl text-[#a7302d] mt-1">
               {openReports.length}
             </div>
-            <div className="text-[11px] text-[#594045]">Student flags</div>
+            <div className="text-[11px] text-[#667064]">Student flags</div>
           </div>
 
           <div className="bg-white p-4 rounded-xl signboard-border signboard-shadow">
-            <div className="text-xs text-[#594045] font-semibold">Active Directory</div>
-            <div className="font-display font-bold text-3xl text-[#0B6E70] mt-1">
+            <div className="text-xs text-[#667064] font-semibold">Active Directory</div>
+            <div className="font-display font-bold text-3xl text-[#335e41] mt-1">
               {activeListings.length}
             </div>
-            <div className="text-[11px] text-[#594045]">Approved shops</div>
+            <div className="text-[11px] text-[#667064]">Approved shops</div>
           </div>
         </div>
 
         {/* QUEUE TABS */}
-        <div className="flex border-b-2 border-[#001C3B] gap-2 overflow-x-auto text-xs md:text-sm font-display font-bold uppercase no-scrollbar">
+        <div className="flex border-b-2 border-[#dfe5d8] gap-2 overflow-x-auto text-xs md:text-sm font-display font-bold uppercase no-scrollbar">
           {[
             { id: 'moderation', label: `Moderation Queue (${pendingListings.length})`, icon: CheckCircle2 },
             { id: 'renewal', label: `Renewal Queue (${expiringPromotions.length})`, icon: Rocket },
@@ -162,8 +163,8 @@ export default function AdminConsolePage() {
                 onClick={() => setActiveQueue(tab.id as typeof activeQueue)}
                 className={`px-4 py-2.5 flex items-center gap-2 shrink-0 rounded-t-lg transition-colors ${
                   activeQueue === tab.id
-                    ? 'bg-white border-t-2 border-x-2 border-[#001C3B] text-[#9B0044] -mb-[2px]'
-                    : 'text-[#594045] hover:text-[#001C3B]'
+                    ? 'bg-white border-t-2 border-x-2 border-[#dfe5d8] text-[#183e35] -mb-[2px]'
+                    : 'text-[#667064] hover:text-[#243b32]'
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -177,31 +178,31 @@ export default function AdminConsolePage() {
         {activeQueue === 'moderation' && (
           <div className="bg-white signboard-border rounded-xl p-5 md:p-6 signboard-shadow space-y-4">
             <div>
-              <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase">
+              <h2 className="font-display font-bold text-xl text-[#243b32] uppercase">
                 Listings Awaiting Moderation
               </h2>
-              <p className="text-xs text-[#594045]">
+              <p className="text-xs text-[#667064]">
                 Review details, verify reachable phone number, and approve or reject.
               </p>
             </div>
 
             {pendingListings.length > 0 ? (
-              <div className="divide-y divide-[#D5DCE4]">
+              <div className="divide-y divide-[#dfe5d8]">
                 {pendingListings.map((biz) => (
                   <div key={biz.id} className="py-4 space-y-2">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <div className="font-display font-bold text-lg text-[#001C3B]">
+                        <div className="font-display font-bold text-lg text-[#243b32]">
                           {biz.name}
                         </div>
-                        <div className="text-xs text-[#594045]">
+                        <div className="text-xs text-[#667064]">
                           Category: <strong>{biz.primaryCategory}</strong> • Zone: <strong>{biz.zone}</strong>
                         </div>
-                        <div className="text-xs text-[#001C3B] mt-0.5">
+                        <div className="text-xs text-[#243b32] mt-0.5">
                           Landmark: {biz.landmark} • Phone: {biz.phone}
                         </div>
                         {biz.ambassadorId && (
-                          <div className="text-[11px] text-[#0B6E70] font-semibold mt-0.5">
+                          <div className="text-[11px] text-[#335e41] font-semibold mt-0.5">
                             Added by Ambassador: {biz.ambassadorId} • Claim Code: {biz.claimCode}
                           </div>
                         )}
@@ -210,14 +211,14 @@ export default function AdminConsolePage() {
                       <div className="flex items-center gap-2 pt-2 sm:pt-0">
                         <button
                           onClick={() => handleAdminAction('approve_listing', biz.id)}
-                          className="bg-[#0B6E70] text-white text-xs font-bold px-3.5 py-1.5 rounded-full signboard-border press-action flex items-center gap-1.5"
+                          className="bg-[#335e41] text-white text-xs font-bold px-3.5 py-1.5 rounded-full signboard-border press-action flex items-center gap-1.5"
                         >
                           <Check className="w-3.5 h-3.5" />
                           <span>Approve & Verify</span>
                         </button>
                         <button
                           onClick={() => handleAdminAction('reject_listing', biz.id, 'Invalid phone number')}
-                          className="bg-[#BA1A1A] text-white text-xs font-bold px-3 py-1.5 rounded-full signboard-border press-action"
+                          className="bg-[#a7302d] text-white text-xs font-bold px-3 py-1.5 rounded-full signboard-border press-action"
                         >
                           Reject
                         </button>
@@ -227,7 +228,7 @@ export default function AdminConsolePage() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-sm text-[#594045]">
+              <div className="p-8 text-center text-sm text-[#667064]">
                 No pending listings! All submissions are reviewed.
               </div>
             )}
@@ -238,16 +239,16 @@ export default function AdminConsolePage() {
         {activeQueue === 'renewal' && (
           <div className="bg-white signboard-border rounded-xl p-5 md:p-6 signboard-shadow space-y-4">
             <div>
-              <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase">
+              <h2 className="font-display font-bold text-xl text-[#243b32] uppercase">
                 Promotions Expiring Soon
               </h2>
-              <p className="text-xs text-[#594045]">
+              <p className="text-xs text-[#667064]">
                 Send a 1-tap WhatsApp nudge with their real performance stats to secure renewal.
               </p>
             </div>
 
             {expiringPromotions.length > 0 ? (
-              <div className="divide-y divide-[#D5DCE4]">
+              <div className="divide-y divide-[#dfe5d8]">
                 {expiringPromotions.map((biz) => {
                   const endsDate = new Date(biz.tierEndsAt || '').toLocaleDateString('en-GB', {
                     day: 'numeric',
@@ -264,14 +265,14 @@ export default function AdminConsolePage() {
                     <div key={biz.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-display font-bold text-base text-[#001C3B]">
+                          <span className="font-display font-bold text-base text-[#243b32]">
                             {biz.name}
                           </span>
-                          <span className="text-[10px] font-bold bg-[#FFDEA0] px-2 py-0.5 rounded signboard-border">
+                          <span className="text-[10px] font-bold bg-[#e9eedf] px-2 py-0.5 rounded signboard-border">
                             {biz.activeTier}
                           </span>
                         </div>
-                        <div className="text-xs text-[#594045] mt-1">
+                        <div className="text-xs text-[#667064] mt-1">
                           Ends: <strong>{endsDate}</strong> • Stats: {biz.metrics.views} views, {biz.metrics.calls} calls, {biz.metrics.whatsapp} WhatsApp taps
                         </div>
                       </div>
@@ -281,9 +282,9 @@ export default function AdminConsolePage() {
                           href={whatsappNudgeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-[#25D366] text-[#001C3B] font-display font-bold text-xs uppercase px-4 py-2 rounded-full signboard-border signboard-shadow press-action flex items-center gap-1.5"
+                          className="bg-[#25D366] text-[#243b32] font-display font-bold text-xs uppercase px-4 py-2 rounded-full signboard-border signboard-shadow press-action flex items-center gap-1.5"
                         >
-                          <WhatsAppIcon className="w-4 h-4 text-[#001C3B]" />
+                          <WhatsAppIcon className="w-4 h-4 text-[#243b32]" />
                           <span>1-Tap WhatsApp Nudge</span>
                         </a>
                       </div>
@@ -292,7 +293,7 @@ export default function AdminConsolePage() {
                 })}
               </div>
             ) : (
-              <div className="p-8 text-center text-sm text-[#594045]">
+              <div className="p-8 text-center text-sm text-[#667064]">
                 No promotions expiring in the next 7 days.
               </div>
             )}
@@ -303,29 +304,29 @@ export default function AdminConsolePage() {
         {activeQueue === 'reports' && (
           <div className="bg-white signboard-border rounded-xl p-5 md:p-6 signboard-shadow space-y-4">
             <div>
-              <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase">
+              <h2 className="font-display font-bold text-xl text-[#243b32] uppercase">
                 Student Flagged Listings
               </h2>
-              <p className="text-xs text-[#594045]">
+              <p className="text-xs text-[#667064]">
                 Reports submitted by campus students (e.g. wrong number, scam, closed down).
               </p>
             </div>
 
             {openReports.length > 0 ? (
-              <div className="divide-y divide-[#D5DCE4]">
+              <div className="divide-y divide-[#dfe5d8]">
                 {openReports.map((rep) => (
                   <div key={rep.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-[#BA1A1A] uppercase">
+                        <span className="font-bold text-sm text-[#a7302d] uppercase">
                           [{rep.reason.replace(/_/g, ' ')}]
                         </span>
-                        <span className="font-display font-bold text-base text-[#001C3B]">
+                        <span className="font-display font-bold text-base text-[#243b32]">
                           {rep.businessName}
                         </span>
                       </div>
                       {rep.details && (
-                        <div className="text-xs text-[#594045] mt-1 italic">
+                        <div className="text-xs text-[#667064] mt-1 italic">
                           &ldquo;{rep.details}&rdquo;
                         </div>
                       )}
@@ -334,13 +335,13 @@ export default function AdminConsolePage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleAdminAction('resolve_report', rep.id)}
-                        className="bg-[#0B6E70] text-white text-xs font-bold px-3 py-1.5 rounded-full signboard-border"
+                        className="bg-[#335e41] text-white text-xs font-bold px-3 py-1.5 rounded-full signboard-border"
                       >
                         Dismiss
                       </button>
                       <button
                         onClick={() => handleAdminAction('suspend_reported', rep.id)}
-                        className="bg-[#BA1A1A] text-white text-xs font-bold px-3 py-1.5 rounded-full signboard-border"
+                        className="bg-[#a7302d] text-white text-xs font-bold px-3 py-1.5 rounded-full signboard-border"
                       >
                         Suspend Shop
                       </button>
@@ -349,7 +350,7 @@ export default function AdminConsolePage() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-sm text-[#594045]">
+              <div className="p-8 text-center text-sm text-[#667064]">
                 Zero active complaints! All reported listings have been handled.
               </div>
             )}
@@ -360,22 +361,22 @@ export default function AdminConsolePage() {
         {activeQueue === 'demand' && (
           <div className="bg-white signboard-border rounded-xl p-5 md:p-6 signboard-shadow space-y-4">
             <div>
-              <h2 className="font-display font-bold text-xl text-[#001C3B] uppercase">
+              <h2 className="font-display font-bold text-xl text-[#243b32] uppercase">
                 Unmet Student Demands (Zero-Result Searches)
               </h2>
-              <p className="text-xs text-[#594045]">
+              <p className="text-xs text-[#667064]">
                 What students searched for but could not find. Guide your field ambassadors to onboard these!
               </p>
             </div>
 
-            <div className="divide-y divide-[#D5DCE4]">
+            <div className="divide-y divide-[#dfe5d8]">
               {demandRequests.map((req) => (
                 <div key={req.id} className="py-3 flex items-center justify-between">
                   <div>
-                    <div className="font-display font-bold text-base text-[#001C3B]">
+                    <div className="font-display font-bold text-base text-[#243b32]">
                       &ldquo;{req.query}&rdquo;
                     </div>
-                    <div className="text-xs text-[#594045]">
+                    <div className="text-xs text-[#667064]">
                       Zone: {req.zone} • {new Date(req.createdAt).toLocaleDateString()}
                     </div>
                   </div>
@@ -384,7 +385,7 @@ export default function AdminConsolePage() {
                       href={`https://wa.me/254${req.contactPhone.replace(/\D/g, '').replace(/^0/, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#25D366] text-[#001C3B] text-xs font-bold px-3 py-1 rounded-full signboard-border"
+                      className="bg-[#25D366] text-[#243b32] text-xs font-bold px-3 py-1 rounded-full signboard-border"
                     >
                       WhatsApp Student
                     </a>
@@ -397,6 +398,7 @@ export default function AdminConsolePage() {
       </main>
 
       <Footer />
+      <BottomNav />
     </div>
   );
 }

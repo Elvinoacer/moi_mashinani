@@ -13,10 +13,10 @@ export default function DashboardIndex() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F2F5F8]">
+    <div className="interior-page min-h-screen flex items-center justify-center bg-[#f7f8f2]">
       <div className="bg-white p-6 signboard-border rounded-xl text-center">
-        <RefreshCw className="w-10 h-10 text-[#9B0044] animate-spin mx-auto" />
-        <div className="mt-2 font-bold text-sm text-[#001C3B]">Opening Merchant Hub...</div>
+        <RefreshCw className="w-10 h-10 text-[#183e35] animate-spin mx-auto" />
+        <div className="mt-2 font-bold text-sm text-[#243b32]">Opening Merchant Hub...</div>
       </div>
     </div>
   );

@@ -107,8 +107,8 @@ export function BusinessCard({
   return (
     <>
       <div
-        className={`bg-white border-[1.5px] border-[#001C3B] rounded-xl shadow-[2px_2px_0px_#001C3B] relative overflow-hidden transition-all duration-100 flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_#001C3B] ${
-          isFeatured ? 'border-l-[6px] border-l-[#FFC53D]' : isRecommended ? 'border-l-[6px] border-l-[#0B6E70]' : ''
+        className={`directory-card bg-white border border-[#dfe5d8] rounded-[19px] relative overflow-hidden flex flex-col justify-between ${
+          isFeatured ? 'border-l-[6px] border-l-[#d9f279]' : isRecommended ? 'border-l-[6px] border-l-[#335e41]' : ''
         }`}
       >
         <div className="p-3.5 sm:p-4">
@@ -116,14 +116,14 @@ export function BusinessCard({
           <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
             <div className="flex flex-wrap items-center gap-1.5">
               {isFeatured && (
-                <span className="bg-[#FFC53D] text-[#001C3B] text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded border border-[#001C3B] shadow-[1px_1px_0px_#001C3B] flex items-center gap-1 uppercase tracking-tight">
-                  <Star className="w-3 h-3 fill-[#001C3B]" />
+                <span className="bg-[#d9f279] text-[#243b32] text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded-md border border-[#dfe5d8] flex items-center gap-1 uppercase tracking-tight">
+                  <Star className="w-3 h-3 fill-[#243b32]" />
                   FEATURED
                 </span>
               )}
 
               {isRecommended && !isFeatured && (
-                <span className="bg-[#0B6E70] text-white text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded border border-[#001C3B] shadow-[1px_1px_0px_#001C3B] flex items-center gap-1 uppercase tracking-tight">
+                <span className="bg-[#335e41] text-white text-[10px] sm:text-[11px] font-display font-black px-2 py-0.5 rounded border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] flex items-center gap-1 uppercase tracking-tight">
                   <CheckCircle2 className="w-3 h-3" />
                   RECOMMENDED
                 </span>
@@ -131,16 +131,16 @@ export function BusinessCard({
 
               {business.verificationLevel === 'L2' && (
                 <span
-                  className="bg-white text-[#001C3B] text-[10px] sm:text-[11px] font-display font-bold px-1.5 py-0.5 rounded border border-[#001C3B] flex items-center gap-0.5"
+                  className="bg-white text-[#243b32] text-[10px] sm:text-[11px] font-display font-bold px-1.5 py-0.5 rounded border border-[#dfe5d8] flex items-center gap-0.5"
                   title="Team physically verified this shop exists"
                 >
-                  <CheckCircle2 className="w-3 h-3 text-[#0B6E70]" />
+                  <CheckCircle2 className="w-3 h-3 text-[#335e41]" />
                   Verified
                 </span>
               )}
 
               {isAvailableNow && (
-                <span className="bg-[#E7EEFF] text-[#005658] text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="bg-[#edf2e5] text-[#183e35] text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse"></span>
                   Available Now
                 </span>
@@ -148,11 +148,11 @@ export function BusinessCard({
             </div>
 
             {/* Promoted Disclosure & Report */}
-            <div className="flex items-center gap-1 text-[11px] text-[#594045]">
+            <div className="flex items-center gap-1 text-[11px] text-[#667064]">
               {(isFeatured || isRecommended) && (
                 <span
                   title="Promoted listing. Owner pays to rank higher; results still match relevance."
-                  className="cursor-help underline decoration-dotted text-[10px] text-[#594045]"
+                  className="cursor-help underline decoration-dotted text-[10px] text-[#667064]"
                 >
                   Promoted
                 </span>
@@ -160,7 +160,7 @@ export function BusinessCard({
               <button
                 type="button"
                 onClick={() => setReportOpen(true)}
-                className="text-[#8D6F75] hover:text-[#BA1A1A] p-1 press-action rounded"
+                className="text-[#758071] hover:text-[#a7302d] p-1 press-action rounded"
                 title="Report problem"
               >
                 <MoreVertical className="w-3.5 h-3.5" />
@@ -172,7 +172,7 @@ export function BusinessCard({
           <div className="flex gap-3 items-start">
             {/* Photo / Thumbnail */}
             <Link href={`/b/${business.slug}`} className="relative shrink-0 block">
-              <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-lg border-[1.5px] border-[#001C3B] overflow-hidden bg-[#F0F3FF]">
+              <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-[13px] border border-[#dfe5d8] overflow-hidden bg-[#e9eedf]">
                 {business.coverPhoto || business.photos[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -182,7 +182,7 @@ export function BusinessCard({
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#E7EEFF] text-[#001C3B] font-display font-black text-xl">
+                  <div className="w-full h-full flex items-center justify-center bg-[#edf2e5] text-[#243b32] font-display font-black text-xl">
                     {business.name.substring(0, 2).toUpperCase()}
                   </div>
                 )}
@@ -192,29 +192,29 @@ export function BusinessCard({
             {/* Info details */}
             <div className="flex-1 min-w-0">
               <Link href={`/b/${business.slug}`} className="block group">
-                <h3 className="font-display font-bold text-base sm:text-lg text-[#001C3B] group-hover:text-[#9B0044] transition-colors leading-snug truncate">
+                <h3 className="font-display font-bold text-base sm:text-lg text-[#243b32] group-hover:text-[#183e35] transition-colors leading-snug truncate">
                   {business.name}
                 </h3>
               </Link>
 
-              <div className="text-xs text-[#594045] mt-1 line-clamp-1">
+              <div className="text-xs text-[#667064] mt-1 line-clamp-1">
                 {business.tagline || business.description}
               </div>
 
               {/* Location & Walk time */}
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5 text-xs text-[#001C3B]">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5 text-xs text-[#243b32]">
                 <span className="flex items-center gap-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#C2185B] flex-shrink-0" />
+                  <MapPin className="w-3.5 h-3.5 text-[#335e41] flex-shrink-0" />
                   <span className="font-semibold capitalize">{business.zone.replace('-', ' ')}</span>
                 </span>
 
-                <span className="flex items-center gap-0.5 text-[#594045] font-medium">
-                  <Footprints className="w-3.5 h-3.5 flex-shrink-0 text-[#0B6E70]" />
+                <span className="flex items-center gap-0.5 text-[#667064] font-medium">
+                  <Footprints className="w-3.5 h-3.5 flex-shrink-0 text-[#335e41]" />
                   <span>{displayDistance}</span>
                 </span>
 
                 {lowestPrice > 0 && (
-                  <span className="bg-[#F0F3FF] px-1.5 py-0.5 rounded text-[11px] font-bold text-[#001C3B] border border-[#001C3B]/20">
+                  <span className="bg-[#e9eedf] px-1.5 py-0.5 rounded text-[11px] font-bold text-[#243b32] border border-[#dfe5d8]/20">
                     from KSh {lowestPrice.toLocaleString()}
                   </span>
                 )}
@@ -222,16 +222,16 @@ export function BusinessCard({
 
               {/* Physical Landmark Tag */}
               {business.landmark && (
-                <div className="mt-1 text-[11px] text-[#594045] bg-[#F0F3FF] px-2 py-0.5 rounded border border-[#001C3B]/10 line-clamp-1 flex items-center gap-1">
-                  <span className="font-bold text-[#001C3B]">Landmark:</span>
+                <div className="mt-1 text-[11px] text-[#667064] bg-[#e9eedf] px-2 py-0.5 rounded border border-[#dfe5d8]/10 line-clamp-1 flex items-center gap-1">
+                  <span className="font-bold text-[#243b32]">Landmark:</span>
                   <span className="truncate">{business.landmark}</span>
                 </div>
               )}
 
               {/* Student discount tag if exists */}
               {business.studentDiscount && (
-                <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-[#795900] bg-[#FFDEA0]/50 border border-[#795900]/30 px-1.5 py-0.5 rounded">
-                  <Tag className="w-3 h-3 text-[#795900] flex-shrink-0" />
+                <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-[#526936] bg-[#e9eedf]/50 border border-[#526936]/30 px-1.5 py-0.5 rounded">
+                  <Tag className="w-3 h-3 text-[#526936] flex-shrink-0" />
                   <span className="truncate">{business.studentDiscount}</span>
                 </div>
               )}
@@ -240,7 +240,7 @@ export function BusinessCard({
         </div>
 
         {/* Action Strip: Directions + Two-Tap Call & WhatsApp */}
-        <div className="border-t-[1.5px] border-[#001C3B] bg-[#F9F9FF] p-2 sm:p-2.5">
+        <div className="border-t border-[#dfe5d8] bg-[#fafbf7] p-2 sm:p-2.5">
           <div className="grid grid-cols-12 gap-2">
             {/* Directions button */}
             {showDirectionsButton && (
@@ -248,9 +248,9 @@ export function BusinessCard({
                 type="button"
                 onClick={handleDirections}
                 title="Get walking directions in Google Maps"
-                className="col-span-4 bg-[#E7EEFF] hover:bg-[#DEE8FF] text-[#001C3B] text-xs font-display font-bold py-2 px-2 rounded-full border-[1.5px] border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center justify-center gap-1"
+                className="col-span-4 bg-[#edf2e5] hover:bg-[#e9eedf] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1"
               >
-                <Navigation className="w-3.5 h-3.5 text-[#0B6E70] flex-shrink-0" />
+                <Navigation className="w-3.5 h-3.5 text-[#335e41] flex-shrink-0" />
                 <span className="truncate">MAPS</span>
               </button>
             )}
@@ -261,7 +261,7 @@ export function BusinessCard({
               onClick={handleCall}
               className={`${
                 showDirectionsButton ? 'col-span-4' : 'col-span-6'
-              } bg-[#C2185B] hover:bg-[#9E1049] text-white text-xs font-display font-bold py-2 px-2 rounded-full border-[1.5px] border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center justify-center gap-1`}
+              } bg-[#335e41] hover:bg-[#2c5141] text-white text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1`}
             >
               <Phone className="w-3.5 h-3.5 flex-shrink-0" />
               <span>CALL</span>
@@ -275,7 +275,7 @@ export function BusinessCard({
               onClick={handleWhatsApp}
               className={`${
                 showDirectionsButton ? 'col-span-4' : 'col-span-6'
-              } bg-[#25D366] hover:bg-[#20ba5a] text-[#001C3B] text-xs font-display font-bold py-2 px-2 rounded-full border-[1.5px] border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center justify-center gap-1`}
+              } bg-[#25D366] hover:bg-[#20ba5a] text-[#243b32] text-xs font-display font-bold py-2 px-2 rounded-full border border-[#dfe5d8] press-action flex items-center justify-center gap-1`}
             >
               <WhatsAppIcon className="w-4 h-4 flex-shrink-0" />
               <span className="truncate">WHATSAPP</span>

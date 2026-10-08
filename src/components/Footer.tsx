@@ -1,122 +1,45 @@
-'use client';
-
-import React from 'react';
-import Link from 'next/link';
-import { CATEGORIES, ZONES } from '@/lib/constants';
-import { WhatsAppIcon } from '@/components/icons';
+import Link from "next/link";
+import { ArrowUpRight, MapPin } from "lucide-react";
+import { CATEGORIES, ZONES } from "@/lib/constants";
+import { SiteBrand } from "@/components/SiteBrand";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#001C3B] text-[#EBF1FF] border-t-4 border-[#9B0044] mt-12 pb-20 md:pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Col 1: Brand & About */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#C2185B] text-white border border-white flex items-center justify-center font-display font-extrabold text-base rounded">
-                M
-              </div>
-              <span className="font-display font-black text-2xl tracking-tight text-white uppercase">
-                MoiMashinani
-              </span>
-            </div>
-            <p className="text-xs text-[#DEE8FF]/80 leading-relaxed font-body">
-              The official hyper-local business & student service directory for Moi University Main Campus (Kesses). Find trusted fundis, printers, salons, food, gas, and hostels in two taps.
-            </p>
-            <div className="pt-2">
-              <a
-                href="https://wa.me/254712345678?text=Hi%20MoiMashinani%20team,%20I%20have%20an%20inquiry"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 bg-[#25D366] text-[#001C3B] text-xs font-display font-bold px-3 py-1.5 rounded-full border border-white press-action shadow-sm"
-              >
-                <WhatsAppIcon className="w-4 h-4" />
-                <span>WhatsApp Helpdesk</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Col 2: Categories */}
+    <footer className="mt-12 w-full border-t border-[#dfe5d8] bg-[#f7f8f2] pb-24 md:pb-8">
+      <div className="mx-auto max-w-[1328px] px-5 py-10 sm:px-8 lg:px-10">
+        <div className="grid grid-cols-1 gap-9 border-b border-[#dfe5d8] pb-9 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
-            <h4 className="font-display font-bold text-sm uppercase text-[#FFC53D] tracking-wider mb-3">
-              Popular Categories
-            </h4>
-            <ul className="space-y-1.5 text-xs text-[#DEE8FF]/80 font-body">
-              {CATEGORIES.slice(0, 6).map((c) => (
-                <li key={c.id}>
-                  <Link href={`/c/${c.slug}`} className="hover:text-white transition-colors">
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link href="/search" className="text-[#FFC53D] font-bold hover:underline">
-                  View all 12 categories →
-                </Link>
-              </li>
-            </ul>
+            <SiteBrand />
+            <p className="mt-4 max-w-[280px] text-[13px] leading-7 text-[#667064]">A little closer to everything. Find local people, real services, and good things around Moi University.</p>
+            <p className="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold text-[#335e41]"><MapPin size={14} /> Made for Moi. Rooted in Kesses.</p>
           </div>
-
-          {/* Col 3: Campus Zones */}
           <div>
-            <h4 className="font-display font-bold text-sm uppercase text-[#FFC53D] tracking-wider mb-3">
-              Campus Zones
-            </h4>
-            <ul className="space-y-1.5 text-xs text-[#DEE8FF]/80 font-body">
-              {ZONES.slice(1, 7).map((z) => (
-                <li key={z.id}>
-                  <Link href={`/search?zone=${z.slug}`} className="hover:text-white transition-colors">
-                    {z.name} ({z.landmarkHint.split(',')[0]})
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">Explore nearby</h2>
+            <nav aria-label="Popular categories" className="flex flex-col items-start gap-3">
+              {CATEGORIES.slice(0, 5).map((category) => <Link key={category.slug} href={"/c/" + category.slug} className="text-[12px] text-[#667064] hover:text-[#183e35]">{category.name}</Link>)}
+              <Link href="/search" className="inline-flex items-center gap-1 text-[12px] font-bold text-[#335e41]">All categories <ArrowUpRight size={13} /></Link>
+            </nav>
           </div>
-
-          {/* Col 4: Platform & Legal */}
           <div>
-            <h4 className="font-display font-bold text-sm uppercase text-[#FFC53D] tracking-wider mb-3">
-              Platform & Safety
-            </h4>
-            <ul className="space-y-1.5 text-xs text-[#DEE8FF]/80 font-body">
-              <li>
-                <Link href="/onboard" className="hover:text-white transition-colors font-bold text-[#FFC53D]">
-                  + List Your Business (Free)
-                </Link>
-              </li>
-              <li>
-                <Link href="/deals" className="hover:text-white transition-colors">
-                  Student Deals & Discounts
-                </Link>
-              </li>
-              <li>
-                <Link href="/ambassador" className="hover:text-white transition-colors">
-                  Ambassador Field Portal
-                </Link>
-              </li>
-              <li>
-                <Link href="/dashboard" className="hover:text-white transition-colors">
-                  Merchant Hub & Analytics
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin" className="hover:text-white transition-colors text-white/50">
-                  Campus Admin Console
-                </Link>
-              </li>
-            </ul>
+            <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">Around campus</h2>
+            <nav aria-label="Campus areas" className="flex flex-col items-start gap-3">
+              {ZONES.slice(1, 6).map((zone) => <Link key={zone.slug} href={"/search?zone=" + encodeURIComponent(zone.slug)} className="text-[12px] text-[#667064] hover:text-[#183e35]">{zone.name}</Link>)}
+            </nav>
+          </div>
+          <div>
+            <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">For the neighborhood</h2>
+            <nav aria-label="Platform links" className="flex flex-col items-start gap-3">
+              <Link href="/onboard" className="font-semibold text-[12px] text-[#335e41] hover:text-[#183e35]">List your business for free ↗</Link>
+              <Link href="/deals" className="text-[12px] text-[#667064] hover:text-[#183e35]">Student deals</Link>
+              <Link href="/dashboard" className="text-[12px] text-[#667064] hover:text-[#183e35]">Manage your business</Link>
+              <Link href="/ambassador" className="text-[12px] text-[#667064] hover:text-[#183e35]">Ambassadors</Link>
+              <Link href="/admin" className="text-[12px] text-[#667064] hover:text-[#183e35]">Admin</Link>
+            </nav>
           </div>
         </div>
-
-        {/* Bottom Bar */}
-        <div className="border-t border-[#DEE8FF]/20 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#DEE8FF]/60 font-body">
-          <div>
-            © {new Date().getFullYear()} MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses).
-          </div>
-          <div className="flex gap-4">
-            <span>Uasin Gishu County, Kenya</span>
-            <span>Kesses - Cheptiret Road</span>
-          </div>
+        <div className="flex flex-col gap-3 pt-6 text-[11px] text-[#758071] sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} MoiMashinani. Local people. Real connections.</span>
+          <span>Moi University Main Campus · Kesses, Kenya</span>
         </div>
       </div>
     </footer>

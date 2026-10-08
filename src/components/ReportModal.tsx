@@ -39,30 +39,30 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#001C3B]/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-[#243b32]/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl max-w-md w-full overflow-hidden">
-        <div className="bg-[#FFDAD6] px-4 py-3 border-b-2 border-[#001C3B] flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[#BA1A1A]">
+        <div className="bg-[#fce7e1] px-4 py-3 border-b-2 border-[#dfe5d8] flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[#a7302d]">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <h2 className="font-display font-bold text-base md:text-lg text-[#001C3B] uppercase">
+            <h2 className="font-display font-bold text-base md:text-lg text-[#243b32] uppercase">
               Report a Problem: {business.name}
             </h2>
           </div>
-          <button onClick={onClose} className="text-[#001C3B] hover:text-[#BA1A1A] p-1">
+          <button onClick={onClose} className="text-[#243b32] hover:text-[#a7302d] p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {submitted ? (
           <div className="p-6 text-center space-y-3">
-            <CheckCircle2 className="w-12 h-12 text-[#0B6E70] mx-auto" />
-            <h3 className="font-display font-bold text-xl text-[#001C3B]">Report Received</h3>
-            <p className="text-sm text-[#594045]">
+            <CheckCircle2 className="w-12 h-12 text-[#335e41] mx-auto" />
+            <h3 className="font-display font-bold text-xl text-[#243b32]">Report Received</h3>
+            <p className="text-sm text-[#667064]">
               Thanks. Our student verification team will review this business within 24 hours.
             </p>
             <button
               onClick={onClose}
-              className="mt-4 bg-[#001C3B] text-white px-6 py-2 rounded-full font-bold text-sm signboard-border press-action"
+              className="mt-4 bg-[#243b32] text-white px-6 py-2 rounded-full font-bold text-sm signboard-border press-action"
             >
               Close
             </button>
@@ -70,7 +70,7 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
         ) : (
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+              <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                 What is the issue?
               </label>
               <div className="space-y-2 text-sm">
@@ -84,7 +84,7 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
                 ].map((item) => (
                   <label
                     key={item.id}
-                    className="flex items-center gap-2 p-2 rounded signboard-border hover:bg-[#F0F3FF] cursor-pointer"
+                    className="flex items-center gap-2 p-2 rounded signboard-border hover:bg-[#e9eedf] cursor-pointer"
                   >
                     <input
                       type="radio"
@@ -92,16 +92,16 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
                       value={item.id}
                       checked={reason === item.id}
                       onChange={() => setReason(item.id as typeof reason)}
-                      className="text-[#9B0044] focus:ring-[#9B0044]"
+                      className="text-[#183e35] focus:ring-[#183e35]"
                     />
-                    <span className="text-[#001C3B] font-medium">{item.label}</span>
+                    <span className="text-[#243b32] font-medium">{item.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+              <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                 Additional Details (Optional)
               </label>
               <textarea
@@ -109,7 +109,7 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
                 onChange={(e) => setDetails(e.target.value)}
                 rows={2}
                 placeholder="Give any helpful context for our campus moderator..."
-                className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
               />
             </div>
 
@@ -117,14 +117,14 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-bold text-[#594045]"
+                className="px-4 py-2 text-sm font-bold text-[#667064]"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#BA1A1A] hover:bg-[#93000A] text-white font-display font-bold text-sm uppercase px-5 py-2.5 rounded-full signboard-border signboard-shadow press-action"
+                className="bg-[#a7302d] hover:bg-[#8f2424] text-white font-display font-bold text-sm uppercase px-5 py-2.5 rounded-full signboard-border signboard-shadow press-action"
               >
                 {loading ? 'Submitting...' : 'Submit Report'}
               </button>

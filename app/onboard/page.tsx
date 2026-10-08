@@ -93,29 +93,29 @@ export default function BusinessOnboardPage() {
   const strength = calculateStrength();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F2F5F8]">
+    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
       <Navbar />
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 md:px-8 py-8 space-y-6">
         {/* Header */}
-        <div className="bg-white border-2 border-[#001C3B] rounded-2xl p-6 shadow-[3px_3px_0px_#001C3B] text-center space-y-2">
-          <Store className="w-10 h-10 text-[#C2185B] mx-auto" />
-          <h1 className="font-display font-black text-2xl md:text-3xl text-[#001C3B] uppercase">
+        <div className="page-hero bg-white border border-[#dfe5d8] rounded-2xl p-6 shadow-[0_10px_28px_#243b3212] text-center space-y-2">
+          <Store className="w-10 h-10 text-[#335e41] mx-auto" />
+          <h1 className="font-display font-black text-2xl md:text-3xl text-[#243b32] uppercase">
             List Your Business — Free
           </h1>
-          <p className="text-xs md:text-sm text-[#594045] max-w-md mx-auto font-body">
+          <p className="text-xs md:text-sm text-[#667064] max-w-md mx-auto font-body">
             Get discovered by thousands of Moi University students. Setup takes less than 3 minutes.
           </p>
 
           {/* Profile Strength Progress Bar */}
           <div className="max-w-xs mx-auto pt-2 space-y-1">
-            <div className="flex justify-between text-[11px] font-bold text-[#001C3B]">
+            <div className="flex justify-between text-[11px] font-bold text-[#243b32]">
               <span>Profile Completeness</span>
               <span>{strength}%</span>
             </div>
-            <div className="w-full bg-[#E7EEFF] h-2.5 rounded-full overflow-hidden border border-[#001C3B]">
+            <div className="w-full bg-[#edf2e5] h-2.5 rounded-full overflow-hidden border border-[#dfe5d8]">
               <div
-                className="bg-[#0B6E70] h-full transition-all duration-300"
+                className="bg-[#335e41] h-full transition-all duration-300"
                 style={{ width: `${strength}%` }}
               ></div>
             </div>
@@ -124,24 +124,24 @@ export default function BusinessOnboardPage() {
 
         {successSlug ? (
           /* SUCCESS SCREEN */
-          <div className="bg-white border-2 border-[#001C3B] rounded-2xl p-8 shadow-[4px_4px_0px_#001C3B] text-center space-y-4">
-            <CheckCircle2 className="w-16 h-16 text-[#0B6E70] mx-auto" />
-            <h2 className="font-display font-black text-3xl text-[#001C3B] uppercase">
+          <div className="bg-white border border-[#dfe5d8] rounded-2xl p-8 shadow-[0_10px_28px_#243b3212] text-center space-y-4">
+            <CheckCircle2 className="w-16 h-16 text-[#335e41] mx-auto" />
+            <h2 className="font-display font-black text-3xl text-[#243b32] uppercase">
               You&apos;re Live on MoiMashinani!
             </h2>
-            <p className="text-sm text-[#594045] max-w-md mx-auto">
+            <p className="text-sm text-[#667064] max-w-md mx-auto">
               Your business profile has been published. Students can now find your shop, check your prices, and contact you in two taps.
             </p>
             <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href={`/b/${successSlug}`}
-                className="bg-[#001C3B] text-white font-display font-bold text-xs uppercase px-5 py-2.5 rounded-full signboard-border press-action"
+                className="bg-[#243b32] text-white font-display font-bold text-xs uppercase px-5 py-2.5 rounded-full signboard-border press-action"
               >
                 View Public Shop Page
               </Link>
               <Link
                 href={`/dashboard/${successSlug}`}
-                className="bg-[#C2185B] text-white font-display font-bold text-xs uppercase px-5 py-2.5 rounded-full signboard-border press-action"
+                className="bg-[#335e41] text-white font-display font-bold text-xs uppercase px-5 py-2.5 rounded-full signboard-border press-action"
               >
                 Open Merchant Dashboard
               </Link>
@@ -151,23 +151,23 @@ export default function BusinessOnboardPage() {
           /* STEP WIZARD FORM */
           <form onSubmit={handleSubmit} className="bg-white signboard-border-thick rounded-xl p-6 signboard-shadow-lg space-y-5">
             {/* Step indicator */}
-            <div className="flex items-center justify-between text-xs font-display font-bold uppercase pb-3 border-b border-[#D5DCE4]">
-              <span className={step >= 1 ? 'text-[#9B0044]' : 'text-[#8D6F75]'}>1. Basic Info</span>
+            <div className="flex items-center justify-between text-xs font-display font-bold uppercase pb-3 border-b border-[#dfe5d8]">
+              <span className={step >= 1 ? 'text-[#183e35]' : 'text-[#758071]'}>1. Basic Info</span>
               <span>→</span>
-              <span className={step >= 2 ? 'text-[#9B0044]' : 'text-[#8D6F75]'}>2. Location & Contact</span>
+              <span className={step >= 2 ? 'text-[#183e35]' : 'text-[#758071]'}>2. Location & Contact</span>
               <span>→</span>
-              <span className={step >= 3 ? 'text-[#9B0044]' : 'text-[#8D6F75]'}>3. Prices & Publish</span>
+              <span className={step >= 3 ? 'text-[#183e35]' : 'text-[#758071]'}>3. Prices & Publish</span>
             </div>
 
             {/* STEP 1 */}
             {step === 1 && (
               <div className="space-y-4">
-                <h2 className="font-display font-bold text-lg text-[#001C3B] uppercase">
+                <h2 className="font-display font-bold text-lg text-[#243b32] uppercase">
                   Business Identity
                 </h2>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     Business Name *
                   </label>
                   <input
@@ -176,18 +176,18 @@ export default function BusinessOnboardPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Modern Kinyozi & Barbershop"
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     Category *
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c.slug} value={c.slug}>
@@ -198,7 +198,7 @@ export default function BusinessOnboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     One-Line Tagline
                   </label>
                   <input
@@ -206,7 +206,7 @@ export default function BusinessOnboardPage() {
                     value={tagline}
                     onChange={(e) => setTagline(e.target.value)}
                     placeholder="e.g. Clean fades, beards & student haircut rates"
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   />
                 </div>
 
@@ -215,7 +215,7 @@ export default function BusinessOnboardPage() {
                   onClick={() => {
                     if (name.trim()) setStep(2);
                   }}
-                  className="w-full bg-[#001C3B] text-white font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border press-action mt-2"
+                  className="w-full bg-[#243b32] text-white font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border press-action mt-2"
                 >
                   Continue to Step 2 →
                 </button>
@@ -225,13 +225,13 @@ export default function BusinessOnboardPage() {
             {/* STEP 2 */}
             {step === 2 && (
               <div className="space-y-4">
-                <h2 className="font-display font-bold text-lg text-[#001C3B] uppercase">
+                <h2 className="font-display font-bold text-lg text-[#243b32] uppercase">
                   Where & How Students Reach You
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                    <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                       Phone Number *
                     </label>
                     <input
@@ -240,12 +240,12 @@ export default function BusinessOnboardPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="0712 345 678"
-                      className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                      className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                    <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                       WhatsApp Number
                     </label>
                     <input
@@ -253,19 +253,19 @@ export default function BusinessOnboardPage() {
                       value={whatsapp}
                       onChange={(e) => setWhatsapp(e.target.value)}
                       placeholder="Leave blank if same as phone"
-                      className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                      className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     Campus Zone *
                   </label>
                   <select
                     value={zone}
                     onChange={(e) => setZone(e.target.value)}
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   >
                     {ZONES.slice(1).map((z) => (
                       <option key={z.slug} value={z.slug}>
@@ -276,7 +276,7 @@ export default function BusinessOnboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     Landmark & Description *
                   </label>
                   <input
@@ -285,12 +285,12 @@ export default function BusinessOnboardPage() {
                     value={landmark}
                     onChange={(e) => setLandmark(e.target.value)}
                     placeholder="e.g. Stage shopping complex, 1st floor next to Bata"
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     Description of Your Work
                   </label>
                   <textarea
@@ -298,7 +298,7 @@ export default function BusinessOnboardPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     placeholder="Describe what you specialize in, turnaround times, and experience..."
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   />
                 </div>
 
@@ -306,7 +306,7 @@ export default function BusinessOnboardPage() {
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="px-4 py-2 text-xs font-bold text-[#594045]"
+                    className="px-4 py-2 text-xs font-bold text-[#667064]"
                   >
                     ← Back
                   </button>
@@ -315,7 +315,7 @@ export default function BusinessOnboardPage() {
                     onClick={() => {
                       if (phone.trim() && landmark.trim()) setStep(3);
                     }}
-                    className="flex-1 bg-[#001C3B] text-white font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border press-action"
+                    className="flex-1 bg-[#243b32] text-white font-display font-bold text-sm uppercase py-2.5 rounded-full signboard-border press-action"
                   >
                     Continue to Step 3 →
                   </button>
@@ -326,7 +326,7 @@ export default function BusinessOnboardPage() {
             {/* STEP 3 */}
             {step === 3 && (
               <div className="space-y-4">
-                <h2 className="font-display font-bold text-lg text-[#001C3B] uppercase">
+                <h2 className="font-display font-bold text-lg text-[#243b32] uppercase">
                   Prices & Student Deals
                 </h2>
 
@@ -337,14 +337,14 @@ export default function BusinessOnboardPage() {
                       value={service1Name}
                       onChange={(e) => setService1Name(e.target.value)}
                       placeholder="Main Service (e.g. Haircut)"
-                      className="bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                      className="bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                     />
                     <input
                       type="number"
                       value={service1Price}
                       onChange={(e) => setService1Price(e.target.value)}
                       placeholder="Price in KES (e.g. 150)"
-                      className="bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                      className="bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                     />
                   </div>
 
@@ -354,20 +354,20 @@ export default function BusinessOnboardPage() {
                       value={service2Name}
                       onChange={(e) => setService2Name(e.target.value)}
                       placeholder="Second Service (e.g. Beard shave)"
-                      className="bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                      className="bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                     />
                     <input
                       type="number"
                       value={service2Price}
                       onChange={(e) => setService2Price(e.target.value)}
                       placeholder="Price in KES (e.g. 100)"
-                      className="bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                      className="bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#001C3B] uppercase mb-1">
+                  <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                     Student Discount (Optional)
                   </label>
                   <input
@@ -375,7 +375,7 @@ export default function BusinessOnboardPage() {
                     value={studentDiscount}
                     onChange={(e) => setStudentDiscount(e.target.value)}
                     placeholder="e.g. 10% discount for students on weekdays"
-                    className="w-full bg-[#F0F3FF] signboard-border rounded px-3 py-2 text-sm text-[#001C3B] focus:outline-none"
+                    className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
                   />
                 </div>
 
@@ -383,14 +383,14 @@ export default function BusinessOnboardPage() {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="px-4 py-2 text-xs font-bold text-[#594045]"
+                    className="px-4 py-2 text-xs font-bold text-[#667064]"
                   >
                     ← Back
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex-1 bg-[#C2185B] hover:bg-[#9E1049] text-white font-display font-bold text-sm uppercase py-3 rounded-full border border-[#001C3B] shadow-[2px_2px_0px_#001C3B] press-action flex items-center justify-center gap-2"
+                    className="flex-1 bg-[#335e41] hover:bg-[#2c5141] text-white font-display font-bold text-sm uppercase py-3 rounded-full border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] press-action flex items-center justify-center gap-2"
                   >
                     <PlusCircle className="w-5 h-5" />
                     <span>{submitting ? 'Publishing Shop...' : 'Publish Business Profile'}</span>

@@ -1,296 +1,128 @@
-'use client';
+"use client";
 
-import React, { useState, Suspense } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ZONES } from '@/lib/constants';
-import {
-  MapPin,
-  Search,
-  ChevronDown,
-  Check,
-  Percent,
-  Store,
-  Plus,
-  Menu,
-  X,
-  Award,
-  ShieldAlert,
-  Home,
-  SlidersHorizontal,
-} from '@/components/icons';
+import React, { Suspense, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Award, Check, ChevronDown, Menu, Plus, Search, ShieldAlert, X, MapPin } from "lucide-react";
+import { ZONES } from "@/lib/constants";
+import { SiteBrand } from "@/components/SiteBrand";
+
+const navLinks = [
+  { href: "/search", label: "Explore" },
+  { href: "/deals", label: "Student deals" },
+  { href: "/ambassador", label: "Ambassadors" },
+  { href: "/dashboard", label: "Merchant hub" },
+];
 
 function NavbarInner() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentZone = searchParams.get('zone') || 'all';
-  const [zoneMenuOpen, setZoneMenuOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [quickSearch, setQuickSearch] = useState('');
+  const currentZone = searchParams.get("zone") || "all";
+  const currentZoneInfo = ZONES.find((zone) => zone.slug === currentZone) || ZONES[0];
+  const [zoneOpen, setZoneOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
-  const selectedZoneObj = ZONES.find((z) => z.slug === currentZone) || ZONES[0];
-
-  const handleZoneChange = (zoneSlug: string) => {
-    setZoneMenuOpen(false);
-    setMobileMenuOpen(false);
+  function selectZone(zone: string) {
+    setZoneOpen(false);
+    setMobileOpen(false);
     const params = new URLSearchParams(searchParams.toString());
-    if (zoneSlug === 'all') {
-      params.delete('zone');
-    } else {
-      params.set('zone', zoneSlug);
-    }
-    router.push(`${pathname}?${params.toString()}`);
-  };
+    if (zone === "all") params.delete("zone");
+    else params.set("zone", zone);
+    router.push(`${pathname}${params.size ? `?${params.toString()}` : ""}`);
+  }
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickSearch.trim()) return;
-    setMobileMenuOpen(false);
-    router.push(`/search?q=${encodeURIComponent(quickSearch.trim())}&zone=${currentZone}`);
-  };
+  function submitSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!query.trim()) return;
+    const params = new URLSearchParams({ q: query.trim() });
+    if (currentZone !== "all") params.set("zone", currentZone);
+    setMobileOpen(false);
+    router.push(`/search?${params.toString()}`);
+  }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b-2 border-[#001C3B] shadow-[2px_2px_0px_#001C3B]">
-      {/* Top Main Bar */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-2.5 max-w-7xl mx-auto flex items-center justify-between gap-3">
-        {/* Brand & Campus Context */}
-        <div className="flex items-center gap-3 md:gap-5 flex-shrink-0">
-          <Link
-            href="/"
-            className="flex items-center gap-2 group press-action select-none"
-            title="MoiMashinani Home"
-          >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-[#C2185B] text-white border-[1.5px] border-[#001C3B] shadow-[2px_2px_0px_#001C3B] flex items-center justify-center font-display font-extrabold text-base sm:text-lg rounded">
-              M
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display font-black tracking-tight text-[#001C3B] text-lg sm:text-xl uppercase leading-none">
-                MoiMashinani
-              </span>
-              <span className="text-[10px] font-bold text-[#594045] uppercase tracking-wider hidden sm:inline">
-                Kesses Campus Hub
-              </span>
-            </div>
-          </Link>
-
-          {/* Location Selector Pill */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setZoneMenuOpen(!zoneMenuOpen)}
-              className="flex items-center gap-1.5 bg-[#F0F3FF] hover:bg-[#DEE8FF] border-[1.5px] border-[#001C3B] shadow-[1px_1px_0px_#001C3B] rounded-full px-2.5 sm:px-3 py-1 text-xs font-bold text-[#001C3B] press-action"
-            >
-              <MapPin className="w-3.5 h-3.5 text-[#C2185B] flex-shrink-0" />
-              <span className="truncate max-w-[110px] sm:max-w-[150px]">{selectedZoneObj.name}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-[#594045]" />
+    <header className="relative z-50 w-full border-b border-[#e3e7dc] bg-[#f7f8f2]">
+      <div className="mx-auto flex min-h-[82px] max-w-[1328px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
+        <div className="flex min-w-0 items-center gap-4 lg:gap-6">
+          <SiteBrand />
+          <div className="relative hidden xl:block">
+            <button type="button" aria-label="Choose campus area" aria-expanded={zoneOpen}
+              onClick={() => setZoneOpen((value) => !value)}
+              className="inline-flex min-h-10 max-w-[190px] items-center gap-2 rounded-full bg-[#e9eedf] px-3 text-[11px] font-semibold text-[#335e41] transition-colors hover:bg-[#dfe9cf]">
+              <MapPin size={15} className="shrink-0" />
+              <span className="truncate">{currentZoneInfo.name}</span>
+              <ChevronDown size={14} className="shrink-0" />
             </button>
-
-            {zoneMenuOpen && (
+            {zoneOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-40 bg-black/10"
-                  onClick={() => setZoneMenuOpen(false)}
-                />
-                <div className="absolute left-0 mt-2 w-72 bg-white border-2 border-[#001C3B] shadow-[4px_4px_0px_#001C3B] rounded-xl py-2 z-50">
-                  <div className="px-3 py-1.5 border-b border-[#D5DCE4] text-[11px] font-bold uppercase tracking-wider text-[#594045] flex items-center justify-between">
-                    <span>Campus Zones</span>
-                    <span className="text-[10px] text-[#0B6E70]">Main Campus</span>
-                  </div>
-                  <div className="max-h-72 overflow-y-auto">
-                    {ZONES.map((zone) => (
-                      <button
-                        key={zone.slug}
-                        onClick={() => handleZoneChange(zone.slug)}
-                        className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-[#F0F3FF] transition-colors ${
-                          currentZone === zone.slug
-                            ? 'bg-[#E7EEFF] font-bold text-[#9B0044]'
-                            : 'text-[#001C3B]'
-                        }`}
-                      >
-                        <div>
-                          <div className="font-semibold">{zone.name}</div>
-                          <div className="text-[10px] text-[#594045]">{zone.landmarkHint}</div>
-                        </div>
-                        {currentZone === zone.slug && (
-                          <Check className="w-4 h-4 text-[#9B0044]" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                <button type="button" aria-label="Close campus area selector" className="fixed inset-0 z-40 cursor-default" onClick={() => setZoneOpen(false)} />
+                <div className="absolute left-0 top-full z-50 mt-2 max-h-80 w-[290px] overflow-y-auto rounded-2xl border border-[#dce5d7] bg-white p-2 shadow-[0_18px_45px_#183e3520]">
+                  <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#667064]">Look around campus</p>
+                  {ZONES.map((zone) => (
+                    <button key={zone.slug} type="button" onClick={() => selectZone(zone.slug)}
+                      className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-xs hover:bg-[#f2f5eb] ${currentZone === zone.slug ? "bg-[#e9eedf] text-[#183e35]" : "text-[#667064]"}`}>
+                      <span><strong className="block text-[#183e35]">{zone.name}</strong><small>{zone.landmarkHint}</small></span>
+                      {currentZone === zone.slug && <Check size={17} className="shrink-0 text-[#335e41]" />}
+                    </button>
+                  ))}
                 </div>
               </>
             )}
           </div>
         </div>
 
-        {/* Quick Search on Desktop (Medium and up) */}
-        <div className="hidden lg:flex items-center flex-1 max-w-sm mx-2">
-          <form
-            onSubmit={handleSearchSubmit}
-            className="w-full flex items-center bg-[#F9F9FF] border-[1.5px] border-[#001C3B] rounded-lg shadow-[1px_1px_0px_#001C3B] px-3 py-1.5 focus-within:ring-2 focus-within:ring-[#9B0044]"
-          >
-            <Search className="w-4 h-4 text-[#594045] mr-2 flex-shrink-0" />
-            <input
-              type="text"
-              value={quickSearch}
-              onChange={(e) => setQuickSearch(e.target.value)}
-              placeholder="Search fundi, braids, print..."
-              className="w-full bg-transparent border-0 p-0 text-xs text-[#001C3B] placeholder:text-[#594045] focus:outline-none"
-            />
-            <span className="text-[9px] font-bold bg-[#E7EEFF] text-[#001C3B] px-1.5 py-0.5 rounded border border-[#001C3B] ml-1.5">
-              KESSES
-            </span>
-          </form>
-        </div>
+        <form onSubmit={submitSearch} role="search" className="hidden min-w-0 max-w-[250px] flex-1 items-center gap-2 rounded-xl border border-[#dce5d7] bg-white px-3.5 py-2.5 focus-within:border-[#879c6d] lg:flex xl:max-w-[310px]">
+          <Search size={16} className="shrink-0 text-[#667064]" />
+          <input type="search" aria-label="Search local businesses" placeholder="Find something nearby..."
+            className="min-w-0 w-full bg-transparent text-xs text-[#183e35] outline-none placeholder:text-[#879084]" value={query} onChange={(event) => setQuery(event.target.value)} />
+        </form>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1.5 lg:gap-2 flex-shrink-0">
-          <Link
-            href="/search"
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-              pathname === '/search' ? 'text-[#9B0044] bg-[#FFEAEF]' : 'text-[#001C3B] hover:bg-[#F0F3FF]'
-            }`}
-          >
-            Browse
-          </Link>
-
-          <Link
-            href="/deals"
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
-              pathname === '/deals' ? 'text-[#795900] bg-[#FFF8E1]' : 'text-[#795900] hover:bg-[#FFF8E1]'
-            }`}
-          >
-            <Percent className="w-3.5 h-3.5 text-[#FFC53D]" />
-            <span>Deals</span>
-          </Link>
-
-          <Link
-            href="/ambassador"
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-              pathname === '/ambassador' ? 'text-[#0B6E70] bg-[#E7F6F6]' : 'text-[#0B6E70] hover:bg-[#E7F6F6]'
-            }`}
-          >
-            Ambassadors
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-[#001C3B] hover:bg-[#F0F3FF] transition-colors"
-          >
-            Merchant Hub
-          </Link>
-
-          {/* List Business Primary CTA */}
-          <Link
-            href="/onboard"
-            className="ml-1 bg-[#9B0044] hover:bg-[#C2185B] text-white font-display font-bold text-xs uppercase px-3 py-1.5 rounded-full border-[1.5px] border-[#001C3B] shadow-[2px_2px_0px_#001C3B] press-action flex items-center gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>List Shop Free</span>
-          </Link>
+        <nav aria-label="Main navigation" className="hidden items-center gap-4 lg:flex xl:gap-6">
+          {navLinks.map(({ href, label }) => (
+            <Link key={href} href={href} aria-current={pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard")) ? "page" : undefined}
+              className={`relative inline-flex min-h-11 items-center text-[12px] font-semibold transition-colors hover:text-[#183e35] ${pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard")) ? "text-[#183e35] after:absolute after:bottom-[7px] after:left-0 after:h-[2px] after:w-6 after:bg-[#335e41]" : "text-[#667064]"}`}>
+              {label}
+            </Link>
+          ))}
         </nav>
 
-        {/* Mobile Action & Menu Toggle */}
-        <div className="flex md:hidden items-center gap-2">
-          <Link
-            href="/onboard"
-            className="bg-[#9B0044] text-white text-[11px] font-bold px-2.5 py-1 rounded-full border-[1.5px] border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center gap-0.5"
-          >
-            <Plus className="w-3 h-3" />
-            <span>List Free</span>
+        <div className="flex items-center gap-2">
+          <Link href="/onboard" className="inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-[#183e35] px-3.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4">
+            <Plus size={16} />
+            <span className="hidden sm:inline">List your business</span><span className="sm:hidden">List free</span>
+            <span className="hidden rounded bg-[#d9f279] px-1.5 py-0.5 text-[9px] font-bold text-[#264b36] lg:inline">Free</span>
           </Link>
-
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 bg-[#F0F3FF] border-[1.5px] border-[#001C3B] rounded-lg shadow-[1px_1px_0px_#001C3B] text-[#001C3B] press-action"
-            aria-label="Toggle navigation"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <button type="button" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((value) => !value)}
+            className="grid h-10 w-10 place-items-center rounded-lg border border-[#dce5d7] bg-white text-[#183e35] lg:hidden">
+            {mobileOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
       </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t-2 border-[#001C3B] bg-white px-4 py-4 space-y-4 shadow-lg animate-in slide-in-from-top-2">
-          {/* Mobile search bar */}
-          <form onSubmit={handleSearchSubmit} className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#594045] absolute left-3 top-2.5" />
-              <input
-                type="text"
-                value={quickSearch}
-                onChange={(e) => setQuickSearch(e.target.value)}
-                placeholder="Search fundi, cyber, braids..."
-                className="w-full pl-9 pr-3 py-2 bg-[#F0F3FF] border-[1.5px] border-[#001C3B] rounded-lg text-xs text-[#001C3B] focus:outline-none"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-[#001C3B] text-white text-xs font-bold px-3 py-2 rounded-lg border-[1.5px] border-[#001C3B] press-action"
-            >
-              Search
-            </button>
+      {mobileOpen && (
+        <div className="border-t border-[#e3e7dc] bg-[#f7f8f2] px-5 pb-5 pt-4 lg:hidden">
+          <form onSubmit={submitSearch} role="search" className="flex gap-2">
+            <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} aria-label="Search local businesses"
+              className="min-w-0 flex-1 rounded-xl border border-[#dce5d7] bg-white px-3.5 py-3 text-sm text-[#183e35]" placeholder="Search around campus..." />
+            <button type="submit" className="rounded-xl bg-[#183e35] px-4 text-xs font-semibold text-white"><Search size={18} /></button>
           </form>
-
-          {/* Mobile navigation links */}
-          <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-            <Link
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-[#F0F3FF] rounded-lg border-[1.5px] border-[#001C3B] flex items-center gap-2 text-[#001C3B]"
-            >
-              <Home className="w-4 h-4 text-[#C2185B]" />
-              <span>Home</span>
-            </Link>
-
-            <Link
-              href="/search"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-[#F0F3FF] rounded-lg border-[1.5px] border-[#001C3B] flex items-center gap-2 text-[#001C3B]"
-            >
-              <SlidersHorizontal className="w-4 h-4 text-[#0B6E70]" />
-              <span>Browse All</span>
-            </Link>
-
-            <Link
-              href="/deals"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-[#FFF8E1] rounded-lg border-[1.5px] border-[#001C3B] flex items-center gap-2 text-[#795900]"
-            >
-              <Percent className="w-4 h-4 text-[#FFC53D]" />
-              <span>Student Deals</span>
-            </Link>
-
-            <Link
-              href="/ambassador"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-[#E7F6F6] rounded-lg border-[1.5px] border-[#001C3B] flex items-center gap-2 text-[#0B6E70]"
-            >
-              <Award className="w-4 h-4 text-[#0B6E70]" />
-              <span>Ambassador Tool</span>
-            </Link>
-
-            <Link
-              href="/dashboard"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-[#F0F3FF] rounded-lg border-[1.5px] border-[#001C3B] flex items-center gap-2 text-[#001C3B]"
-            >
-              <Store className="w-4 h-4 text-[#9B0044]" />
-              <span>Merchant Hub</span>
-            </Link>
-
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-2.5 bg-[#FFDAD6] rounded-lg border-[1.5px] border-[#001C3B] flex items-center gap-2 text-[#BA1A1A]"
-            >
-              <ShieldAlert className="w-4 h-4 text-[#BA1A1A]" />
-              <span>Campus Admin</span>
-            </Link>
+          <label className="mt-3 flex items-center gap-3 text-xs font-semibold text-[#335e41]">
+            <MapPin size={16} className="shrink-0" />
+            <span className="shrink-0">Around</span>
+            <select aria-label="Choose campus area" value={currentZone} onChange={(event) => selectZone(event.target.value)}
+              className="min-w-0 w-full rounded-xl border border-[#dce5d7] bg-white px-3 py-2.5 text-xs text-[#183e35]">
+              {ZONES.map((zone) => <option key={zone.slug} value={zone.slug}>{zone.name}</option>)}
+            </select>
+          </label>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {[{ href: "/", label: "Home" }, ...navLinks, { href: "/admin", label: "Admin" }].map(({ href, label }) => (
+              <Link key={href} href={href} onClick={() => setMobileOpen(false)}
+                className="rounded-xl border border-[#e3e7dc] bg-white px-3 py-3 text-xs font-semibold text-[#335e41] hover:bg-[#e9eedf]">{label}</Link>
+            ))}
           </div>
+          <div className="mt-3 flex items-center gap-2 text-xs text-[#667064]"><Award size={15} /> Built for Moi University & Kesses <ShieldAlert size={15} className="ml-auto" /></div>
         </div>
       )}
     </header>
@@ -298,17 +130,5 @@ function NavbarInner() {
 }
 
 export function Navbar() {
-  return (
-    <Suspense
-      fallback={
-        <header className="w-full bg-white border-b-2 border-[#001C3B] px-4 py-3">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="font-display font-black text-xl text-[#9B0044]">MOIMASHINANI</div>
-          </div>
-        </header>
-      }
-    >
-      <NavbarInner />
-    </Suspense>
-  );
+  return <Suspense fallback={<header className="border-b border-[#e3e7dc] bg-[#f7f8f2] px-5 py-5"><SiteBrand /></header>}><NavbarInner /></Suspense>;
 }

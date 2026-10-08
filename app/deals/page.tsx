@@ -26,7 +26,7 @@ export default function DealsAndSafetyPage() {
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pb-20 md:pb-12">
         {/* Header Banner */}
-        <section className="bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8">
+        <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8">
           <div className="inline-flex items-center gap-1.5 bg-[#e9eedf] text-[#526936] text-xs font-display font-bold px-3 py-1 rounded-full border border-[#dfe5d8] mb-3">
             <CheckCircle2 className="w-4 h-4" />
             <span>STUDENT PERKS & SAFETY HUB</span>

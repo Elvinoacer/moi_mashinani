@@ -178,7 +178,7 @@ export default function BusinessProfilePage({
   const todayHours = business.hours[currentDayName];
 
   return (
-    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2] pb-24 md:pb-12">
+    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2] pb-40 md:pb-12">
       <Navbar />
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
@@ -525,7 +525,7 @@ export default function BusinessProfilePage({
               Similar Nearby Shops
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {similarBusinesses.map((b) => (
                 <BusinessCard key={b.id} business={b} />
               ))}
@@ -535,7 +535,7 @@ export default function BusinessProfilePage({
       </main>
 
       {/* STICKY BOTTOM CONTACT BAR (MOBILE THUMB-REACH) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#dfe5d8] p-2.5 z-40 shadow-lg grid grid-cols-2 gap-2">
+      <div className="md:hidden fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 bg-[#f7f8f2]/95 backdrop-blur border-t border-[#dfe5d8] px-3 py-2.5 z-40 shadow-[0_-5px_20px_#243b3210] grid grid-cols-2 gap-2">
         <a
           href={`tel:${business.phone}`}
           onClick={handleCall}
@@ -585,7 +585,7 @@ export default function BusinessProfilePage({
 
       {/* Share Toast */}
       {shareToast && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#243b32] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border signboard-shadow-lg z-50">
+        <div className="fixed bottom-[170px] left-1/2 -translate-x-1/2 bg-[#243b32] text-white text-xs font-bold px-4 py-2 rounded-full signboard-border signboard-shadow-lg z-50">
           Link copied to clipboard!
         </div>
       )}

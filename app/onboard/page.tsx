@@ -98,7 +98,7 @@ export default function BusinessOnboardPage() {
 
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 md:px-8 py-8 space-y-6">
         {/* Header */}
-        <div className="bg-white border border-[#dfe5d8] rounded-2xl p-6 shadow-[0_10px_28px_#243b3212] text-center space-y-2">
+        <div className="page-hero bg-white border border-[#dfe5d8] rounded-2xl p-6 shadow-[0_10px_28px_#243b3212] text-center space-y-2">
           <Store className="w-10 h-10 text-[#335e41] mx-auto" />
           <h1 className="font-display font-black text-2xl md:text-3xl text-[#243b32] uppercase">
             List Your Business — Free

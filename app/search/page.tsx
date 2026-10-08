@@ -233,13 +233,13 @@ function SearchContent() {
 
         {/* RESULTS LIST */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-44 bg-white rounded-lg signboard-border animate-pulse"></div>
+              <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"></div>
             ))}
           </div>
         ) : results.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {results.map((biz) => (
               <BusinessCard
                 key={biz.id}
@@ -290,7 +290,7 @@ function SearchContent() {
           <div className="flex items-center gap-2">
             <Info className="w-4 h-4 text-[#335e41] flex-shrink-0" />
             <span>
-              Featured (yellow) & Recommended (teal) listings are promoted by local owners. Promoted shops never outrank better matches for queries they do not serve.
+              Featured and Recommended listings are promoted by local owners. Promoted shops never outrank better matches for queries they do not serve.
             </span>
           </div>
           <button

@@ -47,7 +47,7 @@ export default function CategoryPage({
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20 md:pb-12">
         {/* Category Header Banner */}
-        <section className="bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-5 md:p-8 flex items-start gap-4">
+        <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-5 md:p-8 flex items-start gap-4">
           <div
             className="w-14 h-14 md:w-16 md:h-16 rounded-xl border border-[#dfe5d8] flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${categoryObj.color}15`, color: categoryObj.color }}

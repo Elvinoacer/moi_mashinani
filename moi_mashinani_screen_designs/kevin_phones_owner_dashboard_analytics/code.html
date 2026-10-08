@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Merchant Hub | Kevin Phones &amp; Laptops - MoiMashinani Kesses</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed": "#3f0018",
+            "on-primary-fixed-variant": "#8f003f",
+            "on-primary-container": "#ffd9df",
+            "background": "#f9f9ff",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#ffd9df",
+            "tertiary": "#005658",
+            "on-tertiary-fixed-variant": "#004f51",
+            "tertiary-fixed": "#a0f0f2",
+            "surface-tint": "#b90c55",
+            "outline": "#8d6f75",
+            "primary-fixed-dim": "#ffb1c2",
+            "surface-container-low": "#f0f3ff",
+            "on-background": "#001c3b",
+            "on-secondary-fixed-variant": "#5c4300",
+            "error": "#ba1a1a",
+            "on-tertiary": "#ffffff",
+            "outline-variant": "#e1bec4",
+            "surface-container": "#e7eeff",
+            "primary-container": "#c2185b",
+            "inverse-primary": "#ffb1c2",
+            "on-surface": "#001c3b",
+            "surface-dim": "#c7dbff",
+            "on-error-container": "#93000a",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#6f5100",
+            "primary": "#9b0044",
+            "on-tertiary-container": "#a0f0f2",
+            "inverse-surface": "#193151",
+            "tertiary-fixed-dim": "#84d4d5",
+            "surface-variant": "#d5e3ff",
+            "secondary": "#795900",
+            "secondary-fixed-dim": "#f7be36",
+            "surface-container-lowest": "#ffffff",
+            "surface": "#f9f9ff",
+            "secondary-container": "#fdc33b",
+            "tertiary-container": "#107072",
+            "secondary-fixed": "#ffdea0",
+            "surface-container-highest": "#d5e3ff",
+            "inverse-on-surface": "#ebf1ff",
+            "surface-container-high": "#dee8ff",
+            "on-surface-variant": "#594045",
+            "on-error": "#ffffff",
+            "surface-bright": "#f9f9ff",
+            "on-tertiary-fixed": "#002021",
+            "on-secondary-fixed": "#261900",
+            "error-container": "#ffdad6",
+            /* The Signboard System Custom Palettes */
+            "midnight": "#0B2545",
+            "chalk": "#F2F5F8",
+            "jua": "#FFC53D",
+            "teal-deep": "#0B6E70",
+            "bougainvillea": "#C2185B",
+            "whatsapp": "#25D366",
+            "hairline": "#D5DCE4"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-lg": "1.5rem",
+            "gutter-desktop": "1.5rem",
+            "margin-desktop": "2.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xl": "2.5rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Archivo Narrow", "sans-serif"],
+            "headline-xl-mobile": ["Archivo Narrow", "sans-serif"],
+            "headline-sm": ["Archivo Narrow", "sans-serif"],
+            "label-lg": ["Archivo Narrow", "sans-serif"],
+            "body-sm": ["Atkinson Hyperlegible", "sans-serif"],
+            "body-md": ["Atkinson Hyperlegible", "sans-serif"],
+            "body-lg": ["Atkinson Hyperlegible", "sans-serif"],
+            "headline-lg-mobile": ["Archivo Narrow", "sans-serif"],
+            "headline-md": ["Archivo Narrow", "sans-serif"],
+            "headline-xl": ["Archivo Narrow", "sans-serif"],
+            "headline-lg": ["Archivo Narrow", "sans-serif"],
+            "label-md": ["Archivo Narrow", "sans-serif"]
+          },
+          "fontSize": {
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Signboard tactile drop-shadow utilities */
+    .hard-shadow {
+      box-shadow: 2px 2px 0px #0B2545;
+    }
+    .hard-shadow-lg {
+      box-shadow: 3px 3px 0px #0B2545;
+    }
+    .hard-shadow-active:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #0B2545;
+    }
+    .structural-border {
+      border: 1.5px solid #0B2545;
+    }
+    .hairline-border {
+      border: 1px solid #D5DCE4;
+    }
+  </style>
+</head>
+<body class="bg-chalk text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-primary selection:text-white">
+<!-- Top App Navigation / Signboard Header -->
+<header class="w-full bg-surface-container-lowest structural-border border-t-0 border-x-0 hard-shadow sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-margin md:px-margin-desktop py-space-sm flex flex-col md:flex-row justify-between items-center gap-space-sm">
+<!-- Brand & Merchant Identification -->
+<div class="flex items-center gap-space-md w-full md:w-auto justify-between md:justify-start">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-primary uppercase">
+            MoiMashinani
+          </span>
+<span class="bg-midnight text-white font-label-sm text-label-sm uppercase px-2 py-0.5 rounded-DEFAULT border border-midnight">
+            Merchant Hub / Kesses
+          </span>
+</div>
+<!-- Campus Location Sub-indicator -->
+<div class="hidden lg:flex items-center gap-1 text-on-surface-variant font-label-md text-label-md border-l border-hairline pl-space-md">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="location_on">location_on</span>
+<span>Moi University Main Campus</span>
+</div>
+</div>
+<!-- Active Business Switcher & Direct Preview Actions -->
+<div class="flex items-center gap-space-sm w-full md:w-auto justify-end flex-wrap">
+<!-- Business Switcher Dropdown Trigger -->
+<div class="relative bg-surface-container-lowest structural-border hard-shadow px-space-sm py-1 flex items-center gap-space-sm cursor-pointer hover:bg-surface-container-low transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+<div class="flex flex-col text-left">
+<div class="flex items-center gap-1.5">
+<span class="font-label-lg text-label-lg text-on-surface truncate max-w-[190px]">Kevin Phones &amp; Laptops</span>
+<span class="bg-jua text-midnight font-label-sm text-[10px] px-1 font-bold border border-midnight">VERIFIED</span>
+</div>
+<span class="font-body-sm text-[11px] text-on-surface-variant leading-none">Kesses Centre · Stall B-12</span>
+</div>
+<button class="ml-1 text-on-surface hover:text-primary transition-colors flex items-center" title="Switch business">
+<span class="material-symbols-outlined text-[18px]" data-icon="swap_horiz">swap_horiz</span>
+</button>
+</div>
+<!-- Quick Public Profile Action -->
+<a class="bg-chalk text-midnight font-label-md text-label-md px-3 py-1.5 structural-border hard-shadow hard-shadow-active flex items-center gap-1 hover:bg-white transition-all" href="#public-view">
+<span class="material-symbols-outlined text-[18px]" data-icon="open_in_new">open_in_new</span>
+<span>View Public Profile</span>
+</a>
+<!-- Share Kit / QR Poster Action -->
+<button class="bg-primary-container text-white font-label-md text-label-md px-3 py-1.5 structural-border hard-shadow hard-shadow-active flex items-center gap-1 hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="qr_code_2">qr_code_2</span>
+<span>Share Kit &amp; QR</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Canvas Container -->
+<main class="w-full max-w-7xl mx-auto px-margin md:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-lg">
+<!-- 1. Quick Operational Toggles Banner -->
+<section class="bg-surface-container-lowest structural-border hard-shadow p-space-md">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-DEFAULT bg-midnight text-white flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[20px]" data-icon="bolt">bolt</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-midnight tracking-tight">Kesses Stall Real-Time Controls</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Update your walk-in presence to prevent students arriving while you're away.</p>
+</div>
+</div>
+<!-- The 3 Toggles Cluster -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm w-full lg:w-auto">
+<!-- Toggle 1: Available Now (Active window) -->
+<div class="bg-surface-container-lowest p-2.5 structural-border hard-shadow flex items-center justify-between gap-3">
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+<span class="font-label-md text-label-md text-midnight">Available Now</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary-container font-semibold">Active: 2h 45m left</span>
+</div>
+<!-- Pill Switch Active -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-hairline peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-midnight after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-midnight after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 border border-midnight"></div>
+</label>
+</div>
+<!-- Toggle 2: Temporarily Closed / Break -->
+<div class="bg-surface-container-lowest p-2.5 structural-border hard-shadow flex items-center justify-between gap-3">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-midnight">Temp Break</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Parts run / Lunch</span>
+</div>
+<!-- Pill Switch Inactive -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-midnight after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-midnight after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container border border-midnight"></div>
+</label>
+</div>
+<!-- Toggle 3: Next-Day Hostel Callout Service -->
+<div class="bg-surface-container-lowest p-2.5 structural-border hard-shadow flex items-center justify-between gap-3">
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="night_shelter">night_shelter</span>
+<span class="font-label-md text-label-md text-midnight">Hostel Callout</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">Evening rounds</span>
+</div>
+<!-- Pill Switch Active -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-hairline peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-midnight after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-midnight after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bougainvillea border border-midnight"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Top Bento Section: Featured Tier Card & Profile Strength -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+<!-- 2. Active Promotion & Monetization Card (Featured Tier) - 7 cols -->
+<section class="lg:col-span-7 bg-surface-container-lowest structural-border hard-shadow-lg relative overflow-hidden flex flex-col justify-between">
+<!-- 4px Jua Yellow accent top border strip -->
+<div class="h-1.5 w-full bg-jua border-b border-midnight"></div>
+<div class="p-space-lg flex flex-col gap-space-md">
+<div class="flex items-start justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-2">
+<span class="bg-jua text-midnight font-label-md text-label-md px-2.5 py-1 uppercase structural-border hard-shadow">
+                FEATURED TIER ACTIVE
+              </span>
+<span class="font-label-sm text-label-sm bg-surface-container px-2 py-1 text-on-surface border border-hairline">
+                Receipt #R-2026-00084
+              </span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant block uppercase">Expires in</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">3 days (Tue, 14 Oct)</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-midnight font-bold">
+              Promoted in Phone &amp; Laptop Repair Directory
+            </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              Top 3 visibility guaranteed across Kesses Centre search queries, student hostel filters, and the MoiMashinani landing page.
+            </p>
+</div>
+<!-- Value Proof Comparison Callout -->
+<div class="bg-surface-container-low p-3.5 structural-border border-dashed flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-teal-deep text-white flex-shrink-0 flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[20px]" data-icon="trending_up">trending_up</span>
+</div>
+<p class="font-body-sm text-body-sm text-midnight">
+<strong class="font-bold text-bougainvillea">3.4x more WhatsApp taps</strong> received this week compared to standard free repair stalls in Kesses market.
+            </p>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-wrap items-center gap-space-sm pt-2">
+<button class="bg-bougainvillea text-white font-label-lg text-label-lg px-4 py-2 structural-border hard-shadow hard-shadow-active flex items-center gap-1.5 hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="autorenew">autorenew</span>
+<span>Renew Featured (KSh 200/wk)</span>
+</button>
+<button class="bg-chalk text-midnight font-label-lg text-label-lg px-4 py-2 structural-border hard-shadow hard-shadow-active flex items-center gap-1.5 hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="savings">savings</span>
+<span>Extend 4 Weeks (Save KSh 100)</span>
+</button>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-midnight underline ml-auto pt-1" href="#receipt">
+              View M-Pesa Receipt
+            </a>
+</div>
+</div>
+</section>
+<!-- 3. Profile Strength & Optimization Meter (Score: 85/100) - 5 cols -->
+<section class="lg:col-span-5 bg-surface-container-lowest structural-border hard-shadow-lg p-space-lg flex flex-col justify-between gap-space-md">
+<div>
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-teal-deep" data-icon="verified_user">verified_user</span>
+<h3 class="font-headline-sm text-headline-sm text-midnight font-bold">Profile Strength</h3>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md font-bold text-midnight">85</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">/ 100</span>
+</div>
+</div>
+<!-- Segmented Progress Bar -->
+<div class="w-full bg-surface-container h-3 structural-border flex overflow-hidden mb-3">
+<div class="bg-teal-deep h-full w-[85%]"></div>
+<div class="bg-jua h-full w-[15%] opacity-40"></div>
+</div>
+<!-- Segment Checklist Badges -->
+<div class="flex flex-wrap gap-1.5 text-[11px] font-label-sm uppercase">
+<span class="bg-chalk text-midnight px-2 py-0.5 border border-hairline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-teal-deep" data-icon="check_circle">check_circle</span> Name &amp; Category
+            </span>
+<span class="bg-chalk text-midnight px-2 py-0.5 border border-hairline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-teal-deep" data-icon="check_circle">check_circle</span> Phone OTP
+            </span>
+<span class="bg-chalk text-midnight px-2 py-0.5 border border-hairline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-teal-deep" data-icon="check_circle">check_circle</span> Photos 4/6
+            </span>
+<span class="bg-chalk text-midnight px-2 py-0.5 border border-hairline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-teal-deep" data-icon="check_circle">check_circle</span> Price List
+            </span>
+<span class="bg-chalk text-midnight px-2 py-0.5 border border-hairline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-teal-deep" data-icon="check_circle">check_circle</span> Map Pin
+            </span>
+</div>
+</div>
+<!-- Next Best Action Card -->
+<div class="bg-surface-container-high p-3.5 structural-border hard-shadow flex flex-col gap-2">
+<div class="flex items-center gap-1.5 text-midnight">
+<span class="bg-bougainvillea text-white font-label-sm text-[10px] px-1 font-bold">+10 POINTS</span>
+<span class="font-label-md text-label-md font-bold">Recommended action:</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">
+            Add 2 more photos of your micro-soldering station or repair bench to unlock maximum trust score for campus tech students.
+          </p>
+<div class="pt-1">
+<button class="bg-midnight text-white font-label-md text-label-md px-3 py-1.5 structural-border hard-shadow hard-shadow-active flex items-center gap-1 hover:bg-on-surface transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="add_a_photo">add_a_photo</span>
+<span>Upload Photos (2 needed)</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- 4. Weekly Impact & Contact Analytics (This Week vs Last Week) -->
+<section class="bg-surface-container-lowest structural-border hard-shadow-lg p-space-lg flex flex-col gap-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm border-b border-hairline pb-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-headline-md text-headline-md text-midnight font-bold tracking-tight">Weekly Contact &amp; Demand Analytics</h3>
+<span class="bg-surface-container px-2 py-0.5 font-label-sm text-label-sm border border-midnight">Oct 06 - Oct 12, 2026</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Real student lead events captured directly through the Moi University campus directory portal.</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="font-label-md text-label-md px-2.5 py-1 bg-chalk border border-midnight font-bold">This Week</button>
+<button class="font-label-md text-label-md px-2.5 py-1 bg-surface-container-lowest border border-hairline text-on-surface-variant hover:text-midnight">Last 30 Days</button>
+<button class="p-1 border border-midnight bg-surface-container-lowest hover:bg-surface-container" title="Export CSV">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+</div>
+</div>
+<!-- Grid of 5 Metric Cards -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-space-sm">
+<!-- Metric 1: Profile Views -->
+<div class="bg-surface-container-lowest p-3.5 structural-border hard-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Profile Views</span>
+<span class="material-symbols-outlined text-[18px] text-midnight" data-icon="visibility">visibility</span>
+</div>
+<div class="mt-2">
+<div class="font-headline-lg text-headline-lg font-bold text-midnight leading-none">412</div>
+<div class="flex items-center gap-1 mt-1 text-[12px] font-label-md text-emerald-700 font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_upward">arrow_upward</span>
+<span>+18% vs last wk</span>
+</div>
+</div>
+</div>
+<!-- Metric 2: Direct Phone Calls -->
+<div class="bg-surface-container-lowest p-3.5 structural-border hard-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Direct Calls</span>
+<span class="material-symbols-outlined text-[18px] text-midnight" data-icon="call">call</span>
+</div>
+<div class="mt-2">
+<div class="font-headline-lg text-headline-lg font-bold text-midnight leading-none">38</div>
+<div class="flex items-center gap-1 mt-1 text-[12px] font-label-md text-emerald-700 font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_upward">arrow_upward</span>
+<span>+7 calls</span>
+</div>
+</div>
+</div>
+<!-- Metric 3: WhatsApp Inquiries (Highlighted with WhatsApp Green accent) -->
+<div class="bg-surface-container-lowest p-3.5 structural-border hard-shadow border-l-4 border-l-whatsapp flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">WhatsApp Chats</span>
+<span class="material-symbols-outlined text-[18px] text-emerald-600" data-icon="chat">chat</span>
+</div>
+<div class="mt-2">
+<div class="font-headline-lg text-headline-lg font-bold text-midnight leading-none">64</div>
+<div class="flex items-center gap-1 mt-1 text-[12px] font-label-md text-emerald-700 font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_upward">arrow_upward</span>
+<span>+19 chats</span>
+</div>
+</div>
+</div>
+<!-- Metric 4: Directions Taps -->
+<div class="bg-surface-container-lowest p-3.5 structural-border hard-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Map &amp; Landmark</span>
+<span class="material-symbols-outlined text-[18px] text-midnight" data-icon="near_me">near_me</span>
+</div>
+<div class="mt-2">
+<div class="font-headline-lg text-headline-lg font-bold text-midnight leading-none">29</div>
+<div class="flex items-center gap-1 mt-1 text-[12px] font-label-md text-emerald-700 font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_upward">arrow_upward</span>
+<span>+12 taps</span>
+</div>
+</div>
+</div>
+<!-- Metric 5: Student Discount Claims -->
+<div class="bg-surface-container-lowest p-3.5 structural-border hard-shadow flex flex-col justify-between col-span-2 md:col-span-1">
+<div class="flex justify-between items-start">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Deals Claimed</span>
+<span class="material-symbols-outlined text-[18px] text-bougainvillea" data-icon="sell">sell</span>
+</div>
+<div class="mt-2">
+<div class="font-headline-lg text-headline-lg font-bold text-midnight leading-none">14</div>
+<div class="flex items-center gap-1 mt-1 text-[12px] font-label-md text-primary font-bold">
+<span>15% screen coupon</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Chart & Hourly Insight Breakdown Row -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md pt-2">
+<!-- Daily Distribution Bar Visualizer (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-low p-space-md structural-border">
+<div class="flex justify-between items-center mb-3">
+<span class="font-label-md text-label-md font-bold text-midnight uppercase tracking-wide">Daily Student Inquiries (Mon - Sun)</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Peak day: Friday (Cheboiywo market day)</span>
+</div>
+<!-- Pure Tailwind Bar Columns -->
+<div class="h-36 flex items-end justify-between gap-2 pt-4 px-2 border-b border-midnight">
+<!-- Mon -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-midnight font-bold">18</span>
+<div class="w-full bg-midnight structural-border h-[45%]"></div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase">Mon</span>
+</div>
+<!-- Tue -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-midnight font-bold">22</span>
+<div class="w-full bg-midnight structural-border h-[55%]"></div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase">Tue</span>
+</div>
+<!-- Wed -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-midnight font-bold">19</span>
+<div class="w-full bg-midnight structural-border h-[48%]"></div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase">Wed</span>
+</div>
+<!-- Thu -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-midnight font-bold">26</span>
+<div class="w-full bg-midnight structural-border h-[65%]"></div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase">Thu</span>
+</div>
+<!-- Fri (Peak) -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-bougainvillea font-bold">38</span>
+<div class="w-full bg-bougainvillea structural-border h-[95%]"></div>
+<span class="font-label-sm text-[11px] text-midnight font-bold uppercase">Fri</span>
+</div>
+<!-- Sat -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-midnight font-bold">31</span>
+<div class="w-full bg-midnight structural-border h-[78%]"></div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase">Sat</span>
+</div>
+<!-- Sun -->
+<div class="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+<span class="font-label-sm text-[10px] text-midnight font-bold">12</span>
+<div class="w-full bg-hairline structural-border h-[30%]"></div>
+<span class="font-label-sm text-[11px] text-on-surface-variant uppercase">Sun</span>
+</div>
+</div>
+</div>
+<!-- Student Rush Hour Intelligence Callout (5 cols) -->
+<div class="lg:col-span-5 bg-jua p-space-md structural-border hard-shadow flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1.5 text-midnight mb-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="schedule">schedule</span>
+<span class="font-label-lg text-label-lg font-bold uppercase">Campus Operating Intelligence</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-bold text-midnight leading-snug">
+              78% of student contact taps happen between 12:00 PM and 6:30 PM.
+            </p>
+<p class="font-body-sm text-body-sm text-midnight mt-2">
+              Corresponds directly with Moi University midday class break and the evening hostel rush heading from Margaret Thatcher Library down to Kesses Centre.
+            </p>
+</div>
+<div class="mt-4 pt-2 border-t border-midnight flex items-center justify-between text-midnight">
+<span class="font-label-sm text-label-sm font-bold">Recommendation:</span>
+<span class="font-body-sm text-[13px]">Keep "Available Now" toggle active during lunch hours.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Bento Section: Recent Student Inquiries & Quick Management Tabs -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+<!-- 5. Recent Student Inquiries & Activity Feed (7 cols) -->
+<section class="lg:col-span-7 bg-surface-container-lowest structural-border hard-shadow p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between border-b border-hairline pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-bougainvillea" data-icon="stream">stream</span>
+<h3 class="font-headline-sm text-headline-sm text-midnight font-bold">Real-Time Inquiries &amp; Taps</h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 border border-hairline">
+            Anonymous Event Stream
+          </span>
+</div>
+<!-- Tap Events List -->
+<div class="flex flex-col divide-y divide-hairline">
+<!-- Event 1 -->
+<div class="py-2.5 flex items-center justify-between gap-3 hover:bg-surface-container-low transition-colors px-1">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-full bg-[#E7F8ED] border border-whatsapp text-emerald-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span>
+</span>
+<div>
+<p class="font-label-md text-label-md text-midnight">WhatsApp Inquiry: iPhone 11 Screen Replacement</p>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Zone: Cheboiywo Hostel Cluster</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">14m ago</span>
+<span class="block text-[11px] text-emerald-700 font-semibold">Tapped WhatsApp</span>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="py-2.5 flex items-center justify-between gap-3 hover:bg-surface-container-low transition-colors px-1">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-full bg-surface-container border border-midnight text-midnight flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="call">call</span>
+</span>
+<div>
+<p class="font-label-md text-label-md text-midnight">Direct Call Tap: Laptop RAM Upgrade</p>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Zone: Soweto Hostels (Block E)</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">42m ago</span>
+<span class="block text-[11px] text-midnight">Dialed Direct</span>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="py-2.5 flex items-center justify-between gap-3 hover:bg-surface-container-low transition-colors px-1">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-full bg-surface-container border border-midnight text-midnight flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="directions">directions</span>
+</span>
+<div>
+<p class="font-label-md text-label-md text-midnight">Landmark Navigation: Walking Directions</p>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Zone: Moi Uni Main Gate / Stage</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">1h ago</span>
+<span class="block text-[11px] text-on-surface-variant">Route Viewed</span>
+</div>
+</div>
+<!-- Event 4 -->
+<div class="py-2.5 flex items-center justify-between gap-3 hover:bg-surface-container-low transition-colors px-1">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-full bg-[#FFF4DC] border border-jua text-midnight flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="local_offer">local_offer</span>
+</span>
+<div>
+<p class="font-label-md text-label-md text-midnight">Campus Voucher: 15% Off Screen Protector</p>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Zone: Talai Center / Annex bus terminal</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface font-bold">2h ago</span>
+<span class="block text-[11px] text-bougainvillea font-semibold">Code Claimed</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. Quick Management Tabs / Navigation Links (5 cols) -->
+<section class="lg:col-span-5 bg-surface-container-lowest structural-border hard-shadow p-space-lg flex flex-col justify-between gap-space-md">
+<div>
+<div class="flex items-center gap-2 border-b border-hairline pb-2 mb-space-sm">
+<span class="material-symbols-outlined text-midnight" data-icon="tune">tune</span>
+<h3 class="font-headline-sm text-headline-sm text-midnight font-bold">Storefront Settings</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
+            Maintain accurate stall information for Moi University student trust.
+          </p>
+<!-- 2x3 Quick Action Grid -->
+<div class="grid grid-cols-2 gap-2.5">
+<a class="p-3 bg-chalk structural-border hard-shadow hard-shadow-active flex flex-col justify-between hover:bg-white transition-all group" href="#edit-profile">
+<span class="material-symbols-outlined text-midnight group-hover:text-primary transition-colors text-[22px]" data-icon="storefront">storefront</span>
+<div class="mt-2">
+<div class="font-label-md text-label-md text-midnight font-bold">Edit Profile</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Contacts &amp; Bio</div>
+</div>
+</a>
+<a class="p-3 bg-chalk structural-border hard-shadow hard-shadow-active flex flex-col justify-between hover:bg-white transition-all group" href="#manage-photos">
+<span class="material-symbols-outlined text-midnight group-hover:text-primary transition-colors text-[22px]" data-icon="photo_library">photo_library</span>
+<div class="mt-2">
+<div class="font-label-md text-label-md text-midnight font-bold">Photos (4/6)</div>
+<div class="font-body-sm text-[11px] text-bougainvillea font-semibold">+2 Recommended</div>
+</div>
+</a>
+<a class="p-3 bg-chalk structural-border hard-shadow hard-shadow-active flex flex-col justify-between hover:bg-white transition-all group" href="#update-services">
+<span class="material-symbols-outlined text-midnight group-hover:text-primary transition-colors text-[22px]" data-icon="menu_book">menu_book</span>
+<div class="mt-2">
+<div class="font-label-md text-label-md text-midnight font-bold">Price List</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">6 services listed</div>
+</div>
+</a>
+<a class="p-3 bg-chalk structural-border hard-shadow hard-shadow-active flex flex-col justify-between hover:bg-white transition-all group" href="#operating-hours">
+<span class="material-symbols-outlined text-midnight group-hover:text-primary transition-colors text-[22px]" data-icon="schedule">schedule</span>
+<div class="mt-2">
+<div class="font-label-md text-label-md text-midnight font-bold">Stall Hours</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">08:00 - 20:30 EAT</div>
+</div>
+</a>
+<a class="p-3 bg-chalk structural-border hard-shadow hard-shadow-active flex flex-col justify-between hover:bg-white transition-all group" href="#mpesa-till">
+<span class="material-symbols-outlined text-emerald-700 group-hover:text-emerald-800 transition-colors text-[22px]" data-icon="payments">payments</span>
+<div class="mt-2">
+<div class="font-label-md text-label-md text-midnight font-bold">M-Pesa Till</div>
+<div class="font-body-sm text-[11px] text-midnight font-bold">Till: 849201</div>
+</div>
+</a>
+<a class="p-3 bg-jua structural-border hard-shadow hard-shadow-active flex flex-col justify-between hover:brightness-105 transition-all group" href="#qr-pdf">
+<span class="material-symbols-outlined text-midnight text-[22px]" data-icon="download_for_offline">download_for_offline</span>
+<div class="mt-2">
+<div class="font-label-md text-label-md text-midnight font-bold">QR Poster PDF</div>
+<div class="font-body-sm text-[11px] text-midnight">Print for Stall door</div>
+</div>
+</a>
+</div>
+</div>
+<div class="border-t border-hairline pt-2 text-center">
+<span class="font-body-sm text-[12px] text-on-surface-variant">
+            Need in-person support? Visit the Moi Uni Student Center ICT desk or WhatsApp admin.
+          </span>
+</div>
+</section>
+</div>
+</main>
+<!-- Canonical Shared Component: Footer -->
+<footer class="w-full bg-surface-container-lowest structural-border border-b-0 border-x-0 mt-space-xl">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter">
+<div class="flex flex-col items-center md:items-start text-center md:text-left">
+<span class="text-headline-sm font-headline-sm font-bold text-primary">
+          MoiMashinani
+        </span>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1 max-w-md">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+</div>
+<div class="flex flex-wrap justify-center md:justify-end gap-x-space-md gap-y-space-xs text-label-sm font-label-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#add-biz">Add Business (Free)</a>
+<span class="text-hairline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#student-deals">Student Deals</a>
+<span class="text-hairline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#campus-safety">Campus Safety &amp; Trust</a>
+<span class="text-hairline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#kesses-map">Kesses Map Guide</a>
+<span class="text-hairline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#report">Report Inactive Listing</a>
+<span class="text-hairline">·</span>
+<a class="text-primary font-bold underline transition-colors" href="#whatsapp-help">WhatsApp Helpdesk</a>
+</div>
+</div>
+</footer>
+</body></html>

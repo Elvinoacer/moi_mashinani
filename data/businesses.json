@@ -1,0 +1,1400 @@
+[
+  {
+    "id": "biz_kevin_phones",
+    "name": "Kevin Phones & Laptops",
+    "slug": "kevin-phones-laptops",
+    "tagline": "Instant screen replacement, motherboard repairs & original batteries",
+    "description": "Certified smartphone & laptop technician with 3+ years serving Moi University students. Specializing in cracked screen replacements, dead motherboard diagnostics, water damage treatment, software flashing, and genuine replacement batteries. Fast 45-minute turnaround on most phone screens.",
+    "primaryCategory": "phone-laptop-repair",
+    "extraCategories": [
+      "wifi-tech-gadgets"
+    ],
+    "tags": [
+      "screen fix",
+      "iphone",
+      "samsung",
+      "hp laptop",
+      "battery",
+      "charging port",
+      "fundi"
+    ],
+    "serviceModes": [
+      "at_shop",
+      "comes_to_you"
+    ],
+    "phone": "+254712345678",
+    "whatsapp": "+254712345678",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "kesses-centre",
+    "servesZones": [
+      "kesses-centre",
+      "stage",
+      "cheboiywo",
+      "talai",
+      "soweto"
+    ],
+    "landmark": "Behind the main gate, next to the pharmacy, opposite Equity Agent",
+    "address": "Kesses Commercial Centre, Shop 4B",
+    "mapPin": {
+      "lat": 0.2825,
+      "lng": 35.2912
+    },
+    "walkTime": "4 min walk",
+    "hours": {
+      "Monday": {
+        "open": "08:00",
+        "close": "20:30"
+      },
+      "Tuesday": {
+        "open": "08:00",
+        "close": "20:30"
+      },
+      "Wednesday": {
+        "open": "08:00",
+        "close": "20:30"
+      },
+      "Thursday": {
+        "open": "08:00",
+        "close": "20:30"
+      },
+      "Friday": {
+        "open": "08:00",
+        "close": "20:30"
+      },
+      "Saturday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Sunday": {
+        "open": "11:00",
+        "close": "18:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Screen replacement (iPhone / Samsung / Infinix)",
+        "priceFrom": 2500,
+        "note": "Tested with 30-day warranty"
+      },
+      {
+        "id": "s2",
+        "name": "Original iPhone / Techno / Samsung Battery",
+        "priceFrom": 1200,
+        "note": "Brand new 100% health"
+      },
+      {
+        "id": "s3",
+        "name": "Type-C / Lightning Charging Port Repair",
+        "priceFrom": 600,
+        "note": "Takes only 30 minutes"
+      },
+      {
+        "id": "s4",
+        "name": "Laptop Windows OS & Activation",
+        "priceFrom": 800,
+        "note": "Includes Office package & Antivirus"
+      },
+      {
+        "id": "s5",
+        "name": "Dead Phone Motherboard Diagnostics",
+        "priceFrom": 500,
+        "note": "Micro-soldering inspection"
+      },
+      {
+        "id": "s6",
+        "name": "Water Damage Ultrasonic Chemical Clean",
+        "priceFrom": 1500,
+        "note": "Complete dry & component check"
+      }
+    ],
+    "priceLevel": 2,
+    "studentDiscount": "10% off any screen fix with valid Moi University Student ID",
+    "photos": [
+      "https://images.unsplash.com/photo-1597740985671-2a8a3b80532e?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1597740985671-2a8a3b80532e?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "FEATURED",
+    "tierStartsAt": "2026-10-10T09:54:49.241Z",
+    "tierEndsAt": "2026-10-17T09:54:49.241Z",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254712345678",
+    "profileStrength": 95,
+    "metrics": {
+      "views": 129,
+      "calls": 24,
+      "whatsapp": 41,
+      "directions": 12,
+      "bookingRequests": 8,
+      "impressions": 480,
+      "lastWeekViews": 106,
+      "lastWeekCalls": 19,
+      "lastWeekWhatsapp": 32
+    },
+    "createdAt": "2026-08-27T09:54:49.241Z",
+    "updatedAt": "2026-10-06T09:59:21.703Z"
+  },
+  {
+    "id": "biz_mama_neema",
+    "name": "Mama Neema Hair Studio",
+    "slug": "mama-neema-hair-studio",
+    "tagline": "Knotless braids, dreadlocks retwist, human hair styling & wash",
+    "description": "Professional hair care studio situated right at Stage center. Specializing in neat knotless braids that last, natural hair treatments, faux locs, dreadlocks maintenance, and modern styling. Clean, relaxing salon with quick service for busy campus schedules.",
+    "primaryCategory": "hair-beauty-kinyozi",
+    "extraCategories": [],
+    "tags": [
+      "braids",
+      "knotless",
+      "salon",
+      "retwist",
+      "dreads",
+      "hairdresser",
+      "stage"
+    ],
+    "serviceModes": [
+      "at_shop"
+    ],
+    "phone": "+254722987654",
+    "whatsapp": "+254722987654",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "stage",
+    "servesZones": [
+      "stage",
+      "kesses-centre",
+      "soweto"
+    ],
+    "landmark": "Stage shopping complex, 1st floor above Bata shoe shop",
+    "address": "Stage Mall, Room 12",
+    "walkTime": "6 min walk",
+    "hours": {
+      "Monday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Tuesday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Wednesday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Thursday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Friday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Saturday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "Sunday": {
+        "open": "12:00",
+        "close": "19:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Medium Knotless Braids",
+        "priceFrom": 800,
+        "note": "Braiding hair included options available"
+      },
+      {
+        "id": "s2",
+        "name": "Dreadlocks Wash, Retwist & Styling",
+        "priceFrom": 700,
+        "note": "Organic wax and styling included"
+      },
+      {
+        "id": "s3",
+        "name": "Natural Hair Deep Condition & Blow-dry",
+        "priceFrom": 400
+      },
+      {
+        "id": "s4",
+        "name": "Wig Installation & Cornrows Base",
+        "priceFrom": 350
+      }
+    ],
+    "priceLevel": 1,
+    "studentDiscount": "KES 150 discount every Tuesday for Moi University students",
+    "photos": [
+      "https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "RECOMMENDED",
+    "tierStartsAt": "2026-10-04T09:54:49.242Z",
+    "tierEndsAt": "2026-10-11T09:54:49.242Z",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254722987654",
+    "profileStrength": 90,
+    "metrics": {
+      "views": 98,
+      "calls": 18,
+      "whatsapp": 35,
+      "directions": 9,
+      "bookingRequests": 14,
+      "impressions": 340,
+      "lastWeekViews": 82,
+      "lastWeekCalls": 14,
+      "lastWeekWhatsapp": 28
+    },
+    "createdAt": "2026-09-06T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2808,
+      "lng": 35.293
+    }
+  },
+  {
+    "id": "biz_kesses_cyber",
+    "name": "Kesses Modern Cyber & Printing",
+    "slug": "kesses-modern-cyber",
+    "tagline": "Heavy duty printing, project binding, HELB, KRA & passport photos",
+    "description": "Fastest cyber café right by the Moi University Main Gate. 4 high-speed digital printers, full color glossy printing, hardcover & spiral thesis binding, passport photos in 3 minutes, HELB loans compliance, and academic formatting.",
+    "primaryCategory": "printing-cyber",
+    "extraCategories": [],
+    "tags": [
+      "printing",
+      "binding",
+      "helb",
+      "kra",
+      "cyber",
+      "project",
+      "passport photos"
+    ],
+    "serviceModes": [
+      "at_shop",
+      "delivery"
+    ],
+    "phone": "+254701234888",
+    "whatsapp": "+254701234888",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "main-gate",
+    "servesZones": [
+      "main-gate",
+      "kesses-centre",
+      "cheboiywo"
+    ],
+    "landmark": "Directly opposite Moi Main Gate entrance, green signboard",
+    "address": "Gate Plaza, Ground Floor",
+    "walkTime": "2 min walk",
+    "hours": {
+      "Monday": {
+        "open": "07:30",
+        "close": "21:30"
+      },
+      "Tuesday": {
+        "open": "07:30",
+        "close": "21:30"
+      },
+      "Wednesday": {
+        "open": "07:30",
+        "close": "21:30"
+      },
+      "Thursday": {
+        "open": "07:30",
+        "close": "21:30"
+      },
+      "Friday": {
+        "open": "07:30",
+        "close": "21:30"
+      },
+      "Saturday": {
+        "open": "08:00",
+        "close": "21:00"
+      },
+      "Sunday": {
+        "open": "13:00",
+        "close": "19:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Black & White Printing (A4)",
+        "priceFrom": 3,
+        "unit": "per page"
+      },
+      {
+        "id": "s2",
+        "name": "Full Color Printing / Certificates",
+        "priceFrom": 15,
+        "unit": "per page"
+      },
+      {
+        "id": "s3",
+        "name": "Hardcover Golden Lettered Thesis Binding",
+        "priceFrom": 350
+      },
+      {
+        "id": "s4",
+        "name": "Spiral Comb Binding & Clear Covers",
+        "priceFrom": 80
+      },
+      {
+        "id": "s5",
+        "name": "Instant Passport Photos (4 copies)",
+        "priceFrom": 150
+      }
+    ],
+    "priceLevel": 1,
+    "studentDiscount": "Print 50+ pages for academic work at KES 2.50 per page",
+    "photos": [
+      "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "FEATURED",
+    "tierStartsAt": "2026-10-02T09:54:49.242Z",
+    "tierEndsAt": "2026-10-09T09:54:49.242Z",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254701234888",
+    "profileStrength": 92,
+    "metrics": {
+      "views": 185,
+      "calls": 31,
+      "whatsapp": 54,
+      "directions": 20,
+      "bookingRequests": 11,
+      "impressions": 590,
+      "lastWeekViews": 160,
+      "lastWeekCalls": 26,
+      "lastWeekWhatsapp": 45
+    },
+    "createdAt": "2026-08-17T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2832,
+      "lng": 35.2907
+    }
+  },
+  {
+    "id": "biz_mwangi_gadgets",
+    "name": "Mwangi Gadgets & Accessories",
+    "slug": "mwangi-gadgets",
+    "tagline": "Original fast chargers, wireless earbuds, flash drives & phone cases",
+    "description": "Top-rated accessories shop serving Cheboiywo hostels. 6-month warranty on Oraimo chargers, Anker cords, SanDisk flash drives, laptop power adapters, tempered glass, and screen guards.",
+    "primaryCategory": "wifi-tech-gadgets",
+    "extraCategories": [
+      "phone-laptop-repair"
+    ],
+    "tags": [
+      "oraimo",
+      "charger",
+      "type-c",
+      "flash drive",
+      "earbuds",
+      "cover",
+      "cheboiywo"
+    ],
+    "serviceModes": [
+      "at_shop",
+      "delivery"
+    ],
+    "phone": "+254733445566",
+    "whatsapp": "+254733445566",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "cheboiywo",
+    "servesZones": [
+      "cheboiywo",
+      "talai",
+      "stage"
+    ],
+    "landmark": "Cheboiywo market road, next to Total Energies gas depot",
+    "walkTime": "9 min walk",
+    "hours": {
+      "Monday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "Tuesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "Wednesday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "Thursday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "Friday": {
+        "open": "08:00",
+        "close": "20:00"
+      },
+      "Saturday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Sunday": {
+        "open": "10:00",
+        "close": "17:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Oraimo 20W Heavy Duty Fast Charger",
+        "priceFrom": 700
+      },
+      {
+        "id": "s2",
+        "name": "Braided Type-C Fast Data Cable",
+        "priceFrom": 250
+      },
+      {
+        "id": "s3",
+        "name": "SanDisk 64GB High Speed USB Flash",
+        "priceFrom": 850
+      },
+      {
+        "id": "s4",
+        "name": "Tempered 9D Screen Protector & Fixing",
+        "priceFrom": 200
+      }
+    ],
+    "priceLevel": 1,
+    "photos": [
+      "https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "RECOMMENDED",
+    "tierStartsAt": "2026-10-05T09:54:49.242Z",
+    "tierEndsAt": "2026-10-12T09:54:49.242Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254733445566",
+    "profileStrength": 85,
+    "metrics": {
+      "views": 74,
+      "calls": 12,
+      "whatsapp": 22,
+      "directions": 7,
+      "bookingRequests": 3,
+      "impressions": 290,
+      "lastWeekViews": 65,
+      "lastWeekCalls": 10,
+      "lastWeekWhatsapp": 18
+    },
+    "createdAt": "2026-09-11T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2862,
+      "lng": 35.2855
+    }
+  },
+  {
+    "id": "biz_mama_joy_laundry",
+    "name": "Mama Joy Laundry & Mama Fua",
+    "slug": "mama-joy-laundry",
+    "tagline": "Hostel pickup & dropoff laundry, duvet cleaning & iron press",
+    "description": "Trusted laundry team covering Talai, Cheboiywo and Soweto hostels. We pick up from your doorstep, wash thoroughly with scented detergent, sun dry, fold neatly and deliver back within 24 hours.",
+    "primaryCategory": "laundry-mama-fua",
+    "extraCategories": [],
+    "tags": [
+      "mama fua",
+      "laundry",
+      "duvet",
+      "washing",
+      "clothes",
+      "talai",
+      "pickup"
+    ],
+    "serviceModes": [
+      "comes_to_you",
+      "delivery"
+    ],
+    "phone": "+254711889900",
+    "whatsapp": "+254711889900",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "talai",
+    "servesZones": [
+      "talai",
+      "cheboiywo",
+      "soweto",
+      "stage"
+    ],
+    "landmark": "Talai center, behind Deliverance Church",
+    "walkTime": "11 min walk",
+    "hours": {
+      "Monday": {
+        "open": "07:00",
+        "close": "19:00"
+      },
+      "Tuesday": {
+        "open": "07:00",
+        "close": "19:00"
+      },
+      "Wednesday": {
+        "open": "07:00",
+        "close": "19:00"
+      },
+      "Thursday": {
+        "open": "07:00",
+        "close": "19:00"
+      },
+      "Friday": {
+        "open": "07:00",
+        "close": "19:00"
+      },
+      "Saturday": {
+        "open": "07:00",
+        "close": "20:00"
+      },
+      "Sunday": {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Full Bucket Wash, Dry & Fold",
+        "priceFrom": 300,
+        "unit": "per bucket"
+      },
+      {
+        "id": "s2",
+        "name": "Heavy Blanket / Duvet Deep Wash",
+        "priceFrom": 350,
+        "unit": "per duvet"
+      },
+      {
+        "id": "s3",
+        "name": "White Sneakers / Jordans Deep Cleaning",
+        "priceFrom": 150,
+        "unit": "per pair"
+      },
+      {
+        "id": "s4",
+        "name": "Gentle Iron Pressing (5 garments)",
+        "priceFrom": 100
+      }
+    ],
+    "priceLevel": 1,
+    "studentDiscount": "Free hostel door delivery for orders with 2+ duvets",
+    "photos": [
+      "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "NONE",
+    "availableNowUntil": "2026-10-06T13:54:49.242Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254711889900",
+    "profileStrength": 80,
+    "metrics": {
+      "views": 65,
+      "calls": 15,
+      "whatsapp": 28,
+      "directions": 4,
+      "bookingRequests": 9,
+      "impressions": 210,
+      "lastWeekViews": 58,
+      "lastWeekCalls": 12,
+      "lastWeekWhatsapp": 22
+    },
+    "createdAt": "2026-09-16T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2765,
+      "lng": 35.2968
+    }
+  },
+  {
+    "id": "biz_talai_gas",
+    "name": "Talai Express Cooking Gas Refill",
+    "slug": "talai-express-gas",
+    "tagline": "6kg & 13kg gas refills delivered to your hostel room in 20 mins",
+    "description": "Safe weight-checked cooking gas refill. Total, Progas, K-Gas, SeaGas, AfriGas. Free delivery right to your hostel room floor with safety regulator check.",
+    "primaryCategory": "gas-groceries",
+    "extraCategories": [],
+    "tags": [
+      "gas",
+      "cylinder",
+      "6kg",
+      "13kg",
+      "refill",
+      "delivery",
+      "progas",
+      "talai"
+    ],
+    "serviceModes": [
+      "at_shop",
+      "delivery"
+    ],
+    "phone": "+254799001122",
+    "whatsapp": "+254799001122",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "talai",
+    "servesZones": [
+      "talai",
+      "cheboiywo",
+      "soweto",
+      "stage",
+      "kesses-centre"
+    ],
+    "landmark": "Talai junction, yellow container beside pharmacy",
+    "walkTime": "8 min walk",
+    "hours": {
+      "Monday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "Tuesday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "Wednesday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "Thursday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "Friday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "Saturday": {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      "Sunday": {
+        "open": "08:00",
+        "close": "21:30"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "6kg Gas Refill (Progas, Total, K-Gas)",
+        "priceFrom": 1200,
+        "note": "Free door delivery"
+      },
+      {
+        "id": "s2",
+        "name": "13kg Gas Refill",
+        "priceFrom": 2600,
+        "note": "Free delivery + regulator check"
+      },
+      {
+        "id": "s3",
+        "name": "Complete 6kg New Cylinder + Burner + Grill",
+        "priceFrom": 4200
+      },
+      {
+        "id": "s4",
+        "name": "High Pressure Pipe & Regulator Set",
+        "priceFrom": 650
+      }
+    ],
+    "priceLevel": 2,
+    "studentDiscount": "Free burner service and leak check with every refill",
+    "photos": [
+      "https://images.unsplash.com/photo-1542013936693-884638332954?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1542013936693-884638332954?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "RECOMMENDED",
+    "tierStartsAt": "2026-10-03T09:54:49.242Z",
+    "tierEndsAt": "2026-10-10T09:54:49.242Z",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254799001122",
+    "profileStrength": 88,
+    "metrics": {
+      "views": 89,
+      "calls": 29,
+      "whatsapp": 42,
+      "directions": 8,
+      "bookingRequests": 19,
+      "impressions": 320,
+      "lastWeekViews": 75,
+      "lastWeekCalls": 22,
+      "lastWeekWhatsapp": 35
+    },
+    "createdAt": "2026-09-01T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2772,
+      "lng": 35.2962
+    }
+  },
+  {
+    "id": "biz_chef_brian",
+    "name": "Chef Brian Fast Bites & Meals",
+    "slug": "chef-brian-fast-bites",
+    "tagline": "Hot smoky fries, chicken combo, layered chapati & fresh smoothies",
+    "description": "Student-friendly affordable meals in Soweto. Freshly fried potatoes, smokies with kachumbari, crispy chicken wings, layered soft chapos and fresh passion juice.",
+    "primaryCategory": "food-cafes",
+    "extraCategories": [
+      "cakes-bakes"
+    ],
+    "tags": [
+      "fries",
+      "chips",
+      "smokie",
+      "chapati",
+      "food",
+      "soweto",
+      "lunch",
+      "dinner",
+      "cake",
+      "cupcakes",
+      "birthday"
+    ],
+    "serviceModes": [
+      "at_shop",
+      "delivery"
+    ],
+    "phone": "+254744112233",
+    "whatsapp": "+254744112233",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "soweto",
+    "servesZones": [
+      "soweto",
+      "stage",
+      "cheboiywo"
+    ],
+    "landmark": "Soweto shopping street opposite Green Valley hostel",
+    "walkTime": "7 min walk",
+    "hours": {
+      "Monday": {
+        "open": "10:00",
+        "close": "23:00"
+      },
+      "Tuesday": {
+        "open": "10:00",
+        "close": "23:00"
+      },
+      "Wednesday": {
+        "open": "10:00",
+        "close": "23:00"
+      },
+      "Thursday": {
+        "open": "10:00",
+        "close": "23:00"
+      },
+      "Friday": {
+        "open": "10:00",
+        "close": "23:30"
+      },
+      "Saturday": {
+        "open": "10:00",
+        "close": "23:30"
+      },
+      "Sunday": {
+        "open": "11:00",
+        "close": "22:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Full Fries Plate + 2 Smokies + Kachumbari",
+        "priceFrom": 150
+      },
+      {
+        "id": "s2",
+        "name": "Fresh Soft Layered Chapati",
+        "priceFrom": 25,
+        "unit": "per chapo"
+      },
+      {
+        "id": "s3",
+        "name": "Quarter Crispy Chicken + Chips Combo",
+        "priceFrom": 280
+      },
+      {
+        "id": "s4",
+        "name": "Cold Fresh Passion / Mango Juice (500ml)",
+        "priceFrom": 70
+      },
+      {
+        "id": "s5",
+        "name": "Campus Birthday Cake & Cupcakes (Pre-order)",
+        "priceFrom": 800,
+        "note": "Custom birthday messaging & hostel delivery"
+      }
+    ],
+    "priceLevel": 1,
+    "studentDiscount": "Buy 5 chapatis get 1 free during revision weeks",
+    "photos": [
+      "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "RECOMMENDED",
+    "tierStartsAt": "2026-10-05T09:54:49.242Z",
+    "tierEndsAt": "2026-10-12T09:54:49.242Z",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254744112233",
+    "profileStrength": 86,
+    "metrics": {
+      "views": 110,
+      "calls": 25,
+      "whatsapp": 49,
+      "directions": 14,
+      "bookingRequests": 22,
+      "impressions": 410,
+      "lastWeekViews": 95,
+      "lastWeekCalls": 21,
+      "lastWeekWhatsapp": 40
+    },
+    "createdAt": "2026-09-08T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2846,
+      "lng": 35.2942
+    }
+  },
+  {
+    "id": "biz_cheboiywo_hostels",
+    "name": "Cheboiywo Student Hostels Agency",
+    "slug": "cheboiywo-student-hostels",
+    "tagline": "Verified vacant bedsitters, single rooms & tokens included",
+    "description": "Official caretaker agency for 6 major private hostels in Cheboiywo. Water 24/7, perimeter security, Wi-Fi ready, prepaid electricity tokens, tiled floors and individual balconies. Zero broker harassment.",
+    "primaryCategory": "hostels-rooms",
+    "extraCategories": [],
+    "tags": [
+      "hostel",
+      "bedsitter",
+      "single room",
+      "cheboiywo",
+      "vacancies",
+      "caretaker"
+    ],
+    "serviceModes": [
+      "at_shop"
+    ],
+    "phone": "+254715566778",
+    "whatsapp": "+254715566778",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "cheboiywo",
+    "servesZones": [
+      "cheboiywo",
+      "talai",
+      "stage"
+    ],
+    "landmark": "Cheboiywo junction opposite St. Jude Academy",
+    "walkTime": "10 min walk",
+    "hours": {
+      "Monday": {
+        "open": "08:00",
+        "close": "18:30"
+      },
+      "Tuesday": {
+        "open": "08:00",
+        "close": "18:30"
+      },
+      "Wednesday": {
+        "open": "08:00",
+        "close": "18:30"
+      },
+      "Thursday": {
+        "open": "08:00",
+        "close": "18:30"
+      },
+      "Friday": {
+        "open": "08:00",
+        "close": "18:30"
+      },
+      "Saturday": {
+        "open": "09:00",
+        "close": "17:00"
+      },
+      "Sunday": {
+        "open": "12:00",
+        "close": "16:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Executive Bedsitter (Tiled, Balcony, Wi-Fi)",
+        "priceFrom": 5500,
+        "unit": "per month"
+      },
+      {
+        "id": "s2",
+        "name": "Spacious Single Room with Internal Sink",
+        "priceFrom": 3500,
+        "unit": "per month"
+      },
+      {
+        "id": "s3",
+        "name": "Hostel Viewing & Keys Handover",
+        "priceFrom": 0,
+        "note": "Free room viewing"
+      }
+    ],
+    "priceLevel": 2,
+    "photos": [
+      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "FEATURED",
+    "tierStartsAt": "2026-10-01T09:54:49.242Z",
+    "tierEndsAt": "2026-10-08T09:54:49.242Z",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254715566778",
+    "profileStrength": 91,
+    "metrics": {
+      "views": 167,
+      "calls": 38,
+      "whatsapp": 62,
+      "directions": 18,
+      "bookingRequests": 15,
+      "impressions": 520,
+      "lastWeekViews": 140,
+      "lastWeekCalls": 31,
+      "lastWeekWhatsapp": 50
+    },
+    "createdAt": "2026-08-22T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2868,
+      "lng": 35.2862
+    }
+  },
+  {
+    "id": "biz_fix_it_fast",
+    "name": "Fix It Fast Repairs",
+    "slug": "fix-it-fast",
+    "tagline": "Phone screen glass replacement & subwoofer repair",
+    "description": "Fundi for phones, Bluetooth speakers, extensions and subwoofers at Stage. Affordable repairs for students.",
+    "primaryCategory": "phone-laptop-repair",
+    "extraCategories": [],
+    "tags": [
+      "fundi",
+      "screen",
+      "speaker",
+      "subwoofer",
+      "stage"
+    ],
+    "serviceModes": [
+      "at_shop"
+    ],
+    "phone": "+254788554433",
+    "whatsapp": "+254788554433",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "stage",
+    "servesZones": [
+      "stage"
+    ],
+    "landmark": "Stage behind matatu stage next to kiosk 3",
+    "walkTime": "5 min walk",
+    "hours": {
+      "Monday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "Tuesday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "Wednesday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "Thursday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "Friday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "Saturday": {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      "Sunday": {
+        "open": "12:00",
+        "close": "17:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Subwoofer Sound Diagnostics",
+        "priceFrom": 300
+      },
+      {
+        "id": "s2",
+        "name": "Extension Socket Fix",
+        "priceFrom": 150
+      }
+    ],
+    "priceLevel": 1,
+    "photos": [
+      "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "NONE",
+    "status": "ACTIVE",
+    "verificationLevel": "L0",
+    "claimCode": "CLAIM-7821",
+    "isClaimed": false,
+    "profileStrength": 65,
+    "metrics": {
+      "views": 34,
+      "calls": 6,
+      "whatsapp": 11,
+      "directions": 3,
+      "bookingRequests": 1,
+      "impressions": 110,
+      "lastWeekViews": 30,
+      "lastWeekCalls": 5,
+      "lastWeekWhatsapp": 9
+    },
+    "createdAt": "2026-09-26T09:54:49.242Z",
+    "updatedAt": "2026-10-06T09:54:49.242Z",
+    "mapPin": {
+      "lat": 0.2802,
+      "lng": 35.2935
+    }
+  },
+  {
+    "id": "biz_campus_lens",
+    "name": "Campus Lens Photography",
+    "slug": "campus-lens-photo",
+    "tagline": "Graduation studio portraits, outdoor shoots & instant soft copies",
+    "description": "Professional Sony Alpha camera shoots for graduations, birthday portraits, campus events and passport shoots. Same-day cloud photo link delivery.",
+    "primaryCategory": "photography-video",
+    "extraCategories": [],
+    "tags": [
+      "photos",
+      "camera",
+      "graduation",
+      "portraits",
+      "shoots",
+      "kesses"
+    ],
+    "serviceModes": [
+      "at_shop",
+      "comes_to_you"
+    ],
+    "phone": "+254728990011",
+    "whatsapp": "+254728990011",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "kesses-centre",
+    "servesZones": [
+      "kesses-centre",
+      "main-gate",
+      "stage"
+    ],
+    "landmark": "Kesses Centre 2nd floor, above Equity Agent",
+    "walkTime": "4 min walk",
+    "hours": {
+      "Monday": {
+        "open": "08:30",
+        "close": "19:30"
+      },
+      "Tuesday": {
+        "open": "08:30",
+        "close": "19:30"
+      },
+      "Wednesday": {
+        "open": "08:30",
+        "close": "19:30"
+      },
+      "Thursday": {
+        "open": "08:30",
+        "close": "19:30"
+      },
+      "Friday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Saturday": {
+        "open": "08:30",
+        "close": "20:00"
+      },
+      "Sunday": {
+        "open": "13:00",
+        "close": "18:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Graduation Gown Portrait (10 Edited High-Res Photos)",
+        "priceFrom": 1000
+      },
+      {
+        "id": "s2",
+        "name": "Outdoor Campus Portrait Session (5 Photos)",
+        "priceFrom": 500
+      },
+      {
+        "id": "s3",
+        "name": "Framed A4 Glossy Print",
+        "priceFrom": 800
+      }
+    ],
+    "priceLevel": 2,
+    "photos": [
+      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "NONE",
+    "availableNowUntil": "2026-10-06T21:02:04.404Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254728990011",
+    "profileStrength": 82,
+    "metrics": {
+      "views": 52,
+      "calls": 11,
+      "whatsapp": 19,
+      "directions": 5,
+      "bookingRequests": 7,
+      "impressions": 170,
+      "lastWeekViews": 45,
+      "lastWeekCalls": 9,
+      "lastWeekWhatsapp": 15
+    },
+    "createdAt": "2026-09-21T09:54:49.243Z",
+    "updatedAt": "2026-10-06T09:54:49.243Z",
+    "mapPin": {
+      "lat": 0.2827,
+      "lng": 35.2915
+    }
+  },
+  {
+    "id": "biz_topgrade_tutors",
+    "name": "TopGrade Tutors & Revision Hub",
+    "slug": "topgrade-tutors",
+    "tagline": "Engineering mathematics, calculus, mechanics & past paper drills",
+    "description": "Peer tutors with first-class track records assisting first and second years in tricky course units. Small group revisions, step-by-step problem sets, and past paper answers.",
+    "primaryCategory": "tutors-academics",
+    "extraCategories": [],
+    "tags": [
+      "tutor",
+      "calculus",
+      "math",
+      "engineering",
+      "revision",
+      "exams"
+    ],
+    "serviceModes": [
+      "comes_to_you",
+      "online"
+    ],
+    "phone": "+254719223344",
+    "whatsapp": "+254719223344",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "soweto",
+    "servesZones": [
+      "soweto",
+      "cheboiywo",
+      "stage",
+      "talai"
+    ],
+    "landmark": "Soweto center near Sunrise Hostel study hall",
+    "walkTime": "7 min walk",
+    "hours": {
+      "Monday": {
+        "open": "16:00",
+        "close": "22:00"
+      },
+      "Tuesday": {
+        "open": "16:00",
+        "close": "22:00"
+      },
+      "Wednesday": {
+        "open": "16:00",
+        "close": "22:00"
+      },
+      "Thursday": {
+        "open": "16:00",
+        "close": "22:00"
+      },
+      "Friday": {
+        "open": "15:00",
+        "close": "22:00"
+      },
+      "Saturday": {
+        "open": "09:00",
+        "close": "20:00"
+      },
+      "Sunday": {
+        "open": "14:00",
+        "close": "20:00"
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "1-on-1 Calculus / Linear Algebra (2 Hours)",
+        "priceFrom": 400
+      },
+      {
+        "id": "s2",
+        "name": "Past Exam Paper Solution Breakdown Pack",
+        "priceFrom": 200
+      }
+    ],
+    "priceLevel": 1,
+    "photos": [
+      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "RECOMMENDED",
+    "tierStartsAt": "2026-10-04T09:54:49.243Z",
+    "tierEndsAt": "2026-10-11T09:54:49.243Z",
+    "status": "ACTIVE",
+    "verificationLevel": "L2",
+    "isClaimed": true,
+    "ownerPhone": "+254719223344",
+    "profileStrength": 84,
+    "metrics": {
+      "views": 61,
+      "calls": 14,
+      "whatsapp": 26,
+      "directions": 3,
+      "bookingRequests": 8,
+      "impressions": 220,
+      "lastWeekViews": 52,
+      "lastWeekCalls": 11,
+      "lastWeekWhatsapp": 20
+    },
+    "createdAt": "2026-09-18T09:54:49.243Z",
+    "updatedAt": "2026-10-06T09:54:49.243Z",
+    "mapPin": {
+      "lat": 0.285,
+      "lng": 35.2948
+    }
+  },
+  {
+    "id": "biz_smart_stitch",
+    "name": "Smart Stitch Tailoring",
+    "slug": "smart-stitch-tailoring",
+    "tagline": "Fast trouser alteration, zip replacement & graduation suit tailoring",
+    "description": "Reliable tailor shop right at Stage. Tightening oversized trousers, fixing broken bag/jacket zippers within 20 minutes, and custom African prints for events.",
+    "primaryCategory": "tailoring-fashion",
+    "extraCategories": [],
+    "tags": [
+      "tailor",
+      "trouser",
+      "zip",
+      "suit",
+      "stage",
+      "alteration"
+    ],
+    "serviceModes": [
+      "at_shop"
+    ],
+    "phone": "+254721445588",
+    "whatsapp": "+254721445588",
+    "campus": "Moi University (Kesses Main Campus)",
+    "zone": "stage",
+    "servesZones": [
+      "stage",
+      "kesses-centre"
+    ],
+    "landmark": "Stage market, next to dry cleaners",
+    "walkTime": "5 min walk",
+    "hours": {
+      "Monday": {
+        "open": "08:00",
+        "close": "19:30"
+      },
+      "Tuesday": {
+        "open": "08:00",
+        "close": "19:30"
+      },
+      "Wednesday": {
+        "open": "08:00",
+        "close": "19:30"
+      },
+      "Thursday": {
+        "open": "08:00",
+        "close": "19:30"
+      },
+      "Friday": {
+        "open": "08:00",
+        "close": "19:30"
+      },
+      "Saturday": {
+        "open": "08:00",
+        "close": "19:30"
+      },
+      "Sunday": {
+        "closed": true,
+        "open": "",
+        "close": ""
+      }
+    },
+    "services": [
+      {
+        "id": "s1",
+        "name": "Trouser Tightening / Hemming",
+        "priceFrom": 100
+      },
+      {
+        "id": "s2",
+        "name": "Heavy Duty Bag / Jacket Zip Replacement",
+        "priceFrom": 150
+      }
+    ],
+    "priceLevel": 1,
+    "photos": [
+      "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=800&q=80"
+    ],
+    "coverPhoto": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=800&q=80",
+    "activeTier": "NONE",
+    "status": "ACTIVE",
+    "verificationLevel": "L1",
+    "isClaimed": true,
+    "ownerPhone": "+254721445588",
+    "profileStrength": 78,
+    "metrics": {
+      "views": 42,
+      "calls": 8,
+      "whatsapp": 14,
+      "directions": 3,
+      "bookingRequests": 2,
+      "impressions": 140,
+      "lastWeekViews": 38,
+      "lastWeekCalls": 7,
+      "lastWeekWhatsapp": 12
+    },
+    "createdAt": "2026-09-24T09:54:49.243Z",
+    "updatedAt": "2026-10-06T09:54:49.243Z",
+    "mapPin": {
+      "lat": 0.2806,
+      "lng": 35.2928
+    }
+  }
+]

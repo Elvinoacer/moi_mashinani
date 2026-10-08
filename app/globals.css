@@ -1,26 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600;1,700&family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --chalk: #f2f5f8;
+    --paper: #ffffff;
+    --surface: #f9f9ff;
+    --midnight: #001c3b;
+    --slate: #5b6b7f;
+    --line: #d5dce4;
+    --bougainvillea: #c2185b;
+    --bougainvillea-pressed: #9e1049;
+    --primary: #9b0044;
+    --primary-container: #c2185b;
+    --jua: #ffc53d;
+    --secondary: #795900;
+    --secondary-container: #fdc33b;
+    --teal: #0b6e70;
+    --tertiary: #005658;
+    --whatsapp: #25d366;
+    --danger: #b3261e;
+    --on-surface: #001c3b;
+    --on-surface-variant: #594045;
+  }
+
+  body {
+    background-color: var(--chalk);
+    color: var(--midnight);
+    font-family: 'Atkinson Hyperlegible Next', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Archivo Narrow', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: -0.02em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.font-display {
+  font-family: 'Archivo Narrow', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.font-body {
+  font-family: 'Atkinson Hyperlegible Next', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Vernacular Signboard Outlines & Shadows */
+.signboard-border {
+  border: 1.5px solid #001c3b;
+}
+
+.signboard-border-thick {
+  border: 2px solid #001c3b;
+}
+
+.signboard-shadow {
+  box-shadow: 2px 2px 0px #001c3b;
+}
+
+.signboard-shadow-lg {
+  box-shadow: 4px 4px 0px #001c3b;
+}
+
+.signboard-shadow-sm {
+  box-shadow: 1px 1px 0px #001c3b;
+}
+
+.press-action {
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.press-action:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #001c3b !important;
+}
+
+/* Hide scrollbar for clean horizontal scrolls */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoiMashinani Admin - Moderation &amp; Renewal Queue</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Brand Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600&amp;family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#b90c55",
+            "secondary-fixed": "#ffdea0",
+            "surface-variant": "#d5e3ff",
+            "surface-container-high": "#dee8ff",
+            "on-secondary-fixed": "#261900",
+            "tertiary": "#005658",
+            "inverse-primary": "#ffb1c2",
+            "tertiary-fixed-dim": "#84d4d5",
+            "on-secondary-container": "#6f5100",
+            "surface-bright": "#f9f9ff",
+            "on-secondary-fixed-variant": "#5c4300",
+            "on-primary": "#ffffff",
+            "surface-container": "#e7eeff",
+            "primary-container": "#c2185b",
+            "on-error": "#ffffff",
+            "surface": "#f9f9ff",
+            "on-primary-container": "#ffd9df",
+            "error-container": "#ffdad6",
+            "secondary-container": "#fdc33b",
+            "inverse-surface": "#193151",
+            "secondary": "#795900",
+            "surface-dim": "#c7dbff",
+            "on-background": "#001c3b",
+            "tertiary-container": "#107072",
+            "on-secondary": "#ffffff",
+            "on-tertiary-fixed": "#002021",
+            "outline": "#8d6f75",
+            "on-tertiary-fixed-variant": "#004f51",
+            "background": "#f9f9ff",
+            "surface-container-lowest": "#ffffff",
+            "primary": "#9b0044",
+            "on-primary-fixed-variant": "#8f003f",
+            "on-error-container": "#93000a",
+            "surface-container-low": "#f0f3ff",
+            "surface-container-highest": "#d5e3ff",
+            "outline-variant": "#e1bec4",
+            "on-surface": "#001c3b",
+            "on-tertiary-container": "#a0f0f2",
+            "tertiary-fixed": "#a0f0f2",
+            "on-primary-fixed": "#3f0018",
+            "on-surface-variant": "#594045",
+            "error": "#ba1a1a",
+            "primary-fixed": "#ffd9df",
+            "secondary-fixed-dim": "#f7be36",
+            "primary-fixed-dim": "#ffb1c2",
+            "inverse-on-surface": "#ebf1ff",
+            "on-tertiary": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-xl": "2.5rem",
+            "margin-desktop": "2.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "headline-md": ["Archivo Narrow"],
+            "headline-xl": ["Archivo Narrow"],
+            "headline-xl-mobile": ["Archivo Narrow"],
+            "headline-lg": ["Archivo Narrow"],
+            "headline-sm": ["Archivo Narrow"],
+            "label-lg": ["Archivo Narrow"],
+            "label-sm": ["Archivo Narrow"],
+            "headline-lg-mobile": ["Archivo Narrow"],
+            "body-md": ["Atkinson Hyperlegible Next"],
+            "body-lg": ["Atkinson Hyperlegible Next"],
+            "label-md": ["Archivo Narrow"],
+            "body-sm": ["Atkinson Hyperlegible Next"]
+          },
+          "fontSize": {
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    /* Physical Brutalist Signboard Styling Tokens */
+    .signboard-border {
+      border: 1.5px solid #001c3b;
+    }
+    .signboard-shadow {
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .signboard-shadow-sm {
+      box-shadow: 1px 1px 0px #001c3b;
+    }
+    .signboard-shadow-lg {
+      box-shadow: 3px 3px 0px #001c3b;
+    }
+    .signboard-interactive {
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .signboard-interactive:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #001c3b !important;
+    }
+    .jua-badge {
+      background-color: #FFC53D;
+      color: #001c3b;
+      border: 1.5px solid #001c3b;
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .teal-badge {
+      background-color: #0B6E70;
+      color: #ffffff;
+      border: 1.5px solid #001c3b;
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f0f3ff;
+      border-left: 1px solid #d5e3ff;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #001c3b;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md select-none">
+<!-- ========================================================================= -->
+<!-- TOP ADMIN BAR & SYSTEM HEADER (Brand TopNavBar Anchor Translated) -->
+<!-- ========================================================================= -->
+<header class="w-full bg-surface border-b-2 border-on-surface shadow-[2px_2px_0px_#001c3b] sticky top-0 z-50">
+<div class="w-full px-margin md:px-margin-desktop py-space-sm flex justify-between items-center max-w-7xl mx-auto">
+<!-- Left: Brand Logo & Admin Identity -->
+<div class="flex items-center gap-space-md">
+<a class="text-headline-md font-headline-md font-bold tracking-tight text-primary uppercase" href="#">
+          MoiMashinani
+        </a>
+<div class="h-6 w-[2px] bg-on-surface opacity-30 hidden sm:block"></div>
+<div class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-0.5 signboard-border signboard-shadow-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping inline-block"></span>
+<span class="w-2 h-2 rounded-full bg-emerald-600 inline-block -ml-3"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface font-bold">
+            HQ MODERATION &amp; RENEWALS
+          </span>
+</div>
+</div>
+<!-- Center: Campus Ambassador Ops Live Status -->
+<div class="hidden lg:flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-xs signboard-border">
+<span class="material-symbols-outlined text-tertiary text-[18px]">radio_button_checked</span>
+<span class="font-label-md text-label-md text-on-surface">Campus Ambassador Ops — Live Sync active</span>
+<span class="bg-secondary-container text-on-surface px-space-xs font-label-sm text-label-sm font-bold ml-1">KESSES MAIN</span>
+</div>
+<!-- Right Actions: Language & Direct Operations -->
+<div class="flex items-center gap-space-md">
+<div class="hidden sm:flex items-center gap-1 font-label-md text-label-md text-on-surface font-semibold">
+<span class="material-symbols-outlined text-primary text-[18px]">language</span>
+<span>English / Swa</span>
+</div>
+<a class="bg-primary-container text-on-primary font-headline-sm text-label-lg px-space-md py-1.5 signboard-border signboard-shadow signboard-interactive flex items-center gap-1" href="#new-listing">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span>List your business (Free)</span>
+</a>
+</div>
+</div>
+<!-- Sub-Header: Campus Zones Fast Navigation Filter -->
+<div class="w-full bg-surface-container-low border-t border-on-surface px-margin md:px-margin-desktop py-space-xs">
+<div class="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto text-nowrap gap-space-md">
+<div class="flex items-center gap-space-sm font-label-md text-label-md">
+<span class="text-on-surface-variant font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+            CAMPUS HUBS:
+          </span>
+<button class="px-space-sm py-0.5 text-primary border-b-2 border-primary font-bold">Kesses Centre</button>
+<button class="px-space-sm py-0.5 text-on-surface-variant font-semibold hover:text-primary transition-colors">Stage</button>
+<button class="px-space-sm py-0.5 text-on-surface-variant font-semibold hover:text-primary transition-colors">Soweto</button>
+<button class="px-space-sm py-0.5 text-on-surface-variant font-semibold hover:text-primary transition-colors">Cheboiywo</button>
+<button class="px-space-sm py-0.5 text-on-surface-variant font-semibold hover:text-primary transition-colors">Annex</button>
+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant hidden md:flex items-center gap-2">
+<span>Ambassador Field Mode: <strong>Kesses Station 01</strong></span>
+<span class="w-1.5 h-1.5 rounded-full bg-on-surface opacity-40"></span>
+<span>M-Pesa Reconciliation Daraja: <strong>Online</strong></span>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE CONTAINER -->
+<!-- ========================================================================= -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-margin md:px-margin-desktop py-space-lg flex flex-col gap-space-lg">
+<!-- KPI STATS SUMMARY BAR (Tactile Signboard Cards) -->
+<section aria-label="Moderation Queue KPIs" class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- KPI 1: Pending Verifications -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">New Verifications</span>
+<span class="material-symbols-outlined text-primary text-[20px]">verified_user</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-headline-lg font-headline-lg text-primary leading-none">14</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">
+<strong class="text-error font-bold">8 kiosk visits</strong> assigned to ambassadors
+          </p>
+</div>
+</div>
+<!-- KPI 2: Promotion Renewals & M-Pesa -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md flex flex-col justify-between relative overflow-hidden">
+<div class="absolute -right-2 -bottom-3 text-secondary-container opacity-20 pointer-events-none">
+<span class="material-symbols-outlined text-[80px]">payments</span>
+</div>
+<div class="flex items-start justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Promotion Renewals</span>
+<span class="jua-badge px-space-xs font-label-sm text-label-sm font-bold">Jua Sun Tier</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-headline-lg font-headline-lg text-on-surface leading-none">6</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">
+<strong>KSh 1,200</strong> pending M-Pesa match
+          </p>
+</div>
+</div>
+<!-- KPI 3: Flagged Listings -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-error font-bold">Flagged &amp; Inactive</span>
+<span class="material-symbols-outlined text-error text-[20px]">report</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-headline-lg font-headline-lg text-error leading-none">3</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">
+            Student reports: wrong no. &amp; moved shops
+          </p>
+</div>
+</div>
+<!-- KPI 4: Unmet Student Demand Requests -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md flex flex-col justify-between">
+<div class="flex items-start justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-tertiary font-bold">Student Demand Desk</span>
+<span class="teal-badge px-space-xs font-label-sm text-label-sm font-bold">Unmet Requests</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-headline-lg font-headline-lg text-tertiary leading-none">9</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">
+            Hostel items awaiting vendor matching
+          </p>
+</div>
+</div>
+</section>
+<!-- QUEUE FILTER PILLS / NAVIGATION TABS -->
+<nav aria-label="Queue Filter Categories" class="flex flex-wrap gap-2 items-center border-b-2 border-on-surface pb-space-xs">
+<button class="bg-on-surface text-surface font-label-lg text-label-lg px-space-md py-1 signboard-border signboard-shadow-sm flex items-center gap-1.5 font-bold">
+<span>All Action Items</span>
+<span class="bg-surface text-on-surface font-label-sm text-label-sm px-1.5 py-0.2 rounded-none">32</span>
+</button>
+<button class="bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg px-space-md py-1 signboard-border signboard-shadow-sm flex items-center gap-1.5 font-bold signboard-interactive">
+<span>New Merchant Verification</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-1.5 py-0.2">14</span>
+</button>
+<button class="bg-secondary-container text-on-surface font-label-lg text-label-lg px-space-md py-1 signboard-border signboard-shadow-sm flex items-center gap-1.5 font-bold signboard-interactive">
+<span class="material-symbols-outlined text-[16px]">point_of_sale</span>
+<span>Promotion &amp; M-Pesa Reconciliation</span>
+<span class="bg-surface-container-lowest text-on-surface font-label-sm text-label-sm px-1.5 py-0.2 font-bold">6</span>
+</button>
+<button class="bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg px-space-md py-1 signboard-border signboard-shadow-sm flex items-center gap-1.5 font-bold signboard-interactive">
+<span>Flagged &amp; Inactive Reports</span>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-1.5 py-0.2">3</span>
+</button>
+<button class="bg-surface-container-lowest hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg px-space-md py-1 signboard-border signboard-shadow-sm flex items-center gap-1.5 font-bold signboard-interactive">
+<span>Student Demand Desk</span>
+<span class="bg-surface-variant text-on-surface font-label-sm text-label-sm px-1.5 py-0.2">9</span>
+</button>
+</nav>
+<!-- ========================================================================= -->
+<!-- WORKFLOW CORE: TWO-COLUMN WORKBENCH -->
+<!-- ========================================================================= -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<!-- LEFT COLUMN: Search & Moderation Queue (5 Cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Search Bar with hard border -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-sm flex flex-col gap-space-sm">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-space-md py-2 bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-on-surface focus:outline-none focus:ring-0 focus:border-primary-container" placeholder="Filter by business name, phone, zone, receipt code..." type="text" value="Mama Shiro"/>
+</div>
+<!-- Zone Quick Chips -->
+<div class="flex items-center gap-1.5 overflow-x-auto text-nowrap pb-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-bold mr-1">ZONE:</span>
+<button class="px-2 py-0.5 bg-on-surface text-surface font-label-sm text-label-sm signboard-border">All Zones</button>
+<button class="px-2 py-0.5 bg-surface hover:bg-surface-container text-on-surface font-label-sm text-label-sm signboard-border">Kesses Centre</button>
+<button class="px-2 py-0.5 bg-surface hover:bg-surface-container text-on-surface font-label-sm text-label-sm signboard-border">Stage</button>
+<button class="px-2 py-0.5 bg-surface hover:bg-surface-container text-on-surface font-label-sm text-label-sm signboard-border">Soweto</button>
+<button class="px-2 py-0.5 bg-surface hover:bg-surface-container text-on-surface font-label-sm text-label-sm signboard-border">Cheboiywo</button>
+</div>
+</div>
+<!-- Moderation Queue Items Scrollable List -->
+<div class="flex flex-col gap-space-sm max-h-[720px] overflow-y-auto pr-1 custom-scroll" role="list">
+<!-- QUEUE CARD 1 (Active / Focused Item - Urgent M-Pesa Manual Match) -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md border-l-8 border-l-primary-container relative cursor-pointer" role="listitem">
+<div class="flex justify-between items-start gap-space-sm">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="jua-badge px-space-xs font-label-sm text-label-sm font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">payments</span>
+                    M-Pesa Match Needed
+                  </span>
+<span class="bg-surface-container-high px-space-xs font-label-sm text-label-sm signboard-border">
+                    Kesses Centre
+                  </span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-1">Mama Shiro Salon</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ann Waithera • +254 721 987 654</p>
+</div>
+<div class="text-right">
+<span class="bg-secondary-container text-on-surface font-headline-sm text-label-lg px-2 py-0.5 signboard-border font-bold">KSh 200</span>
+<span class="block font-label-sm text-label-sm text-on-surface-variant mt-1">Ref: SLK929KX88</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-tertiary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">verified</span>
+                Till 849201 Verified Match
+              </span>
+<span class="text-primary font-bold">Inspecting Now →</span>
+</div>
+</div>
+<!-- QUEUE CARD 2: Physical Verification Visit Needed -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md border-l-8 border-l-tertiary-container hover:bg-surface-container-low transition-colors cursor-pointer" role="listitem">
+<div class="flex justify-between items-start gap-space-sm">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="teal-badge px-space-xs font-label-sm text-label-sm font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">storefront</span>
+                    Physical Audit
+                  </span>
+<span class="bg-surface-container-high px-space-xs font-label-sm text-label-sm signboard-border">
+                    Cheboiywo Gate
+                  </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-1">Boda Point Electricals &amp; Spares</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Room 3, Cheboiywo Commercial Block</p>
+</div>
+<div class="text-right">
+<span class="text-on-surface-variant font-label-sm text-label-sm block">Shopfront Photo:</span>
+<span class="text-tertiary font-bold font-label-sm text-label-sm">Uploaded (1)</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Assigned: Ambassador Brian</span>
+<span class="bg-surface-variant px-1 font-bold text-on-surface">Pending Spot Check</span>
+</div>
+</div>
+<!-- QUEUE CARD 3: Promotion Approaching Expiry -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md border-l-8 border-l-secondary-container hover:bg-surface-container-low transition-colors cursor-pointer" role="listitem">
+<div class="flex justify-between items-start gap-space-sm">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-bold px-space-xs signboard-border flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">alarm</span>
+                    Expires in 3 Days
+                  </span>
+<span class="bg-surface-container-high px-space-xs font-label-sm text-label-sm signboard-border">
+                    Stage Market
+                  </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-1">Kevin Phones &amp; Laptops</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Featured Tier • STK Prompt Pushed</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Renewal</span>
+<span class="block font-headline-sm text-label-md font-bold text-on-surface">KSh 350 / 14d</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>STK Prompt sent 10:14 AM</span>
+<span class="text-primary font-bold underline">Resend WhatsApp Ping</span>
+</div>
+</div>
+<!-- QUEUE CARD 4: Flagged Listing Report -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md border-l-8 border-l-error hover:bg-surface-container-low transition-colors cursor-pointer" role="listitem">
+<div class="flex justify-between items-start gap-space-sm">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm font-bold px-space-xs signboard-border flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">warning</span>
+                    Flagged Inactive
+                  </span>
+<span class="bg-surface-container-high px-space-xs font-label-sm text-label-sm signboard-border">
+                    Annex
+                  </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-error font-bold mt-1">Apex Kinyozi Annex</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">2 reports: "Permanently relocated to Eldoret"</p>
+</div>
+<div class="text-right">
+<span class="bg-error text-on-error font-label-sm text-label-sm px-1.5 py-0.5 font-bold">2 Flags</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Auto-call test: No Answer</span>
+<span class="text-error font-bold underline">Delist / Suspend</span>
+</div>
+</div>
+<!-- QUEUE CARD 5: Student Unmet Request Desk -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md border-l-8 border-l-surface-tint hover:bg-surface-container-low transition-colors cursor-pointer" role="listitem">
+<div class="flex justify-between items-start gap-space-sm">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="bg-surface-variant text-on-surface font-label-sm text-label-sm font-bold px-space-xs signboard-border flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">build</span>
+                    Student Request
+                  </span>
+<span class="bg-surface-container-high px-space-xs font-label-sm text-label-sm signboard-border">
+                    Soweto Block C
+                  </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-1">Dell Motherboard Ribbon Cable</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Engineering Student request urgently</p>
+</div>
+<div class="text-right">
+<span class="text-primary font-bold font-label-sm text-label-sm">Match Needed</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Suggested: FastFix or Kevin Phones</span>
+<button class="font-bold text-tertiary underline">Dispatch Lead</button>
+</div>
+</div>
+<!-- QUEUE CARD 6: Free Listing Waiting for Approval -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md border-l-8 border-l-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer" role="listitem">
+<div class="flex justify-between items-start gap-space-sm">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="bg-surface-container-high text-on-surface font-label-sm text-label-sm font-bold px-space-xs signboard-border">
+                    Free Organic Listing
+                  </span>
+<span class="bg-surface-container-high px-space-xs font-label-sm text-label-sm signboard-border">
+                    Stage Market
+                  </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold mt-1">Cheptiret Fresh Fruit &amp; Shake Bar</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Kiosk stall #14 • Smoothies &amp; fruit cuts</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm bg-surface px-1 text-on-surface-variant">Standard</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Submitted: Today, 08:30 AM</span>
+<span class="text-on-surface font-bold underline">Quick Approve</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Detailed Item Review & Action Workbench (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Active Inspection Card Container -->
+<article class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md md:p-space-lg flex flex-col gap-space-md relative">
+<!-- Banner Header Strip -->
+<div class="bg-secondary-container text-on-surface p-space-sm signboard-border signboard-shadow-sm flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+<span class="font-headline-sm text-label-lg uppercase tracking-tight font-bold">
+                M-Pesa Promotion Reconciliation &amp; Merchant Verification
+              </span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest text-on-surface px-2 py-0.5 signboard-border font-bold">
+              ITEM ID #MOD-2024-0982
+            </span>
+</div>
+<!-- Merchant Identification & Physical Stall Anchor -->
+<div class="flex flex-col md:flex-row gap-space-md justify-between border-b-2 border-on-surface pb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<h1 class="font-headline-md font-headline-md text-on-surface font-bold">
+                  Mama Shiro Salon
+                </h1>
+<span class="jua-badge px-2 py-0.5 font-label-sm text-label-sm font-bold">
+                  7-Day Featured Requested
+                </span>
+</div>
+<div class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant flex flex-col gap-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">person</span>
+<span>Owner: <strong>Ann Waithera (Mama Shiro)</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">call</span>
+<span class="font-mono font-bold text-on-surface">+254 721 987 654</span>
+<span class="bg-surface-container text-primary font-label-sm text-label-sm px-1.5 signboard-border">Safaricom SIM</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
+<span>Kesses Centre, Opposite Equity ATM, 1st Floor Room 12</span>
+</div>
+</div>
+</div>
+<!-- Two-Tap Direct Verification Strip (Signboard Micro-Widget) -->
+<div class="bg-surface-container-low p-space-sm signboard-border flex flex-col justify-between min-w-[210px] gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold tracking-wider">
+                Direct Contact Check
+              </span>
+<div class="flex flex-col gap-1.5">
+<a class="bg-surface hover:bg-surface-container text-on-surface font-headline-sm text-label-md py-1 px-space-sm signboard-border signboard-shadow-sm flex items-center justify-center gap-1.5" href="tel:+254721987654">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Call Merchant (Sim 1)</span>
+</a>
+<a class="bg-[#25D366] text-on-surface font-headline-sm text-label-md py-1 px-space-sm signboard-border signboard-shadow-sm flex items-center justify-center gap-1.5 font-bold" href="https://wa.me/254721987654" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp Merchant</span>
+</a>
+</div>
+</div>
+</div>
+<!-- M-PESA DARAJA RECONCILIATION BLOCK -->
+<div class="bg-surface-container-low signboard-border p-space-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between border-b border-on-surface pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-700 text-[22px]">paid</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">
+                  M-Pesa C2B / Till Audit Check
+                </span>
+</div>
+<span class="bg-emerald-100 text-emerald-800 text-label-sm font-label-sm px-2 py-0.5 border border-emerald-800 font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                DARAJA LIVE MATCH CONFIRMED
+              </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm text-left">
+<div class="bg-surface-container-lowest p-space-sm signboard-border">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Claimed M-Pesa Code</span>
+<span class="font-headline-sm text-headline-sm text-primary font-mono font-bold">SLK929KX88</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mt-0.5">Till: <strong>849201</strong> (MoiMashinani Ops)</span>
+</div>
+<div class="bg-surface-container-lowest p-space-sm signboard-border">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Daraja Statement Trace</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-mono font-bold">KSh 200.00</span>
+<span class="font-body-sm text-body-sm text-emerald-700 block mt-0.5 font-bold">From: ANN W. (Verified)</span>
+</div>
+<div class="bg-surface-container-lowest p-space-sm signboard-border">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Transaction Timestamp</span>
+<span class="font-headline-sm text-label-lg text-on-surface font-bold">12 Oct 14:22 EAT</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant block mt-0.5">Safaricom Receipt Valid</span>
+</div>
+</div>
+<!-- Promotion Tier Specification -->
+<div class="bg-surface-container-lowest p-space-sm signboard-border flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-[#FFC53D] signboard-border"></div>
+<span class="font-label-md text-label-md text-on-surface font-bold">
+                  Tier to activate: Featured Directory Decal (7 Days / 168 Hours)
+                </span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Standard Rate: KSh 200/wk</span>
+</div>
+</div>
+<!-- VERIFICATION CHECKLIST & CAMPUS CRITERIA -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]">checklist</span>
+              Campus Listing Quality Standard Checklist
+            </span>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
+<!-- Item 1 -->
+<label class="bg-surface-container-low p-space-sm signboard-border flex items-start gap-2.5 cursor-pointer">
+<input checked="" class="w-4 h-4 mt-0.5 text-primary-container border-2 border-on-surface focus:ring-0 rounded-none cursor-pointer" type="checkbox"/>
+<div class="font-body-sm text-body-sm">
+<span class="font-bold text-on-surface block">Phone OTP Verified</span>
+<span class="text-on-surface-variant">Merchant validated via Safaricom one-time code.</span>
+</div>
+</label>
+<!-- Item 2 -->
+<label class="bg-surface-container-low p-space-sm signboard-border flex items-start gap-2.5 cursor-pointer">
+<input checked="" class="w-4 h-4 mt-0.5 text-primary-container border-2 border-on-surface focus:ring-0 rounded-none cursor-pointer" type="checkbox"/>
+<div class="font-body-sm text-body-sm">
+<span class="font-bold text-on-surface block">Physical Stall Ground Confirmed</span>
+<span class="text-on-surface-variant">Location matches Kesses Centre landmark registry.</span>
+</div>
+</label>
+<!-- Item 3 -->
+<label class="bg-surface-container-low p-space-sm signboard-border flex items-start gap-2.5 cursor-pointer">
+<input checked="" class="w-4 h-4 mt-0.5 text-primary-container border-2 border-on-surface focus:ring-0 rounded-none cursor-pointer" type="checkbox"/>
+<div class="font-body-sm text-body-sm">
+<span class="font-bold text-on-surface block">Zero Deposit Fraud Claims</span>
+<span class="text-on-surface-variant">No unresolved campus student complaints on record.</span>
+</div>
+</label>
+<!-- Item 4 -->
+<label class="bg-surface-container-low p-space-sm signboard-border flex items-start gap-2.5 cursor-pointer">
+<input class="w-4 h-4 mt-0.5 text-primary-container border-2 border-on-surface focus:ring-0 rounded-none cursor-pointer" type="checkbox"/>
+<div class="font-body-sm text-body-sm">
+<span class="font-bold text-on-surface block">Student Pricing Transparency</span>
+<span class="text-on-surface-variant">Knotless braids &amp; retouch prices clearly displayed.</span>
+</div>
+</label>
+</div>
+</div>
+<!-- AMBASSADOR FIELD REPORT & PHOTO AUDIT -->
+<div class="bg-surface-container-low signboard-border p-space-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface font-bold uppercase tracking-wider flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary">badge</span>
+                Ambassador Field Notes — Moi Uni Student Representative
+              </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Field Visit: Monday 15:40</span>
+</div>
+<div class="bg-surface-container-lowest p-space-sm signboard-border font-body-sm text-body-sm text-on-surface italic">
+              "Visited Mama Shiro's salon on 1st Floor Kesses Centre directly opposite Equity ATM stairs. 3 styling chairs active, generator backup for Kesses power cuts, student discount offers 15% off with Moi University Student ID. Recommend immediate Featured Tier activation."
+              <span class="block mt-1 font-bold not-italic text-tertiary">— Ambassador Faith (School of Information Sciences, 4th Year)</span>
+</div>
+<!-- Uploaded Shopfront Photo Proof Mock -->
+<div class="flex items-center gap-space-sm overflow-x-auto py-1">
+<div class="relative w-28 h-20 bg-surface-container signboard-border flex-shrink-0 flex flex-col items-center justify-center text-center p-1">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">storefront</span>
+<span class="font-label-sm text-[10px] text-on-surface font-bold">Stall Signboard</span>
+</div>
+<div class="relative w-28 h-20 bg-surface-container signboard-border flex-shrink-0 flex flex-col items-center justify-center text-center p-1">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">receipt_long</span>
+<span class="font-label-sm text-[10px] text-on-surface font-bold">Menu &amp; Price List</span>
+</div>
+<div class="relative w-28 h-20 bg-surface-container signboard-border flex-shrink-0 flex flex-col items-center justify-center text-center p-1">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">local_atm</span>
+<span class="font-label-sm text-[10px] text-on-surface font-bold">Lipa M-Pesa Till Plate</span>
+</div>
+</div>
+</div>
+<!-- DECISION ACTION BAR (Brutalist High-Contrast Buttons) -->
+<div class="pt-space-sm border-t-2 border-on-surface flex flex-col md:flex-row gap-space-sm justify-between items-stretch">
+<!-- Left secondary actions -->
+<div class="flex gap-2">
+<button class="bg-surface hover:bg-surface-container text-error font-headline-sm text-label-md px-space-md py-2 signboard-border signboard-shadow-sm signboard-interactive flex items-center justify-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+<span>Reject &amp; Refund</span>
+</button>
+<button class="bg-surface hover:bg-surface-container text-on-surface font-headline-sm text-label-md px-space-md py-2 signboard-border signboard-shadow-sm signboard-interactive flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">sms</span>
+<span>SMS Merchant</span>
+</button>
+</div>
+<!-- Primary Decision Push -->
+<div class="flex flex-col sm:flex-row gap-2">
+<button class="bg-[#0B6E70] text-surface-container-lowest font-headline-sm text-label-md px-space-md py-2 signboard-border signboard-shadow signboard-interactive flex items-center justify-center gap-1.5 font-bold">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Organic Listing Only (Free)</span>
+</button>
+<button class="bg-primary-container text-on-primary font-headline-sm text-label-md px-space-lg py-2.5 signboard-border signboard-shadow-lg signboard-interactive flex items-center justify-center gap-2 font-bold tracking-tight">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Approve &amp; Activate Featured Badge (7 Days)</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- RECENT ACTIVITY AUDIT LOG & AMBASSADOR DISPATCH STATUS -->
+<!-- ========================================================================= -->
+<section class="bg-surface-container-lowest signboard-border signboard-shadow p-space-md md:p-space-lg flex flex-col gap-space-sm">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-on-surface pb-space-xs gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">history_toggle_off</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+            Live Administrative Audit Log &amp; Field Actions
+          </h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">
+          Last refreshed: Just now (Auto-polling 15s)
+        </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter text-on-surface">
+<!-- Log item 1 -->
+<div class="p-space-sm bg-surface-container-low signboard-border flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-tertiary font-bold">M-PESA RENEWAL</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">12 min ago</span>
+</div>
+<p class="font-body-sm text-body-sm mt-1">
+              Admin Kelvin approved <strong>Kevin Phones &amp; Laptops</strong> 14-day renewal badge.
+            </p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2 font-mono">Tx Ref #R-2026-00084</span>
+</div>
+<!-- Log item 2 -->
+<div class="p-space-sm bg-surface-container-low signboard-border flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-bold">FIELD SPOT CHECK</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">34 min ago</span>
+</div>
+<p class="font-body-sm text-body-sm mt-1">
+              Ambassador Brian verified <strong>Apex Cyber Gate A</strong> on-site in Cheboiywo.
+            </p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2 font-mono">GPS Match Confirmed</span>
+</div>
+<!-- Log item 3 -->
+<div class="p-space-sm bg-surface-container-low signboard-border flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-error font-bold">AUTOMATED SYSTEM</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1 hr ago</span>
+</div>
+<p class="font-body-sm text-body-sm mt-1">
+              Automated sweep unlisted inactive phone <span class="font-mono font-bold">+254 700 111 222</span> after 3 failed callout attempts.
+            </p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2 font-mono">Auto-Takedown Script</span>
+</div>
+</div>
+</section>
+</main>
+<!-- ========================================================================= -->
+<!-- FOOTER (Brand Footer Anchor Translated) -->
+<!-- ========================================================================= -->
+<footer class="w-full bg-surface-container-lowest border-t-2 border-on-surface mt-space-xl">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter">
+<!-- Brand & Mission statement -->
+<div class="flex flex-col gap-1 text-center md:text-left max-w-lg">
+<span class="text-headline-sm font-headline-sm font-bold text-primary">
+          MoiMashinani Admin HQ
+        </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+</div>
+<!-- Quick Nav Links -->
+<div class="flex flex-wrap justify-center md:justify-end gap-x-space-md gap-y-space-xs font-label-sm text-label-sm">
+<a class="text-primary font-bold underline" href="#">Add Business (Free)</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Student Deals</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Campus Safety &amp; Trust</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Kesses Map Guide</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Report Inactive Listing</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">WhatsApp Helpdesk</a>
+</div>
+</div>
+</footer>
+<!-- Micro-interaction JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Allow clicking queue items to update visual focus
+      const queueItems = document.querySelectorAll('[role="listitem"]');
+      queueItems.forEach(item => {
+        item.addEventListener('click', () => {
+          queueItems.forEach(i => i.classList.remove('ring-2', 'ring-primary-container'));
+          item.classList.add('ring-2', 'ring-primary-container');
+        });
+      });
+    });
+  </script>
+</body></html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoiMashinani Merchant Hub - Promote Kevin Phones &amp; Laptops</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600&amp;family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container": "#e7eeff",
+            "inverse-primary": "#ffb1c2",
+            "tertiary": "#005658",
+            "primary-container": "#c2185b",
+            "surface-variant": "#d5e3ff",
+            "secondary-fixed-dim": "#f7be36",
+            "surface-tint": "#b90c55",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-fixed-variant": "#004f51",
+            "secondary-fixed": "#ffdea0",
+            "background": "#f9f9ff",
+            "inverse-surface": "#193151",
+            "tertiary-fixed": "#a0f0f2",
+            "on-secondary-fixed": "#261900",
+            "surface-container-highest": "#d5e3ff",
+            "error-container": "#ffdad6",
+            "on-surface": "#001c3b",
+            "surface": "#f9f9ff",
+            "on-error": "#ffffff",
+            "tertiary-fixed-dim": "#84d4d5",
+            "secondary": "#795900",
+            "on-error-container": "#93000a",
+            "on-background": "#001c3b",
+            "on-surface-variant": "#594045",
+            "error": "#ba1a1a",
+            "secondary-container": "#fdc33b",
+            "outline": "#8d6f75",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#3f0018",
+            "inverse-on-surface": "#ebf1ff",
+            "surface-dim": "#c7dbff",
+            "on-primary-container": "#ffd9df",
+            "primary-fixed-dim": "#ffb1c2",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-container": "#6f5100",
+            "on-primary-fixed-variant": "#8f003f",
+            "primary": "#9b0044",
+            "on-primary": "#ffffff",
+            "on-tertiary-container": "#a0f0f2",
+            "surface-container-low": "#f0f3ff",
+            "tertiary-container": "#107072",
+            "primary-fixed": "#ffd9df",
+            "on-tertiary-fixed": "#002021",
+            "outline-variant": "#e1bec4",
+            "on-secondary-fixed-variant": "#5c4300",
+            "surface-bright": "#f9f9ff",
+            "surface-container-high": "#dee8ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-xl": "2.5rem",
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem",
+            "margin-desktop": "2.5rem"
+          },
+          "fontFamily": {
+            "headline-xl-mobile": ["Archivo Narrow"],
+            "label-lg": ["Archivo Narrow"],
+            "label-sm": ["Archivo Narrow"],
+            "label-md": ["Archivo Narrow"],
+            "body-md": ["Atkinson Hyperlegible Next"],
+            "headline-lg": ["Archivo Narrow"],
+            "headline-sm": ["Archivo Narrow"],
+            "body-lg": ["Atkinson Hyperlegible Next"],
+            "headline-md": ["Archivo Narrow"],
+            "body-sm": ["Atkinson Hyperlegible Next"],
+            "headline-lg-mobile": ["Archivo Narrow"],
+            "headline-xl": ["Archivo Narrow"]
+          },
+          "fontSize": {
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Signboard brutalist custom tokens aligned with brand anchors */
+    .signboard-border {
+      border: 1.5px solid #001c3b;
+    }
+    .signboard-shadow {
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .signboard-shadow-lg {
+      box-shadow: 4px 4px 0px #001c3b;
+    }
+    .signboard-shadow-hover:hover {
+      box-shadow: 3px 3px 0px #001c3b;
+      transform: translate(-1px, -1px);
+    }
+    .signboard-press:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #001c3b;
+    }
+    .hairline-divider {
+      border-color: #d5dce4;
+    }
+    /* Pulse dot */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .animate-pulse-dot {
+      animation: pulse-dot 1.4s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-[#F2F5F8] text-on-surface font-body-md antialiased min-h-screen flex flex-col justify-between selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TOP APP BAR / BRAND HEADER -->
+<header class="w-full bg-surface-container-lowest border-b-2 border-on-surface shadow-[2px_2px_0px_#001c3b] sticky top-0 z-50">
+<div class="w-full px-margin md:px-margin-desktop py-space-sm flex flex-wrap justify-between items-center max-w-7xl mx-auto gap-4">
+<!-- Brand & Breadcrumb Hierarchy -->
+<div class="flex items-center gap-3">
+<a class="flex items-center gap-2 text-on-surface hover:opacity-90" href="#dashboard">
+<span class="bg-primary text-on-primary px-2 py-0.5 signboard-border signboard-shadow text-headline-sm font-headline-sm uppercase font-bold tracking-tight">
+            MoiMashinani
+          </span>
+<span class="text-label-md font-label-md bg-secondary-container text-on-secondary-container px-2 py-0.5 signboard-border font-bold">
+            MERCHANT HUB
+          </span>
+</a>
+<div class="hidden md:flex items-center gap-1.5 text-body-sm font-body-sm text-on-surface-variant pl-2 border-l border-outline-variant">
+<span class="material-symbols-outlined text-[16px]">storefront</span>
+<a class="hover:underline text-on-surface font-medium" href="#dashboard">Owner Dashboard</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Promote Kevin Phones &amp; Laptops</span>
+</div>
+</div>
+<!-- Live Listing Status Badge & Action -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-[#FFDEA0] text-on-secondary-fixed signboard-border signboard-shadow px-2.5 py-1">
+<span class="w-2 h-2 rounded-full bg-[#C2185B] animate-pulse-dot"></span>
+<span class="text-label-sm font-label-sm uppercase tracking-wide">
+            Currently Active: <strong class="font-bold">Featured until Tue 14 Oct</strong>
+</span>
+</div>
+<a class="inline-flex items-center gap-1.5 bg-[#F2F5F8] text-on-surface signboard-border signboard-shadow px-3 py-1.5 text-label-md font-label-md font-bold signboard-press hover:bg-surface-container-high transition-colors" href="#dashboard">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<span>Return to Dashboard</span>
+</a>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS (Two-Column Signboard Layout max-w 1120px) -->
+<main class="w-full max-w-[1120px] mx-auto px-4 md:px-6 py-6 flex-grow">
+<!-- Top Notice Banner for Campus Context -->
+<div class="mb-6 bg-surface-container-lowest signboard-border signboard-shadow p-3.5 flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<span class="bg-[#0B6E70] text-white p-1 signboard-border flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">campaign</span>
+</span>
+<div>
+<span class="text-label-md font-label-md text-on-surface font-bold">Targeting Moi University Main Campus Students:</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant ml-1">Kesses Centre, Stage, Cheboiywo &amp; Soweto Hostels</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-[#005658] bg-tertiary-fixed px-2 py-0.5 signboard-border font-bold">
+<span class="material-symbols-outlined text-[14px]">bolt</span> High Search Volume: Exams &amp; Gadget Repairs Season
+      </div>
+</div>
+<!-- Grid Container -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Plan Selection & Checkout Configuration (7 cols) -->
+<section class="lg:col-span-7 flex flex-col gap-6">
+<!-- Section Header Card -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-5">
+<div class="flex items-center justify-between border-b pb-3 mb-3 hairline-divider">
+<div>
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-primary font-bold">Step 1 of 2: Placement</span>
+<h1 class="text-headline-md font-headline-md text-on-surface tracking-tight">Choose Your Visibility Tier in Kesses</h1>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-1 signboard-border font-semibold text-on-surface-variant">
+              Moi Uni Local Index
+            </span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+            All tiers respect genuine proximity and fair student search intent. Promoted badges display immediate physical kiosk markers with 1-tap WhatsApp and call direct lines.
+          </p>
+</div>
+<!-- TIER CARDS SELECTION -->
+<div class="flex flex-col gap-4">
+<!-- FEATURED TIER CARD (Selected Default) -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow-lg relative overflow-hidden transition-all ring-2 ring-[#001c3b]" id="tier-featured-card">
+<!-- Top Jua Signboard Banner -->
+<div class="bg-[#FFC53D] px-4 py-2 signboard-border border-t-0 border-l-0 border-r-0 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="bg-on-surface text-[#FFC53D] px-2 py-0.5 text-label-sm font-label-sm font-bold signboard-border">
+                  MOST POPULAR AT STAGE
+                </span>
+<span class="text-label-sm font-label-sm text-on-surface font-bold uppercase tracking-wider">Top Search Exposure</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#C2185B]"></span>
+<span class="text-label-sm font-label-sm font-bold text-on-surface">Selected Plan</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-3">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-[#FFC53D] text-[#001c3b] px-2 py-0.5 text-label-md font-label-md font-bold signboard-border signboard-shadow">
+                      FEATURED TIER
+                    </span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">(Premium Top-Block)</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Guaranteed Top 3 Display in Search</h3>
+</div>
+<div class="text-right">
+<div class="text-headline-md font-headline-md text-primary font-bold">KSh 200</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">per week (7 days)</span>
+</div>
+</div>
+<!-- Perks Grid -->
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-body-sm font-body-sm mb-4 pt-2 border-t hairline-divider">
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>Guaranteed top 3 block in student queries</span>
+</li>
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>Homepage Kesses swipeable carousel</span>
+</li>
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>'Phones &amp; Repairs' category top hero</span>
+</li>
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>Detailed weekly WhatsApp click analytics</span>
+</li>
+</ul>
+<!-- Live Visual Preview Snippet of Search Row -->
+<div class="bg-surface-container-low p-3 signboard-border">
+<div class="flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant mb-2">
+<span class="font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">preview</span>
+                    STUDENT SEARCH PREVIEW (e.g. "Screen repair Kesses")
+                  </span>
+<span class="text-[10px] bg-white px-1.5 py-0.5 signboard-border font-bold text-[#001c3b]">LIVE PREVIEW</span>
+</div>
+<!-- Mockup of Listing in search -->
+<div class="bg-white signboard-border signboard-shadow p-2.5 flex items-center justify-between gap-3 border-l-4 border-l-[#FFC53D]">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-surface-container signboard-border flex flex-col items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[24px]">phone_android</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-md font-label-md font-bold text-on-surface">Kevin Phones &amp; Laptops</span>
+<span class="bg-[#FFC53D] text-[#001c3b] text-[10px] font-bold px-1 signboard-border">FEATURED</span>
+<span class="material-symbols-outlined text-[14px] text-[#0B6E70]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Kesses Centre, Opposite Equity ATM • <span class="text-[#0B6E70] font-bold">Open Now</span></p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-2 py-1 bg-[#25D366] text-[#001c3b] signboard-border text-[11px] font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">chat</span> WhatsApp
+                    </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RECOMMENDED TIER CARD -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow hover:bg-surface-container-low transition-colors cursor-pointer opacity-90" id="tier-recommended-card">
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-[#0B6E70] text-white px-2 py-0.5 text-label-md font-label-md font-bold signboard-border signboard-shadow">
+                      RECOMMENDED
+                    </span>
+<span class="text-body-sm font-body-sm text-on-surface-variant font-medium">(Standard Priority)</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Ranked Above Free Directory Listings</h3>
+</div>
+<div class="text-right">
+<div class="text-headline-md font-headline-md text-on-surface font-bold">KSh 100</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">per week (7 days)</span>
+</div>
+</div>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-body-sm font-body-sm pt-2 border-t hairline-divider">
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0">check</span>
+<span>Ranked above all organic free listings</span>
+</li>
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0">check</span>
+<span>Teal accent edge card styling in search</span>
+</li>
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0">check</span>
+<span>Included in Recommended student feeds</span>
+</li>
+<li class="flex items-start gap-1.5">
+<span class="material-symbols-outlined text-[#0B6E70] text-[18px] shrink-0">check</span>
+<span>Verified campus trust badge icon</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- DURATION SELECTOR CARD -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-5">
+<div class="flex items-center justify-between mb-3">
+<div>
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-primary font-bold">Step 2 of 2: Duration</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Select Promo Duration</h2>
+</div>
+<span class="text-label-sm font-label-sm text-[#0B6E70] font-bold bg-[#E6F4F1] px-2 py-0.5 signboard-border">
+              Continuous Uptime
+            </span>
+</div>
+<!-- Duration Chips -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+<button class="duration-chip p-3 text-left signboard-border bg-[#F2F5F8] hover:bg-surface-container-high transition-colors signboard-press" type="button">
+<span class="text-label-sm font-label-sm text-on-surface-variant block">Short Term</span>
+<span class="text-label-md font-label-md text-on-surface font-bold block mt-0.5">1 Week (Standard)</span>
+<span class="text-[12px] text-on-surface-variant">KSh 200 total</span>
+</button>
+<button class="duration-chip p-3 text-left signboard-border bg-[#F2F5F8] hover:bg-surface-container-high transition-colors signboard-press" type="button">
+<span class="text-label-sm font-label-sm text-on-surface-variant block">Fortnight</span>
+<span class="text-label-md font-label-md text-on-surface font-bold block mt-0.5">2 Weeks</span>
+<span class="text-[12px] text-on-surface-variant">KSh 400 total</span>
+</button>
+<button class="duration-chip p-3 text-left signboard-border bg-[#FFDEA0] ring-2 ring-on-surface signboard-shadow signboard-press relative" type="button">
+<span class="absolute -top-2.5 right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.2 signboard-border">
+                SAVE KSh 100
+              </span>
+<span class="text-label-sm font-label-sm text-[#6F5100] font-bold block">Best Value for Semester</span>
+<span class="text-label-md font-label-md text-on-surface font-bold block mt-0.5">4 Weeks (Bundle Deal)</span>
+<span class="text-[12px] text-on-surface font-bold">KSh 700 <s class="font-normal text-on-surface-variant">800</s></span>
+</button>
+</div>
+<!-- Timeline Notice Box -->
+<div class="bg-surface-container-low p-3.5 signboard-border flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">date_range</span>
+<div class="text-body-sm font-body-sm leading-snug">
+<div class="font-bold text-on-surface mb-0.5">Calculated Run Timeline:</div>
+<p class="text-on-surface">
+<strong>Starts:</strong> Tue, 14 Oct 2026 (immediately after current active period) <br/>
+<strong>Ends:</strong> Tue, 11 Nov 2026, 14:32 EAT 
+              </p>
+<p class="text-[12px] text-[#0B6E70] font-bold mt-1">
+                ✓ Fair Continuity: No days or hours are lost by renewing early before expiration.
+              </p>
+</div>
+</div>
+</div>
+<!-- M-PESA STK PUSH FORM -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-5">
+<div class="flex items-center gap-2 mb-3">
+<span class="w-3 h-3 bg-[#25D366] signboard-border"></span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">M-Pesa STK Instant Checkout</h2>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-label-md font-label-md text-on-surface font-bold mb-1" for="mpesa-number">
+                Safaricom M-Pesa Phone Number
+              </label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface font-bold text-body-md">
+                  🇰🇪 +254
+                </div>
+<input class="w-full pl-20 pr-16 py-2.5 bg-white text-on-surface font-body-md signboard-border text-headline-sm font-headline-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary signboard-shadow" id="mpesa-number" type="text" value="0712 345 678"/>
+<button class="absolute inset-y-1.5 right-1.5 px-3 bg-surface-container text-on-surface font-label-sm font-bold signboard-border hover:bg-surface-container-high transition-colors" type="button">
+                  Edit
+                </button>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                An instant STK prompt will appear on this handset requesting your M-Pesa PIN.
+              </p>
+</div>
+<!-- Order Summary Breakdown Card -->
+<div class="bg-[#F2F5F8] p-4 signboard-border space-y-2">
+<div class="text-label-md font-label-md text-on-surface font-bold pb-2 border-b hairline-divider flex justify-between">
+<span>Order Summary Breakdown</span>
+<span class="text-primary">Promo ID: #PRM-8492</span>
+</div>
+<div class="flex justify-between text-body-sm font-body-sm text-on-surface">
+<span>4 Weeks Featured Placement (@ KSh 200/wk)</span>
+<span class="font-bold">KSh 800</span>
+</div>
+<div class="flex justify-between text-body-sm font-body-sm text-[#0B6E70] font-bold">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">local_offer</span> 4-Week Bundle Discount (Early Renewal)
+                </span>
+<span>- KSh 100</span>
+</div>
+<div class="pt-2 border-t-2 border-on-surface flex justify-between items-baseline">
+<div>
+<span class="text-headline-sm font-headline-sm text-on-surface">Total Due Now</span>
+<span class="block text-[11px] text-on-surface-variant">Includes all local taxes &amp; SMS verification</span>
+</div>
+<span class="text-headline-lg font-headline-lg text-primary font-bold">KSh 700</span>
+</div>
+</div>
+<!-- Transparent Policy Sticker -->
+<div class="bg-surface-container-low p-3 signboard-border flex items-center gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">security</span>
+<div>
+<strong>Zero Hidden Charges Policy:</strong> No automatic recurring card deductions. We will send an SMS alert to your phone 24 hours prior to 11 Nov.
+              </div>
+</div>
+<!-- PRIMARY ACTION BUTTON -->
+<div>
+<button class="w-full py-3.5 px-6 bg-[#C2185B] text-white signboard-border signboard-shadow-lg font-label-lg uppercase tracking-wider text-center flex items-center justify-center gap-3 signboard-press hover:bg-[#a6134c] transition-all cursor-pointer" id="send-stk-btn" type="button">
+<span class="material-symbols-outlined text-[22px]">send_to_mobile</span>
+<span class="text-[17px] font-bold">Send M-Pesa STK Push (KSh 700)</span>
+</button>
+<div class="text-center mt-2 text-label-sm font-label-sm text-on-surface-variant">
+                🔒 Protected by Safaricom Lipa Na M-Pesa &amp; MoiMashinani Escrow
+              </div>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: Real-Time Payment Terminal & Simulation & Fallbacks (5 cols) -->
+<section class="lg:col-span-5 flex flex-col gap-6">
+<!-- INTERACTIVE LIVE STK PUSH TERMINAL SIMULATOR -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow-lg p-5 relative overflow-hidden">
+<!-- Terminal Header -->
+<div class="flex items-center justify-between border-b pb-3 mb-4 hairline-divider">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#25D366] animate-pulse-dot"></span>
+<span class="text-label-md font-label-md text-on-surface font-bold">Live Payment Gateway</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant font-mono">STK_DISPATCH_v2.4</span>
+</div>
+<!-- Phone Notification Header Simulation -->
+<div class="bg-surface-container-high p-3 signboard-border mb-4">
+<div class="flex items-center gap-2 text-primary font-bold text-body-sm font-body-sm">
+<span class="material-symbols-outlined text-[18px]">phonelink_ring</span>
+<span>Check your phone screen now</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">
+              We pushed an instant prompt to <strong class="text-on-surface font-bold">+254 712 345 678</strong>.
+            </p>
+</div>
+<!-- REALISTIC SAFARICOM SIM TOOLKIT POP-UP MOCKUP -->
+<div class="relative mx-auto my-2 max-w-[320px] bg-[#E8ECEF] signboard-border signboard-shadow p-3 rounded-sm font-sans text-on-surface">
+<!-- Simulated SIM Tool Header -->
+<div class="bg-[#001c3b] text-white text-[11px] px-2 py-1 font-mono font-bold flex justify-between items-center mb-3">
+<span>SAFARICOM M-PESA</span>
+<span class="material-symbols-outlined text-[13px]">sim_card</span>
+</div>
+<!-- SIM Dialog Box Body -->
+<div class="bg-white signboard-border p-3 space-y-2.5">
+<div class="text-[13px] leading-tight text-on-surface">
+                Do you want to pay <strong class="font-bold text-[#001c3b]">KES 700.00</strong> to 
+                <span class="bg-[#FFDEA0] px-1 font-bold">MOIMASHINANI KESSES</span> (IntaSend Services)?
+              </div>
+<div>
+<label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                  Enter M-Pesa PIN:
+                </label>
+<div class="bg-surface-container-low border border-on-surface px-3 py-1.5 flex items-center justify-between tracking-widest font-mono text-base font-bold">
+<span>•  •  •  •</span>
+<span class="material-symbols-outlined text-outline text-[16px]">lock</span>
+</div>
+</div>
+<!-- Dialog action simulator buttons -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t hairline-divider">
+<button class="py-1 text-center bg-[#F2F5F8] signboard-border text-[12px] font-bold text-on-surface hover:bg-surface-container" type="button">
+                  Cancel
+                </button>
+<button class="py-1 text-center bg-[#25D366] text-[#001c3b] signboard-border text-[12px] font-bold hover:opacity-90" type="button">
+                  Send
+                </button>
+</div>
+</div>
+<div class="text-center mt-2">
+<span class="text-[10px] text-on-surface-variant font-mono">SIM Application Toolkit Prompt</span>
+</div>
+</div>
+<!-- Pulsing Status & Real-Time Countdown -->
+<div class="mt-4 pt-4 border-t hairline-divider space-y-2">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="flex items-center gap-1.5 text-on-surface font-semibold">
+<span class="w-2.5 h-2.5 rounded-full bg-[#25D366] animate-pulse"></span>
+                Waiting for M-Pesa network confirmation...
+              </span>
+<span class="text-label-sm font-label-sm text-primary font-bold">Attempt 1 of 3</span>
+</div>
+<!-- Progress bar -->
+<div class="w-full bg-surface-container signboard-border h-2 overflow-hidden">
+<div class="bg-[#0B6E70] h-full w-2/3 transition-all duration-500"></div>
+</div>
+<div class="flex items-center justify-between text-[12px] text-on-surface-variant">
+<span>Auto-checking status in <strong class="text-on-surface font-mono" id="countdown">18s</strong>...</span>
+<button class="text-primary hover:underline font-bold" type="button">Resend STK Push</button>
+</div>
+</div>
+<!-- Troubleshooting Guide Collapsible / Box -->
+<div class="mt-4 bg-[#F2F5F8] p-3 signboard-border text-body-sm font-body-sm">
+<div class="font-bold text-on-surface text-label-sm font-label-sm uppercase mb-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-[#C2185B]">help</span>
+              Did not receive the PIN prompt?
+            </div>
+<ol class="list-decimal list-inside text-[13px] text-on-surface-variant space-y-1">
+<li>Check phone signal (Airtel/Safaricom towers around Kesses stage).</li>
+<li>Unlock phone screen and verify your SIM toolkit isn't busy.</li>
+<li>Click <strong>'Resend STK push'</strong> or use the direct Till option below.</li>
+</ol>
+</div>
+</div>
+<!-- MANUAL M-PESA PAYMENT FALLBACK BOX -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-5">
+<div class="flex items-start justify-between mb-3">
+<div>
+<span class="bg-[#FFDEA0] text-[#001c3b] px-2 py-0.5 text-label-sm font-label-sm font-bold signboard-border">
+                MANUAL FALLBACK
+              </span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mt-1">Prefer to Pay via Buy Goods / Till?</h3>
+</div>
+<span class="material-symbols-outlined text-primary text-[28px]">payments</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-4">
+            If the automated STK push delays or your phone is on airplane mode, pay manually to our registered Moi University merchant till:
+          </p>
+<!-- Till Detail Badge -->
+<div class="bg-[#F2F5F8] p-3.5 signboard-border mb-4 space-y-2">
+<div class="flex justify-between items-center pb-2 border-b hairline-divider">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase font-bold">Till Number (Buy Goods)</span>
+<span class="font-mono text-headline-sm font-headline-sm text-[#001c3b] bg-white px-2 py-0.5 signboard-border font-bold">849201</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-on-surface-variant">Store Name:</span>
+<span class="font-bold text-on-surface">MoiMashinani Kesses</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-on-surface-variant">Exact Amount:</span>
+<span class="font-bold text-primary">KSh 700</span>
+</div>
+</div>
+<!-- Step Instructions & Manual Code Form -->
+<div class="space-y-3">
+<div class="text-[12px] text-on-surface-variant space-y-0.5">
+<div><strong>1.</strong> Go to M-Pesa &gt; Lipa na M-Pesa &gt; Buy Goods.</div>
+<div><strong>2.</strong> Enter Till <strong>849201</strong> &amp; Amount <strong>KSh 700</strong>.</div>
+<div><strong>3.</strong> Paste the 10-character confirmation code below:</div>
+</div>
+<div class="flex gap-2">
+<input class="flex-grow px-3 py-2 bg-white text-on-surface uppercase font-mono font-bold signboard-border text-label-md focus:border-primary focus:outline-none" maxlength="10" placeholder="e.g. SLK829XK39" type="text"/>
+<button class="px-4 py-2 bg-on-surface text-white signboard-border text-label-md font-label-md font-bold signboard-press hover:bg-opacity-90 shrink-0" type="button">
+                Verify Payment
+              </button>
+</div>
+<!-- Student Desk Reassurance Note -->
+<div class="pt-2 flex items-start gap-1.5 text-[12px] text-[#005658]">
+<span class="material-symbols-outlined text-[15px] shrink-0 mt-0.5">support_agent</span>
+<span>Manual submissions are verified in under 5 minutes by our student ambassador desk at Equity ATM Kesses.</span>
+</div>
+</div>
+</div>
+<!-- RECENT RECEIPTS & PROMO HISTORY SNIPPET -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow p-4">
+<div class="flex items-center justify-between mb-2 pb-2 border-b hairline-divider">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-on-surface">receipt_long</span>
+<span class="text-label-md font-label-md font-bold text-on-surface">Promotion Ledger History</span>
+</div>
+<a class="text-label-sm font-label-sm text-primary hover:underline font-bold" href="#history">View All</a>
+</div>
+<div class="space-y-2">
+<!-- Receipt Item -->
+<div class="bg-surface-container-low p-2.5 signboard-border flex items-center justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="text-label-md font-label-md font-bold text-on-surface">Receipt #R-2026-00084</span>
+<span class="bg-[#25D366] text-[#001c3b] text-[10px] font-bold px-1 signboard-border">COMPLETED</span>
+</div>
+<div class="text-[12px] text-on-surface-variant">1 Week Featured • KSh 200 via M-Pesa STK</div>
+</div>
+<div class="text-right">
+<span class="text-[11px] font-mono text-on-surface-variant block">07 Oct 2026</span>
+<button class="text-primary hover:underline text-[11px] font-bold flex items-center gap-0.5 justify-end" type="button">
+<span class="material-symbols-outlined text-[12px]">download</span> PDF
+                </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- FOOTER FROM SHARED COMPONENTS SPECIFICATION -->
+<footer class="w-full bg-surface-container-lowest border-t-2 border-on-surface mt-12">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter">
+<!-- Brand & Copyright Text -->
+<div class="flex flex-col gap-1 text-center md:text-left">
+<div class="flex items-center justify-center md:justify-start gap-2">
+<span class="text-headline-sm font-headline-sm font-bold text-primary uppercase">MoiMashinani</span>
+<span class="text-label-sm font-label-sm bg-surface-container px-1.5 py-0.5 signboard-border font-bold">KESSES MAIN CAMPUS</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-md">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+</div>
+<!-- Links Cluster -->
+<div class="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-2 text-label-sm font-label-sm">
+<a class="text-primary font-bold underline hover:text-primary transition-colors" href="#add">Add Business (Free)</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#deals">Student Deals</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#safety">Campus Safety &amp; Trust</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#map">Kesses Map Guide</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#report">Report Inactive Listing</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1" href="https://wa.me/254700000000">
+<span class="material-symbols-outlined text-[14px] text-[#25D366]" style="font-variation-settings: 'FILL' 1;">chat</span>
+<span>WhatsApp Helpdesk</span>
+</a>
+</div>
+</div>
+</footer>
+<!-- Interactive JavaScript for micro-interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Countdown simulation
+      let timeLeft = 18;
+      const countdownEl = document.getElementById('countdown');
+      if (countdownEl) {
+        setInterval(() => {
+          if (timeLeft > 1) {
+            timeLeft--;
+            countdownEl.textContent = timeLeft + 's';
+          } else {
+            timeLeft = 20;
+            countdownEl.textContent = '20s';
+          }
+        }, 1000);
+      }
+
+      // STK Push button tactile feedback
+      const stkBtn = document.getElementById('send-stk-btn');
+      if (stkBtn) {
+        stkBtn.addEventListener('click', () => {
+          const originalText = stkBtn.innerHTML;
+          stkBtn.innerHTML = `
+            <span class="material-symbols-outlined text-[20px] animate-spin">refresh</span>
+            <span class="text-[17px] font-bold">Pushing STK to +254 712 345 678...</span>
+          `;
+          stkBtn.classList.add('bg-primary');
+          setTimeout(() => {
+            stkBtn.innerHTML = `
+              <span class="material-symbols-outlined text-[22px]">check_circle</span>
+              <span class="text-[17px] font-bold">Prompt Dispatched to Phone!</span>
+            `;
+            setTimeout(() => {
+              stkBtn.innerHTML = originalText;
+            }, 3500);
+          }, 1200);
+        });
+      }
+    });
+  </script>
+</body></html>

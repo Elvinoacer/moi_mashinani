@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoiMashinani - Search &amp; Category Results | Kesses Directory</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600&amp;family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-lowest": "#ffffff",
+            "tertiary": "#005658",
+            "secondary": "#795900",
+            "tertiary-container": "#107072",
+            "inverse-on-surface": "#ebf1ff",
+            "on-primary-fixed-variant": "#8f003f",
+            "background": "#f9f9ff",
+            "outline-variant": "#e1bec4",
+            "on-error-container": "#93000a",
+            "surface-dim": "#c7dbff",
+            "on-surface-variant": "#594045",
+            "surface-container-high": "#dee8ff",
+            "secondary-fixed": "#ffdea0",
+            "primary-container": "#c2185b",
+            "inverse-primary": "#ffb1c2",
+            "on-primary-container": "#ffd9df",
+            "surface-tint": "#b90c55",
+            "on-primary-fixed": "#3f0018",
+            "on-tertiary-fixed": "#002021",
+            "on-background": "#001c3b",
+            "on-secondary-fixed": "#261900",
+            "primary": "#9b0044",
+            "error": "#ba1a1a",
+            "on-secondary-container": "#6f5100",
+            "inverse-surface": "#193151",
+            "on-tertiary-fixed-variant": "#004f51",
+            "primary-fixed-dim": "#ffb1c2",
+            "surface-container-highest": "#d5e3ff",
+            "error-container": "#ffdad6",
+            "secondary-container": "#fdc33b",
+            "surface-bright": "#f9f9ff",
+            "on-surface": "#001c3b",
+            "on-primary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed-dim": "#84d4d5",
+            "tertiary-fixed": "#a0f0f2",
+            "surface-variant": "#d5e3ff",
+            "on-error": "#ffffff",
+            "surface": "#f9f9ff",
+            "surface-container-low": "#f0f3ff",
+            "surface-container": "#e7eeff",
+            "on-secondary-fixed-variant": "#5c4300",
+            "outline": "#8d6f75",
+            "on-tertiary-container": "#a0f0f2",
+            "primary-fixed": "#ffd9df",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#f7be36"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "space-xs": "0.25rem",
+            "margin-desktop": "2.5rem",
+            "space-sm": "0.5rem",
+            "space-xl": "2.5rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "headline-md": ["Archivo Narrow"],
+            "body-md": ["Atkinson Hyperlegible Next"],
+            "headline-lg": ["Archivo Narrow"],
+            "body-sm": ["Atkinson Hyperlegible Next"],
+            "label-md": ["Archivo Narrow"],
+            "body-lg": ["Atkinson Hyperlegible Next"],
+            "label-sm": ["Archivo Narrow"],
+            "headline-xl-mobile": ["Archivo Narrow"],
+            "headline-lg-mobile": ["Archivo Narrow"],
+            "label-lg": ["Archivo Narrow"],
+            "headline-xl": ["Archivo Narrow"],
+            "headline-sm": ["Archivo Narrow"]
+          },
+          "fontSize": {
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .signboard-shadow {
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .signboard-shadow-sm {
+      box-shadow: 1.5px 1.5px 0px #001c3b;
+    }
+    .signboard-inset {
+      box-shadow: inset 1px 1px 0px #001c3b;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col font-body-md selection:bg-secondary-container selection:text-on-background">
+<!-- ========================================================================= -->
+<!-- SHARED COMPONENT: TopNavBar                                               -->
+<!-- ========================================================================= -->
+<header class="w-full bg-surface border-b-2 border-on-surface shadow-[2px_2px_0px_#001c3b] sticky top-0 z-50">
+<div class="w-full px-margin md:px-margin-desktop py-space-sm flex justify-between items-center max-w-7xl mx-auto">
+<!-- Logo & Search Brand Anchor -->
+<div class="flex items-center gap-space-lg">
+<a class="text-headline-md font-headline-md font-bold tracking-tight text-primary uppercase flex items-center gap-space-xs active:translate-x-[1px] active:translate-y-[1px] transition-transform" href="#">
+<span class="bg-primary text-on-primary px-space-xs py-0.5 border border-on-surface text-label-lg tracking-normal">MOI</span>
+<span>MASHINANI</span>
+</a>
+<!-- Fast Campus Zone Nav (Context: Kesses Centre active) -->
+<nav class="hidden lg:flex items-center gap-space-sm pl-space-md border-l-2 border-outline-variant">
+<a class="px-space-sm py-1 text-label-md font-label-md text-primary border-b-2 border-primary font-bold active:translate-x-[1px] active:translate-y-[1px]" href="#">Kesses Centre</a>
+<a class="px-space-sm py-1 text-label-md font-label-md text-on-surface-variant font-semibold hover:bg-surface-container-high transition-colors duration-150" href="#">Stage</a>
+<a class="px-space-sm py-1 text-label-md font-label-md text-on-surface-variant font-semibold hover:bg-surface-container-high transition-colors duration-150" href="#">Soweto</a>
+<a class="px-space-sm py-1 text-label-md font-label-md text-on-surface-variant font-semibold hover:bg-surface-container-high transition-colors duration-150" href="#">Cheboiywo</a>
+<a class="px-space-sm py-1 text-label-md font-label-md text-on-surface-variant font-semibold hover:bg-surface-container-high transition-colors duration-150" href="#">Annex</a>
+</nav>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center gap-space-sm">
+<button class="hidden sm:flex items-center gap-1 px-space-sm py-1.5 border border-on-surface bg-surface-container-lowest text-label-md font-label-md font-semibold text-on-surface signboard-shadow-sm active:translate-x-[1px] active:translate-y-[1px] transition-transform">
+<span class="material-symbols-outlined text-[16px] text-tertiary">language</span>
+<span>English / Swa</span>
+</button>
+<a class="flex items-center gap-1.5 bg-primary-container text-on-primary px-space-md py-1.5 border-2 border-on-surface text-label-md font-label-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px] transition-transform" href="#">
+<span class="material-symbols-outlined text-[18px]">add_business</span>
+<span>List your business (Free)</span>
+</a>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE: 2-COLUMN BRUTALIST SIGNBOARD CATALOG                       -->
+<!-- ========================================================================= -->
+<main class="w-full flex-grow max-w-7xl mx-auto px-margin md:px-margin-desktop py-space-lg">
+<!-- Top Query & Breadcrumb Bar -->
+<div class="mb-space-lg bg-surface-container-lowest border-2 border-on-surface p-space-md signboard-shadow">
+<div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-space-md">
+<!-- Search Input Bar -->
+<div class="flex-grow flex items-center border-2 border-on-surface bg-surface shadow-[2px_2px_0px_#dee8ff]">
+<div class="pl-space-md text-on-surface-variant flex items-center">
+<span class="material-symbols-outlined text-[22px]">search</span>
+</div>
+<input class="w-full py-space-sm px-space-sm bg-transparent border-0 text-body-md font-body-md text-on-surface focus:ring-0 placeholder:text-outline" placeholder="Search fundi, cyber, salon, laptop doctor..." type="text" value="screen repair"/>
+<div class="pr-space-xs flex items-center gap-1">
+<span class="hidden sm:inline-flex items-center gap-1 bg-surface-container px-space-sm py-0.5 border border-on-surface text-label-sm font-label-sm text-on-surface">
+<span class="material-symbols-outlined text-[13px] text-tertiary">location_on</span>
+              Kesses Centre
+            </span>
+<button class="bg-primary hover:bg-surface-tint text-on-primary px-space-lg py-space-sm text-label-md font-headline-md font-bold uppercase border-l-2 border-on-surface active:translate-x-[1px] active:translate-y-[1px] transition-transform">
+              Find Fundi
+            </button>
+</div>
+</div>
+<!-- Sort Select Strip -->
+<div class="flex items-center gap-space-sm shrink-0">
+<label class="text-label-md font-headline-md text-on-surface uppercase font-bold shrink-0" for="sort-dropdown">
+            Sort By:
+          </label>
+<div class="relative">
+<select class="appearance-none bg-surface-container-low border-2 border-on-surface pr-8 pl-space-md py-space-sm text-label-md font-headline-md font-semibold text-on-surface signboard-shadow-sm focus:ring-0 cursor-pointer" id="sort-dropdown">
+<option selected="">Best match (Default)</option>
+<option>Nearest / Shortest Walk</option>
+<option>Price: Low to High</option>
+<option>Newest Registered</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2.5 text-on-surface pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Layout Grid: 2-Column Responsive -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<!-- ===================================================================== -->
+<!-- LEFT COLUMN: SIDEBAR FILTERS (~300px on desktop)                      -->
+<!-- ===================================================================== -->
+<aside class="lg:col-span-4 xl:col-span-3 space-y-space-md lg:sticky lg:top-20">
+<!-- Filter Card Frame -->
+<div class="bg-surface-container-lowest border-2 border-on-surface p-space-md signboard-shadow">
+<div class="flex items-center justify-between pb-space-sm border-b-2 border-on-surface mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface uppercase">Filter Fundis</h2>
+</div>
+<button class="text-label-sm font-label-sm font-bold text-primary hover:underline uppercase">
+              Reset All
+            </button>
+</div>
+<!-- Active Filter Chips -->
+<div class="mb-space-md">
+<div class="text-label-sm font-label-sm uppercase font-bold text-outline mb-space-xs tracking-wider">Active Filters</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="inline-flex items-center gap-1 bg-surface-container-high border border-on-surface px-2 py-0.5 text-label-sm font-label-sm text-on-surface">
+                Kesses Centre
+                <button aria-label="Remove filter" class="hover:text-primary leading-none">×</button>
+</span>
+<span class="inline-flex items-center gap-1 bg-surface-container-high border border-on-surface px-2 py-0.5 text-label-sm font-label-sm text-on-surface">
+                Open Now
+                <button aria-label="Remove filter" class="hover:text-primary leading-none">×</button>
+</span>
+<span class="inline-flex items-center gap-1 bg-secondary-fixed border border-on-surface px-2 py-0.5 text-label-sm font-label-sm text-on-surface font-bold">
+                Phone &amp; Laptop
+                <button aria-label="Remove filter" class="hover:text-primary leading-none">×</button>
+</span>
+</div>
+</div>
+<!-- 1. Campus Zones -->
+<div class="mb-space-md pt-space-sm border-t border-outline-variant">
+<div class="text-label-sm font-label-sm uppercase font-bold text-on-surface mb-space-xs flex justify-between">
+<span>Campus Zones</span>
+<span class="text-outline text-label-sm">Walk reach</span>
+</div>
+<div class="space-y-1">
+<label class="flex items-center justify-between p-1 hover:bg-surface-container cursor-pointer border border-transparent hover:border-on-surface">
+<div class="flex items-center gap-2">
+<input checked="" class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm font-semibold text-on-surface">Kesses Centre</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-1.5 py-0.2 border border-on-surface">11</span>
+</label>
+<label class="flex items-center justify-between p-1 hover:bg-surface-container cursor-pointer border border-transparent hover:border-on-surface">
+<div class="flex items-center gap-2">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface">Stage Market</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">5</span>
+</label>
+<label class="flex items-center justify-between p-1 hover:bg-surface-container cursor-pointer border border-transparent hover:border-on-surface">
+<div class="flex items-center gap-2">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface">Soweto</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">3</span>
+</label>
+<label class="flex items-center justify-between p-1 hover:bg-surface-container cursor-pointer border border-transparent hover:border-on-surface">
+<div class="flex items-center gap-2">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface">Cheboiywo</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">2</span>
+</label>
+<label class="flex items-center justify-between p-1 hover:bg-surface-container cursor-pointer border border-transparent hover:border-on-surface">
+<div class="flex items-center gap-2">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface">Annex</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">4</span>
+</label>
+</div>
+</div>
+<!-- 2. Availability & Quick Badges -->
+<div class="mb-space-md pt-space-sm border-t border-outline-variant space-y-2">
+<div class="text-label-sm font-label-sm uppercase font-bold text-on-surface mb-space-xs">Status &amp; Verification</div>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm font-semibold text-on-surface flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+                Open Now
+              </span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface">Available Right Now (Live)</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                Verified Fundis Only
+              </span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer bg-secondary-fixed/30 p-1 border border-secondary-container">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm font-bold text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">local_activity</span>
+                Has Student ID Deals
+              </span>
+</label>
+</div>
+<!-- 3. Service Mode -->
+<div class="mb-space-md pt-space-sm border-t border-outline-variant">
+<div class="text-label-sm font-label-sm uppercase font-bold text-on-surface mb-space-xs">Service Mode</div>
+<div class="space-y-1.5 text-body-sm font-body-sm">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span>At shop / kiosk</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span class="font-semibold text-tertiary">Comes to hostel / room</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span>Delivery available</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="w-4 h-4 rounded-none text-primary-container border-2 border-on-surface focus:ring-0" type="checkbox"/>
+<span>Online / Remote</span>
+</label>
+</div>
+</div>
+<!-- 4. Price Bracket -->
+<div class="pt-space-sm border-t border-outline-variant">
+<div class="text-label-sm font-label-sm uppercase font-bold text-on-surface mb-space-xs">Price Level</div>
+<div class="grid grid-cols-3 gap-1">
+<button class="py-1 border-2 border-on-surface text-label-md font-headline-md font-bold bg-surface-container-high hover:bg-surface-tint hover:text-on-primary">
+                KSh
+              </button>
+<button class="py-1 border-2 border-on-surface text-label-md font-headline-md font-bold bg-surface-container-lowest hover:bg-surface-tint hover:text-on-primary">
+                KSh KSh
+              </button>
+<button class="py-1 border-2 border-on-surface text-label-md font-headline-md font-bold bg-surface-container-lowest hover:bg-surface-tint hover:text-on-primary">
+                KSh KSh KSh
+              </button>
+</div>
+</div>
+</div>
+<!-- Student Safety Notice Kiosk Tag -->
+<div class="bg-surface-container-low border-2 border-on-surface p-space-md signboard-shadow-sm">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">shield</span>
+<div>
+<div class="text-label-md font-headline-md font-bold uppercase text-on-surface">Campus Anti-Con Policy</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">
+                Never pay upfront deposits before diagnosis. Physical verification stamps mean our student reps walked into the workshop.
+              </p>
+</div>
+</div>
+</div>
+</aside>
+<!-- ===================================================================== -->
+<!-- RIGHT COLUMN: RESULTS FEED WITH RETRO TIER ARCHITECTURE               -->
+<!-- ===================================================================== -->
+<section class="lg:col-span-8 xl:col-span-9 space-y-space-md">
+<!-- Search Meta Header & Count -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-xs gap-space-xs">
+<div>
+<h1 class="text-headline-md font-headline-md font-bold text-on-surface uppercase tracking-tight">
+              18 Verified Fundis &amp; Kiosks matching "screen repair"
+            </h1>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+              Showing active repair fundis near <span class="font-bold text-on-surface">Kesses Centre &amp; Stage</span>
+</p>
+</div>
+<div class="text-label-sm font-label-sm bg-surface-container border border-on-surface px-2 py-1 shrink-0 self-start sm:self-auto">
+            LIVE DIRECTORY · CAMPUS TERM 2
+          </div>
+</div>
+<!-- Tier Explanation Decal Banner -->
+<div class="bg-surface-container-low border-2 border-on-surface p-space-sm flex items-center justify-between gap-space-md text-body-sm font-body-sm">
+<div class="flex items-center gap-space-sm">
+<span class="flex h-3 w-3 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-secondary-container"></span>
+</span>
+<span>
+<strong class="font-bold text-on-surface">Featured (#FFC53D)</strong> and <strong class="font-bold text-on-surface">Recommended (#0B6E70)</strong> placements are verified local businesses. Ranking is strictly relevance-gated.
+            </span>
+</div>
+<a class="text-label-sm font-headline-md font-bold text-primary hover:underline uppercase shrink-0 flex items-center gap-0.5" href="#">
+<span>How ranking works</span>
+<span class="material-symbols-outlined text-[14px]">north_east</span>
+</a>
+</div>
+<!-- =================================================================== -->
+<!-- RESULT LISTINGS                                                     -->
+<!-- =================================================================== -->
+<div class="space-y-space-md">
+<!-- --------------------------------------------------------------- -->
+<!-- 1. FEATURED TIER: Kevin Phones & Laptops                         -->
+<!-- --------------------------------------------------------------- -->
+<article class="bg-surface-container-lowest border-2 border-on-surface border-l-[6px] border-l-[#FFC53D] p-space-md signboard-shadow relative hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-space-xs">
+<!-- Physical Sticker Badges -->
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="bg-secondary-container text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase signboard-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                  FEATURED
+                </span>
+<span class="bg-surface-container-lowest text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                  VERIFIED FUNDI
+                </span>
+<span class="text-label-sm font-label-sm bg-emerald-100 text-emerald-900 border border-emerald-800 px-1.5 py-0.2 font-bold">
+                  Open now until 8:30 PM
+                </span>
+</div>
+<!-- Distance Marker -->
+<div class="text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">directions_walk</span>
+<span>4 min walk from Main Gate</span>
+</div>
+</div>
+<!-- Content & Actions Layout -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">
+<a class="hover:text-primary transition-colors" href="#">Kevin Phones &amp; Laptops</a>
+</h3>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">storefront</span>
+                  Phone &amp; Laptop repair · Kesses Centre (Behind Equity ATM, 1st Flr Room 4)
+                </p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">Price hint:</span> Screen replacement from KSh 1,800 · Charging ports from KSh 500
+                </p>
+<!-- Student Deal Badge -->
+<div class="pt-1">
+<span class="inline-flex items-center gap-1.5 bg-[#FFC53D]/30 border border-secondary text-on-surface px-2 py-0.5 text-label-sm font-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px] text-secondary">local_offer</span>
+                    15% off labor with Moi Student ID
+                  </span>
+</div>
+</div>
+<!-- Action Cluster: Call & WhatsApp -->
+<div class="flex sm:flex-col lg:flex-row items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-primary-container text-on-primary px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="tel:+254712345678">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call (+254 712...)</span>
+</a>
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#25D366] text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="https://wa.me/254712345678?text=Hi%20Kevin%20Phones,%20I%20found%20you%20on%20MoiMashinani%20regarding%20screen%20repair" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- --------------------------------------------------------------- -->
+<!-- 2. FEATURED TIER: Apex Cyber & Electronics                      -->
+<!-- --------------------------------------------------------------- -->
+<article class="bg-surface-container-lowest border-2 border-on-surface border-l-[6px] border-l-[#FFC53D] p-space-md signboard-shadow relative hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-space-xs">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="bg-secondary-container text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase signboard-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                  FEATURED
+                </span>
+<span class="bg-surface-container-lowest text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                  VERIFIED FUNDI
+                </span>
+<span class="text-label-sm font-label-sm bg-emerald-100 text-emerald-900 border border-emerald-800 px-1.5 py-0.2 font-bold">
+                  Open now until 10:00 PM
+                </span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">directions_walk</span>
+<span>2 min walk from Stage</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">
+<a class="hover:text-primary transition-colors" href="#">Apex Cyber &amp; Electronics - Gate A</a>
+</h3>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">build</span>
+                  Laptop flashing, software installation &amp; hardware soldering · Stage Market
+                </p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">Price hint:</span> OS Installation KSh 500 · Screen fixing from KSh 2,000
+                </p>
+</div>
+<div class="flex sm:flex-col lg:flex-row items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-primary-container text-on-primary px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="tel:+254722000111">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call (+254 722...)</span>
+</a>
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#25D366] text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="https://wa.me/254722000111?text=Hi%20Apex%20Cyber,%20I%20found%20you%20on%20MoiMashinani..." rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- --------------------------------------------------------------- -->
+<!-- 3. RECOMMENDED TIER: Fix It Fast Tech - Soweto Road             -->
+<!-- --------------------------------------------------------------- -->
+<article class="bg-surface-container-lowest border-2 border-on-surface border-l-[6px] border-l-[#0B6E70] p-space-md signboard-shadow relative hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-space-xs">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="bg-[#0B6E70] text-surface-container-lowest px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase signboard-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">thumb_up</span>
+                  RECOMMENDED
+                </span>
+<span class="bg-surface-container-lowest text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                  VERIFIED
+                </span>
+<span class="text-label-sm font-label-sm bg-surface-container border border-on-surface px-1.5 py-0.2 font-semibold text-on-surface">
+                  Open now
+                </span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">directions_walk</span>
+<span>8 min walk · Soweto</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">
+<a class="hover:text-primary transition-colors" href="#">Fix It Fast Tech - Soweto Road</a>
+</h3>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">devices</span>
+                  Specialized in HP, Dell, Lenovo motherboards and screen hinge repair
+                </p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">Price hint:</span> Diagnostics Free · Screens from KSh 1,900
+                </p>
+</div>
+<div class="flex sm:flex-col lg:flex-row items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-surface text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="tel:+254733444555">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call (+254 733...)</span>
+</a>
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#25D366] text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="https://wa.me/254733444555?text=Hi%20Fix%20It%20Fast,%20found%20you%20on%20MoiMashinani" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- --------------------------------------------------------------- -->
+<!-- 4. RECOMMENDED TIER: Cheboiywo Electronics Fundi                 -->
+<!-- --------------------------------------------------------------- -->
+<article class="bg-surface-container-lowest border-2 border-on-surface border-l-[6px] border-l-[#0B6E70] p-space-md signboard-shadow relative hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-space-xs">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="bg-[#0B6E70] text-surface-container-lowest px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase signboard-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">thumb_up</span>
+                  RECOMMENDED
+                </span>
+<span class="bg-surface-container-high text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary">home_repair_service</span>
+                  HOSTEL VISIT
+                </span>
+<span class="text-label-sm font-label-sm bg-surface-container border border-on-surface px-1.5 py-0.2 font-semibold text-on-surface">
+                  Mobile on call
+                </span>
+</div>
+<div class="text-label-sm font-label-sm text-tertiary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">electric_moped</span>
+<span>Comes to hostel in 15 mins</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">
+<a class="hover:text-primary transition-colors" href="#">Cheboiywo Electronics Fundi (Fundi Otieno)</a>
+</h3>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">two_wheeler</span>
+                  Comes to your hostel room · Stationed at Cheboiywo Junction
+                </p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">Price hint:</span> Repairs from KSh 600 · Free inspection if within Cheboiywo
+                </p>
+</div>
+<div class="flex sm:flex-col lg:flex-row items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-surface text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="tel:+254799112233">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call (+254 799...)</span>
+</a>
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#25D366] text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="https://wa.me/254799112233?text=Hi%20Fundi%20Otieno,%20I%20need%20repair%20service%20in%20my%20hostel" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- --------------------------------------------------------------- -->
+<!-- 5. ORGANIC / FREE TIER: Mwangi Gadgets & Accessories            -->
+<!-- --------------------------------------------------------------- -->
+<article class="bg-surface-container-lowest border-2 border-on-surface p-space-md signboard-shadow relative hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-space-xs">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="bg-surface-container-lowest text-on-surface px-2 py-0.5 border border-on-surface text-label-sm font-headline-md font-bold uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                  VERIFIED
+                </span>
+<span class="text-label-sm font-label-sm bg-emerald-100 text-emerald-900 border border-emerald-800 px-1.5 py-0.2 font-bold">
+                  Open now
+                </span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">directions_walk</span>
+<span>3 min walk · Kesses Stage</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">
+<a class="hover:text-primary transition-colors" href="#">Mwangi Gadgets &amp; Accessories</a>
+</h3>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">cable</span>
+                  Screen guards, laptop chargers, battery replacements · Kesses Stage
+                </p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">Price hint:</span> Accessories from KSh 250 · Tempered Glass KSh 200 fixed
+                </p>
+</div>
+<div class="flex sm:flex-col lg:flex-row items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-surface text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="tel:+254711889900">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call (+254 711...)</span>
+</a>
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#25D366] text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="https://wa.me/254711889900?text=Hi%20Mwangi%20Gadgets,%20saw%20you%20on%20MoiMashinani" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- --------------------------------------------------------------- -->
+<!-- 6. ORGANIC / FREE TIER: Campus Tech Doctors                     -->
+<!-- --------------------------------------------------------------- -->
+<article class="bg-surface-container-lowest border-2 border-on-surface p-space-md signboard-shadow relative hover:translate-x-[1px] hover:-translate-y-[1px] transition-transform">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-space-xs">
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="text-label-sm font-label-sm bg-error-container text-on-error-container border border-error px-1.5 py-0.2 font-bold">
+                  Closing soon at 7:00 PM
+                </span>
+<span class="text-label-sm font-label-sm bg-surface-container border border-on-surface px-1.5 py-0.2 text-on-surface font-semibold">
+                  Annex Zone
+                </span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-primary">directions_walk</span>
+<span>5 min walk</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">
+<a class="hover:text-primary transition-colors" href="#">Campus Tech Doctors</a>
+</h3>
+<p class="text-body-sm font-body-sm text-on-surface font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline">phonelink_setup</span>
+                  Software flashing &amp; screen adhesive glueing · Annex Kiosk 12
+                </p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface">Price hint:</span> Screen repairs from KSh 2,200 · Touch repair KSh 1,200
+                </p>
+</div>
+<div class="flex sm:flex-col lg:flex-row items-stretch gap-2 shrink-0 pt-2 md:pt-0">
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-surface text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="tel:+254700332211">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Call (+254 700...)</span>
+</a>
+<a class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 bg-[#25D366] text-on-surface px-space-md py-2 border-2 border-on-surface text-label-md font-headline-md font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px]" href="https://wa.me/254700332211?text=Hi%20Campus%20Tech%20Doctors,%20saw%20you%20on%20MoiMashinani" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+<!-- =================================================================== -->
+<!-- PAGINATION: DATA-FRIENDLY "SHOW MORE" BUTTON (§4.1.2)               -->
+<!-- =================================================================== -->
+<div class="bg-surface-container border-2 border-on-surface p-space-md text-center signboard-shadow space-y-space-sm">
+<div class="text-label-md font-headline-md text-on-surface uppercase font-bold tracking-wider">
+            Showing 6 of 18 results
+          </div>
+<div>
+<button class="bg-surface-container-lowest hover:bg-surface-container-high text-on-surface px-space-xl py-space-sm border-2 border-on-surface text-headline-sm font-headline-sm font-bold uppercase signboard-shadow active:translate-x-[1px] active:translate-y-[1px] transition-transform inline-flex items-center gap-2">
+<span>Show 10 More Fundis</span>
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</button>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">
+            Avoids endless scrolling to save your phone bundle &amp; battery on Safaricom / Airtel campus networks.
+          </p>
+</div>
+<!-- =================================================================== -->
+<!-- DEMAND CAPTURE CARD: Unmet Student Needs Request Strip              -->
+<!-- =================================================================== -->
+<div class="bg-secondary-container/20 border-2 border-on-surface p-space-lg signboard-shadow">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">contact_support</span>
+<h4 class="text-headline-sm font-headline-sm font-bold text-on-surface uppercase">
+                  Can't find the exact fundi or spare part?
+                </h4>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-xl">
+                Tell us what you need (e.g., iPhone 11 original display, soldered HP hinge). Our Kesses campus student ambassadors will locate verified fundis within 30 minutes.
+              </p>
+</div>
+<!-- Quick Request Form -->
+<div class="w-full md:w-auto flex-shrink-0 flex items-stretch">
+<input class="bg-surface-container-lowest border-2 border-r-0 border-on-surface px-space-md py-space-sm text-body-sm font-body-sm text-on-surface focus:ring-0 w-full sm:w-56" placeholder="What part or service?" type="text"/>
+<button class="bg-primary hover:bg-surface-tint text-on-primary px-space-md py-space-sm text-label-md font-headline-md font-bold uppercase border-2 border-on-surface signboard-shadow active:translate-x-[1px] active:translate-y-[1px] shrink-0">
+                Ask Rep
+              </button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- ========================================================================= -->
+<!-- SHARED COMPONENT: Footer                                                  -->
+<!-- ========================================================================= -->
+<footer class="w-full bg-surface-container-lowest border-t-2 border-on-surface mt-space-xl">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter">
+<!-- Brand & Mission statement -->
+<div class="flex flex-col gap-space-xs text-center md:text-left">
+<span class="text-headline-sm font-headline-sm font-bold text-primary">
+          MoiMashinani
+        </span>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-md">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+</div>
+<!-- Footer Quick Action Directory Links -->
+<div class="flex flex-wrap justify-center md:justify-end gap-x-space-md gap-y-space-xs text-label-sm font-label-sm">
+<a class="text-primary font-bold underline hover:text-primary transition-colors" href="#">
+          Add Business (Free)
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Student Deals
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Campus Safety &amp; Trust
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Kesses Map Guide
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Report Inactive Listing
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-bold text-emerald-800" href="#">
+          WhatsApp Helpdesk
+        </a>
+</div>
+</div>
+</footer>
+</body></html>

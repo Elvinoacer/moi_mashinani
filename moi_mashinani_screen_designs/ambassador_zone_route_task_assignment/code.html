@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ambassador Zone Route &amp; Task Assignment - MoiMashinani</title>
+<!-- Google Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&amp;family=Atkinson+Hyperlegible+Next:ital,wght@0,400..700;1,400..700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-primary": "#ffb1c2",
+            "surface-variant": "#d5e3ff",
+            "on-tertiary": "#ffffff",
+            "primary-container": "#c2185b",
+            "primary-fixed": "#ffd9df",
+            "on-error-container": "#93000a",
+            "outline": "#8d6f75",
+            "on-surface": "#001c3b",
+            "surface-tint": "#b90c55",
+            "on-secondary-fixed-variant": "#5c4300",
+            "background": "#f9f9ff",
+            "primary-fixed-dim": "#ffb1c2",
+            "secondary": "#795900",
+            "inverse-surface": "#193151",
+            "surface-bright": "#f9f9ff",
+            "tertiary": "#005658",
+            "secondary-fixed": "#ffdea0",
+            "on-background": "#001c3b",
+            "surface-container-high": "#dee8ff",
+            "error-container": "#ffdad6",
+            "primary": "#9b0044",
+            "on-surface-variant": "#594045",
+            "on-tertiary-container": "#a0f0f2",
+            "outline-variant": "#e1bec4",
+            "error": "#ba1a1a",
+            "on-secondary": "#ffffff",
+            "inverse-on-surface": "#ebf1ff",
+            "on-tertiary-fixed": "#002021",
+            "surface-container-low": "#f0f3ff",
+            "tertiary-container": "#107072",
+            "surface-container-highest": "#d5e3ff",
+            "on-secondary-fixed": "#261900",
+            "on-error": "#ffffff",
+            "on-primary-fixed-variant": "#8f003f",
+            "surface-dim": "#c7dbff",
+            "tertiary-fixed": "#a0f0f2",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed-variant": "#004f51",
+            "surface-container": "#e7eeff",
+            "secondary-fixed-dim": "#f7be36",
+            "on-primary-container": "#ffd9df",
+            "secondary-container": "#fdc33b",
+            "on-primary-fixed": "#3f0018",
+            "tertiary-fixed-dim": "#84d4d5",
+            "on-secondary-container": "#6f5100",
+            "surface": "#f9f9ff",
+            "surface-container-lowest": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-desktop": "1.5rem",
+            "space-xl": "2.5rem",
+            "space-md": "1rem",
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "margin-desktop": "2.5rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "label-md": ["Archivo Narrow"],
+            "headline-lg": ["Archivo Narrow"],
+            "headline-xl": ["Archivo Narrow"],
+            "headline-lg-mobile": ["Archivo Narrow"],
+            "body-md": ["Atkinson Hyperlegible Next"],
+            "body-sm": ["Atkinson Hyperlegible Next"],
+            "body-lg": ["Atkinson Hyperlegible Next"],
+            "label-lg": ["Archivo Narrow"],
+            "headline-md": ["Archivo Narrow"],
+            "headline-sm": ["Archivo Narrow"],
+            "label-sm": ["Archivo Narrow"],
+            "headline-xl-mobile": ["Archivo Narrow"]
+          },
+          "fontSize": {
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 20;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f0f3ff;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #001c3b;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-sm text-body-sm min-h-screen flex flex-col selection:bg-secondary-fixed selection:text-on-surface">
+<!-- TOP BRAND & DISPATCH BAR (TopNavBar Anchor Adaptation) -->
+<header class="w-full bg-surface border-b-2 border-on-surface shadow-[0_2px_0px_#001c3b] sticky top-0 z-50">
+<div class="w-full px-margin md:px-margin-desktop py-space-sm flex flex-col lg:flex-row justify-between items-center gap-space-sm max-w-7xl mx-auto">
+<!-- Left: Logo & Ops Badge -->
+<div class="flex items-center gap-space-md w-full lg:w-auto justify-between lg:justify-start">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-primary uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[26px] text-primary" data-icon="storefront">storefront</span>
+            MoiMashinani
+          </span>
+<span class="bg-secondary-container text-on-surface border-[1.5px] border-on-surface px-2 py-0.5 font-label-sm text-label-sm uppercase tracking-wider shadow-[1.5px_1.5px_0px_#001c3b]">
+            CAMPUS OPS &amp; DISPATCH
+          </span>
+</div>
+<!-- Telemetry Ping indicator -->
+<div class="flex items-center gap-1.5 bg-surface-container border border-on-surface px-2.5 py-1 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+<span class="font-label-sm text-label-sm">Field Fleet: <strong>6 Active</strong> • <strong>18 Queued</strong> Audits</span>
+</div>
+</div>
+<!-- Center: Campus Navigation Links from Shared Components -->
+<nav class="hidden xl:flex items-center gap-space-md">
+<a class="text-primary border-b-2 border-primary font-bold font-label-md text-label-md px-1 py-1" href="#kesses">Kesses Centre</a>
+<a class="text-on-surface-variant hover:text-primary font-semibold font-label-md text-label-md px-1 py-1 transition-colors" href="#stage">Stage</a>
+<a class="text-on-surface-variant hover:text-primary font-semibold font-label-md text-label-md px-1 py-1 transition-colors" href="#soweto">Soweto</a>
+<a class="text-on-surface-variant hover:text-primary font-semibold font-label-md text-label-md px-1 py-1 transition-colors" href="#cheboiywo">Cheboiywo</a>
+<a class="text-on-surface-variant hover:text-primary font-semibold font-label-md text-label-md px-1 py-1 transition-colors" href="#annex">Annex</a>
+</nav>
+<!-- Right: Actions & Tools -->
+<div class="flex items-center gap-space-sm w-full lg:w-auto justify-end">
+<button class="bg-surface-container-lowest text-on-surface border-[1.5px] border-on-surface px-3 py-1.5 font-label-md text-label-md flex items-center gap-1.5 shadow-[2px_2px_0px_#001c3b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="language">language</span>
+          English / Swa
+        </button>
+<button class="bg-surface-container-high text-on-surface border-[1.5px] border-on-surface px-3 py-1.5 font-label-md text-label-md flex items-center gap-1.5 shadow-[2px_2px_0px_#001c3b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all">
+<span class="material-symbols-outlined text-[16px]" data-icon="route">route</span>
+          Auto-Optimize Routes
+        </button>
+<button class="bg-primary-container text-on-primary border-[1.5px] border-on-surface px-3.5 py-1.5 font-label-md text-label-md font-bold flex items-center gap-1 shadow-[2px_2px_0px_#001c3b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+          + Dispatch Task
+        </button>
+</div>
+</div>
+</header>
+<!-- LIVE MISSION CONTROL STRIP -->
+<section class="bg-surface-container-low border-b-[1.5px] border-on-surface px-margin md:px-margin-desktop py-space-sm">
+<div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-space-sm">
+<!-- Metric 1 -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface p-space-sm flex items-center gap-2.5 shadow-[2px_2px_0px_#001c3b]">
+<div class="w-8 h-8 bg-surface-container-highest border border-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="explore">explore</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block leading-tight">ACTIVE ROUTES</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">4 Campus Zones</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface p-space-sm flex items-center gap-2.5 shadow-[2px_2px_0px_#001c3b]">
+<div class="w-8 h-8 bg-secondary-container border border-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface text-[20px]" data-icon="pending_actions">pending_actions</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block leading-tight">PENDING AUDITS</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">18 Kiosks Queued</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface p-space-sm flex items-center gap-2.5 shadow-[2px_2px_0px_#001c3b]">
+<div class="w-8 h-8 bg-tertiary-fixed border border-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary text-[20px]" data-icon="verified">verified</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block leading-tight">TODAY'S VERIFIED</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">14 (KSh 700 Paid)</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface p-space-sm flex items-center gap-2.5 shadow-[2px_2px_0px_#001c3b]">
+<div class="w-8 h-8 bg-primary-fixed border border-on-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="flag">flag</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block leading-tight">URGENT RE-CHECKS</span>
+<span class="font-headline-sm text-headline-sm font-bold text-error">3 Relocated / Flags</span>
+</div>
+</div>
+</div>
+</section>
+<!-- MAIN 3-COLUMN DISPATCH OPERATIONAL CANVAS -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-margin md:px-margin-desktop py-space-md grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<!-- COLUMN 1: ZONE OVERVIEW & AMBASSADOR FLEET STATUS (3.5 cols / ~29%) -->
+<section class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- Zone Selector Board -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface shadow-[3px_3px_0px_#001c3b]">
+<div class="bg-surface-container-high px-space-md py-space-sm border-b-[1.5px] border-on-surface flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]" data-icon="map">map</span>
+            Dispatch Zones (Moi Main)
+          </h2>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest border border-on-surface px-1.5 py-0.5">Kesses Ward</span>
+</div>
+<div class="p-space-sm flex flex-col gap-1.5">
+<!-- Active Zone Tab -->
+<button class="w-full text-left p-space-sm bg-primary-fixed border-[1.5px] border-on-surface shadow-[2px_2px_0px_#001c3b] flex items-center justify-between">
+<div>
+<span class="font-label-lg text-label-lg text-on-surface flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                Zone 1: Kesses Centre
+              </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Commercial row, Equity ATM alley, butchery strip</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm font-bold bg-primary text-on-primary px-1.5 py-0.5">8 Kiosks</span>
+<span class="block font-label-sm text-label-sm text-on-surface mt-1">High Density</span>
+</div>
+</button>
+<!-- Zone 2 -->
+<button class="w-full text-left p-space-sm bg-surface border border-outline hover:border-on-surface transition-all flex items-center justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                Zone 2: Stage &amp; Matatu Terminal
+              </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Eldoret 24B stage, cyber cafes, boda sheds</p>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container border border-on-surface px-1.5 py-0.5">5 Kiosks</span>
+</button>
+<!-- Zone 3 -->
+<button class="w-full text-left p-space-sm bg-surface border border-outline hover:border-on-surface transition-all flex items-center justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                Zone 3: Soweto Hostels &amp; Talai
+              </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hostel grocers, gas refills, fast kibanda</p>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container border border-on-surface px-1.5 py-0.5">4 Kiosks</span>
+</button>
+<!-- Zone 4 -->
+<button class="w-full text-left p-space-sm bg-surface border border-outline hover:border-on-surface transition-all flex items-center justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+                Zone 4: Cheboiywo Gate Market
+              </span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cheboiywo boundary, tailors, salons</p>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container border border-on-surface px-1.5 py-0.5">6 Kiosks</span>
+</button>
+</div>
+</div>
+<!-- Field Ambassador Fleet List -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface shadow-[3px_3px_0px_#001c3b]">
+<div class="bg-surface-container-high px-space-md py-space-sm border-b-[1.5px] border-on-surface flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]" data-icon="badge">badge</span>
+            Student Ambassadors (4 Active)
+          </h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Live Telemetry</span>
+</div>
+<div class="p-space-sm flex flex-col gap-space-sm">
+<!-- Ambassador Card 1: Faith -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm relative shadow-[2px_2px_0px_#001c3b]">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Faith Chemutai</span>
+<span class="bg-secondary-container border border-on-surface text-on-surface font-label-sm text-label-sm px-1 font-bold">4th Yr IS</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Route 1: Kesses Centre Core Loop</p>
+</div>
+<span class="bg-emerald-100 text-emerald-800 border border-emerald-800 font-label-sm text-label-sm px-1.5 py-0.5 font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-ping"></span>
+                ACTIVE
+              </span>
+</div>
+<!-- Stats Bar -->
+<div class="mt-space-sm bg-surface-container border border-outline p-1.5 grid grid-cols-3 gap-1 text-center">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Audits</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">12 / 15</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Battery</span>
+<span class="font-label-md text-label-md font-bold text-emerald-700 flex items-center justify-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]" data-icon="battery_5_bar">battery_5_bar</span>
+                  84%
+                </span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Today Bounty</span>
+<span class="font-label-md text-label-md font-bold text-primary">KSh 600</span>
+</div>
+</div>
+<div class="mt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="pin_drop">pin_drop</span>
+                Behind Equity ATM (2m ago)
+              </span>
+<button class="text-primary font-bold hover:underline flex items-center gap-0.5">
+                Handset Ping
+                <span class="material-symbols-outlined text-[14px]" data-icon="cell_tower">cell_tower</span>
+</button>
+</div>
+</div>
+<!-- Ambassador Card 2: Brian -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm relative">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Brian Kiprop</span>
+<span class="bg-surface-container border border-on-surface text-on-surface font-label-sm text-label-sm px-1 font-bold">3rd Yr Tech</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Route 2: Cheboiywo Gate</p>
+</div>
+<span class="bg-emerald-100 text-emerald-800 border border-emerald-800 font-label-sm text-label-sm px-1.5 py-0.5 font-bold">
+                ACTIVE
+              </span>
+</div>
+<div class="mt-space-sm bg-surface-container border border-outline p-1.5 grid grid-cols-3 gap-1 text-center">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Audits</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">5 / 8</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Battery</span>
+<span class="font-label-md text-label-md font-bold text-on-surface flex items-center justify-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]" data-icon="battery_4_bar">battery_4_bar</span>
+                  67%
+                </span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Today Bounty</span>
+<span class="font-label-md text-label-md font-bold text-primary">KSh 250</span>
+</div>
+</div>
+<div class="mt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+                Cheboiywo Market Lane 2
+              </span>
+<span class="text-tertiary font-bold">Online</span>
+</div>
+</div>
+<!-- Ambassador Card 3: Mercy Jerotich -->
+<div class="border-[1.5px] border-outline bg-surface-container-low p-space-sm relative">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Mercy Jerotich</span>
+<span class="bg-surface-container border border-on-surface font-label-sm text-label-sm px-1">4th Yr BBM</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Scheduled for 2:00 PM (Stage)</p>
+</div>
+<span class="bg-amber-100 text-amber-900 border border-amber-800 font-label-sm text-label-sm px-1.5 py-0.5 font-bold">
+                STANDBY
+              </span>
+</div>
+<div class="mt-2 text-on-surface-variant font-body-sm text-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]" data-icon="schedule">schedule</span>
+              Next Shift: 6 Kiosks (Barbers &amp; Printing Cybers)
+            </div>
+</div>
+<!-- Ambassador Card 4: Kelvin Omondi (Off-duty) -->
+<div class="border-[1.5px] border-outline bg-surface-container-low p-space-sm opacity-80">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Kelvin Omondi</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Shift Completed • Soweto Hostels</p>
+</div>
+<span class="bg-surface-container-highest border border-on-surface font-label-sm text-label-sm px-1.5 py-0.5">
+                OFF-DUTY
+              </span>
+</div>
+<div class="mt-1 font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary text-[14px]" data-icon="check_circle">check_circle</span>
+              7/7 Verified • 100% Daraja Till Match
+            </div>
+</div>
+</div>
+<!-- Bounty Policy Ledger Banner -->
+<div class="p-space-sm bg-secondary-fixed border-t-[1.5px] border-on-surface">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="payments">payments</span>
+<div>
+<span class="font-label-md text-label-md font-bold text-on-secondary-fixed block">Kesses Bounty Formula:</span>
+<p class="font-label-sm text-label-sm text-on-secondary-fixed-variant leading-tight">
+<strong>KSh 50</strong> per verified merchant + <strong>KSh 20 bonus</strong> for physical storefront photo &amp; Daraja Till sticker check.
+              </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- COLUMN 2: DYNAMIC WALKING ROUTE MAP & SEQUENCE PATH (5 cols / ~43%) -->
+<section class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Schematic Wayfinding Map Visualizer -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface shadow-[3px_3px_0px_#001c3b] overflow-hidden">
+<div class="bg-surface-container-high px-space-md py-space-sm border-b-[1.5px] border-on-surface flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="near_me">near_me</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Route 1: Kesses Centre Core Loop</span>
+</div>
+<span class="bg-secondary-container border border-on-surface px-2 py-0.5 font-label-sm text-label-sm font-bold">
+            Live GPS Sync
+          </span>
+</div>
+<!-- Stylized Map Canvas with Graphic Overlay -->
+<div class="relative bg-surface-container-low border-b-[1.5px] border-on-surface p-space-md min-h-[220px] flex flex-col justify-between overflow-hidden">
+<!-- Subtle Grid Background -->
+<div class="absolute inset-0 opacity-15 pointer-events-none" style="background-image: radial-gradient(#001c3b 1px, transparent 1px); background-size: 16px 16px;"></div>
+<!-- Top Map Meta -->
+<div class="relative z-10 flex justify-between items-start">
+<div class="bg-surface-container-lowest border border-on-surface px-2 py-1 shadow-[2px_2px_0px_#001c3b]">
+<span class="font-label-sm text-label-sm text-on-surface-variant block uppercase">Current Focus Area</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">Behind Equity Bank ATM Corridor</span>
+</div>
+<div class="bg-surface-container-lowest border border-on-surface p-1 shadow-[2px_2px_0px_#001c3b] flex gap-1">
+<span class="text-label-sm font-label-sm bg-surface-container px-1.5 py-0.5">Walking Pace: 3.8 km/h</span>
+<span class="text-label-sm font-label-sm bg-surface-container px-1.5 py-0.5">GPS Drift: ±3m</span>
+</div>
+</div>
+<!-- Schematic Waypoints Trail -->
+<div class="relative z-10 my-4 flex items-center justify-between px-2">
+<!-- WP 1 -->
+<div class="flex flex-col items-center">
+<span class="w-7 h-7 rounded-full bg-emerald-600 text-on-primary border-[1.5px] border-on-surface flex items-center justify-center font-label-md font-bold text-label-md shadow-[1.5px_1.5px_0px_#001c3b]">
+                ✓
+              </span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface mt-1">Stop #1</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Mama Shiro</span>
+</div>
+<!-- Path Line 1 -->
+<div class="flex-1 h-1 bg-emerald-600 mx-1"></div>
+<!-- WP 2 (Current) -->
+<div class="flex flex-col items-center">
+<div class="relative">
+<span class="w-8 h-8 rounded-full bg-primary text-on-primary border-[2px] border-on-surface flex items-center justify-center font-label-md font-bold text-label-md shadow-[2px_2px_0px_#001c3b] animate-bounce">
+                  2
+                </span>
+<span class="absolute -top-1 -right-1 w-3 h-3 bg-secondary-container border border-on-surface rounded-full"></span>
+</div>
+<span class="font-label-sm text-label-sm font-bold text-primary mt-1">Stop #2 (NOW)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Boda Point</span>
+</div>
+<!-- Path Line 2 (Dashed) -->
+<div class="flex-1 h-0.5 border-t-2 border-dashed border-on-surface mx-1"></div>
+<!-- WP 3 -->
+<div class="flex flex-col items-center">
+<span class="w-7 h-7 rounded-full bg-surface-container-lowest text-on-surface border-[1.5px] border-on-surface flex items-center justify-center font-label-md font-bold text-label-md shadow-[1.5px_1.5px_0px_#001c3b]">
+                3
+              </span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface mt-1">Stop #3</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Butchery</span>
+</div>
+<!-- Path Line 3 (Dashed) -->
+<div class="flex-1 h-0.5 border-t-2 border-dashed border-outline mx-1"></div>
+<!-- WP 4 -->
+<div class="flex flex-col items-center">
+<span class="w-7 h-7 rounded-full bg-surface-container-lowest text-outline border-[1.5px] border-outline flex items-center justify-center font-label-md font-bold text-label-md">
+                4
+              </span>
+<span class="font-label-sm text-label-sm font-bold text-outline mt-1">Stop #4</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Apex Cyber</span>
+</div>
+<!-- Path Line 4 -->
+<div class="flex-1 h-0.5 border-t-2 border-dashed border-outline mx-1"></div>
+<!-- WP 5 & 6 -->
+<div class="flex flex-col items-center">
+<span class="w-7 h-7 rounded-full bg-surface-container-lowest text-outline border-[1.5px] border-outline flex items-center justify-center font-label-md font-bold text-label-md">
+                5+6
+              </span>
+<span class="font-label-sm text-label-sm font-bold text-outline mt-1">Annex End</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Chemo</span>
+</div>
+</div>
+<!-- Bottom Route summary stats -->
+<div class="relative z-10 bg-surface-container-lowest border border-on-surface p-space-sm flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="straighten">straighten</span>
+                1.4 km Total
+              </span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="timer">timer</span>
+                42 mins Walking
+              </span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="pin_drop">pin_drop</span>
+                6 Stops
+              </span>
+</div>
+<span class="font-label-md text-label-md font-bold bg-secondary-fixed px-2 py-0.5 border border-on-surface">
+              Bounty: KSh 300
+            </span>
+</div>
+</div>
+<!-- Optimized Waypoint Order Sequence Cards -->
+<div class="p-space-sm flex flex-col gap-2 max-h-[480px] overflow-y-auto custom-scroll">
+<!-- Stop #1: Completed -->
+<div class="border-[1.5px] border-outline bg-surface-container-lowest p-space-sm opacity-90">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-2">
+<span class="bg-emerald-600 text-on-primary font-label-md text-label-md px-1.5 py-0.5 border border-on-surface">
+                  STOP 1
+                </span>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface leading-tight">Mama Shiro Salon &amp; Braiding</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Room 12, Behind Equity ATM • 0m away</p>
+</div>
+</div>
+<span class="bg-emerald-100 text-emerald-800 border border-emerald-800 font-label-sm text-label-sm px-1.5 py-0.5 font-bold">
+                AUDITED ✓
+              </span>
+</div>
+<div class="mt-1.5 text-on-surface-variant font-label-sm text-label-sm flex items-center justify-between border-t border-surface-container pt-1">
+<span>Daraja Till 729104 Verified • 15% Student discount sticker affixed</span>
+<span class="font-bold text-emerald-700">+KSh 70 Approved</span>
+</div>
+</div>
+<!-- Stop #2: Current In Progress -->
+<div class="border-[2px] border-on-surface bg-surface-container-lowest p-space-sm shadow-[3px_3px_0px_#001c3b]">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-2">
+<span class="bg-primary text-on-primary font-label-md text-label-md px-1.5 py-0.5 border border-on-surface">
+                  STOP 2
+                </span>
+<div>
+<div class="flex items-center gap-1.5">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface leading-tight">Boda Point Electricals &amp; Spares</h3>
+<span class="bg-secondary-container border border-on-surface font-label-sm text-label-sm px-1">Room 3</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Commercial Block Lane A • In Progress (On-site 8 mins)</p>
+</div>
+</div>
+<span class="bg-primary text-on-primary border border-on-surface font-label-sm text-label-sm px-2 py-0.5 font-bold flex items-center gap-1 animate-pulse">
+<span class="material-symbols-outlined text-[13px]" data-icon="sync">sync</span>
+                IN AUDIT
+              </span>
+</div>
+<div class="mt-2 bg-surface-container p-1.5 border border-outline flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface">Faith Chemutai uploading storefront fascia banner photo...</span>
+<span class="font-label-sm text-label-sm font-bold text-primary">GPS Lock: Strong</span>
+</div>
+</div>
+<!-- Stop #3: Next in Sequence -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm shadow-[2px_2px_0px_#001c3b]">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-2">
+<span class="bg-surface-container-highest text-on-surface font-label-md text-label-md px-1.5 py-0.5 border border-on-surface font-bold">
+                  STOP 3
+                </span>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface leading-tight">Kesses Modern Butchery &amp; Grill</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Kiosk #7 • 45m walking distance (approx. 2 mins)</p>
+</div>
+</div>
+<span class="bg-secondary-fixed text-on-secondary-fixed border border-on-surface font-label-sm text-label-sm px-1.5 py-0.5 font-bold">
+                NEXT UP
+              </span>
+</div>
+<p class="mt-1 font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low p-1 border border-outline">
+<strong>Audit Goal:</strong> Verify newly reported Safaricom Buy Goods Till plate (#5820194) and opening hours.
+            </p>
+</div>
+<!-- Stop #4: Relocation Check -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-2">
+<span class="bg-surface-container text-on-surface font-label-md text-label-md px-1.5 py-0.5 border border-outline">
+                  STOP 4
+                </span>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface leading-tight">Apex Cyber &amp; Laminations</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Near Stage Footpath • Flagged: Relocation query</p>
+</div>
+</div>
+<span class="bg-rose-100 text-rose-900 border border-rose-900 font-label-sm text-label-sm px-1.5 py-0.5 font-bold">
+                RE-CHECK
+              </span>
+</div>
+<div class="mt-1 font-label-sm text-label-sm text-on-surface-variant flex items-center justify-between">
+<span>Task: Confirm if relocated 2 doors down to Room 5</span>
+<span class="font-bold text-on-surface">Pending</span>
+</div>
+</div>
+<!-- Stop #5: QuickFix Phone Accessories -->
+<div class="border-[1.5px] border-outline bg-surface-container-lowest p-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-2">
+<span class="bg-surface-container text-on-surface font-label-md text-label-md px-1.5 py-0.5 border border-outline">
+                  STOP 5
+                </span>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface leading-tight">QuickFix Phone Accessories</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Stall 14B • 210m from Stop 4</p>
+</div>
+</div>
+<span class="bg-surface-container text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 border border-outline">
+                QUEUED
+              </span>
+</div>
+<p class="mt-1 font-label-sm text-label-sm text-on-surface-variant">
+              Task: Collect laminated student screen protector and charging price chart photo.
+            </p>
+</div>
+<!-- Stop #6: Chemo Chemist & First Aid -->
+<div class="border-[1.5px] border-outline bg-surface-container-lowest p-space-sm">
+<div class="flex items-start justify-between">
+<div class="flex items-start gap-2">
+<span class="bg-surface-container text-on-surface font-label-md text-label-md px-1.5 py-0.5 border border-outline">
+                  STOP 6
+                </span>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface leading-tight">Chemo Chemist &amp; First Aid</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Annex Junction • Route Terminal</p>
+</div>
+</div>
+<span class="bg-surface-container text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 border border-outline">
+                QUEUED
+              </span>
+</div>
+<p class="mt-1 font-label-sm text-label-sm text-on-surface-variant">
+              Task: Physical verification for student health discount directory.
+            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- COLUMN 3: TASK ASSIGNMENT & UNASSIGNED WORK QUEUE (3.5 cols / ~28%) -->
+<section class="lg:col-span-3 flex flex-col gap-space-md">
+<!-- Quick Dispatcher Panel -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface shadow-[3px_3px_0px_#001c3b]">
+<div class="bg-secondary-container px-space-md py-space-sm border-b-[1.5px] border-on-surface flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+            Quick Dispatch Form
+          </h2>
+<span class="font-label-sm text-label-sm bg-surface-container-lowest px-1.5 py-0.5 border border-on-surface font-bold">SMS Hook</span>
+</div>
+<form class="p-space-sm flex flex-col gap-space-sm" onsubmit="event.preventDefault();">
+<div>
+<label class="block font-label-sm text-label-sm font-bold text-on-surface mb-1">Select Field Ambassador:</label>
+<select class="w-full bg-surface-container-lowest border-[1.5px] border-on-surface p-1.5 font-body-sm text-body-sm focus:border-primary focus:ring-0 shadow-[1.5px_1.5px_0px_#001c3b]">
+<option>Brian Kiprop (Zone 2 - Active • 67% batt)</option>
+<option>Mercy Jerotich (Available at 14:00)</option>
+<option>Faith Chemutai (Zone 1 - High Load)</option>
+<option>Kelvin Omondi (Standby Pool)</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div>
+<label class="block font-label-sm text-label-sm font-bold text-on-surface mb-1">Target Zone:</label>
+<select class="w-full bg-surface-container-lowest border-[1.5px] border-on-surface p-1.5 font-body-sm text-body-sm focus:border-primary focus:ring-0 shadow-[1.5px_1.5px_0px_#001c3b]">
+<option>Zone 3: Soweto</option>
+<option>Zone 1: Kesses</option>
+<option>Zone 2: Stage</option>
+<option>Zone 4: Cheboiywo</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm font-bold text-on-surface mb-1">Priority:</label>
+<select class="w-full bg-surface-container-lowest border-[1.5px] border-on-surface p-1.5 font-body-sm text-body-sm focus:border-primary focus:ring-0 shadow-[1.5px_1.5px_0px_#001c3b]">
+<option>High (Urgent Re-check)</option>
+<option>Standard Verification</option>
+<option>Express Spot Check</option>
+</select>
+</div>
+</div>
+<button class="w-full mt-1 bg-primary text-on-primary border-[1.5px] border-on-surface py-2 font-label-lg text-label-lg font-bold shadow-[2px_2px_0px_#001c3b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none flex items-center justify-center gap-1.5 transition-all" type="submit">
+<span class="material-symbols-outlined text-[18px]" data-icon="bolt">bolt</span>
+            Dispatch to Handset (Alert SMS)
+          </button>
+</form>
+</div>
+<!-- Unassigned Kiosk Queue (Incoming & Flagged) -->
+<div class="bg-surface-container-lowest border-[1.5px] border-on-surface shadow-[3px_3px_0px_#001c3b]">
+<div class="bg-surface-container-high px-space-md py-space-sm border-b-[1.5px] border-on-surface flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="queue">queue</span>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Unassigned Queue</h2>
+</div>
+<span class="bg-primary text-on-primary font-label-sm text-label-sm px-1.5 py-0.5 font-bold">4 Tasks</span>
+</div>
+<div class="p-space-sm flex flex-col gap-space-sm">
+<!-- Queue Item 1: High Priority Flagged -->
+<div class="border-[2px] border-primary bg-primary-fixed p-space-sm shadow-[2px_2px_0px_#001c3b]">
+<div class="flex items-start justify-between">
+<span class="bg-primary text-on-primary font-label-sm text-label-sm px-1.5 py-0.5 font-bold uppercase">
+                Urgent Flag
+              </span>
+<span class="font-label-sm text-label-sm text-on-primary-fixed-variant">10m ago</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1 leading-tight">
+              Dell Laptop Motherboard Repair
+            </h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+              Soweto Hostel Block C Gate
+            </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">
+              Student flagged kiosk as closed/vacated. Requires on-site verification before unlisting.
+            </p>
+<div class="mt-space-sm flex gap-1.5">
+<button class="flex-1 bg-surface-container-lowest border border-on-surface py-1 font-label-sm text-label-sm font-bold shadow-[1px_1px_0px_#001c3b] hover:bg-surface-container transition-all">
+                Assign to Brian
+              </button>
+<button class="flex-1 bg-surface-container-lowest border border-on-surface py-1 font-label-sm text-label-sm font-bold shadow-[1px_1px_0px_#001c3b] hover:bg-surface-container transition-all">
+                Assign to Mercy
+              </button>
+</div>
+</div>
+<!-- Queue Item 2: Free Listing Request -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm shadow-[2px_2px_0px_#001c3b]">
+<div class="flex items-start justify-between">
+<span class="bg-secondary-fixed text-on-secondary-fixed border border-on-surface font-label-sm text-label-sm px-1.5 py-0.5 font-bold uppercase">
+                New Free Kiosk
+              </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">32m ago</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1 leading-tight">
+              Mama Jane Chapati &amp; Chai Kiosk
+            </h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+              Stage Matatu Stand #9
+            </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">
+              Self-registered via SMS. Needs physical sign photo &amp; Daraja Till verification plate.
+            </p>
+<button class="w-full mt-space-sm bg-surface-container border border-on-surface py-1 font-label-sm text-label-sm font-bold shadow-[1px_1px_0px_#001c3b] hover:bg-surface-container-high transition-all flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="add">add</span>
+              Queue to Route 2 (Mercy)
+            </button>
+</div>
+<!-- Queue Item 3: Expired Featured Tier Check -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm">
+<div class="flex items-start justify-between">
+<span class="bg-surface-container border border-outline font-label-sm text-label-sm px-1.5 py-0.5 font-semibold">
+                Tier Renewal
+              </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1h ago</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1 leading-tight">
+              Campus Clean Drycleaners
+            </h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+              Cheboiywo Market Lane 1
+            </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">
+              Renewal verification. Confirm WhatsApp contact is still 0722-XXX-XXX.
+            </p>
+</div>
+<!-- Queue Item 4: Phone Complaint -->
+<div class="border-[1.5px] border-on-surface bg-surface-container-lowest p-space-sm">
+<div class="flex items-start justify-between">
+<span class="bg-rose-100 text-rose-900 border border-rose-900 font-label-sm text-label-sm px-1.5 py-0.5 font-bold">
+                Student Complaint
+              </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2h ago</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface mt-1 leading-tight">
+              SmartNet Cyber Services
+            </h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+              Kesses Post Office Lane
+            </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 text-xs">
+              Wrong phone listed. Needs manual check with cyber attendant.
+            </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- LIVE FIELD TELEMETRY FEED (TICKER TAPE) -->
+<aside class="w-full bg-surface-container-high border-t-[1.5px] border-b-[1.5px] border-on-surface py-1.5 px-margin md:px-margin-desktop overflow-hidden">
+<div class="max-w-7xl mx-auto flex items-center gap-space-md text-on-surface font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5 shrink-0 bg-primary text-on-primary px-2 py-0.5 font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="rss_feed">rss_feed</span>
+        OPS WIRE
+      </div>
+<div class="overflow-x-auto whitespace-nowrap flex items-center gap-space-lg text-xs">
+<span class="flex items-center gap-1">
+<strong class="text-primary">14:28</strong> • Faith Chemutai submitted Till plate match for Mama Shiro (#AUD-882)
+        </span>
+<span class="text-outline">•</span>
+<span class="flex items-center gap-1">
+<strong class="text-tertiary">14:15</strong> • Brian Kiprop checked in at Cheboiywo Market (+38m accuracy)
+        </span>
+<span class="text-outline">•</span>
+<span class="flex items-center gap-1">
+<strong class="text-secondary">13:58</strong> • Route 3 auto-recalculated to avoid muddy Soweto hostel pathway
+        </span>
+<span class="text-outline">•</span>
+<span class="flex items-center gap-1">
+<strong>13:40</strong> • Daraja Webhook: Safaricom Till #5820194 active and answering handshake
+        </span>
+</div>
+</div>
+</aside>
+<!-- SHARED FOOTER (Immutable content & tokens strictly executed from JSON) -->
+<footer class="w-full bg-surface-container-lowest border-t-2 border-on-surface mt-auto">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter">
+<!-- Brand & Copyright -->
+<div class="text-center md:text-left max-w-xl">
+<div class="font-headline-sm text-headline-sm font-bold text-primary flex items-center justify-center md:justify-start gap-1">
+<span class="material-symbols-outlined text-[20px]" data-icon="storefront">storefront</span>
+          MoiMashinani
+        </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+</div>
+<!-- Links Grid from JSON -->
+<div class="flex flex-wrap gap-x-space-md gap-y-2 justify-center md:justify-end text-label-sm font-label-sm">
+<a class="text-primary font-bold underline transition-colors" href="#add">Add Business (Free)</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#deals">Student Deals</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#safety">Campus Safety &amp; Trust</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#map">Kesses Map Guide</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#report">Report Inactive Listing</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1" href="#whatsapp">
+<span class="material-symbols-outlined text-[14px]" data-icon="support_agent">support_agent</span>
+          WhatsApp Helpdesk
+        </a>
+</div>
+</div>
+</footer>
+</body></html>

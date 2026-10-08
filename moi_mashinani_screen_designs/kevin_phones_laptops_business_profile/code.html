@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kevin Phones &amp; Laptops | MoiMashinani Business Directory</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts: Archivo Narrow and Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600&amp;family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-container": "#c2185b",
+            "primary": "#9b0044",
+            "on-primary-fixed": "#3f0018",
+            "on-primary-fixed-variant": "#8f003f",
+            "tertiary-fixed-dim": "#84d4d5",
+            "surface-container-high": "#dee8ff",
+            "inverse-primary": "#ffb1c2",
+            "surface-bright": "#f9f9ff",
+            "surface-variant": "#d5e3ff",
+            "primary-fixed-dim": "#ffb1c2",
+            "secondary": "#795900",
+            "error": "#ba1a1a",
+            "on-background": "#001c3b",
+            "on-tertiary-fixed-variant": "#004f51",
+            "on-secondary-fixed": "#261900",
+            "on-primary-container": "#ffd9df",
+            "error-container": "#ffdad6",
+            "on-primary": "#ffffff",
+            "surface-container-highest": "#d5e3ff",
+            "surface-container-lowest": "#ffffff",
+            "secondary-fixed": "#ffdea0",
+            "inverse-surface": "#193151",
+            "on-secondary": "#ffffff",
+            "outline-variant": "#e1bec4",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#ebf1ff",
+            "primary-fixed": "#ffd9df",
+            "on-tertiary": "#ffffff",
+            "outline": "#8d6f75",
+            "on-tertiary-container": "#a0f0f2",
+            "tertiary-container": "#107072",
+            "on-secondary-fixed-variant": "#5c4300",
+            "on-tertiary-fixed": "#002021",
+            "tertiary": "#005658",
+            "on-surface-variant": "#594045",
+            "surface-container-low": "#f0f3ff",
+            "tertiary-fixed": "#a0f0f2",
+            "secondary-container": "#fdc33b",
+            "secondary-fixed-dim": "#f7be36",
+            "on-surface": "#001c3b",
+            "surface": "#f9f9ff",
+            "background": "#f9f9ff",
+            "on-secondary-container": "#6f5100",
+            "surface-dim": "#c7dbff",
+            "surface-container": "#e7eeff",
+            "on-error-container": "#93000a",
+            "surface-tint": "#b90c55"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter-desktop": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem",
+            "space-xl": "2.5rem",
+            "margin-desktop": "2.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Archivo Narrow", "sans-serif"],
+            "headline-md": ["Archivo Narrow", "sans-serif"],
+            "label-sm": ["Archivo Narrow", "sans-serif"],
+            "body-md": ["Atkinson Hyperlegible Next", "sans-serif"],
+            "headline-xl-mobile": ["Archivo Narrow", "sans-serif"],
+            "label-lg": ["Archivo Narrow", "sans-serif"],
+            "body-sm": ["Atkinson Hyperlegible Next", "sans-serif"],
+            "label-md": ["Archivo Narrow", "sans-serif"],
+            "body-lg": ["Atkinson Hyperlegible Next", "sans-serif"],
+            "headline-lg-mobile": ["Archivo Narrow", "sans-serif"],
+            "headline-xl": ["Archivo Narrow", "sans-serif"],
+            "headline-lg": ["Archivo Narrow", "sans-serif"]
+          },
+          "fontSize": {
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Physical Vernacular Signboard Outlines & Shadows */
+    .signboard-border {
+      border: 1.5px solid #001c3b;
+    }
+    .signboard-border-thick {
+      border: 2px solid #001c3b;
+    }
+    .signboard-shadow {
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .signboard-shadow-lg {
+      box-shadow: 4px 4px 0px #001c3b;
+    }
+    .press-action {
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .press-action:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #001c3b !important;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .icon-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md selection:bg-secondary-container selection:text-on-surface">
+<!-- TOP APP BAR (Shared Component JSON Source of Truth) -->
+<header class="w-full bg-surface dark:bg-inverse-surface border-b-2 border-on-surface dark:border-outline shadow-[2px_2px_0px_#001c3b] dark:shadow-none sticky top-0 z-50">
+<div class="w-full px-margin md:px-margin-desktop py-space-sm flex justify-between items-center max-w-7xl mx-auto">
+<!-- Left: Brand & Search -->
+<div class="flex items-center gap-space-lg">
+<a class="text-headline-md font-headline-md font-bold tracking-tight text-primary dark:text-inverse-primary uppercase flex items-center gap-1.5 press-action" href="#">
+<span class="material-symbols-outlined text-[28px] text-primary" data-icon="storefront">storefront</span>
+<span>MoiMashinani</span>
+</a>
+<!-- On left search bar as required by JSON -->
+<div class="hidden lg:flex items-center bg-surface-container-lowest signboard-border rounded signboard-shadow px-3 py-1.5 w-72">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2" data-icon="search">search</span>
+<input class="w-full bg-transparent border-0 p-0 text-body-sm font-body-sm text-on-surface placeholder:text-on-surface-variant focus:ring-0" placeholder="Search fundi, repair, phone model..." type="text"/>
+<span class="text-label-sm font-label-sm bg-surface-container px-1.5 py-0.5 rounded signboard-border text-on-surface-variant">KESSES</span>
+</div>
+</div>
+<!-- Navigation Links from JSON: ["Kesses Centre", "Stage", "Soweto", "Cheboiywo", "Annex"] -->
+<!-- Semantic Active State: "Kesses Centre" is the exact zone match for this listing -->
+<nav class="hidden md:flex items-center space-x-6 text-label-md font-label-md">
+<a class="text-primary dark:text-inverse-primary border-b-2 border-primary font-bold py-1 flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[18px] text-primary" data-icon="location_on">location_on</span>
+          Kesses Centre
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface font-semibold hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-150 py-1" href="#">
+          Stage
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface font-semibold hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-150 py-1" href="#">
+          Soweto
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface font-semibold hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-150 py-1" href="#">
+          Cheboiywo
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface font-semibold hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-150 py-1" href="#">
+          Annex
+        </a>
+</nav>
+<!-- Trailing Action Cluster from JSON -->
+<div class="flex items-center gap-3">
+<!-- Language Switcher -->
+<button class="signboard-border bg-surface-container-lowest text-on-surface px-2.5 py-1 text-label-md font-label-md rounded signboard-shadow flex items-center gap-1 press-action hover:bg-surface-container-high">
+<span class="material-symbols-outlined text-[18px]" data-icon="language">language</span>
+<span>English / Swa</span>
+</button>
+<!-- Primary Action -->
+<a class="bg-primary-container text-on-primary font-headline-sm text-label-lg px-3.5 py-1.5 rounded signboard-border signboard-shadow press-action flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="add_circle">add_circle</span>
+<span>List your business (Free)</span>
+</a>
+</div>
+</div>
+</header>
+<!-- MAIN CANVAS CONTAINER -->
+<main class="w-full max-w-7xl mx-auto px-margin md:px-margin-desktop py-space-md flex-grow">
+<!-- 1. Breadcrumb navigation -->
+<nav aria-label="Breadcrumb" class="mb-4">
+<ol class="flex items-center space-x-2 text-label-md font-label-md text-on-surface-variant flex-wrap">
+<li>
+<a class="hover:text-primary transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]" data-icon="home">home</span>
+<span>Home</span>
+</a>
+</li>
+<li class="flex items-center text-outline">
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+</li>
+<li>
+<a class="hover:text-primary transition-colors" href="#">Kesses Centre</a>
+</li>
+<li class="flex items-center text-outline">
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+</li>
+<li>
+<a class="hover:text-primary transition-colors" href="#">Phone &amp; Laptop Repair</a>
+</li>
+<li class="flex items-center text-outline">
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+</li>
+<li class="text-on-surface font-bold">
+          Kevin Phones &amp; Laptops
+        </li>
+</ol>
+</nav>
+<!-- 2. Verified & Freshness Banner -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-3 mb-space-md flex flex-wrap items-center justify-between gap-3 border-l-4 border-l-tertiary">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-tertiary text-on-tertiary text-xs signboard-border">
+<span class="material-symbols-outlined text-[16px] icon-fill" data-icon="verified">verified</span>
+</span>
+<span class="text-body-sm font-body-sm font-semibold text-on-surface">
+          Verified Kesses Fundi <span class="text-on-surface-variant font-normal">· Physically inspected at Kesses Centre (Behind Equity ATM) · Last confirmed active today at 09:30 AM</span>
+</span>
+</div>
+<div class="flex items-center gap-2 text-label-sm font-label-sm">
+<span class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping"></span>
+<span class="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded signboard-border font-bold">ACTIVE SPOT CHECK PASS</span>
+</div>
+</div>
+<!-- 3. Main Profile Header Card (Signboard Style with 4px Jua Yellow #FFC53D left accent border) -->
+<section class="bg-surface-container-lowest signboard-border signboard-shadow-lg rounded mb-space-lg overflow-hidden border-l-[6px] border-l-secondary-container">
+<div class="p-5 md:p-7">
+<!-- Decal Badges Cluster -->
+<div class="flex flex-wrap items-center gap-2.5 mb-3.5">
+<!-- Featured Tier Badge -->
+<span class="bg-secondary-container text-on-surface font-label-md font-bold px-3 py-1 rounded signboard-border signboard-shadow flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] icon-fill text-on-surface" data-icon="stars">stars</span>
+            FEATURED
+          </span>
+<!-- Verified Fundi Badge -->
+<span class="bg-surface-container-lowest text-on-surface font-label-md font-bold px-3 py-1 rounded signboard-border signboard-shadow flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-tertiary icon-fill" data-icon="verified_user">verified_user</span>
+            VERIFIED FUNDI
+          </span>
+<!-- Recommended Badge -->
+<span class="bg-tertiary text-on-tertiary font-label-md font-bold px-3 py-1 rounded signboard-border signboard-shadow flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] icon-fill" data-icon="thumb_up">thumb_up</span>
+            RECOMMENDED
+          </span>
+<!-- Open Status Badge -->
+<span class="bg-emerald-50 text-emerald-900 font-label-md font-bold px-2.5 py-1 rounded signboard-border flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            OPEN NOW UNTIL 8:30 PM
+          </span>
+<!-- Live availability badge -->
+<span class="bg-surface-container text-on-surface font-label-sm font-semibold px-2.5 py-1 rounded signboard-border flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="nest_clock_farsight_analog">nest_clock_farsight_analog</span>
+            AVAILABLE NOW · 4H LIVE
+          </span>
+</div>
+<!-- Business Name -->
+<h1 class="text-headline-xl font-headline-xl text-on-surface tracking-tight leading-none mb-2">
+          Kevin Phones &amp; Laptops
+        </h1>
+<!-- Tagline -->
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-4xl mb-4 font-normal">
+          Specialist in iPhone &amp; Samsung display replacements, HP/Dell hinge rebuilds, battery swaps &amp; micro-soldering.
+        </p>
+<!-- Landmark Location & Distance -->
+<div class="flex flex-wrap items-center gap-y-2 gap-x-4 py-2 border-t border-b border-surface-container mb-5 text-body-sm font-body-sm">
+<div class="flex items-center text-on-surface font-semibold gap-1.5">
+<span class="material-symbols-outlined text-[20px] text-primary" data-icon="location_on">location_on</span>
+<span>Kesses Centre, behind Equity Bank ATM, 1st Floor Room 4 (Opposite Western Fresh Butchery)</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm text-on-surface">
+<span class="material-symbols-outlined text-[14px]" data-icon="directions_walk">directions_walk</span>
+<span>4 min walk (approx. 320m) from Moi Univ Main Gate</span>
+</div>
+</div>
+<!-- Student Discount Highlight Banner -->
+<div class="bg-secondary-fixed text-on-secondary-fixed p-2.5 mb-6 rounded signboard-border flex items-center gap-3">
+<span class="text-2xl leading-none">🎓</span>
+<p class="text-body-sm font-body-sm font-bold text-on-secondary-fixed">
+            STUDENT DEAL: 15% OFF labor on all screen &amp; battery replacements with valid Moi University Student ID card.
+          </p>
+<span class="ml-auto bg-on-surface text-surface text-label-sm font-label-sm font-bold px-2 py-1 rounded">SHOW ID AT COUNTER</span>
+</div>
+<!-- Massive Action Bar CTAs -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+<!-- Primary Call CTA -->
+<a class="md:col-span-4 bg-primary text-on-primary font-headline-sm text-headline-sm py-3.5 px-4 rounded signboard-border signboard-shadow press-action flex items-center justify-center gap-2" href="tel:+254712345678">
+<span class="material-symbols-outlined text-[24px] icon-fill" data-icon="call">call</span>
+<span>Call Kevin (+254 712 345 678)</span>
+</a>
+<!-- Primary WhatsApp CTA -->
+<a class="md:col-span-5 bg-[#25D366] text-on-surface font-headline-sm text-headline-sm py-3.5 px-4 rounded signboard-border signboard-shadow press-action flex items-center justify-center gap-2" href="https://wa.me/254712345678?text=Hi%20Kevin,%20I%20saw%20your%20listing%20on%20MoiMashinani%20directory..." rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[24px] icon-fill text-on-surface" data-icon="chat">chat</span>
+<span>Chat on WhatsApp (Instant Reply)</span>
+</a>
+<!-- Diagnostic Sheet trigger -->
+<button class="md:col-span-3 bg-surface-container-lowest text-on-surface font-headline-sm text-headline-sm py-3.5 px-3 rounded signboard-border signboard-shadow press-action flex items-center justify-center gap-1.5 hover:bg-surface-container" onclick="document.getElementById('service-pricing-table').scrollIntoView({behavior: 'smooth'})">
+<span class="material-symbols-outlined text-[22px]" data-icon="build">build</span>
+<span>Request Diagnostic</span>
+</button>
+</div>
+<!-- Secondary Utility Buttons Row -->
+<div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-surface-container">
+<a class="bg-surface-container-low hover:bg-surface-container text-on-surface text-label-md font-label-md px-3 py-1.5 rounded signboard-border flex items-center gap-1.5 press-action" href="https://maps.google.com" rel="noopener" target="_blank">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="map">map</span>
+<span>Get Directions (Google Maps)</span>
+</a>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface text-label-md font-label-md px-3 py-1.5 rounded signboard-border flex items-center gap-1.5 press-action">
+<span class="material-symbols-outlined text-[16px]" data-icon="share">share</span>
+<span>Share Profile (QR / WhatsApp)</span>
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container text-on-surface text-label-md font-label-md px-3 py-1.5 rounded signboard-border flex items-center gap-1.5 press-action">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="favorite">favorite</span>
+<span>Save to Favourites</span>
+</button>
+<span class="ml-auto text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+            Average reply time: <span class="font-bold text-on-surface">3 mins</span>
+</span>
+</div>
+</div>
+</section>
+<!-- 4. Two-Column Content Layout (70/30 split) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- ================= LEFT COLUMN (70% - lg:col-span-8) ================= -->
+<div class="lg:col-span-8 space-y-space-lg">
+<!-- a) Real Work Gallery -->
+<section class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-5">
+<div class="flex justify-between items-center mb-4">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]" data-icon="photo_camera">photo_camera</span>
+                Real Technician Workbench &amp; Workshop
+              </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Verified on-site visit by MoiMashinani Student Ambassador</p>
+</div>
+<span class="bg-surface-container px-3 py-1 rounded signboard-border text-label-sm font-label-sm text-on-surface font-bold">
+              1 of 5 Photos · Verified by Ambassador
+            </span>
+</div>
+<!-- 4-Image Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="relative group signboard-border rounded overflow-hidden h-52 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A clean, brightly lit electronics repair workbench inside a shopping centre kiosk near Moi University Kesses. An optical stereo microscope sits alongside precision tweezers, flux paste, and a digital soldering station with a warm amber readout. The mood is highly professional and focused, emphasizing authentic craftsmanship." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZoRVz4rt1m2buptZoL2zbtv3rWmi9NvJd6hmxBwRlCptX2r0BoMF_x2saaLuAg3W_okrlbdiDc--sw2DqycMw40cZ6tw2t0PtYuqnODZzZBJE2vtvHUGXv1f62VR8O7STfV-zcp0_WIjVJ9oHddMAJO3TkvQVc3ugkj8EEp45nJcdb1VfXp78OJG7VPs5Ccb8CeCkX1GODiYgPfw6Z10TwDe-AwTO1i_FHYX2IK4lGwJn7yY5dGUz"/>
+<div class="absolute bottom-0 inset-x-0 bg-on-surface/85 text-surface p-2 text-label-sm font-label-sm flex justify-between items-center">
+<span>Micro-soldering Station &amp; Scope</span>
+<span class="bg-primary px-1.5 py-0.5 rounded text-[10px]">VERIFIED</span>
+</div>
+</div>
+<div class="relative group signboard-border rounded overflow-hidden h-52 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Authentic storefront of Kevin Phones and Laptops in Kesses Centre showing a hand-painted wooden sign in front of a blue security doorway. Sunlight reflects off surrounding storefronts with clear signage indicating Equity ATM and butchery nearby, under Rift Valley afternoon daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwJLSj9h4mr7z9fklCtEh-TyfAhEu82EBC2I4VoB3fQQMiQkGrqzi8EekRx_l1iXPbVry9d9mB_sd5NEuoP20mQtEvqLBT4wuj4DnB5S7CmHXdBzE9DwYk0_PnQFoDNghctuLP0yPI8jYZasYvYzuiPnN1E73vaOsfEis8gLA9cbxzM6ghIKyR9YhRBZAjnXk93qnyiBDR_1cqCtydeCK5y1TT7IxNfl-GQ5CKCZnyLHNZb8_P-RZj"/>
+<div class="absolute bottom-0 inset-x-0 bg-on-surface/85 text-surface p-2 text-label-sm font-label-sm flex justify-between items-center">
+<span>Shopfront Entrance (1st Floor Room 4)</span>
+<span class="bg-secondary-container text-on-surface px-1.5 py-0.5 rounded text-[10px] font-bold">EXTERIOR</span>
+</div>
+</div>
+<div class="relative group signboard-border rounded overflow-hidden h-52 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A repair technician wearing antistatic wristbands holding a disassembled modern smartphone screen with original flex cables cleanly laid out on a blue magnetic project mat. Surrounding tools are sharply arranged under bright task illumination." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeT-XaMOo8jrXZp8y9dFub0C_IDKLLYolz2AHpKibl0oZVZtu9XJYHdsO9U3G9SQeopbPI4bErZgOMLTbkm9SyxEPy-g4Fs2WJOMcaWVgJxcgJb92aGfJVwS7y0A8dxMnR6B1E7tjTqGeD_03G57ldfh1sk7QoHr7jxlHGQz1V2bav_OGQgVgkBNEo3HTVYGGB4fQi6cR8Xx2vJ33tRvwRSakEc3iHbPzIhxHQV4pSULBOqem-BXOM"/>
+<div class="absolute bottom-0 inset-x-0 bg-on-surface/85 text-surface p-2 text-label-sm font-label-sm flex justify-between items-center">
+<span>Genuine OLED Replacement Stocks</span>
+<span class="bg-tertiary text-on-tertiary px-1.5 py-0.5 rounded text-[10px]">OEM PARTS</span>
+</div>
+</div>
+<div class="relative group signboard-border rounded overflow-hidden h-52 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A Dell laptop base chassis undergoing structural hinge reinforcement using high strength resin and micro bolts on an organized workshop table in Kesses. The scene illustrates meticulous precision electronic repair for university students." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHR-QiRNKk3MoIBlg_99KHx2Yz3derU2zzFsn-SOLAFSxy74HDMY9X2KloxTHA62xieKvXfFIM0iUrRQZYi0fKgJSxTnkwKGSn2szGJ0GvFfZ41v-RATFrqhD20ptl4c3eHJJCq1I5gHULI46s4QgmuP0v115hLfwcMruZ9tqKX0RN-th7gK9Nz39OcsgmVi67wyRJVTPUtKCL4sGJDoztw4YQcQr0fMyFzp3vi2PfZuwODgLl67Jj"/>
+<div class="absolute bottom-0 inset-x-0 bg-on-surface/85 text-surface p-2 text-label-sm font-label-sm flex justify-between items-center">
+<span>Laptop Chassis &amp; Hinge Rebuild</span>
+<span class="bg-surface-variant text-on-surface px-1.5 py-0.5 rounded text-[10px] font-bold">LIVE REPAIR</span>
+</div>
+</div>
+</div>
+</section>
+<!-- b) Services & Transparent Price List (Table with KES prices) -->
+<section class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-5" id="service-pricing-table">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b-2 border-surface-container">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]" data-icon="payments">payments</span>
+                Services &amp; Transparent Price List (KES)
+              </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Fixed pricing for Moi University students &amp; staff. No hidden diagnostic charges.</p>
+</div>
+<div class="bg-secondary-fixed text-on-secondary-fixed px-2.5 py-1 rounded signboard-border text-label-sm font-label-sm font-bold">
+              UPDATED NOV 2026
+            </div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container border-b signboard-border text-label-md font-label-md text-on-surface uppercase">
+<th class="py-2.5 px-3">Service Description</th>
+<th class="py-2.5 px-3">Price Range</th>
+<th class="py-2.5 px-3">Turnaround</th>
+<th class="py-2.5 px-3">Warranty / Condition</th>
+<th class="py-2.5 px-3 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container text-body-sm font-body-sm">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-semibold text-on-surface">
+                    iPhone Screen Replacement (iPhone X to 14)
+                    <span class="block text-label-sm font-label-sm font-normal text-on-surface-variant">Includes TrueTone transfer &amp; dust gasket replacement</span>
+</td>
+<td class="py-3 px-3 font-bold text-primary">From KSh 2,500</td>
+<td class="py-3 px-3">45 mins</td>
+<td class="py-3 px-3">
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm font-bold">90-Day Warranty</span>
+</td>
+<td class="py-3 px-3 text-right">
+<a class="inline-block bg-[#25D366] text-on-surface text-label-sm font-label-sm font-bold px-2 py-1 rounded signboard-border signboard-shadow press-action" href="https://wa.me/254712345678?text=Hi%20Kevin,%20interested%20in%20iPhone%20Screen%20Replacement">WhatsApp</a>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-semibold text-on-surface">
+                    HP / Dell / Lenovo Screen Replacement
+                    <span class="block text-label-sm font-label-sm font-normal text-on-surface-variant">14-inch &amp; 15.6-inch slim/thick 30-pin &amp; 40-pin FHD displays</span>
+</td>
+<td class="py-3 px-3 font-bold text-primary">From KSh 3,800</td>
+<td class="py-3 px-3">1 hour</td>
+<td class="py-3 px-3">
+<span class="bg-surface-container px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm">Tested on spot</span>
+</td>
+<td class="py-3 px-3 text-right">
+<a class="inline-block bg-[#25D366] text-on-surface text-label-sm font-label-sm font-bold px-2 py-1 rounded signboard-border signboard-shadow press-action" href="https://wa.me/254712345678?text=Hi%20Kevin,%20interested%20in%20Laptop%20Screen%20Replacement">WhatsApp</a>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-semibold text-on-surface">
+                    Type-C &amp; Lightning Charging Port Repair
+                    <span class="block text-label-sm font-label-sm font-normal text-on-surface-variant">Loose pin reconnect, fast charging line restoration</span>
+</td>
+<td class="py-3 px-3 font-bold text-primary">KSh 600 - 900</td>
+<td class="py-3 px-3">30 mins</td>
+<td class="py-3 px-3">
+<span class="bg-surface-container px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm">Micro-soldered</span>
+</td>
+<td class="py-3 px-3 text-right">
+<a class="inline-block bg-[#25D366] text-on-surface text-label-sm font-label-sm font-bold px-2 py-1 rounded signboard-border signboard-shadow press-action" href="https://wa.me/254712345678?text=Hi%20Kevin,%20charging%20port%20repair">WhatsApp</a>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-semibold text-on-surface">
+                    Laptop Hinge Welding &amp; Plastic Reconstruction
+                    <span class="block text-label-sm font-label-sm font-normal text-on-surface-variant">Structural anchor rebuilding using metal rivets &amp; polymer resin</span>
+</td>
+<td class="py-3 px-3 font-bold text-primary">KSh 1,200</td>
+<td class="py-3 px-3">Same day</td>
+<td class="py-3 px-3">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm font-bold">Heavy duty rebuild</span>
+</td>
+<td class="py-3 px-3 text-right">
+<a class="inline-block bg-[#25D366] text-on-surface text-label-sm font-label-sm font-bold px-2 py-1 rounded signboard-border signboard-shadow press-action" href="https://wa.me/254712345678?text=Hi%20Kevin,%20laptop%20hinge%20repair">WhatsApp</a>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-semibold text-on-surface">
+                    Original Battery Swap (iPhone &amp; Samsung)
+                    <span class="block text-label-sm font-label-sm font-normal text-on-surface-variant">Zero cycle high-capacity replacement with warranty seal</span>
+</td>
+<td class="py-3 px-3 font-bold text-primary">From KSh 1,500</td>
+<td class="py-3 px-3">25 mins</td>
+<td class="py-3 px-3">
+<span class="bg-surface-container px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm">100% Battery Health</span>
+</td>
+<td class="py-3 px-3 text-right">
+<a class="inline-block bg-[#25D366] text-on-surface text-label-sm font-label-sm font-bold px-2 py-1 rounded signboard-border signboard-shadow press-action" href="https://wa.me/254712345678?text=Hi%20Kevin,%20battery%20replacement">WhatsApp</a>
+</td>
+</tr>
+<tr class="bg-emerald-50/50 hover:bg-emerald-50 transition-colors">
+<td class="py-3 px-3 font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]" data-icon="check_circle">check_circle</span>
+                    Free Student Diagnostic Inspection
+                    <span class="block text-label-sm font-label-sm font-normal text-on-surface-variant">Check board shorts, water ingress, and battery degradation curve</span>
+</td>
+<td class="py-3 px-3 font-bold text-emerald-800">FREE (KSh 0)</td>
+<td class="py-3 px-3 font-semibold">15 mins</td>
+<td class="py-3 px-3">
+<span class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm font-bold">Walk-in anytime</span>
+</td>
+<td class="py-3 px-3 text-right">
+<span class="text-label-sm font-label-sm font-bold text-emerald-800">NO BOOKING NEEDED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-4 p-2.5 bg-surface-container-low rounded signboard-border flex items-center justify-between text-body-sm font-body-sm text-on-surface">
+<span>💡 <strong>Need a custom quote?</strong> Kevin provides free inspection before any screw is taken out.</span>
+<span class="text-label-sm font-label-sm bg-surface text-on-surface px-2 py-1 rounded signboard-border">M-PESA ACCEPTED</span>
+</div>
+</section>
+<!-- c) About Kevin's Workshop -->
+<section class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-5">
+<h2 class="text-headline-md font-headline-md text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]" data-icon="store">store</span>
+            About Kevin’s Workshop (Kesses Centre)
+          </h2>
+<div class="prose max-w-none text-body-md font-body-md text-on-surface leading-relaxed space-y-3">
+<p>
+              Operating continuously for over 4 years right behind the Equity Bank ATM at Kesses Centre, Kevin Phones &amp; Laptops has become the go-to technical workstation for Moi University engineering, IT, and computer science students. Rather than relying on unreliable grey-market boards, Kevin personally receives twice-weekly consignments of genuine original screens, OEM laptop panels, and high-purity solder paste directly sourced from vetted importers on Nairobi’s Luthuli Avenue.
+            </p>
+<p>
+              Every replacement is conducted in open view on an anti-static workbench, guaranteeing complete anti-counterfeit integrity and peace of mind for sensitive student coursework and hardware. If a device has sustained water damage or drop-impact fractures, students receive an honest assessment and a transparent diagnostic report before any repair work commences.
+            </p>
+</div>
+<!-- Key facts tags -->
+<div class="mt-4 pt-3 border-t border-surface-container flex flex-wrap gap-2 text-label-md font-label-md">
+<span class="bg-surface-container px-2.5 py-1 rounded signboard-border text-on-surface">⚡ 4+ Years at Kesses Centre</span>
+<span class="bg-surface-container px-2.5 py-1 rounded signboard-border text-on-surface">📦 Bi-weekly Nairobi Luthuli Shipments</span>
+<span class="bg-surface-container px-2.5 py-1 rounded signboard-border text-on-surface">🔬 Stereoscopic Micro-soldering Rig</span>
+<span class="bg-surface-container px-2.5 py-1 rounded signboard-border text-on-surface">🛡️ Zero Counterfeits Policy</span>
+</div>
+</section>
+<!-- d) Operating Hours Schedule -->
+<section class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-5">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]" data-icon="schedule">schedule</span>
+              Operating Hours Schedule
+            </h2>
+<span class="bg-emerald-100 text-emerald-900 px-2.5 py-1 rounded signboard-border text-label-sm font-label-sm font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+              Open Today Until 8:30 PM
+            </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+<!-- Mon - Fri -->
+<div class="p-3 rounded signboard-border bg-surface-container-high border-2 border-primary">
+<div class="flex justify-between items-center mb-1">
+<span class="font-headline-sm text-label-lg font-bold text-primary">Monday – Friday</span>
+<span class="text-[10px] bg-primary text-on-primary font-bold px-1.5 py-0.2 rounded">TODAY</span>
+</div>
+<p class="text-headline-sm font-headline-sm text-on-surface">8:00 AM – 8:30 PM</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Peak technician hours</p>
+</div>
+<!-- Saturday -->
+<div class="p-3 rounded signboard-border bg-surface-container-low">
+<span class="font-headline-sm text-label-lg font-bold text-on-surface block mb-1">Saturday</span>
+<p class="text-headline-sm font-headline-sm text-on-surface">8:30 AM – 9:00 PM</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Full bench service</p>
+</div>
+<!-- Sunday -->
+<div class="p-3 rounded signboard-border bg-surface-container-low">
+<span class="font-headline-sm text-label-lg font-bold text-on-surface block mb-1">Sunday</span>
+<p class="text-headline-sm font-headline-sm text-on-surface">1:00 PM – 7:30 PM</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">After church hours</p>
+</div>
+</div>
+<!-- Emergency callout notice -->
+<div class="bg-secondary-fixed/50 p-3 rounded signboard-border flex items-center gap-3">
+<span class="material-symbols-outlined text-on-secondary-fixed text-[24px]" data-icon="electric_bolt">electric_bolt</span>
+<div class="text-body-sm font-body-sm text-on-surface">
+<span class="font-bold">After-Hours Campus Hostel Callouts:</span>
+              Urgent laptop repair during exam/CAT weeks? Kevin offers emergency hostel pickup at Cheboiywo, Soweto, and Stage Hostels. Contact via WhatsApp.
+            </div>
+</div>
+</section>
+</div>
+<!-- ================= RIGHT COLUMN (30% - lg:col-span-4 Sidebar) ================= -->
+<aside class="lg:col-span-4 space-y-space-lg">
+<!-- a) Landmark Map & Directions Card -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded overflow-hidden">
+<div class="bg-surface-container p-3 border-b signboard-border flex items-center justify-between">
+<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="explore">explore</span>
+              Landmark &amp; Walking Route
+            </h3>
+<span class="text-label-sm font-label-sm bg-surface-container-lowest px-2 py-0.5 rounded signboard-border font-bold">
+              320m FROM GATE
+            </span>
+</div>
+<!-- Mini Map Simulation with Visual Vernacular Wayfinding -->
+<div class="p-4 bg-surface-container-low border-b signboard-border relative" data-location="Kesses, Eldoret, Kenya" style="">
+<div class="bg-surface signboard-border rounded p-3 text-center space-y-2 relative overflow-hidden">
+<!-- Illustrated Route Step -->
+<div class="flex items-center justify-between text-label-sm font-label-sm">
+<span class="bg-surface-container-highest px-2 py-0.5 rounded font-bold">Main Gate</span>
+<span class="text-outline">──────►</span>
+<span class="bg-secondary-fixed px-2 py-0.5 rounded font-bold text-on-secondary-fixed">Equity ATM</span>
+<span class="text-outline">──────►</span>
+<span class="bg-primary text-on-primary px-2 py-0.5 rounded font-bold">Room 4</span>
+</div>
+<!-- Visual Map Graphic -->
+<div class="py-3 border border-dashed border-outline-variant rounded bg-surface-container-lowest/60">
+<p class="text-label-md font-label-md font-bold text-on-surface">KESSES ROAD JUNCTION</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Behind Equity Bank ATM · 1st Floor, Room 4</p>
+<p class="text-[11px] text-tertiary font-bold mt-1">Opposite Western Fresh Butchery</p>
+</div>
+</div>
+</div>
+<!-- Specific Walk Directions -->
+<div class="p-4 space-y-3">
+<div class="text-body-sm font-body-sm text-on-surface">
+<strong class="text-on-surface block mb-1">Walking instructions:</strong>
+              "Walk past the Stage matatu terminal, branch left at the Equity ATM, enter the blue door up the stairs to Room 4 on the first floor."
+            </div>
+<a class="w-full bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-sm text-label-lg py-2.5 px-3 rounded signboard-border signboard-shadow press-action flex items-center justify-center gap-2" href="https://maps.google.com" rel="noopener" target="_blank">
+<span class="material-symbols-outlined text-[18px] text-primary" data-icon="open_in_new">open_in_new</span>
+<span>Open in Google Maps</span>
+</a>
+</div>
+</div>
+<!-- b) Fundi Trust & Guarantee Badges Card -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-4">
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-3 flex items-center gap-1.5 pb-2 border-b border-surface-container">
+<span class="material-symbols-outlined text-tertiary text-[22px] icon-fill" data-icon="verified">verified</span>
+            Trust &amp; Service Guarantees
+          </h3>
+<div class="space-y-3">
+<div class="flex items-start gap-2.5">
+<div class="p-1.5 bg-emerald-100 text-emerald-800 rounded signboard-border shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px] icon-fill" data-icon="shield">shield</span>
+</div>
+<div>
+<h4 class="text-label-lg font-label-lg text-on-surface">No Advance Deposit</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Pay only after your screen or hinge is fully installed and tested.</p>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<div class="p-1.5 bg-tertiary/15 text-tertiary rounded signboard-border shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px] icon-fill" data-icon="published_with_changes">published_with_changes</span>
+</div>
+<div>
+<h4 class="text-label-lg font-label-lg text-on-surface">30-Day Free Replacement</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Immediate replacement if touch screen ghosts or flex cable fails.</p>
+</div>
+</div>
+<div class="flex items-start gap-2.5">
+<div class="p-1.5 bg-secondary-fixed text-on-secondary-fixed rounded signboard-border shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px] icon-fill" data-icon="storefront">storefront</span>
+</div>
+<div>
+<h4 class="text-label-lg font-label-lg text-on-surface">Physical Workshop Inspected</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">MoiMashinani Ambassador visited on 12th Oct 2026. Verified premise.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- c) Owner & Shop Contact Details card with M-Pesa Till number -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-4">
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-3 flex items-center gap-1.5 pb-2 border-b border-surface-container">
+<span class="material-symbols-outlined text-primary text-[22px]" data-icon="badge">badge</span>
+            Direct Merchant Contacts
+          </h3>
+<div class="space-y-2.5 text-body-sm font-body-sm">
+<div class="flex justify-between items-center py-1 border-b border-surface-container-low">
+<span class="text-on-surface-variant">Lead Technician:</span>
+<span class="font-bold text-on-surface">Kevin Cheruiyot</span>
+</div>
+<div class="flex justify-between items-center py-1 border-b border-surface-container-low">
+<span class="text-on-surface-variant">Direct Line:</span>
+<a class="font-bold text-primary hover:underline" href="tel:+254712345678">+254 712 345 678</a>
+</div>
+<div class="flex justify-between items-center py-1 border-b border-surface-container-low">
+<span class="text-on-surface-variant">WhatsApp:</span>
+<span class="font-bold text-[#25D366] bg-emerald-950 px-2 py-0.5 rounded text-xs">Available</span>
+</div>
+<!-- M-Pesa Till Block -->
+<div class="mt-3 p-3 bg-emerald-50 rounded signboard-border border-emerald-800">
+<div class="flex items-center justify-between mb-1">
+<span class="text-label-sm font-label-sm font-bold text-emerald-900 uppercase">M-PESA BUY GOODS TILL</span>
+<span class="material-symbols-outlined text-emerald-800 text-[18px]" data-icon="contactless">contactless</span>
+</div>
+<div class="text-headline-md font-headline-md font-bold tracking-wider text-emerald-950">
+                849201
+              </div>
+<p class="text-[11px] text-emerald-900 mt-0.5">Till Name: KEVIN CHERUIYOT REPAIRS</p>
+</div>
+</div>
+</div>
+<!-- d) Report a Problem link -->
+<div class="p-3 bg-surface-container-low signboard-border rounded text-center">
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-2">Notice outdated information?</p>
+<a class="text-error font-label-md font-label-md flex items-center justify-center gap-1 hover:underline" href="#">
+<span class="material-symbols-outlined text-[16px]" data-icon="flag">flag</span>
+<span>Report a Problem (Wrong number, Closed down, Scam)</span>
+</a>
+</div>
+</aside>
+</div>
+<!-- 5. Similar Nearby Fundis in Kesses Centre (Comparison Section) -->
+<section class="mt-space-xl pt-space-lg border-t-2 border-on-surface">
+<div class="flex flex-wrap items-center justify-between mb-4">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface">
+            Similar Nearby Fundis in Kesses Centre
+          </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Alternative phone and electronics technicians within 5 minutes walk.</p>
+</div>
+<a class="text-primary font-label-md font-label-md font-bold flex items-center gap-1 hover:underline" href="#">
+<span>View all 18 repair shops in Kesses</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Fundi Card 1 -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="bg-surface-container px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm font-bold text-on-surface">
+                STAGE JUNCTION
+              </span>
+<span class="text-label-sm font-label-sm font-bold text-amber-700 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] icon-fill text-amber-600" data-icon="star">star</span>
+                4.8 (42)
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-1">Apex Smartphone Clinic</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-3">Specialist in software flashing, iCloud bypass consultation, and Infinix/Tecno charging ribbons.</p>
+<p class="text-label-sm font-label-sm text-on-surface mb-4">📍 Stage matatu stand, Container #3 (120m away)</p>
+</div>
+<!-- Two-Tap Strip -->
+<div class="grid grid-cols-2 gap-2 pt-3 border-t border-surface-container">
+<a class="bg-surface-container-low text-on-surface text-center py-1.5 rounded signboard-border font-label-md font-label-md press-action" href="tel:+254700000001">Call</a>
+<a class="bg-[#25D366] text-on-surface text-center py-1.5 rounded signboard-border font-label-md font-label-md press-action" href="https://wa.me/254700000001">WhatsApp</a>
+</div>
+</div>
+<!-- Fundi Card 2 -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="bg-surface-container px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm font-bold text-on-surface">
+                SOWETO MARKET
+              </span>
+<span class="text-label-sm font-label-sm font-bold text-amber-700 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] icon-fill text-amber-600" data-icon="star">star</span>
+                4.6 (29)
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-1">Mama Brian Electronics &amp; TV</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-3">Power adapters, laptop chargers, HDMI cables, and desktop motherboard capacitor diagnostics.</p>
+<p class="text-label-sm font-label-sm text-on-surface mb-4">📍 Soweto Market lane 2 (450m away)</p>
+</div>
+<!-- Two-Tap Strip -->
+<div class="grid grid-cols-2 gap-2 pt-3 border-t border-surface-container">
+<a class="bg-surface-container-low text-on-surface text-center py-1.5 rounded signboard-border font-label-md font-label-md press-action" href="tel:+254700000002">Call</a>
+<a class="bg-[#25D366] text-on-surface text-center py-1.5 rounded signboard-border font-label-md font-label-md press-action" href="https://wa.me/254700000002">WhatsApp</a>
+</div>
+</div>
+<!-- Fundi Card 3 -->
+<div class="bg-surface-container-lowest signboard-border signboard-shadow rounded p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="bg-surface-container px-2 py-0.5 rounded signboard-border text-label-sm font-label-sm font-bold text-on-surface">
+                CHEBOIYWO GATE
+              </span>
+<span class="text-label-sm font-label-sm font-bold text-amber-700 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] icon-fill text-amber-600" data-icon="star">star</span>
+                4.9 (53)
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface mb-1">FastFix Mac &amp; PC Spares</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-3">MacBook battery rebuilds, SSD thermal upgrades, and BIOS chip reprogramming for Dell/Lenovo.</p>
+<p class="text-label-sm font-label-sm text-on-surface mb-4">📍 Opposite Cheboiywo Gate (600m away)</p>
+</div>
+<!-- Two-Tap Strip -->
+<div class="grid grid-cols-2 gap-2 pt-3 border-t border-surface-container">
+<a class="bg-surface-container-low text-on-surface text-center py-1.5 rounded signboard-border font-label-md font-label-md press-action" href="tel:+254700000003">Call</a>
+<a class="bg-[#25D366] text-on-surface text-center py-1.5 rounded signboard-border font-label-md font-label-md press-action" href="https://wa.me/254700000003">WhatsApp</a>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. Bottom Demand / Community Helpdesk strip -->
+<section class="mt-space-lg mb-space-md p-4 bg-surface-container signboard-border signboard-shadow rounded flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-container text-on-primary flex items-center justify-center signboard-border shrink-0">
+<span class="material-symbols-outlined text-[24px]" data-icon="search_check">search_check</span>
+</div>
+<div>
+<h4 class="text-headline-sm font-headline-sm text-on-surface">Need a specific laptop motherboard or rare ribbon cable?</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Post on the MoiMashinani Student Hardware Desk. 40+ campus fundis respond within 20 mins.</p>
+</div>
+</div>
+<a class="bg-on-surface text-surface hover:bg-on-surface/90 text-label-lg font-label-lg px-4 py-2 rounded signboard-border signboard-shadow press-action whitespace-nowrap flex items-center gap-2" href="https://wa.me/254700000999?text=MoiMashinani%20Hardware%20Inquiry">
+<span class="material-symbols-outlined text-[18px]" data-icon="forum">forum</span>
+<span>Ask Kesses Hardware Desk</span>
+</a>
+</section>
+</main>
+<!-- 7. FOOTER (Shared Component JSON Source of Truth) -->
+<footer class="w-full bg-surface-container-lowest dark:bg-inverse-surface border-t-2 border-on-surface dark:border-outline mt-space-xl">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-gutter">
+<!-- Brand & Copyright from JSON -->
+<div class="text-center md:text-left space-y-1">
+<div class="text-headline-sm font-headline-sm font-bold text-primary dark:text-inverse-primary flex items-center justify-center md:justify-start gap-1">
+<span class="material-symbols-outlined text-[20px]" data-icon="storefront">storefront</span>
+<span>MoiMashinani</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant dark:text-inverse-on-surface max-w-xl">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+</div>
+<!-- Links cluster from JSON: ["Add Business (Free)", "Student Deals", "Campus Safety & Trust", "Kesses Map Guide", "Report Inactive Listing", "WhatsApp Helpdesk"] -->
+<nav class="flex flex-wrap justify-center md:justify-end gap-x-4 gap-y-2 text-label-sm font-label-sm">
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Add Business (Free)
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Student Deals
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Campus Safety &amp; Trust
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Kesses Map Guide
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Report Inactive Listing
+        </a>
+<span class="text-outline">·</span>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors font-bold flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[14px]" data-icon="support_agent">support_agent</span>
+          WhatsApp Helpdesk
+        </a>
+</nav>
+</div>
+</footer>
+</body></html>

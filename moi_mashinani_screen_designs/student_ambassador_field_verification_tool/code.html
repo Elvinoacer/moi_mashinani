@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>MoiMashinani Field Ops - Ambassador Verification</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600&amp;family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with form plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config verbatim injection -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-on-surface": "#ebf1ff",
+            "surface-container": "#e7eeff",
+            "surface-variant": "#d5e3ff",
+            "on-surface-variant": "#594045",
+            "surface-bright": "#f9f9ff",
+            "secondary-fixed": "#ffdea0",
+            "outline": "#8d6f75",
+            "tertiary": "#005658",
+            "on-tertiary-fixed-variant": "#004f51",
+            "on-error-container": "#93000a",
+            "on-secondary": "#ffffff",
+            "inverse-primary": "#ffb1c2",
+            "primary-container": "#c2185b",
+            "background": "#f9f9ff",
+            "surface-container-highest": "#d5e3ff",
+            "secondary-container": "#fdc33b",
+            "on-primary-container": "#ffd9df",
+            "surface-container-high": "#dee8ff",
+            "surface-dim": "#c7dbff",
+            "on-surface": "#001c3b",
+            "on-error": "#ffffff",
+            "on-primary-fixed": "#3f0018",
+            "inverse-surface": "#193151",
+            "secondary": "#795900",
+            "tertiary-container": "#107072",
+            "primary": "#9b0044",
+            "surface-container-low": "#f0f3ff",
+            "on-secondary-container": "#6f5100",
+            "error-container": "#ffdad6",
+            "on-tertiary-container": "#a0f0f2",
+            "on-primary-fixed-variant": "#8f003f",
+            "on-background": "#001c3b",
+            "surface-tint": "#b90c55",
+            "primary-fixed-dim": "#ffb1c2",
+            "tertiary-fixed": "#a0f0f2",
+            "on-secondary-fixed-variant": "#5c4300",
+            "on-primary": "#ffffff",
+            "outline-variant": "#e1bec4",
+            "surface": "#f9f9ff",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#f7be36",
+            "tertiary-fixed-dim": "#84d4d5",
+            "on-secondary-fixed": "#261900",
+            "surface-container-lowest": "#ffffff",
+            "error": "#ba1a1a",
+            "primary-fixed": "#ffd9df",
+            "on-tertiary-fixed": "#002021"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xl": "2.5rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "margin-desktop": "2.5rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "label-sm": ["Archivo Narrow"],
+            "headline-xl": ["Archivo Narrow"],
+            "label-lg": ["Archivo Narrow"],
+            "headline-md": ["Archivo Narrow"],
+            "headline-lg-mobile": ["Archivo Narrow"],
+            "headline-sm": ["Archivo Narrow"],
+            "headline-lg": ["Archivo Narrow"],
+            "label-md": ["Archivo Narrow"],
+            "body-md": ["Atkinson Hyperlegible"],
+            "headline-xl-mobile": ["Archivo Narrow"],
+            "body-sm": ["Atkinson Hyperlegible"],
+            "body-lg": ["Atkinson Hyperlegible"]
+          },
+          "fontSize": {
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "30px", "fontWeight": "700" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-xl-mobile": ["32px", { "lineHeight": "36px", "fontWeight": "700" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Physical Neo-brutalist Tactile Elevation & Signboard Physics */
+    .hard-shadow {
+      box-shadow: 2px 2px 0px #001c3b;
+    }
+    .hard-shadow-lg {
+      box-shadow: 3px 3px 0px #001c3b;
+    }
+    .hard-shadow-sm {
+      box-shadow: 1px 1px 0px #001c3b;
+    }
+    .tactile-active:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #001c3b;
+    }
+    .tactile-active-sm:active {
+      transform: translate(1px, 1px);
+      box-shadow: 0px 0px 0px #001c3b;
+    }
+    /* Material symbols helper */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+      display: inline-block;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 700;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-sm antialiased selection:bg-secondary-container selection:text-on-surface min-h-screen pb-32">
+<!-- ========================================== -->
+<!-- 1. TOP STICKY AMBASSADOR FIELD OPS HEADER -->
+<!-- ========================================== -->
+<header class="sticky top-0 z-40 bg-surface-container-lowest border-b-2 border-on-surface shadow-[0_2px_0px_#001c3b]">
+<!-- Top Utility & Brand Strip -->
+<div class="px-margin py-space-xs bg-surface-container-low border-b border-on-surface flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm font-bold tracking-tight text-primary uppercase">
+          MoiMashinani
+        </span>
+<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-secondary-container text-on-surface font-label-sm text-label-sm border border-on-surface rounded-DEFAULT hard-shadow-sm uppercase">
+<span class="material-symbols-outlined text-[13px] fill-icon" data-icon="verified_user">verified_user</span>
+          FIELD OPS
+        </span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm">
+<span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-surface-bright text-tertiary border border-on-surface rounded-DEFAULT">
+<span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+          OFFLINE READY
+        </span>
+</div>
+</div>
+<!-- Ambassador Identity & GPS Telemetry Grid -->
+<div class="px-margin py-space-xs bg-surface-container-lowest">
+<div class="flex items-start justify-between gap-space-xs">
+<div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="badge">badge</span>
+<h1 class="font-headline-sm text-headline-sm text-on-surface leading-tight font-bold">
+              Faith Chemutai
+            </h1>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-semibold">
+            Sch. of Info Sciences · 4th Yr Ambassador
+          </p>
+</div>
+<!-- Sync Counter Pill -->
+<div class="text-right">
+<span class="inline-block px-1.5 py-0.5 bg-surface-variant text-on-surface font-label-sm text-label-sm border border-on-surface rounded-DEFAULT">
+            Queue: <strong>14/18 Synced</strong>
+</span>
+<p class="text-[10px] text-tertiary font-bold tracking-tight mt-0.5 flex items-center justify-end gap-0.5">
+<span class="material-symbols-outlined text-[12px]" data-icon="cloud_done">cloud_done</span>
+            Auto-backup
+          </p>
+</div>
+</div>
+<!-- Real-time Geo-fence & Route Selector Ribbon -->
+<div class="mt-space-xs pt-space-xs border-t border-dashed border-outline-variant flex flex-wrap items-center justify-between gap-1">
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="material-symbols-outlined text-tertiary text-[15px]" data-icon="location_on">location_on</span>
+<span class="font-bold">GPS: Kesses Centre</span>
+<span class="text-[11px] text-on-surface-variant font-medium">(±4m accuracy)</span>
+</div>
+<!-- Zone Selector Dropdown -->
+<div class="relative inline-flex items-center">
+<label class="sr-only" for="zone-select">Assigned Audit Route</label>
+<select class="py-0.5 pl-2 pr-6 font-label-sm text-label-sm bg-surface-bright text-on-surface font-bold border border-on-surface rounded-DEFAULT hard-shadow-sm appearance-none focus:outline-none focus:border-primary-container" id="zone-select">
+<option selected="">Zone: Kesses Centre - Route 1</option>
+<option>Zone: Stage Market - Route 2</option>
+<option>Zone: Soweto Hostels Corridor</option>
+<option>Zone: Cheboiywo Gate Strip</option>
+<option>Zone: Annex Campus Junction</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-1 text-on-surface text-[14px]" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================== -->
+<!-- MAIN FIELD CONTENT CONTAINER               -->
+<!-- ========================================== -->
+<main class="max-w-[390px] mx-auto px-margin pt-space-md space-y-space-md">
+<!-- AUDIT NOTICE BANNER -->
+<div class="bg-secondary-container text-on-surface border-2 border-on-surface rounded-DEFAULT p-space-xs hard-shadow flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary font-bold text-[18px]" data-icon="radar">radar</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider font-bold">
+          LIVE ON-SITE AUDIT IN PROGRESS
+        </span>
+</div>
+<span class="px-1.5 py-0.2 bg-surface-container-lowest text-primary border border-on-surface rounded-DEFAULT font-label-sm text-label-sm font-bold">
+        #AUD-882
+      </span>
+</div>
+<!-- ========================================== -->
+<!-- 2. KIOSK UNDER AUDIT CARD                  -->
+<!-- ========================================== -->
+<section class="bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT hard-shadow overflow-hidden">
+<!-- Attached Jua Sun Yellow Signboard Header -->
+<div class="bg-secondary-container px-space-md py-space-xs border-b-2 border-on-surface flex justify-between items-center">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-on-surface text-[17px] fill-icon" data-icon="storefront">storefront</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wide font-bold text-on-surface">
+            Stall Signage Registration
+          </span>
+</div>
+<span class="bg-primary text-on-primary text-[10px] font-bold px-1.5 py-0.5 rounded-DEFAULT uppercase tracking-tight flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[11px]" data-icon="schedule">schedule</span>
+          12m On-Site
+        </span>
+</div>
+<!-- Kiosk Core Profile Details -->
+<div class="p-space-md space-y-space-xs">
+<div class="flex items-start justify-between gap-space-xs">
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface leading-tight tracking-tight">
+              Mama Shiro Salon &amp; Braiding
+            </h2>
+<p class="font-label-md text-label-md text-primary font-bold mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]" data-icon="content_cut">content_cut</span>
+              Beauty &amp; Hairdressing · Certified Fundi
+            </p>
+</div>
+<span class="inline-flex px-1.5 py-0.5 bg-surface-container-high text-tertiary font-label-sm text-label-sm font-bold border border-on-surface rounded-DEFAULT">
+            Room 12
+          </span>
+</div>
+<!-- Campus Physical Landmark Pinpoint -->
+<div class="bg-surface-container-low border border-on-surface rounded-DEFAULT p-space-xs text-[12px] flex items-start gap-1.5">
+<span class="material-symbols-outlined text-primary text-[16px] shrink-0 mt-0.5" data-icon="pin_drop">pin_drop</span>
+<p class="text-on-surface leading-snug">
+<strong>Location Landmark:</strong> Kesses Centre (Behind Equity ATM building, 1st Floor, Room 12 - facing Soweto path).
+          </p>
+</div>
+<!-- Fundi Contact Details -->
+<div class="pt-1 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-on-surface" data-icon="person">person</span>
+<span class="font-bold text-on-surface">Ann Waithera (Mama Shiro)</span>
+</div>
+<span class="font-mono text-on-surface font-semibold text-[11px]">+254 721 987 654</span>
+</div>
+</div>
+<!-- Signature Two-Tap Quick Contact Strip -->
+<div class="grid grid-cols-2 border-t-2 border-on-surface divide-x-2 divide-on-surface bg-surface-container-low">
+<a class="py-2.5 px-2 flex items-center justify-center gap-1.5 font-label-md text-label-md font-bold text-on-surface bg-surface-container-lowest hover:bg-surface-container-high transition-colors tactile-active" href="tel:+254721987654">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="call">call</span>
+<span>Call Merchant</span>
+</a>
+<a class="py-2.5 px-2 flex items-center justify-center gap-1.5 font-label-md text-label-md font-bold text-on-surface bg-[#25D366] hover:brightness-95 transition-all tactile-active" href="https://wa.me/254721987654?text=Habari%20Mama%20Shiro,%20nipo%20hapa%20kufanya%20MoiMashinani%20Campus%20Verification.">
+<span class="material-symbols-outlined text-on-surface text-[18px]" data-icon="chat">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- 3. MANDATORY 5-STEP GROUND CHECKLIST       -->
+<!-- ========================================== -->
+<section class="space-y-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="checklist_rtl">checklist_rtl</span>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-tight">
+            5-Point Field Checklist
+          </h3>
+</div>
+<span class="px-2 py-0.5 bg-tertiary-container text-on-tertiary font-label-sm text-label-sm font-bold rounded-DEFAULT border border-on-surface">
+          5 / 5 Complete
+        </span>
+</div>
+<!-- Checklist Accordion / Items Stack -->
+<div class="space-y-space-xs">
+<!-- STEP 1: Physical Stall Presence & Signboard -->
+<article class="bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT p-space-xs hard-shadow">
+<div class="flex items-start gap-space-xs">
+<input checked="" class="mt-0.5 w-4 h-4 text-primary-container border-2 border-on-surface rounded-DEFAULT focus:ring-0 cursor-pointer" id="step-1" type="checkbox"/>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-bold text-on-surface cursor-pointer" for="step-1">
+                  1. Physical Stall &amp; Signboard Match
+                </label>
+<span class="text-tertiary flex items-center gap-0.5 font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                  Verified
+                </span>
+</div>
+<p class="font-body-sm text-[12px] leading-snug text-on-surface-variant">
+                Signboard clearly visible from main Kesses walkway; confirmed room #12 matches registration records.
+              </p>
+<!-- Evidence Trigger Badge -->
+<div class="flex items-center justify-between pt-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface bg-surface-container-low px-2 py-0.5 border border-on-surface rounded-DEFAULT">
+<span class="material-symbols-outlined text-[13px] text-tertiary" data-icon="photo_camera">photo_camera</span>
+                  1 Photo Attached
+                </span>
+<button class="text-primary font-label-sm text-label-sm font-bold underline hover:text-on-surface" type="button">
+                  Retake Photo
+                </button>
+</div>
+</div>
+</div>
+</article>
+<!-- STEP 2: Live Phone & M-Pesa Till Plate Audit -->
+<article class="bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT p-space-xs hard-shadow">
+<div class="flex items-start gap-space-xs">
+<input checked="" class="mt-0.5 w-4 h-4 text-primary-container border-2 border-on-surface rounded-DEFAULT focus:ring-0 cursor-pointer" id="step-2" type="checkbox"/>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-bold text-on-surface cursor-pointer" for="step-2">
+                  2. M-Pesa Till Plate Audit
+                </label>
+<span class="text-tertiary flex items-center gap-0.5 font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                  Verified
+                </span>
+</div>
+<p class="font-body-sm text-[12px] leading-snug text-on-surface-variant">
+                Physically inspected and cross-checked Safaricom Till Plate <strong class="text-on-surface font-mono">#849201</strong> mounted on wall against merchant's live M-Pesa business app.
+              </p>
+<!-- Evidence Trigger Badge -->
+<div class="flex items-center justify-between pt-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface bg-surface-container-low px-2 py-0.5 border border-on-surface rounded-DEFAULT">
+<span class="material-symbols-outlined text-[13px] text-tertiary" data-icon="qr_code_2">qr_code_2</span>
+                  Till Plate Photo Attached
+                </span>
+<span class="font-mono text-[11px] font-bold text-tertiary">MATCH: 100%</span>
+</div>
+</div>
+</div>
+</article>
+<!-- STEP 3: Transparent Student Price List -->
+<article class="bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT p-space-xs hard-shadow">
+<div class="flex items-start gap-space-xs">
+<input checked="" class="mt-0.5 w-4 h-4 text-primary-container border-2 border-on-surface rounded-DEFAULT focus:ring-0 cursor-pointer" id="step-3" type="checkbox"/>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-bold text-on-surface cursor-pointer" for="step-3">
+                  3. Displayed Student Price List
+                </label>
+<span class="text-tertiary flex items-center gap-0.5 font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                  Verified
+                </span>
+</div>
+<p class="font-body-sm text-[12px] leading-snug text-on-surface-variant">
+                Price list laminated and pinned on salon mirror (e.g. Lines: 250/=, Knotless Braids: 800/=, Retouch: 200/=).
+              </p>
+<div class="flex items-center justify-between pt-1">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface bg-surface-container-low px-2 py-0.5 border border-on-surface rounded-DEFAULT">
+<span class="material-symbols-outlined text-[13px] text-tertiary" data-icon="receipt_long">receipt_long</span>
+                  Menu Chart Attached
+                </span>
+<span class="text-[11px] font-bold text-on-surface-variant">Visible to walk-ins</span>
+</div>
+</div>
+</div>
+</article>
+<!-- STEP 4: Special Moi Student Discount Agreement -->
+<article class="bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT p-space-xs hard-shadow">
+<div class="flex items-start gap-space-xs">
+<input checked="" class="mt-0.5 w-4 h-4 text-primary-container border-2 border-on-surface rounded-DEFAULT focus:ring-0 cursor-pointer" id="step-4" type="checkbox"/>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-bold text-on-surface cursor-pointer" for="step-4">
+                  4. Moi Student Discount (15%)
+                </label>
+<span class="bg-secondary-container text-on-surface px-1.5 py-0.2 font-label-sm text-label-sm font-bold border border-on-surface rounded-DEFAULT">
+                  Pact Signed
+                </span>
+</div>
+<p class="font-body-sm text-[12px] leading-snug text-on-surface-variant">
+                Ann agreed to grant a mandatory 15% discount to any client presenting a current Moi University student ID.
+              </p>
+</div>
+</div>
+</article>
+<!-- STEP 5: Anti-Con & Integrity Declaration -->
+<article class="bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT p-space-xs hard-shadow">
+<div class="flex items-start gap-space-xs">
+<input checked="" class="mt-0.5 w-4 h-4 text-primary-container border-2 border-on-surface rounded-DEFAULT focus:ring-0 cursor-pointer" id="step-5" type="checkbox"/>
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md font-bold text-on-surface cursor-pointer" for="step-5">
+                  5. Anti-Con &amp; Continuous Presence
+                </label>
+<span class="text-tertiary flex items-center gap-0.5 font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span>
+                  Compliant
+                </span>
+</div>
+<p class="font-body-sm text-[12px] leading-snug text-on-surface-variant">
+                Confirmed strictly zero upfront deposits for uncommenced styling services. Fundi has been in Kesses &gt; 3 years.
+              </p>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- 4. AMBASSADOR FIELD EVIDENCE PHOTO GRID    -->
+<!-- ========================================== -->
+<section class="space-y-space-xs">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-tight flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="collections">collections</span>
+          Ground Evidence Photos
+        </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-bold">3 of 4 Uploaded</span>
+</div>
+<!-- Bento-style Photo Evidence Grid -->
+<div class="grid grid-cols-2 gap-space-xs">
+<!-- Slot 1: Stall Signboard Photo -->
+<div class="relative bg-surface-container border-2 border-on-surface rounded-DEFAULT overflow-hidden hard-shadow group">
+<img class="w-full h-24 object-cover" data-alt="Close up street photograph of Mama Shiro Salon wooden hand-painted shop sign in Kesses Centre near Moi University, painted in vibrant yellow, red and black typography on a timber plank, mounted on rustic corrugated iron and timber kiosk frame under Rift Valley afternoon sunlight, hyper-realistic, neo-brutalist authentic documentation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5vzpkJlz9soCIZajyQD80w5HqAhzHaf2CT1Rs8gUGbYHEsTACV1IDustfRom307iYmmaTDwvd2hC7JHEIzqyoPNweoS10Y0q9vxUI6V46yttjkbbGpgB0y2YdjVw1rxgrFLmHb8jQHXvDXUbALXDwy6Q1QDevfxgNhjOBKytMg5yx7X1wJ-IK94JXj-WNzRkry2NwCedIz1rjfhHRNc2zFPVFfQrmrmNDnpt72yyunS3B6k3bDygP"/>
+<div class="absolute inset-x-0 bottom-0 bg-on-surface bg-opacity-80 p-1 flex items-center justify-between text-on-secondary">
+<span class="font-label-sm text-[10px] truncate">1. Signboard</span>
+<span class="material-symbols-outlined text-secondary-fixed text-[14px] fill-icon" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Slot 2: M-Pesa Till Plate -->
+<div class="relative bg-surface-container border-2 border-on-surface rounded-DEFAULT overflow-hidden hard-shadow group">
+<img class="w-full h-24 object-cover" data-alt="Documentary photograph of an official green Safaricom Lipa na M-Pesa Till Number plate printed on rigid plastic, reading Buy Goods Till number with hand written digits, fixed firmly to an interior salon lime-green wooden partition wall inside a bustling Kenyan campus salon, bright natural daylight, high contrast sharp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXSJaVrjysD3jz3rpE3zfyyz9f1UBW4JXs8qhvqsjWi3qAm53ghpLw9vNuLBCGAp8cR2sK6z0xwJXpAbBscK5PRyFgv7un9MY5xUiWz2jhdFX1ed7OL4AXJWP9_Nnj0A_W5xmZrqqbzwFveiK74jS9S81QqTxuJRWpaSaZf-qSZKzD7gZsNfSS_moIH2XqSkhEe0ZqfMdL5HrwUFeUpuHGMF0Bcluwx1Ic_0Vs4UQntHviQox3TO1z"/>
+<div class="absolute inset-x-0 bottom-0 bg-on-surface bg-opacity-80 p-1 flex items-center justify-between text-on-secondary">
+<span class="font-label-sm text-[10px] truncate">2. Till Plate</span>
+<span class="material-symbols-outlined text-secondary-fixed text-[14px] fill-icon" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Slot 3: Price Chart / Workshop Bench -->
+<div class="relative bg-surface-container border-2 border-on-surface rounded-DEFAULT overflow-hidden hard-shadow group">
+<img class="w-full h-24 object-cover" data-alt="Handwritten salon price menu written with bold black marker on bright cardboard taped next to a hairdressing vanity mirror in Kesses shopping center, bottles of hair conditioning oil and synthetic braiding hair in background, crisp realistic texture with sharp edges under natural Rift Valley sun." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxdUkvTYnDkv_BY8IZZGX9Sj5ahnja2neE0Jz0aQbMO7oOig4P3Z8ER5HQBBavKxbayAbcs3I1Bi0RskUYiKI3_Tv9oMDtmReoCnrgS_46esVi2O0gcrcedgSProZGS-6waWThNl18m1qhoR-r0t5Lx49xHD5134OE1jlsfbymBBBVptqf_zF0UtHphe0h9bNJJihw-WWRIPl0Svg1FjboqS0bQxAbqGs_9wEU2aApKRvwGm4RVayK"/>
+<div class="absolute inset-x-0 bottom-0 bg-on-surface bg-opacity-80 p-1 flex items-center justify-between text-on-secondary">
+<span class="font-label-sm text-[10px] truncate">3. Price Chart</span>
+<span class="material-symbols-outlined text-secondary-fixed text-[14px] fill-icon" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Slot 4: Extra / Add Photo Slot -->
+<button class="h-24 bg-surface-container-low border-2 border-dashed border-on-surface rounded-DEFAULT flex flex-col items-center justify-center gap-1 text-on-surface hover:bg-surface-container-high transition-colors tactile-active" type="button">
+<span class="material-symbols-outlined text-primary text-[24px]" data-icon="add_a_photo">add_a_photo</span>
+<span class="font-label-sm text-[11px] font-bold text-center leading-tight">
+            + Interior Photo<br/><span class="text-on-surface-variant font-normal">(Optional)</span>
+</span>
+</button>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- 5. FIELD AUDIT NOTES & VOICE MEMO          -->
+<!-- ========================================== -->
+<section class="space-y-space-xs bg-surface-container-lowest border-2 border-on-surface rounded-DEFAULT p-space-md hard-shadow">
+<div class="flex items-center justify-between">
+<label class="font-headline-sm text-headline-sm font-bold text-on-surface uppercase tracking-tight flex items-center gap-1" for="audit-notes">
+<span class="material-symbols-outlined text-primary text-[19px]" data-icon="edit_note">edit_note</span>
+          Ambassador Field Log
+        </label>
+<span class="font-label-sm text-label-sm text-tertiary font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]" data-icon="lock">lock</span>
+          Geo-Stamped
+        </span>
+</div>
+<!-- Pre-filled Rich Field Observation Notes -->
+<textarea class="w-full p-2 bg-surface-bright border-2 border-on-surface rounded-DEFAULT font-body-sm text-[13px] leading-relaxed text-on-surface focus:outline-none focus:border-primary-container hard-shadow-sm resize-none" id="audit-notes" rows="3">Met Ann in person. Salon has 3 active styling chairs and back-up generator for frequent Kesses blackouts. High student traffic from Soweto hostels. Confirmed student deals and genuine Till number.</textarea>
+<!-- Audio Memo Capsule -->
+<div class="pt-1 flex items-center justify-between gap-space-xs">
+<div class="flex-1 bg-surface-container-low border border-on-surface rounded-DEFAULT px-2.5 py-1.5 flex items-center justify-between hard-shadow-sm">
+<div class="flex items-center gap-2">
+<button class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center tactile-active" type="button">
+<span class="material-symbols-outlined text-[17px] fill-icon" data-icon="play_arrow">play_arrow</span>
+</button>
+<div>
+<p class="font-label-sm text-label-sm font-bold text-on-surface leading-none">Voice Memo (0:42)</p>
+<p class="text-[10px] text-on-surface-variant font-medium mt-0.5">Ambassador verbal confirmation</p>
+</div>
+</div>
+<span class="font-mono text-[11px] font-bold text-tertiary">WAV · 640KB</span>
+</div>
+<button class="p-2 border border-on-surface bg-surface-bright rounded-DEFAULT hover:bg-error-container text-on-surface hover:text-error tactile-active" title="Delete voice note" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span>
+</button>
+</div>
+</section>
+<!-- TRUST & ESCROW BADGE -->
+<div class="bg-surface-variant border-2 border-on-surface p-space-xs rounded-DEFAULT flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px] shrink-0" data-icon="gavel">gavel</span>
+<p class="font-label-sm text-label-sm text-on-surface leading-tight">
+<strong>Anti-Fraud Guarantee:</strong> By submitting, Faith Chemutai certifies under student union code that this kiosk was audited in person at Kesses Centre.
+      </p>
+</div>
+</main>
+<!-- ========================================== -->
+<!-- 6. FINAL AUDIT STICKY BOTTOM ACTION BAR    -->
+<!-- ========================================== -->
+<footer class="fixed bottom-0 inset-x-0 z-50 bg-surface-container-lowest border-t-2 border-on-surface shadow-[0_-3px_0px_#001c3b]">
+<div class="max-w-[390px] mx-auto p-space-xs space-y-1.5">
+<!-- Action Buttons Row -->
+<div class="grid grid-cols-12 gap-1.5">
+<!-- Secondary Action: Flag Issue -->
+<button class="col-span-4 py-2.5 px-1 bg-surface-bright border-2 border-on-surface rounded-DEFAULT font-label-md text-label-md font-bold text-on-surface flex items-center justify-center gap-1 hard-shadow tactile-active hover:bg-surface-container-high transition-colors" onclick="openFlagModal()" type="button">
+<span class="material-symbols-outlined text-error text-[17px]" data-icon="report_problem">report_problem</span>
+<span>Flag Issue</span>
+</button>
+<!-- Primary Action: Approve & Submit -->
+<button class="col-span-8 py-2.5 px-2 bg-primary-container text-on-primary border-2 border-on-surface rounded-DEFAULT font-label-lg text-label-lg font-bold flex items-center justify-center gap-1.5 hard-shadow tactile-active transition-transform" onclick="submitVerification()" type="button">
+<span class="material-symbols-outlined text-white text-[18px]" data-icon="verified">verified</span>
+<span>Approve &amp; Verify Kiosk</span>
+</button>
+</div>
+<!-- Stipend & Cryptographic Timestamp Microcopy -->
+<div class="flex items-center justify-between text-[10px] text-on-surface-variant px-0.5">
+<span class="flex items-center gap-1 font-bold text-tertiary">
+<span class="material-symbols-outlined text-[13px]" data-icon="payments">payments</span>
+          +50 KES Ambassador Bounty
+        </span>
+<span class="font-mono text-[9px] text-on-surface">GPS: 0.2831° N, 35.2912° E</span>
+</div>
+</div>
+</footer>
+<!-- ========================================== -->
+<!-- MODAL: FLAG / INCOMPLETE AUDIT MODAL       -->
+<!-- ========================================== -->
+<dialog class="p-0 backdrop:bg-on-surface/50 border-2 border-on-surface rounded-DEFAULT hard-shadow max-w-[340px] w-full bg-surface-container-lowest m-auto" id="flag-modal">
+<div class="p-space-md space-y-space-md">
+<div class="flex items-center justify-between border-b-2 border-on-surface pb-space-xs">
+<div class="flex items-center gap-1.5 text-error">
+<span class="material-symbols-outlined text-[20px]" data-icon="warning">warning</span>
+<h4 class="font-headline-sm text-headline-sm font-bold text-on-surface">Flag Kiosk Issue</h4>
+</div>
+<button class="text-on-surface hover:text-primary" onclick="closeFlagModal()" type="button">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="space-y-space-xs font-label-md text-label-md">
+<label class="flex items-center gap-2 p-2 border border-on-surface rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input checked="" class="text-primary-container focus:ring-0" name="flag-reason" type="radio"/>
+<span>Stall physically closed / abandoned</span>
+</label>
+<label class="flex items-center gap-2 p-2 border border-on-surface rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input class="text-primary-container focus:ring-0" name="flag-reason" type="radio"/>
+<span>Wrong GPS or incorrect room location</span>
+</label>
+<label class="flex items-center gap-2 p-2 border border-on-surface rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input class="text-primary-container focus:ring-0" name="flag-reason" type="radio"/>
+<span>Refused student discount agreement</span>
+</label>
+<label class="flex items-center gap-2 p-2 border border-on-surface rounded-DEFAULT bg-surface-container-low cursor-pointer">
+<input class="text-primary-container focus:ring-0" name="flag-reason" type="radio"/>
+<span>Fraudulent M-Pesa till name mismatch</span>
+</label>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-space-xs border-t border-on-surface">
+<button class="py-2 border-2 border-on-surface bg-surface font-label-md font-bold text-on-surface rounded-DEFAULT hard-shadow-sm tactile-active" onclick="closeFlagModal()" type="button">
+          Cancel
+        </button>
+<button class="py-2 border-2 border-on-surface bg-error text-on-error font-label-md font-bold rounded-DEFAULT hard-shadow-sm tactile-active" onclick="confirmFlag()" type="button">
+          Submit Flag
+        </button>
+</div>
+</div>
+</dialog>
+<!-- ========================================== -->
+<!-- LIGHTWEIGHT INTERACTIVITY SCRIPT           -->
+<!-- ========================================== -->
+<script>
+    const flagModal = document.getElementById('flag-modal');
+
+    function openFlagModal() {
+      if (flagModal) flagModal.showModal();
+    }
+
+    function closeFlagModal() {
+      if (flagModal) flagModal.close();
+    }
+
+    function confirmFlag() {
+      alert("Audit #AUD-882 has been marked as Flagged. Escalating to Student Union Field Lead.");
+      closeFlagModal();
+    }
+
+    function submitVerification() {
+      const btn = event.currentTarget;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Submitting...`;
+      
+      setTimeout(() => {
+        btn.classList.remove('bg-primary-container');
+        btn.classList.add('bg-tertiary');
+        btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">check_circle</span> Verified &amp; 50 KES Logged!`;
+        
+        // Haptic feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate([40, 60, 40]);
+        }
+      }, 700);
+    }
+  </script>
+</body></html>

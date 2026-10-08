@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MoiMashinani | Kesses Campus Directory - Moi University</title>
+<!-- Google Fonts: Archivo Narrow & Atkinson Hyperlegible Next -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,500;0,600;0,700;1,600;1,700&amp;family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#ffd9df",
+            "inverse-primary": "#ffb1c2",
+            "surface-dim": "#c7dbff",
+            "surface-container-lowest": "#ffffff",
+            "tertiary": "#005658",
+            "secondary-fixed": "#ffdea0",
+            "tertiary-fixed": "#a0f0f2",
+            "secondary-fixed-dim": "#f7be36",
+            "inverse-surface": "#193151",
+            "surface": "#f9f9ff",
+            "on-secondary-fixed": "#261900",
+            "on-secondary-fixed-variant": "#5c4300",
+            "on-tertiary-container": "#a0f0f2",
+            "on-tertiary-fixed": "#002021",
+            "surface-variant": "#d5e3ff",
+            "background": "#f9f9ff",
+            "on-tertiary": "#ffffff",
+            "outline": "#8d6f75",
+            "primary": "#9b0044",
+            "on-surface-variant": "#594045",
+            "primary-container": "#c2185b",
+            "on-secondary-container": "#6f5100",
+            "surface-container-low": "#f0f3ff",
+            "on-background": "#001c3b",
+            "surface-container-high": "#dee8ff",
+            "on-primary-fixed-variant": "#8f003f",
+            "on-error": "#ffffff",
+            "inverse-on-surface": "#ebf1ff",
+            "on-tertiary-fixed-variant": "#004f51",
+            "primary-fixed": "#ffd9df",
+            "error": "#ba1a1a",
+            "secondary": "#795900",
+            "on-error-container": "#93000a",
+            "secondary-container": "#fdc33b",
+            "primary-fixed-dim": "#ffb1c2",
+            "tertiary-fixed-dim": "#84d4d5",
+            "surface-bright": "#f9f9ff",
+            "surface-container": "#e7eeff",
+            "on-surface": "#001c3b",
+            "error-container": "#ffdad6",
+            "surface-tint": "#b90c55",
+            "tertiary-container": "#107072",
+            "on-secondary": "#ffffff",
+            "on-primary": "#ffffff",
+            "outline-variant": "#e1bec4",
+            "surface-container-highest": "#d5e3ff",
+            "on-primary-fixed": "#3f0018",
+            "whatsapp": "#25D366",
+            "jua-yellow": "#FFC53D",
+            "deep-teal": "#0B6E70",
+            "midnight": "#0B2545"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "margin-desktop": "2.5rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2.5rem",
+            "space-xs": "0.25rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Atkinson Hyperlegible Next", "sans-serif"],
+            "body-md": ["Atkinson Hyperlegible Next", "sans-serif"],
+            "body-sm": ["Atkinson Hyperlegible Next", "sans-serif"],
+            "label-lg": ["Archivo Narrow", "sans-serif"],
+            "label-md": ["Archivo Narrow", "sans-serif"],
+            "label-sm": ["Archivo Narrow", "sans-serif"],
+            "headline-xl": ["Archivo Narrow", "sans-serif"],
+            "headline-lg": ["Archivo Narrow", "sans-serif"],
+            "headline-md": ["Archivo Narrow", "sans-serif"],
+            "headline-sm": ["Archivo Narrow", "sans-serif"]
+          },
+          "fontSize": {
+            "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-lg": ["15px", { "lineHeight": "18px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "16px", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "700" }],
+            "headline-xl": ["48px", { "lineHeight": "52px", "fontWeight": "700" }],
+            "headline-lg": ["36px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "600" }]
+          },
+          "boxShadow": {
+            "signboard": "2px 2px 0px #0B2545",
+            "signboard-lg": "4px 4px 0px #0B2545",
+            "signboard-active": "0px 0px 0px #0B2545"
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-filled {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Physical brutalist press physics */
+    .sign-press:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #0B2545 !important;
+    }
+    .sign-press-subtle:active {
+      transform: translate(1px, 1px);
+    }
+    /* Custom horizontal scroll bar for live ticker */
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-fixed min-h-screen flex flex-col font-body-md">
+<!-- ================= TOP NAVIGATION BAR (SHARED COMPONENT) ================= -->
+<header class="sticky top-0 z-50 bg-surface border-b-2 border-on-surface shadow-[2px_2px_0px_#001c3b]">
+<div class="w-full px-margin md:px-margin-desktop py-space-sm flex justify-between items-center max-w-7xl mx-auto">
+<!-- Brand & Campus Context -->
+<div class="flex items-center gap-space-lg">
+<a class="flex items-center gap-2 group" href="#">
+<div class="w-8 h-8 bg-primary-container text-on-primary border-[1.5px] border-midnight shadow-signboard flex items-center justify-center font-headline-md font-bold">
+            M
+          </div>
+<span class="text-headline-md font-headline-md font-bold tracking-tight text-primary uppercase">
+            MoiMashinani
+          </span>
+</a>
+<!-- Campus Selector Dropdown Pill -->
+<div class="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-surface-container-low border-[1.5px] border-midnight shadow-signboard rounded-DEFAULT text-on-surface">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span class="text-label-md font-label-md font-bold">Moi University - Main Campus (Kesses)</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+<!-- Navigation Zone Links from JSON -->
+<nav aria-label="Campus Zones" class="hidden md:flex items-center gap-space-md">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Zones:</span>
+<a class="px-2 py-1 text-primary border-b-2 border-primary font-bold text-label-md font-label-md hover:bg-surface-container-high transition-colors" href="#">
+          All
+        </a>
+<a class="px-2 py-1 text-on-surface-variant font-semibold text-label-md font-label-md hover:bg-surface-container-high hover:text-primary transition-colors" href="#">
+          Kesses Centre
+        </a>
+<a class="px-2 py-1 text-on-surface-variant font-semibold text-label-md font-label-md hover:bg-surface-container-high hover:text-primary transition-colors" href="#">
+          Stage
+        </a>
+<a class="px-2 py-1 text-on-surface-variant font-semibold text-label-md font-label-md hover:bg-surface-container-high hover:text-primary transition-colors" href="#">
+          Soweto
+        </a>
+<a class="px-2 py-1 text-on-surface-variant font-semibold text-label-md font-label-md hover:bg-surface-container-high hover:text-primary transition-colors" href="#">
+          Cheboiywo
+        </a>
+<a class="px-2 py-1 text-on-surface-variant font-semibold text-label-md font-label-md hover:bg-surface-container-high hover:text-primary transition-colors" href="#">
+          Annex
+        </a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-space-md">
+<!-- Language Selector -->
+<button class="hidden sm:flex items-center gap-1 px-2.5 py-1 text-label-md font-label-md text-on-surface-variant border-[1.5px] border-outline-variant hover:border-midnight hover:text-midnight transition-colors" title="Switch Language">
+<span class="material-symbols-outlined text-[16px]">language</span>
+<span>English / Swa</span>
+</button>
+<!-- Primary CTA from JSON -->
+<a class="sign-press inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary-container text-on-primary border-[1.5px] border-midnight shadow-signboard font-label-lg font-label-lg hover:bg-primary transition-all" href="#list-business">
+<span class="material-symbols-outlined text-[18px]">add_business</span>
+<span>List your business (Free)</span>
+</a>
+</div>
+</div>
+</header>
+<!-- ================= MAIN CANVAS ================= -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-margin md:px-margin-desktop py-space-lg space-y-space-xl">
+<!-- 1. HERO & QUICK INTENT SECTION -->
+<section class="relative bg-surface-container-lowest border-2 border-midnight shadow-signboard-lg p-6 md:p-10 overflow-hidden">
+<!-- Decorative Physical Sign Accents -->
+<div class="absolute -top-3 -right-3 w-16 h-16 bg-secondary-container rotate-12 border-2 border-midnight flex items-center justify-center pointer-events-none">
+<span class="text-label-sm font-label-sm font-bold uppercase tracking-tight text-midnight">KESSES DIRECTORY</span>
+</div>
+<div class="max-w-4xl mx-auto text-center space-y-6">
+<!-- Badge -->
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container border-[1.5px] border-midnight shadow-signboard">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-midnight font-bold">Moi University Main Campus Hyper-Local Hub</span>
+</div>
+<!-- Vernacular Signboard Main Headline -->
+<h1 class="text-headline-lg md:text-headline-xl font-headline-xl text-on-surface tracking-tight leading-none uppercase">
+          Find local fundis, salons &amp; cyber services around campus in seconds.
+        </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl mx-auto">
+          From Stage to Cheboiywo Gate, connect with over 150+ verified student fundis and kiosk operators within walking distance.
+        </p>
+<!-- Central Search Bar -->
+<div class="pt-2 max-w-3xl mx-auto">
+<form class="relative flex items-center bg-white border-[2px] border-midnight shadow-signboard p-1.5 focus-within:border-primary-container transition-all">
+<span class="material-symbols-outlined text-outline px-3 text-[26px]">search</span>
+<input class="w-full bg-transparent border-0 focus:ring-0 text-body-md font-body-md text-on-surface placeholder:text-outline py-2.5 px-0" id="mainCampusSearch" placeholder="Try: laptop repair, braids, cyber printing, gas refill..." type="text"/>
+<!-- Shortcut Indicator -->
+<div class="hidden sm:flex items-center gap-1 px-2.5 py-1 bg-surface-container-high border border-outline-variant text-label-sm font-label-sm text-on-surface-variant mr-2">
+<span>Press</span>
+<kbd class="px-1.5 py-0.5 bg-white border border-midnight font-mono text-[11px] shadow-[1px_1px_0px_#0B2545] font-bold">/</kbd>
+<span>to search</span>
+</div>
+<!-- Instant Search Submit Button -->
+<button class="sign-press px-6 py-2.5 bg-midnight text-white font-label-lg font-label-lg border-[1.5px] border-midnight shadow-signboard hover:bg-primary-container transition-all flex items-center gap-1.5" type="submit">
+<span>Tafuta</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Fast Intent Chips Row -->
+<div class="pt-3">
+<div class="flex items-center justify-center gap-2 mb-2.5">
+<span class="text-label-sm font-label-sm uppercase font-bold text-outline">Quick Shortcuts:</span>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-2">
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-primary">laptop_mac</span>
+<span>Phone &amp; Laptop Repair</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-tertiary">print</span>
+<span>Printing &amp; Cyber</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-primary-container">face_3</span>
+<span>Braids &amp; Salon</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-secondary">content_cut</span>
+<span>Kinyozi / Barber</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-error">local_gas_station</span>
+<span>Gas Refill Delivery</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container">local_laundry_service</span>
+<span>Mama Fua (Laundry)</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-primary">apartment</span>
+<span>Hostel Vacancies</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-outline">styler</span>
+<span>Graduation Suit Tailor</span>
+</button>
+<button class="sign-press-subtle inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-lowest hover:bg-surface-container border-[1.5px] border-midnight text-label-md font-label-md font-semibold shadow-signboard">
+<span class="material-symbols-outlined text-[16px] text-on-surface">photo_camera</span>
+<span>Photography</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. 'AVAILABLE NOW' REAL-TIME LIVE TICKER -->
+<section class="space-y-space-md">
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-2 border-midnight pb-2">
+<div class="flex items-center gap-3">
+<div class="w-3.5 h-3.5 rounded-full bg-whatsapp border-[1.5px] border-midnight animate-ping"></div>
+<div>
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface flex items-center gap-2">
+              Available Right Now in Kesses
+              <span class="px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed border border-midnight text-label-sm font-label-sm uppercase">Live</span>
+</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Open right now — walk in or get quick delivery directly to campus hostels.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 self-end text-label-sm font-label-sm text-outline">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Updated 4 minutes ago</span>
+</div>
+</div>
+<!-- Horizontal Scrollable Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Live Card 1 -->
+<article class="bg-white border-[1.5px] border-midnight shadow-signboard p-4 flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-0.5 bg-whatsapp/20 text-tertiary-fixed-variant border border-tertiary text-label-sm font-label-sm font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-whatsapp inline-block"></span> OPEN NOW
+              </span>
+<span class="text-label-sm font-label-sm text-on-surface-variant font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-primary">directions_walk</span> 2 min walk
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface leading-snug">Kevin Gadget Fix</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Phone &amp; Laptop Repair · Stage</p>
+<div class="my-3 p-2 bg-surface-container-low border-l-2 border-primary text-body-sm font-body-sm font-semibold text-on-surface">
+              "Screen replacements ready in 30 mins"
+            </div>
+</div>
+<!-- Action Strip -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant">
+<a class="sign-press py-1.5 px-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md text-center flex items-center justify-center gap-1" href="tel:+254700000001">
+<span class="material-symbols-outlined text-[16px]">call</span> Call
+            </a>
+<a class="sign-press py-1.5 px-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254700000001?text=Habari%20Kevin,%20nimepata%20kazi%20yako%20kwa%20MoiMashinani" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+            </a>
+</div>
+</article>
+<!-- Live Card 2 -->
+<article class="bg-white border-[1.5px] border-midnight shadow-signboard p-4 flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-0.5 bg-whatsapp/20 text-tertiary-fixed-variant border border-tertiary text-label-sm font-label-sm font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-whatsapp inline-block"></span> 1 CHAIR FREE
+              </span>
+<span class="text-label-sm font-label-sm text-on-surface-variant font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-primary">directions_walk</span> 5 min walk
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface leading-snug">Mama Neema Salon</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Braids &amp; Weaving · Behind Equity ATM</p>
+<div class="my-3 p-2 bg-surface-container-low border-l-2 border-primary-container text-body-sm font-body-sm font-semibold text-on-surface">
+              "Knotless &amp; lines slot open right now"
+            </div>
+</div>
+<!-- Action Strip -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant">
+<a class="sign-press py-1.5 px-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md text-center flex items-center justify-center gap-1" href="tel:+254700000002">
+<span class="material-symbols-outlined text-[16px]">call</span> Call
+            </a>
+<a class="sign-press py-1.5 px-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254700000002?text=Habari%20Mama%20Neema,%20nimeona%20slot%20kwa%20MoiMashinani" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+            </a>
+</div>
+</article>
+<!-- Live Card 3 -->
+<article class="bg-white border-[1.5px] border-midnight shadow-signboard p-4 flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-0.5 bg-whatsapp/20 text-tertiary-fixed-variant border border-tertiary text-label-sm font-label-sm font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-whatsapp inline-block"></span> NO QUEUE
+              </span>
+<span class="text-label-sm font-label-sm text-on-surface-variant font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-primary">directions_walk</span> 1 min walk
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface leading-snug">QuickPrint Cyber</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Printing &amp; Binding · Main Gate Opp. Stage</p>
+<div class="my-3 p-2 bg-surface-container-low border-l-2 border-tertiary text-body-sm font-body-sm font-semibold text-on-surface">
+              "Heavy thesis binding open till 10:00 PM"
+            </div>
+</div>
+<!-- Action Strip -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant">
+<a class="sign-press py-1.5 px-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md text-center flex items-center justify-center gap-1" href="tel:+254700000003">
+<span class="material-symbols-outlined text-[16px]">call</span> Call
+            </a>
+<a class="sign-press py-1.5 px-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254700000003?text=Habari%20QuickPrint,%20nataka%20kuprint%20PDF" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+            </a>
+</div>
+</article>
+<!-- Live Card 4 -->
+<article class="bg-white border-[1.5px] border-midnight shadow-signboard p-4 flex flex-col justify-between hover:translate-y-[-2px] transition-transform">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="px-2 py-0.5 bg-secondary-container text-midnight border border-midnight text-label-sm font-label-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span> BODA RIDER READY
+              </span>
+<span class="text-label-sm font-label-sm text-on-surface-variant font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-tertiary">near_me</span> Soweto Rd
+              </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface leading-snug">TotalGas Kesses</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Gas Refills (6kg / 13kg) · Soweto</p>
+<div class="my-3 p-2 bg-surface-container-low border-l-2 border-secondary text-body-sm font-body-sm font-semibold text-on-surface">
+              "Free doorstep delivery to all campus hostels"
+            </div>
+</div>
+<!-- Action Strip -->
+<div class="grid grid-cols-2 gap-2 pt-2 border-t border-outline-variant">
+<a class="sign-press py-1.5 px-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md text-center flex items-center justify-center gap-1" href="tel:+254700000004">
+<span class="material-symbols-outlined text-[16px]">call</span> Call
+            </a>
+<a class="sign-press py-1.5 px-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254700000004?text=Habari%20TotalGas,%20nahitaji%20refill%20kwa%20hostel" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+            </a>
+</div>
+</article>
+</div>
+</section>
+<!-- 3. 'FEATURED LISTINGS' SIGNBOARD SECTION -->
+<section class="space-y-space-md">
+<div class="flex items-center justify-between border-b-2 border-midnight pb-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-8 bg-jua-yellow border-[1.5px] border-midnight"></div>
+<div>
+<h2 class="text-headline-md font-headline-md font-bold text-on-surface uppercase">
+              Featured Verified Fundis &amp; Local Shops
+            </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Top-rated campus providers with trusted track records and physical presence in Kesses.</p>
+</div>
+</div>
+<a class="hidden sm:inline-flex items-center gap-1 text-label-md font-label-md font-bold text-primary hover:underline" href="#">
+<span>View all 152 verified businesses</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</a>
+</div>
+<!-- Bento-style High Contrast Signboard Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter-desktop">
+<!-- Featured Listing 1 -->
+<article class="bg-white border-2 border-midnight shadow-signboard flex flex-col sm:flex-row overflow-hidden border-l-[6px] border-l-jua-yellow">
+<!-- Thumbnail Image -->
+<div class="sm:w-5/12 relative border-b sm:border-b-0 sm:border-r border-midnight overflow-hidden">
+<img class="w-full h-48 sm:h-full object-cover" data-alt="A brightly lit Kenyan electronics repair workshop near a university campus with organized tools, soldering irons, precision multimeters, and laptop parts. The daytime sunlight creates crisp, high-contrast shadows across the workbench with deep navy blue accents, pale slate containers, and a warm wooden counter. The technician's desk is meticulously ordered, conveying fast trustworthy service in a local African commercial context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDq46Ixw04T0Z4hskuT_prJPanG-BX7Saf61ttVVVBDZ-0Yrgs55VycCGZLDF7kGa7wUGSQXwWZKtyM6DWn2q6KW0Ua_lc_dNz7CA2-ciMUcDNYzRmqAN9sItYa57jnlF4fq38R-EHZilF_dWlYmXIFgFZrHqOwE6ouMjn8hLB6Azip5eyVXsVaxLlVLtinX-mAn-dIvetenPpHz5shoscvBAUmmLQ3sTDpV5sewD-9LGUPH2Zw22LR"/>
+<!-- Badges -->
+<div class="absolute top-2 left-2 flex flex-col gap-1">
+<span class="px-2 py-0.5 bg-jua-yellow text-midnight border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard">
+                FEATURED
+              </span>
+<span class="px-2 py-0.5 bg-deep-teal text-white border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] material-symbols-filled">verified</span> VERIFIED
+              </span>
+</div>
+</div>
+<!-- Body Content -->
+<div class="sm:w-7/12 p-5 flex flex-col justify-between space-y-3">
+<div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant mb-1">
+<span class="text-tertiary-fixed-variant font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-whatsapp inline-block"></span> Open now until 8:30 PM
+                </span>
+<span class="font-bold text-midnight bg-surface-container px-1.5 py-0.5 border border-outline-variant">
+                  From KSh 1,200
+                </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">Kevin Phones &amp; Laptops</h3>
+<p class="text-label-md font-label-md text-primary font-bold">Phone &amp; Laptop repair · Kesses Centre</p>
+<!-- Landmark directions -->
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant flex items-start gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">pin_drop</span>
+<span>Directly behind Equity ATM, 1st floor room 4 (opposite Stage).</span>
+</div>
+<div class="mt-1 flex items-center gap-3 text-label-sm font-label-sm text-outline">
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">directions_walk</span> 4 min from Main Gate
+                </span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-secondary">star</span> 4.9 (84 reviews)
+                </span>
+</div>
+</div>
+<!-- Two-Tap Contact Strip -->
+<div class="pt-2 border-t border-outline-variant flex items-center gap-2">
+<a class="sign-press flex-1 py-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="tel:+254711000111">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Call Now</span>
+</a>
+<a class="sign-press flex-1 py-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254711000111?text=Habari%20Kevin,%20nimepata%20kazi%20yako%20kwa%20MoiMashinani" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- Featured Listing 2 -->
+<article class="bg-white border-2 border-midnight shadow-signboard flex flex-col sm:flex-row overflow-hidden border-l-[6px] border-l-jua-yellow">
+<!-- Thumbnail Image -->
+<div class="sm:w-5/12 relative border-b sm:border-b-0 sm:border-r border-midnight overflow-hidden">
+<img class="w-full h-48 sm:h-full object-cover" data-alt="A stylish modern hair braiding salon near a Kenyan university campus with vibrant wall mirrors, neon signage, neatly organized braiding extensions, and comfortable styling stations. Warm afternoon daylight illuminates clean glossy surfaces, high-contrast dark accents, and Bougainvillea colored decorative decals. The ambiance is energetic and youthful, appealing directly to university students." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5JOFn2EJ1bayFS9ztgm_58QBbLhez810STvdTC-EmqkO9itEfKDdhuN-POXA5WLm7GMk6yGIZ3S0JrUZ2Y6fTv01H3IQVWAC1p-sVJ7G2CHWjlCcvxX92e6CaXFwOixHdReht4X-r9J43dCPF_QalI1fkA18XsgPXifXaYdql81fWcYsBP4GcB5US-IGU-WZhZPXN8UtFbvfuCpCS3xjyjYqQ7UWlGRu_pQHMIv9C9S4270tYEI6j"/>
+<!-- Badges -->
+<div class="absolute top-2 left-2 flex flex-col gap-1">
+<span class="px-2 py-0.5 bg-jua-yellow text-midnight border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard">
+                FEATURED
+              </span>
+<span class="px-2 py-0.5 bg-deep-teal text-white border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] material-symbols-filled">verified</span> VERIFIED
+              </span>
+</div>
+</div>
+<!-- Body Content -->
+<div class="sm:w-7/12 p-5 flex flex-col justify-between space-y-3">
+<div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant mb-1">
+<span class="text-tertiary-fixed-variant font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-whatsapp inline-block"></span> Open now until 9:00 PM
+                </span>
+<span class="font-bold text-midnight bg-surface-container px-1.5 py-0.5 border border-outline-variant">
+                  From KSh 800
+                </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">Glitz &amp; Braids Studio</h3>
+<p class="text-label-md font-label-md text-primary font-bold">Hair &amp; Beauty · Stage Market</p>
+<!-- Landmark directions -->
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant flex items-start gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">pin_drop</span>
+<span>Stage market strip, next to Western Fresh Butchery.</span>
+</div>
+<div class="mt-1 flex items-center gap-3 text-label-sm font-label-sm text-outline">
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">directions_walk</span> 6 min walk
+                </span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-secondary">star</span> 4.8 (67 reviews)
+                </span>
+</div>
+</div>
+<!-- Two-Tap Contact Strip -->
+<div class="pt-2 border-t border-outline-variant flex items-center gap-2">
+<a class="sign-press flex-1 py-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="tel:+254711000222">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Call Now</span>
+</a>
+<a class="sign-press flex-1 py-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254711000222?text=Habari%20Glitz,%20nataka%20kubook%20braids" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- Featured Listing 3 -->
+<article class="bg-white border-2 border-midnight shadow-signboard flex flex-col sm:flex-row overflow-hidden border-l-[6px] border-l-jua-yellow">
+<!-- Thumbnail Image -->
+<div class="sm:w-5/12 relative border-b sm:border-b-0 sm:border-r border-midnight overflow-hidden">
+<img class="w-full h-48 sm:h-full object-cover" data-alt="An energetic Kenyan campus cyber cafe and stationery shop with rows of high-speed desktop monitors, commercial multi-function laser printers, spiral binding machines, and shelves of reams of paper. Bright indoor commercial fluorescent illumination captures clean lines, crisp structural hairlines, and primary blue and yellow details, creating an authentic university examination revision atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxlJNkPU4a5eDEuKuzvFq3IyQTiv8qIwxUCPwsXfoZAABDTs9K5GCMnRW87JWwpk21agdiUzFZayx-UnmRgzSttiBfJZhdRUH0js1oHOKclOGTJDAxUOLw_HNPHtPRbhW8VGCrqHHgm2K2obp7nEIro2fikvkTIAOjYltOpyhuZwXgPPx0Dl5U6btl9HwtZIYSZrrZhcQv9MEccCOc1XZxQd_gAF_0LKtnWj4rdGCAi8WfLWMkY74q"/>
+<!-- Badges -->
+<div class="absolute top-2 left-2 flex flex-col gap-1">
+<span class="px-2 py-0.5 bg-jua-yellow text-midnight border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard">
+                FEATURED
+              </span>
+<span class="px-2 py-0.5 bg-deep-teal text-white border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] material-symbols-filled">verified</span> VERIFIED
+              </span>
+</div>
+</div>
+<!-- Body Content -->
+<div class="sm:w-7/12 p-5 flex flex-col justify-between space-y-3">
+<div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant mb-1">
+<span class="text-tertiary-fixed-variant font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-whatsapp inline-block"></span> Open now until 10:00 PM
+                </span>
+<span class="font-bold text-midnight bg-surface-container px-1.5 py-0.5 border border-outline-variant">
+                  KSh 3 / page
+                </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">Apex Cyber &amp; Stationers</h3>
+<p class="text-label-md font-label-md text-primary font-bold">Printing, Binding &amp; Stationery · Gate A</p>
+<!-- Landmark directions -->
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant flex items-start gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">pin_drop</span>
+<span>Directly adjacent to Moi University Gate A security booth.</span>
+</div>
+<div class="mt-1 flex items-center gap-3 text-label-sm font-label-sm text-outline">
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">directions_walk</span> 3 min walk
+                </span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-secondary">star</span> 4.9 (112 reviews)
+                </span>
+</div>
+</div>
+<!-- Two-Tap Contact Strip -->
+<div class="pt-2 border-t border-outline-variant flex items-center gap-2">
+<a class="sign-press flex-1 py-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="tel:+254711000333">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Call Now</span>
+</a>
+<a class="sign-press flex-1 py-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254711000333?text=Habari%20Apex,%20natuma%20documents%20kwa%20printing" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+<!-- Featured Listing 4 -->
+<article class="bg-white border-2 border-midnight shadow-signboard flex flex-col sm:flex-row overflow-hidden border-l-[6px] border-l-jua-yellow">
+<!-- Thumbnail Image -->
+<div class="sm:w-5/12 relative border-b sm:border-b-0 sm:border-r border-midnight overflow-hidden">
+<img class="w-full h-48 sm:h-full object-cover" data-alt="An expert Kenyan electrician and fundi with tool vest, copper wiring, socket components, and safety goggles working on a student apartment junction box in Kesses. The bright natural daylight spills through the open doorway, highlighting clean work tools, vibrant safety yellow equipment, and high tactile fidelity. The photograph feels authentic, professional, and locally grounded." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6YuCHTw0A9u6ztJXV1teAbWhdX1Gh3lFzMCd_cw2aGXTdQFBEiOhmVHesDTumU76MYXmWvySmzOS2USp3j7uj7ih4AJS_nfHnFzGb2MZuUIFa1Rwa59cL-NlPW7oEmp4PKsaH2mJazETx7rGWranb1tfNFuEUtOHPHMYsYhDrB1sbjOR1l4OYChdcQWivkPTIPjE1GdMequp6YYbQjoUxey2dsUswgSfgjWdET5CaXVsS5DS6mXhp"/>
+<!-- Badges -->
+<div class="absolute top-2 left-2 flex flex-col gap-1">
+<span class="px-2 py-0.5 bg-jua-yellow text-midnight border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard">
+                FEATURED
+              </span>
+<span class="px-2 py-0.5 bg-deep-teal text-white border-[1.5px] border-midnight text-label-sm font-label-sm font-bold shadow-signboard flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] material-symbols-filled">verified</span> VERIFIED
+              </span>
+</div>
+</div>
+<!-- Body Content -->
+<div class="sm:w-7/12 p-5 flex flex-col justify-between space-y-3">
+<div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant mb-1">
+<span class="text-tertiary-fixed-variant font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-whatsapp inline-block"></span> Mobile / On Call
+                </span>
+<span class="font-bold text-midnight bg-surface-container px-1.5 py-0.5 border border-outline-variant">
+                  From KSh 500
+                </span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">Fundi Otieno Electricals</h3>
+<p class="text-label-md font-label-md text-primary font-bold">Wiring, Showers &amp; Plumbing · Cheboiywo</p>
+<!-- Landmark directions -->
+<div class="mt-2 text-body-sm font-body-sm text-on-surface-variant flex items-start gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">pin_drop</span>
+<span>Stationed at Cheboiywo Junction; does hostel room callouts.</span>
+</div>
+<div class="mt-1 flex items-center gap-3 text-label-sm font-label-sm text-outline">
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">motorcycle</span> Comes to your hostel (10 mins)
+                </span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-secondary">star</span> 5.0 (49 reviews)
+                </span>
+</div>
+</div>
+<!-- Two-Tap Contact Strip -->
+<div class="pt-2 border-t border-outline-variant flex items-center gap-2">
+<a class="sign-press flex-1 py-2 bg-surface-container-high text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="tel:+254711000444">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Call Now</span>
+</a>
+<a class="sign-press flex-1 py-2 bg-whatsapp text-midnight border-[1.5px] border-midnight font-label-md font-label-md font-bold text-center flex items-center justify-center gap-1" href="https://wa.me/254711000444?text=Habari%20Fundi%20Otieno,%20shower%20yangu%20haina%20moto" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>WhatsApp</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- 4. BROWSE BY CATEGORY GRID (12 CAMPUS CATEGORIES) -->
+<section class="space-y-space-md">
+<div class="flex items-center justify-between border-b-2 border-midnight pb-2">
+<div>
+<h2 class="text-headline-md font-headline-md font-bold text-on-surface uppercase">
+            Browse Kesses Services by Category
+          </h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Click any category to filter verified local fundis and student service operators.</p>
+</div>
+<span class="px-2.5 py-1 bg-surface-container border-[1.5px] border-midnight font-label-sm font-label-sm font-bold text-midnight">
+          12 CATEGORIES
+        </span>
+</div>
+<!-- 12-Card Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+<!-- 1 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-primary-container text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">laptop_chromebook</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">18 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Electronics &amp; Phone Repair</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Screen fixes, software flashes, laptop chargers</p>
+</div>
+</a>
+<!-- 2 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-tertiary text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">print</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">14 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Cyber, Printing &amp; Stationery</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Color printing, spiral binding, passport photos</p>
+</div>
+</a>
+<!-- 3 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-primary text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">face_3</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">22 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Salons &amp; Hair Studios</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Knotless braids, dreadlocks, nail art &amp; lashes</p>
+</div>
+</a>
+<!-- 4 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-secondary text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">content_cut</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">16 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Kinyozi &amp; Barbershops</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Student fades, beard grooming, head massage</p>
+</div>
+</a>
+<!-- 5 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-error text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">local_gas_station</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">8 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Gas Refill &amp; Delivery</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Pro Gas, K-Gas, TotalGas delivered to room</p>
+</div>
+</a>
+<!-- 6 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-tertiary-container text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">local_laundry_service</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">12 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Mama Fua &amp; Laundry</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Duvet washing, ironed clothes, weekly buckets</p>
+</div>
+</a>
+<!-- 7 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-secondary-fixed-dim text-midnight border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">restaurant</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">25 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Food Stalls, Cafes &amp; Bakes</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Chapati dens, student chips, cakes &amp; milk bars</p>
+</div>
+</a>
+<!-- 8 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-midnight text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">home_work</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">15 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Hostels &amp; Room Vacancies</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Bedsitters, single rooms, Soweto &amp; Cheboiywo</p>
+</div>
+</a>
+<!-- 9 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-outline text-white border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">checkroom</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">9 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Tailoring &amp; Alterations</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Graduation suits, zipper replacements, fitting</p>
+</div>
+</a>
+<!-- 10 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-surface-container-highest text-midnight border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">camera</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">7 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Photography &amp; Video</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Graduation portraits, photoshoot packages, events</p>
+</div>
+</a>
+<!-- 11 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-surface-dim text-midnight border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">plumbing</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">11 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Plumbers &amp; Electricians</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Shower heads, broken pipes, socket wiring</p>
+</div>
+</a>
+<!-- 12 -->
+<a class="sign-press-subtle p-4 bg-white border-[1.5px] border-midnight shadow-signboard hover:bg-surface-container-low transition-all group flex flex-col justify-between" href="#">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 bg-primary-fixed-dim text-midnight border-[1.5px] border-midnight shadow-[1px_1px_0px_#0B2545] flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[22px]">menu_book</span>
+</div>
+<span class="text-label-sm font-label-sm bg-surface-container px-2 py-0.5 border border-outline-variant font-bold">6 listings</span>
+</div>
+<div class="mt-4">
+<h3 class="text-label-lg font-label-lg font-bold text-on-surface group-hover:text-primary transition-colors">Tutors &amp; Academic Typing</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Statistics data analysis, project typing, tutorials</p>
+</div>
+</a>
+</div>
+</section>
+<!-- 5. 'STUDENT DEALS & DISCOUNTS' SECTION -->
+<section class="space-y-space-md">
+<div class="bg-surface-container-high border-2 border-midnight p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-jua-yellow border-2 border-midnight shadow-signboard flex items-center justify-center">
+<span class="material-symbols-outlined text-midnight text-[28px]">savings</span>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface">Moi Student Special Deals</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Confirmed discounts active upon showing your valid Moi University Student ID.</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm font-bold bg-white px-3 py-1.5 border border-midnight shadow-[1px_1px_0px_#0B2545]">
+            VALID STUDENT ID REQUIRED
+          </span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Deal 1 -->
+<div class="bg-white border-2 border-midnight shadow-signboard p-5 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -top-6 -right-6 w-20 h-20 bg-secondary-container rounded-full border border-midnight -z-0"></div>
+<div class="relative z-10">
+<span class="px-2 py-0.5 bg-primary-container text-white text-label-sm font-label-sm font-bold border border-midnight">
+              15% OFF
+            </span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface mt-3">Laptop &amp; Phone Screen Repair</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Get 15% discount on labor fees for all HP, Dell, and smartphone glass replacements.</p>
+<p class="text-label-md font-label-md font-bold text-midnight mt-3">Vendor: Kevin Gadget Fix (Stage)</p>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-outline">Expires in 6 days</span>
+<a class="sign-press px-3 py-1 bg-whatsapp text-midnight border border-midnight text-label-sm font-label-sm font-bold" href="https://wa.me/254700000001?text=Claiming%2015%25%20Student%20Discount">Claim Deal</a>
+</div>
+</div>
+<!-- Deal 2 -->
+<div class="bg-white border-2 border-midnight shadow-signboard p-5 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -top-6 -right-6 w-20 h-20 bg-tertiary-fixed rounded-full border border-midnight -z-0"></div>
+<div class="relative z-10">
+<span class="px-2 py-0.5 bg-tertiary text-white text-label-sm font-label-sm font-bold border border-midnight">
+              FREE BINDING
+            </span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface mt-3">Thesis &amp; Project Reports</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Complimentary tape or spiral binding when you print more than 50 pages of research coursework.</p>
+<p class="text-label-md font-label-md font-bold text-midnight mt-3">Vendor: Apex Cyber (Gate A)</p>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-outline">Ongoing semester deal</span>
+<a class="sign-press px-3 py-1 bg-whatsapp text-midnight border border-midnight text-label-sm font-label-sm font-bold" href="https://wa.me/254711000333?text=Claiming%20Free%20Binding%20Deal">Claim Deal</a>
+</div>
+</div>
+<!-- Deal 3 -->
+<div class="bg-white border-2 border-midnight shadow-signboard p-5 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -top-6 -right-6 w-20 h-20 bg-primary-fixed rounded-full border border-midnight -z-0"></div>
+<div class="relative z-10">
+<span class="px-2 py-0.5 bg-secondary text-white text-label-sm font-label-sm font-bold border border-midnight">
+              KSH 100 OFF
+            </span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface mt-3">Friday Gas Refill Delivery</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Direct KSh 100 cut on any 6kg or 13kg cylinder refill ordered on Fridays to campus hostels.</p>
+<p class="text-label-md font-label-md font-bold text-midnight mt-3">Vendor: TotalGas (Soweto Road)</p>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-outline">Every Friday</span>
+<a class="sign-press px-3 py-1 bg-whatsapp text-midnight border border-midnight text-label-sm font-label-sm font-bold" href="https://wa.me/254700000004?text=Claiming%20Friday%20Gas%20Discount">Claim Deal</a>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. 'CAN'T FIND WHAT YOU NEED?' DEMAND CAPTURE CARD -->
+<section class="bg-secondary-fixed border-2 border-midnight shadow-signboard-lg p-6 md:p-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+<div class="lg:col-span-7 space-y-2">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-white border border-midnight text-label-sm font-label-sm font-bold text-midnight">
+<span class="material-symbols-outlined text-[14px] text-primary">live_help</span> STUDENT COMMUNITY REQUEST DESK
+          </div>
+<h2 class="text-headline-lg font-headline-lg font-bold text-midnight leading-tight">
+            Can't find what you need around Kesses?
+          </h2>
+<p class="text-body-md font-body-md text-on-secondary-fixed-variant">
+            Tell us which specific fundi, spare part, or service you are struggling to locate. Our campus field ambassadors will scout the local kiosks and notify you via SMS within 2 hours.
+          </p>
+</div>
+<div class="lg:col-span-5">
+<form class="bg-white p-4 border-[1.5px] border-midnight shadow-signboard space-y-3" onsubmit="event.preventDefault(); alert('Service request submitted! Our Kesses student team will search for this fundi.');">
+<div>
+<label class="block text-label-sm font-label-sm font-bold text-midnight mb-1" for="demandInput">
+                What service or item are you looking for?
+              </label>
+<input class="w-full bg-surface-container-low border-[1.5px] border-midnight text-body-sm font-body-sm p-2.5 focus:border-primary-container focus:ring-0" id="demandInput" placeholder="e.g. Type-C MacBook charger, sofa repair fundi..." required="" type="text"/>
+</div>
+<div>
+<label class="block text-label-sm font-label-sm font-bold text-midnight mb-1" for="phoneInput">
+                Your WhatsApp Number
+              </label>
+<input class="w-full bg-surface-container-low border-[1.5px] border-midnight text-body-sm font-body-sm p-2.5 focus:border-primary-container focus:ring-0" id="phoneInput" placeholder="e.g. 0712 345 678" required="" type="tel"/>
+</div>
+<button class="sign-press w-full py-2.5 bg-primary-container text-white font-label-lg font-label-lg border-[1.5px] border-midnight shadow-signboard hover:bg-primary transition-all flex items-center justify-center gap-1.5" type="submit">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Request Service from Campus Ambassadors</span>
+</button>
+</form>
+</div>
+</div>
+</section>
+<!-- 7. 'LIST YOUR BUSINESS' PROMO CALLOUT -->
+<section class="bg-white border-2 border-midnight shadow-signboard p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6" id="list-business">
+<div class="space-y-2">
+<span class="px-2.5 py-0.5 bg-jua-yellow text-midnight border border-midnight text-label-sm font-label-sm font-bold">100% FREE FOR LOCAL TRADERS</span>
+<h2 class="text-headline-md font-headline-md font-bold text-on-surface">Are you a fundi, salonist, or kiosk owner in Kesses?</h2>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-2xl">
+          Get your shop seen by over 12,000+ Moi University students walking past your door every day. We verify your location and add direct Two-Tap WhatsApp &amp; Call buttons.
+        </p>
+</div>
+<div class="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+<a class="sign-press px-5 py-3 bg-whatsapp text-midnight border-[1.5px] border-midnight shadow-signboard font-label-lg font-label-lg font-bold flex items-center gap-2" href="https://wa.me/254700000000?text=Habari,%20nataka%20kuorodhesha%20biashara%20yangu%20kwa%20MoiMashinani">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+<span>Register on WhatsApp</span>
+</a>
+<a class="sign-press px-5 py-3 bg-surface-container-high text-midnight border-[1.5px] border-midnight shadow-signboard font-label-lg font-label-lg font-bold flex items-center gap-2" href="#">
+<span>Fill Web Form</span>
+</a>
+</div>
+</section>
+</main>
+<!-- ================= FOOTER (SHARED COMPONENT) ================= -->
+<footer class="mt-space-xl bg-surface-container-lowest border-t-2 border-on-surface">
+<div class="w-full px-margin md:px-margin-desktop py-space-xl max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-gutter">
+<!-- Brand & Copyright from JSON -->
+<div class="space-y-2 max-w-md">
+<div class="text-headline-sm font-headline-sm font-bold text-primary flex items-center gap-2 uppercase tracking-tight">
+<div class="w-6 h-6 bg-primary-container text-white border border-midnight flex items-center justify-center text-label-sm font-bold">
+            M
+          </div>
+          MoiMashinani
+        </div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+          © 2024 MoiMashinani. Hyper-local business directory for Moi University Main Campus (Kesses). Built for students &amp; local fundis.
+        </p>
+<p class="text-label-sm font-label-sm text-outline">
+          Uasin Gishu County, Kenya · Kesses - Cheptiret Road
+        </p>
+</div>
+<!-- Links from JSON -->
+<div class="flex flex-wrap gap-x-6 gap-y-2 text-label-sm font-label-sm">
+<a class="text-primary font-bold underline transition-colors" href="#list-business">
+          Add Business (Free)
+        </a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Student Deals
+        </a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Campus Safety &amp; Trust
+        </a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Kesses Map Guide
+        </a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">
+          Report Inactive Listing
+        </a>
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 font-bold" href="https://wa.me/254700000000">
+<span class="material-symbols-outlined text-[14px] text-whatsapp">chat</span>
+          WhatsApp Helpdesk
+        </a>
+</div>
+</div>
+</footer>
+<!-- Vanilla JS Keyboard Shortcut & Micro-interactions -->
+<script>
+    // '/' key focus search bar
+    window.addEventListener('keydown', function(e) {
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        const searchInput = document.getElementById('mainCampusSearch');
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+  </script>
+</body></html>

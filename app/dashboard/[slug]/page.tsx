@@ -212,7 +212,7 @@ export default function BusinessDashboardPage({
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Top Header: Business Switcher & Public View Button */}
-        <div className="bg-white signboard-border-thick rounded-xl p-4 md:p-5 signboard-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="page-hero bg-white signboard-border-thick rounded-xl p-4 md:p-5 signboard-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded signboard-border overflow-hidden bg-[#e9eedf] shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}

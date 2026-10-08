@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { BusinessCard } from '@/components/BusinessCard';
+import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { DemandModal } from '@/components/DemandModal';
 import { CATEGORIES, ZONES } from '@/lib/constants';
 import { Business, Tier } from '@/lib/types';
@@ -284,6 +285,8 @@ function SearchContent() {
             </div>
           </div>
         )}
+
+        <JoinNeighborhoodCard />
 
         {/* BOTTOM PROMOTED DISCLOSURE */}
         <div className="p-3 bg-[#edf2e5] rounded signboard-border text-xs text-[#667064] flex items-center justify-between">

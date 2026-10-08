@@ -1,54 +1,28 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Search, PlusCircle, Percent, Store } from '@/components/icons';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Compass, House, Plus, Percent, Store } from "lucide-react";
+
+const items = [
+  { href: "/", label: "Home", icon: House },
+  { href: "/search", label: "Explore", icon: Compass },
+  { href: "/onboard", label: "List free", icon: Plus, primary: true },
+  { href: "/deals", label: "Deals", icon: Percent },
+  { href: "/dashboard", label: "Merchant", icon: Store },
+];
 
 export function BottomNav() {
   const pathname = usePathname();
-
-  const navItems = [
-    { href: '/', label: 'Home', icon: Home },
-    { href: '/search', label: 'Explore', icon: Search },
-    { href: '/onboard', label: 'List Shop', icon: PlusCircle, highlight: true },
-    { href: '/deals', label: 'Deals', icon: Percent },
-    { href: '/dashboard', label: 'Owner', icon: Store },
-  ];
-
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#001C3B] shadow-[0px_-2px_6px_rgba(0,0,0,0.06)] z-40 px-2 py-1.5 flex items-center justify-around">
-      {navItems.map((item) => {
-        const IconComponent = item.icon;
-        const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-
-        if (item.highlight) {
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center justify-center -mt-5"
-            >
-              <div className="w-11 h-11 rounded-full bg-[#C2185B] text-white flex items-center justify-center border-2 border-[#001C3B] shadow-[2px_2px_0px_#001C3B] press-action">
-                <IconComponent className="w-6 h-6" />
-              </div>
-              <span className="text-[10px] font-bold text-[#001C3B] mt-0.5">{item.label}</span>
-            </Link>
-          );
-        }
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex flex-col items-center justify-center py-1 px-2.5 transition-colors ${
-              isActive ? 'text-[#9B0044] font-bold' : 'text-[#594045]'
-            }`}
-          >
-            <IconComponent className={`w-5 h-5 ${isActive ? 'text-[#9B0044]' : 'text-[#594045]'}`} />
-            <span className="text-[10px] tracking-tight">{item.label}</span>
-          </Link>
-        );
+    <nav aria-label="Mobile quick navigation" className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around gap-1 border-t border-[#dbe3ce] bg-[#f7f8f2]/95 px-2 pb-[calc(9px+env(safe-area-inset-bottom))] pt-2 shadow-[0_-5px_20px_#243b3207] backdrop-blur md:hidden">
+      {items.map(({ href, label, icon: Icon, primary }) => {
+        const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+        return <Link key={href} href={href} aria-current={active ? "page" : undefined}
+          className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[10px] font-semibold ${primary ? "text-[#183e35]" : active ? "text-[#183e35]" : "text-[#667064]"}`}>
+          <span className={`grid h-9 w-10 place-items-center rounded-xl transition-colors ${primary ? "bg-[#183e35] text-[#d9f279]" : active ? "bg-[#e9eedf] text-[#335e41]" : "text-[#667064]"}`}><Icon size={19} strokeWidth={1.9} /></span>
+          <span>{label}</span>
+        </Link>;
       })}
     </nav>
   );

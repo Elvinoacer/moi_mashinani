@@ -86,7 +86,7 @@ export default function AdminConsolePage() {
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
         {/* Header */}
-        <div className="bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex items-center justify-between">
+        <div className="page-hero bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex items-center justify-between">
           <div>
             <div className="inline-flex items-center gap-1.5 bg-[#fce7e1] text-[#8f2424] font-display text-xs font-bold px-2.5 py-0.5 rounded signboard-border">
               <ShieldAlert className="w-3.5 h-3.5 text-[#8f2424]" />

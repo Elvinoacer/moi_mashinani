@@ -366,10 +366,11 @@
 }
 
 @container (min-width: 490px) {
-  .media { width: 40%; height: auto; min-height: 294px; }
-  .card { flex-direction: row; }
-  /* A container cannot style its own layout, so the parent grid determines its width;
-     the inner media/content react to card width independently. */
+  .media { height: 234px; }
+  .body { padding: 22px 24px 18px; }
+  .topline { margin-bottom: 10px; }
+  .description { font-size: 13px; }
+  .actions { gap: 12px; }
 }
 @media (hover: hover) {
   .card:hover {

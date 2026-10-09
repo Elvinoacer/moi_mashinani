@@ -16,7 +16,11 @@ export const metadata: Metadata = {
   description:
     "Find food, refreshments, groceries, housing, clothing, health, transport, study essentials and local services around Moi University Main Campus (Kesses). Call or WhatsApp businesses directly.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/brand/moimashinani-mark.svg", type: "image/svg+xml", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: { url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
   },
 };
 

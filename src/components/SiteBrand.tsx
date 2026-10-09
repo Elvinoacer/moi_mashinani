@@ -1,16 +1,19 @@
-import Link from "next/link";
-import { MapPin } from "lucide-react";
+import Image from 'next/image';
+import Link from 'next/link';
 
-/** Mirrors the approved landing-page wordmark without coupling interior routes to its CSS module. */
-export function SiteBrand({ small = false }: { small?: boolean }) {
+/** One vector identity shared by the landing page, navigation, and footer. */
+export function SiteBrand({ small = false, className = '' }: { small?: boolean; className?: string }) {
   return (
-    <Link href="/" aria-label="MoiMashinani home" className="inline-flex shrink-0 items-center gap-2.5 text-[#183e35] group">
-      <span className="grid h-[38px] w-[34px] shrink-0 -rotate-[7deg] place-items-center rounded-[11px_11px_11px_3px] bg-[#183e35] text-[#d9f279] transition-transform group-hover:-rotate-[2deg]">
-        <MapPin size={21} strokeWidth={2.6} className="rotate-[7deg]" />
-      </span>
-      <span className={`font-display whitespace-nowrap font-extrabold tracking-[-1.2px] ${small ? "text-[20px]" : "text-[23px]"}`}>
-        moi<span className="font-medium">mashinani</span><span className="text-[#799633]">.</span>
-      </span>
+    <Link href="/" aria-label="MoiMashinani home" className={`inline-flex shrink-0 items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#335e41] ${className}`}>
+      <Image
+        src="/brand/moimashinani-logo.svg"
+        alt="MoiMashinani"
+        width={300}
+        height={64}
+        unoptimized
+        loading="eager"
+        className={small ? 'h-auto w-[180px]' : 'h-auto w-[160px] min-[380px]:w-[190px] sm:w-[212px]'}
+      />
     </Link>
   );
 }

@@ -33,6 +33,7 @@ import {
 } from "@/components/landing/Discovery";
 import styles from "./home.module.css";
 import { CategoryBrowser } from "@/components/CategoryBrowser";
+import { SiteBrand } from "@/components/SiteBrand";
 
 const shortcuts = [
   { slug: 'food-drinks', label: 'Food & refreshments', icon: UtensilsCrossed, tone: 'peach' },
@@ -48,20 +49,6 @@ const shortcuts = [
   { slug: 'leisure-events', label: 'Leisure & events', icon: Camera, tone: 'peach' },
   { slug: 'cleaning-repairs', label: 'Cleaning & repairs', icon: Wrench, tone: 'yellow' },
 ];
-
-function Brand() {
-  return (
-    <Link href="/" className={styles.brand} aria-label="MoiMashinani home">
-      <span className={styles.brandMark}>
-        <MapPin size={22} strokeWidth={2.6} />
-      </span>
-      <span>
-        moi<span className={styles.brandLight}>mashinani</span>
-        <span className={styles.brandDot}>.</span>
-      </span>
-    </Link>
-  );
-}
 
 function NeighborhoodScene() {
   return (
@@ -269,7 +256,7 @@ export default async function HomePage() {
       </a>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <Brand />
+          <SiteBrand className={styles.brand} />
           <nav className={styles.desktopNav} aria-label="Main navigation">
             <a href="#find" className={styles.activeNav}>
               Find something
@@ -443,7 +430,7 @@ export default async function HomePage() {
       </main>
       <footer className={styles.footer}>
         <div>
-          <Brand />
+          <SiteBrand small className={styles.brand} />
           <p>A little closer to everything.</p>
         </div>
         <nav aria-label="Footer navigation">

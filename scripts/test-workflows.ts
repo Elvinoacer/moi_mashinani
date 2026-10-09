@@ -20,7 +20,7 @@ async function request(path:string, options:{method?:string;body?:unknown;cookie
 function emailToken(email:string) {
   const messages = JSON.parse(readFileSync(context.mailPath,'utf8')) as Array<{to:string[];message:string}>;
   const latest = messages.filter(message=>message.to.includes(email)).at(-1);
-  assert.ok(latest,'Verification email delivered to local SMTP');
+  assert.ok(latest,'Verification email accepted by mocked Resend');
   const decoded = latest.message.replace(/=\r?\n/g,'').replace(/=([0-9A-F]{2})/g,(_,hex)=>String.fromCharCode(parseInt(hex,16)));
   const token = decoded.match(/\/verify\?token=([a-f0-9]{64})/)?.[1];
   assert.ok(token,'Email contains verification token');return token;
@@ -130,9 +130,9 @@ async function main() {
   check((await request(`/api/businesses/${pending.data.business.slug}`)).data.verificationLevel === 'L0','listing approval does not falsely claim field verification');
   const expiredEmail = `expired-${testId}@test.invalid`;
   // Intentionally disable delivery only in this process. The HTTP server's
-  // local SMTP configuration remains available for the recovery step.
+  // mocked Resend configuration remains available for the recovery step.
   process.env.APP_URL = base;
-  delete process.env.SMTP_HOST;
+  process.env.RESEND_API_KEY = '';
   const failedEnrollRoute = await import('../app/api/admin/enroll/route');
   const {NextRequest} = await import('next/server');
   const failedDelivery = await failedEnrollRoute.POST(new NextRequest(base+'/api/admin/enroll',{method:'POST',headers:{Cookie:admin.cookie,'Content-Type':'application/json',Origin:base},body:JSON.stringify({...draft,ownerEmail:expiredEmail,name:`Delivery Recovery Shop ${testId}`})}));

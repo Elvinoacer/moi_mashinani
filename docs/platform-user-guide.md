@@ -718,7 +718,7 @@ At the time of the recorded local verification, no real admin had been bootstrap
 
 ### 7.3 Enable account emails
 
-Configure `SMTP_HOST`, `SMTP_PORT`, optional SMTP authentication, `MAIL_FROM` and appropriate TLS settings. Use a sender your email provider accepts. Production delivery requires TLS, and the public application URL must use HTTPS.
+Configure `RESEND_API_KEY` and `EMAIL_FROM`. Verify the sender domain in Resend. Account verification and password-reset messages are sent through the Resend HTTPS API, and the public application URL must use HTTPS.
 
 Test enrollment with an inbox you control and confirm that the full verification link opens your deployment. SMTP acceptance alone does not prove delivery to the recipient's inbox.
 
@@ -733,7 +733,7 @@ Configure:
 
 Register the deployment's `/api/payments/webhook` endpoint and the matching challenge in IntaSend for collection events. Follow [payments.md](payments.md) for the exact configuration and verification/retry behaviour.
 
-Complete a provider checkout and verify the delivered webhook, stored receipt and promotion dates before enabling live collections. Automated local tests used mocked provider responses and local SMTP; they did not verify a real email-provider inbox or make an external payment charge.
+Complete a provider checkout and verify the delivered webhook, stored receipt and promotion dates before enabling live collections. Automated local tests used mocked provider responses and mocked email delivery; they did not verify a real email-provider inbox or make an external payment charge.
 
 ### 7.5 Maintenance and verification
 

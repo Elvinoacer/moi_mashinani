@@ -1,6 +1,6 @@
 # Workflow verification
 
-Verified locally on 9 October 2026 against Next.js 16.3.8 and PostgreSQL. HTTP, SMTP and browser fixtures ran in a disposable database. Existing business data was preserved; its database received only the three schema migrations and still contains 12 businesses and no bootstrapped real accounts.
+Verified locally on 9 October 2026 against Next.js 16.3.8 and PostgreSQL. HTTP, captured-email and browser fixtures ran in a disposable database. Existing business data was preserved; its database received only the three schema migrations and still contains 12 businesses and no bootstrapped real accounts.
 
 | Check | Result | Coverage |
 | --- | --- | --- |
@@ -20,6 +20,6 @@ Corrections include unauthorized business/admin access, client-controlled paymen
 
 ## External services still to verify
 
-Email delivery was verified through a local SMTP capture server. IntaSend tests use mocked provider transport with actual route handlers and PostgreSQL transactions. No external emails or payment charges were made. These checks establish application behavior, but cannot establish delivery through a real SMTP account or IntaSend account.
+The original email workflow was verified with a local capture fixture. The Resend migration has separate mocked API contract tests (`npm run test:mail`); live Resend delivery has not been exercised. IntaSend tests use mocked provider transport with actual route handlers and PostgreSQL transactions. No external emails or payment charges were made. These checks establish application behavior, but cannot establish delivery through a real Resend account or IntaSend account.
 
-To operate the deployment, configure SMTP and IntaSend environment variables, bootstrap the main administrator with `npm run admin:create`, and register the HTTPS collection webhook. Then complete an IntaSend sandbox checkout and confirm its delivered webhook, stored receipt and promotion dates on that deployment before enabling live collections. See [account setup](onboarding.md) and [payment setup](payments.md).
+To operate the deployment, configure Resend and IntaSend environment variables, bootstrap the main administrator with `npm run admin:create`, and register the HTTPS collection webhook. Then complete an IntaSend sandbox checkout and confirm its delivered webhook, stored receipt and promotion dates on that deployment before enabling live collections. See [account setup](onboarding.md) and [payment setup](payments.md).

@@ -1,3 +1,5 @@
+import { nextProEnd, productLimitError, PRO_PRICE_KES } from './catalog-plan';
+import { attachMedia, mediaReferences } from './media-storage';
 import { randomUUID } from 'node:crypto';
 import { ApiError } from './api';
 import { Prisma } from '../generated/prisma/client';
@@ -88,6 +90,8 @@ export function mapPrismaBusiness(b: PrismaBusiness): Business {
     activeTier: (b.activeTier || 'NONE') as Tier,
     tierEndsAt: b.tierEndsAt ? new Date(b.tierEndsAt).toISOString() : undefined,
     tierStartsAt: b.tierStartsAt ? new Date(b.tierStartsAt).toISOString() : undefined,
+    proStartsAt: b.proStartsAt?.toISOString(),
+    proEndsAt: b.proEndsAt?.toISOString(),
     availableNowUntil: b.availableNowUntil ? new Date(b.availableNowUntil).toISOString() : undefined,
     isTemporarilyClosed: Boolean(b.isTemporarilyClosed),
     temporarilyClosedUntil: b.temporarilyClosedUntil ? new Date(b.temporarilyClosedUntil).toISOString() : undefined,
@@ -278,59 +282,67 @@ export const Store = {
     return mapPrismaBusiness(created);
   },
 
-  async updateBusiness(id: string, updates: Partial<Business>): Promise<Business | undefined> {
-    const existing = await prisma.business.findUnique({ where: { id } });
-    if (!existing) return undefined;
+  async updateBusiness(id: string, updates: Partial<Business>, mediaAccountId?: string): Promise<Business | undefined> {
+    return prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${id} FOR UPDATE`;
+      const existing = await tx.business.findUnique({ where: { id } });
+      if (!existing) return undefined;
 
-    const mappedExisting = mapPrismaBusiness(existing);
-    const merged = { ...mappedExisting, ...updates };
-    const newStrength = computeProfileStrength(merged);
+      const mappedExisting = mapPrismaBusiness(existing);
+      const merged = { ...mappedExisting, ...updates };
+      const limitError = updates.services !== undefined ? productLimitError(mappedExisting, mappedExisting.services, updates.services) : undefined;
+      if (limitError) throw new ApiError(409, limitError);
+      if (updates.services !== undefined || updates.photos !== undefined || updates.coverPhoto !== undefined) {
+        await attachMedia(tx, id, mediaReferences(mappedExisting), mediaReferences(merged), mediaAccountId);
+      }
+      const newStrength = computeProfileStrength(merged);
 
-    const prismaUpdateData: Record<string, unknown> = {};
-    if (updates.name !== undefined) prismaUpdateData.name = updates.name;
-    if (updates.slug !== undefined) prismaUpdateData.slug = updates.slug;
-    if (updates.tagline !== undefined) prismaUpdateData.tagline = updates.tagline;
-    if (updates.description !== undefined) prismaUpdateData.description = updates.description;
-    if (updates.primaryCategory !== undefined) prismaUpdateData.primaryCategory = updates.primaryCategory;
-    if (updates.extraCategories !== undefined) prismaUpdateData.extraCategories = updates.extraCategories;
-    if (updates.tags !== undefined) prismaUpdateData.tags = updates.tags;
-    if (updates.serviceModes !== undefined) prismaUpdateData.serviceModes = updates.serviceModes;
-    if (updates.phone !== undefined) prismaUpdateData.phone = updates.phone;
-    if (updates.whatsapp !== undefined) prismaUpdateData.whatsapp = updates.whatsapp;
-    if (updates.campus !== undefined) prismaUpdateData.campus = updates.campus;
-    if (updates.zone !== undefined) prismaUpdateData.zone = updates.zone;
-    if (updates.servesZones !== undefined) prismaUpdateData.servesZones = updates.servesZones;
-    if (updates.landmark !== undefined) prismaUpdateData.landmark = updates.landmark;
-    if (updates.address !== undefined) prismaUpdateData.address = updates.address;
-    if ('mapPin' in updates) prismaUpdateData.mapPin = updates.mapPin ? JSON.parse(JSON.stringify(updates.mapPin)) : Prisma.DbNull;
-    if (updates.walkTime !== undefined) prismaUpdateData.walkTime = updates.walkTime;
-    if (updates.hours !== undefined) prismaUpdateData.hours = JSON.parse(JSON.stringify(updates.hours));
-    if (updates.services !== undefined) prismaUpdateData.services = JSON.parse(JSON.stringify(updates.services));
-    if (updates.priceLevel !== undefined) prismaUpdateData.priceLevel = updates.priceLevel;
-    if (updates.studentDiscount !== undefined) prismaUpdateData.studentDiscount = updates.studentDiscount;
-    if (updates.photos !== undefined) prismaUpdateData.photos = updates.photos;
-    if (updates.coverPhoto !== undefined) prismaUpdateData.coverPhoto = updates.coverPhoto;
-    if (updates.activeTier !== undefined) prismaUpdateData.activeTier = updates.activeTier;
-    if (updates.tierEndsAt !== undefined) prismaUpdateData.tierEndsAt = updates.tierEndsAt ? new Date(updates.tierEndsAt) : null;
-    if (updates.tierStartsAt !== undefined) prismaUpdateData.tierStartsAt = updates.tierStartsAt ? new Date(updates.tierStartsAt) : null;
-    if (updates.availableNowUntil !== undefined) prismaUpdateData.availableNowUntil = updates.availableNowUntil ? new Date(updates.availableNowUntil) : null;
-    if (updates.isTemporarilyClosed !== undefined) prismaUpdateData.isTemporarilyClosed = updates.isTemporarilyClosed;
-    if (updates.temporarilyClosedUntil !== undefined) prismaUpdateData.temporarilyClosedUntil = updates.temporarilyClosedUntil ? new Date(updates.temporarilyClosedUntil) : null;
-    if (updates.status !== undefined) prismaUpdateData.status = updates.status;
-    if (updates.verificationLevel !== undefined) prismaUpdateData.verificationLevel = updates.verificationLevel;
-    if (updates.moderationReason !== undefined) prismaUpdateData.moderationReason = updates.moderationReason || null;
-    if (updates.claimCode !== undefined) prismaUpdateData.claimCode = updates.claimCode;
-    if (updates.isClaimed !== undefined) prismaUpdateData.isClaimed = updates.isClaimed;
-    if (updates.ownerPhone !== undefined) prismaUpdateData.ownerPhone = updates.ownerPhone;
-    if (updates.ambassadorId !== undefined) prismaUpdateData.ambassadorId = updates.ambassadorId;
-    if (updates.metrics !== undefined) prismaUpdateData.metrics = JSON.parse(JSON.stringify(updates.metrics));
-    prismaUpdateData.profileStrength = newStrength;
+      const prismaUpdateData: Record<string, unknown> = {};
+      if (updates.name !== undefined) prismaUpdateData.name = updates.name;
+      if (updates.slug !== undefined) prismaUpdateData.slug = updates.slug;
+      if (updates.tagline !== undefined) prismaUpdateData.tagline = updates.tagline;
+      if (updates.description !== undefined) prismaUpdateData.description = updates.description;
+      if (updates.primaryCategory !== undefined) prismaUpdateData.primaryCategory = updates.primaryCategory;
+      if (updates.extraCategories !== undefined) prismaUpdateData.extraCategories = updates.extraCategories;
+      if (updates.tags !== undefined) prismaUpdateData.tags = updates.tags;
+      if (updates.serviceModes !== undefined) prismaUpdateData.serviceModes = updates.serviceModes;
+      if (updates.phone !== undefined) prismaUpdateData.phone = updates.phone;
+      if (updates.whatsapp !== undefined) prismaUpdateData.whatsapp = updates.whatsapp;
+      if (updates.campus !== undefined) prismaUpdateData.campus = updates.campus;
+      if (updates.zone !== undefined) prismaUpdateData.zone = updates.zone;
+      if (updates.servesZones !== undefined) prismaUpdateData.servesZones = updates.servesZones;
+      if (updates.landmark !== undefined) prismaUpdateData.landmark = updates.landmark;
+      if (updates.address !== undefined) prismaUpdateData.address = updates.address;
+      if ('mapPin' in updates) prismaUpdateData.mapPin = updates.mapPin ? JSON.parse(JSON.stringify(updates.mapPin)) : Prisma.DbNull;
+      if (updates.walkTime !== undefined) prismaUpdateData.walkTime = updates.walkTime;
+      if (updates.hours !== undefined) prismaUpdateData.hours = JSON.parse(JSON.stringify(updates.hours));
+      if (updates.services !== undefined) prismaUpdateData.services = JSON.parse(JSON.stringify(updates.services));
+      if (updates.priceLevel !== undefined) prismaUpdateData.priceLevel = updates.priceLevel;
+      if (updates.studentDiscount !== undefined) prismaUpdateData.studentDiscount = updates.studentDiscount;
+      if (updates.photos !== undefined) prismaUpdateData.photos = updates.photos;
+      if (updates.coverPhoto !== undefined) prismaUpdateData.coverPhoto = updates.coverPhoto;
+      if (updates.activeTier !== undefined) prismaUpdateData.activeTier = updates.activeTier;
+      if (updates.tierEndsAt !== undefined) prismaUpdateData.tierEndsAt = updates.tierEndsAt ? new Date(updates.tierEndsAt) : null;
+      if (updates.tierStartsAt !== undefined) prismaUpdateData.tierStartsAt = updates.tierStartsAt ? new Date(updates.tierStartsAt) : null;
+      if (updates.availableNowUntil !== undefined) prismaUpdateData.availableNowUntil = updates.availableNowUntil ? new Date(updates.availableNowUntil) : null;
+      if (updates.isTemporarilyClosed !== undefined) prismaUpdateData.isTemporarilyClosed = updates.isTemporarilyClosed;
+      if (updates.temporarilyClosedUntil !== undefined) prismaUpdateData.temporarilyClosedUntil = updates.temporarilyClosedUntil ? new Date(updates.temporarilyClosedUntil) : null;
+      if (updates.status !== undefined) prismaUpdateData.status = updates.status;
+      if (updates.verificationLevel !== undefined) prismaUpdateData.verificationLevel = updates.verificationLevel;
+      if (updates.moderationReason !== undefined) prismaUpdateData.moderationReason = updates.moderationReason || null;
+      if (updates.claimCode !== undefined) prismaUpdateData.claimCode = updates.claimCode;
+      if (updates.isClaimed !== undefined) prismaUpdateData.isClaimed = updates.isClaimed;
+      if (updates.ownerPhone !== undefined) prismaUpdateData.ownerPhone = updates.ownerPhone;
+      if (updates.ambassadorId !== undefined) prismaUpdateData.ambassadorId = updates.ambassadorId;
+      if (updates.metrics !== undefined) prismaUpdateData.metrics = JSON.parse(JSON.stringify(updates.metrics));
+      prismaUpdateData.profileStrength = newStrength;
 
-    const updated = await prisma.business.update({
-      where: { id },
-      data: prismaUpdateData,
-    });
-    return mapPrismaBusiness(updated);
+      const updated = await tx.business.update({
+        where: { id },
+        data: prismaUpdateData,
+      });
+      return mapPrismaBusiness(updated);
+    }, {maxWait:20000,timeout:30000});
   },
 
   async claimBusiness(slug: string, claimCode: string, ownerPhone: string): Promise<boolean> {
@@ -471,6 +483,13 @@ export const Store = {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${payment.businessId} FOR UPDATE`;
       const business = await tx.business.findUniqueOrThrow({where:{id:payment.businessId}});
       const now = new Date();
+      if (payment.planId === 'PRO') {
+        if (payment.amountKes !== PRO_PRICE_KES || payment.currency !== 'KES' || payment.weeks !== 1) throw new ApiError(400, 'Invalid Pro payment amount or duration');
+        await tx.business.update({where:{id:business.id},data:{
+          proStartsAt: business.proEndsAt && business.proEndsAt > now ? business.proStartsAt : now,
+          proEndsAt: nextProEnd(business.proEndsAt, now),
+        }});
+      } else {
       const active = business.tierEndsAt && business.tierEndsAt > now;
       const sameTier = active && business.activeTier === payment.planId;
       // A late lower-tier payment cannot erase an already-active Featured plan.
@@ -481,8 +500,9 @@ export const Store = {
         // Preserve the purchased Recommended entitlement after the Featured term by adding its value as Featured time.
         await tx.business.update({where:{id:business.id},data:{tierEndsAt:new Date(business.tierEndsAt!.getTime()+payment.weeks*7*864e5/2)}});
       }
+      }
       return mapPrismaPayment(await tx.paymentRecord.update({where:{id},data:{state:'COMPLETE',providerInvoiceId:proof.invoiceId,providerRef:proof.providerRef,mpesaRef:proof.providerRef,receiptNumber:proof.invoiceId,paidAt:now,verifiedAt:now,failedReason:null}}));
-    });
+    }, {maxWait:20000,timeout:30000});
   },
 
   async getServiceRequests(): Promise<ServiceRequest[]> {

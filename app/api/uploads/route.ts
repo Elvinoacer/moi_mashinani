@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { uploadPhotosToR2 } from '@/lib/r2';
+import { uploadPhotosToR2, photoUrlsForIds } from '@/lib/r2';
+import { prisma } from '@/lib/prisma';
+import { MAX_UPLOAD_BYTES, MAX_STORED_IMAGE_BYTES } from '@/lib/catalog-plan';
+import { reserveMedia, removeUnusedMedia } from '@/lib/media-storage';
 import { requireUser } from '@/lib/auth';
 import { apiError, ApiError, assertSameOrigin } from '@/lib/api';
 import { rateLimit } from '@/lib/rate-limit';
@@ -26,18 +29,55 @@ export async function POST(req: NextRequest) {
     const form = await new Request(req.url,{method:'POST',headers:{'Content-Type':req.headers.get('content-type') || ''},body:payload}).formData();
     const files = form.getAll('files');
     if (!files.length || files.length > 8) throw new ApiError(400,'Choose one to eight photos');
+    const requestedBusiness = form.get('businessId');
+    let businessId: string | undefined;
+    if (typeof requestedBusiness === 'string' && requestedBusiness) {
+      const business = await prisma.business.findUnique({where:{id:requestedBusiness}});
+      if (!business || (user.role !== 'ADMIN' && business.ownerId !== user.id)) throw new ApiError(403, 'Choose your own business for these uploads');
+      businessId = business.id;
+    } else if (user.role !== 'ADMIN') {
+      const businesses = await prisma.business.findMany({where:{ownerId:user.id},select:{id:true}});
+      if (businesses.length !== 1) throw new ApiError(400, 'Choose the business receiving these photos');
+      businessId = businesses[0].id;
+    }
     const contents: Buffer[] = [];
     for (const file of files) {
-      if (!(file instanceof File) || file.size === 0 || file.size > 5 * 1024 * 1024) throw new ApiError(400,'Each photo must be less than 5 MB');
+      if (!(file instanceof File) || file.size === 0 || file.size > MAX_UPLOAD_BYTES) throw new ApiError(400,'Each photo must be less than 5 MB');
       try {
         const image = sharp(Buffer.from(await file.arrayBuffer()),{limitInputPixels:25000000,animated:false});
         const meta = await image.metadata();
         if (!['jpeg','png','webp','avif','heif'].includes(meta.format || '')) throw new Error('Unsupported format');
         // Re-encode, rotate, strip EXIF/location metadata, bound dimensions and use a safe MIME type.
-        contents.push(await image.rotate().resize({width:1600,height:1600,fit:'inside',withoutEnlargement:true}).webp({quality:82}).toBuffer());
-      } catch { throw new ApiError(400,'Use a valid JPEG, PNG, WebP or supported phone photo'); }
+        let content = await image.clone().rotate().resize({width:1600,height:1600,fit:'inside',withoutEnlargement:true}).webp({quality:82}).toBuffer();
+        if (content.length > MAX_STORED_IMAGE_BYTES) content = await image.clone().rotate().resize({width:1200,height:1200,fit:'inside',withoutEnlargement:true}).webp({quality:65}).toBuffer();
+        if (content.length > MAX_STORED_IMAGE_BYTES) throw new ApiError(413, 'This image is too complex to store. Reduce its dimensions and try again.');
+        contents.push(content);
+      } catch (error) { if (error instanceof ApiError) throw error; throw new ApiError(400,'Use a valid JPEG, PNG, WebP or supported phone photo'); }
     }
-    const photos = await uploadPhotosToR2(user.id, contents);
-    return NextResponse.json({photos},{status:201});
+    const reservations = await reserveMedia(user.id, businessId, contents.map(content => content.length));
+    try {
+      const urls = photoUrlsForIds(user.id, reservations.map(asset => asset.id));
+      await prisma.$transaction(reservations.map((asset,index) => prisma.businessMedia.update({where:{id:asset.id},data:{url:urls[index]}})));
+      const photos = await uploadPhotosToR2(user.id, contents, reservations.map(asset => asset.id));
+      await prisma.businessMedia.updateMany({where:{id:{in:reservations.map(asset => asset.id)}},data:{state:'READY'}});
+      return NextResponse.json({photos,bytes:contents.reduce((sum,content) => sum + content.length,0)},{status:201});
+    } catch (error) {
+      await Promise.allSettled(reservations.map(asset => removeUnusedMedia(asset.id)));
+      throw error;
+    }
   } catch(error) { return apiError(error); }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    assertSameOrigin(req);
+    const user = await requireUser(req);
+    const url = new URL(req.url).searchParams.get('url');
+    if (!url) throw new ApiError(400, 'Choose a photo to remove');
+    const asset = await prisma.businessMedia.findUnique({where:{url},include:{business:{select:{ownerId:true}}}});
+    if (!asset) return NextResponse.json({removed:false});
+    if (user.role !== 'ADMIN' && !(asset.business ? asset.business.ownerId === user.id : asset.accountId === user.id)) throw new ApiError(403, 'You can only remove your own photos');
+    if (!await removeUnusedMedia(asset.id)) throw new ApiError(409, 'Remove this photo from your products and business gallery first');
+    return NextResponse.json({removed:true});
+  } catch (error) { return apiError(error); }
 }

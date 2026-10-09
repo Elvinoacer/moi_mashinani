@@ -38,6 +38,10 @@ model Business {
   activeTier             String    @default("NONE")
   tierEndsAt             DateTime?
   tierStartsAt           DateTime?
+  proStartsAt            DateTime?
+  proEndsAt              DateTime?
+  media                  BusinessMedia[]
+  planNotices            PlanNotice[]
   availableNowUntil      DateTime?
   isTemporarilyClosed    Boolean   @default(false)
   temporarilyClosedUntil DateTime?
@@ -64,6 +68,7 @@ model Business {
   @@index([status])
   @@index([activeTier])
   @@index([ownerId])
+  @@index([proEndsAt])
 }
 
 model ProblemReport {
@@ -148,6 +153,7 @@ model Account {
   sessions        AccountSession[]
   tokens          VerificationToken[]
   uploads         UploadedPhoto[]
+  media           BusinessMedia[]
 }
 
 model AccountSession {
@@ -208,4 +214,33 @@ model Zone {
   center                 Json?
   walkTimeFromGate       String?
   distanceFromGateMeters Int?
+}
+
+// Includes reserved uploads so concurrent requests cannot exceed the Free quota.
+model BusinessMedia {
+  id          String   @id @default(uuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  businessId  String?
+  business    Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  url         String?  @unique
+  bytes       Int
+  state       String   @default("RESERVED")
+  createdAt   DateTime @default(now())
+  @@index([businessId])
+  @@index([accountId, businessId])
+  @@index([state, createdAt])
+}
+
+model PlanNotice {
+  id          String   @id @default(uuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  endsAt      DateTime
+  daysBefore  Int
+  sentAt      DateTime?
+  claimedAt   DateTime?
+  error       String?
+  @@unique([businessId, endsAt, daysBefore])
+  @@index([sentAt])
 }

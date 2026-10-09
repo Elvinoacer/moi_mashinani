@@ -16,7 +16,7 @@ npm run db:migrate
 npm run seed:production
 ```
 
-The production seed inserts the 12 categories and 8 zones. It preserves existing reference records and creates no businesses, customers, payments or accounts. It can be run again safely. `npm run seed` is a separate demo-data command and must not be used to populate production.
+The production seed inserts the current category catalogue and 8 zones. It preserves existing reference records and creates no businesses, customers, payments or accounts. It can be run again safely. `npm run seed` is a separate demo-data command and must not be used to populate production.
 
 ## Administrator and external services
 
@@ -25,6 +25,10 @@ Set `ADMIN_EMAIL`, `ADMIN_NAME` and `ADMIN_PASSWORD`, then run `npm run admin:cr
 Set `APP_URL` to the public HTTPS origin, without a path. Resend uses `RESEND_API_KEY` and `EMAIL_FROM`; the sender domain must be verified in Resend. R2 uses the existing server credentials and stores photos under `moimashinani/photos/` in the shared bucket.
 
 For live payments, use `INTASEND_MODE=live` and the matching live public/secret keys. Register `<APP_URL>/api/payments/webhook` in the matching IntaSend account with the same `INTASEND_WEBHOOK_CHALLENGE`. A configured sandbox remains a testing environment.
+
+## Catalogue Pro and reminders
+
+Apply the catalogue migration with `npm run db:migrate`, configure the same server-only `CRON_SECRET` in the deployed host and cron-job.org's Authorization header, and schedule `GET /api/cron/catalog-plans` every 15 minutes. No GitHub Actions or Vercel Cron configuration is needed. Pro is KES 500 per calendar month and renews only when the owner completes checkout. See [catalogue plans](catalog-plans.md) for scheduler settings, quota enforcement, expiry behavior and verification.
 
 ## Validation and startup
 

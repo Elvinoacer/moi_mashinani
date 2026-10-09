@@ -16,6 +16,7 @@ async function main() {
     check('APP_URL is a public HTTPS origin', url.protocol === 'https:' && !url.username && !url.password &&
       url.pathname === '/' && !url.search && !url.hash && !['localhost', '127.0.0.1', '::1'].includes(url.hostname));
   } catch { check('APP_URL is a public HTTPS origin', false); }
+  check('Protected plan reminder scheduler is configured', Boolean(process.env.CRON_SECRET && process.env.CRON_SECRET.length >= 32));
   check('Resend sender and server API key are configured', Boolean(process.env.RESEND_API_KEY?.trim() && process.env.EMAIL_FROM?.trim()));
   try { const storage = r2Storage(); storage.client.destroy(); check('R2 upload configuration is valid', true); }
   catch { check('R2 upload configuration is valid', false); }

@@ -22,7 +22,7 @@ Copy `.env.example` to your environment and supply `DATABASE_URL`, `APP_URL`, `R
 
 Configure the server-only `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT` and `R2_PUBLIC_URL`. Set `R2_KEY_PREFIX=moimashinani` to keep this app’s media separate in the shared `gtss` bucket. New image keys are `moimashinani/photos/<account-id>/<uuid>.webp`. `NEXT_PUBLIC_R2_PUBLIC_URL` may mirror the public URL; credentials must never use the `NEXT_PUBLIC_` prefix. Enable public reads for the configured URL. Uploads go through the authenticated app server, so browser upload CORS rules are unnecessary. Missing R2 configuration returns 503; failed writes return 502 and attempt to remove partial uploads.
 
-The legacy `/api/uploads/<id>` route still serves photos already stored in PostgreSQL. Existing photos are not automatically migrated. Removing a gallery photo detaches its URL; it does not delete the stored object.
+The legacy `/api/uploads/<id>` route still serves photos already stored in PostgreSQL. Existing photos are not automatically migrated. Removing a tracked photo deletes its object when no gallery, cover or product still references it. Legacy images remain readable; see [catalogue plans](catalog-plans.md) for accounting and quotas.
 
 Run `npm run db:migrate`. On a **previously provisioned database without Prisma migration history**, first baseline its original schema:
 

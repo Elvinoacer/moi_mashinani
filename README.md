@@ -32,3 +32,5 @@ npm run test:payments
 The [isolated workflow harness](docs/onboarding.md#testing) runs PostgreSQL, HTTP, email and browser journeys with synthetic records and no external payments/emails.
 
 See the [verification record](docs/verification.md) for tested workflows and the remaining external-service setup.
+
+See [catalogue plans](docs/catalog-plans.md) for Free/Pro product limits, storage accounting, manual monthly renewal and expiry reminders.

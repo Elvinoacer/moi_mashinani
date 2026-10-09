@@ -49,6 +49,9 @@ export async function GET(req: NextRequest) {
     businesses = businesses.filter((b) => Boolean(b.studentDiscount));
   }
 
+  // Hidden saved products must not influence public search after Pro expires.
+  businesses = businesses.map(publicBusiness);
+
   // Run official ranking engine
   const ranked = rankBusinesses(businesses, q, zone, category, undefined, sessionId);
 

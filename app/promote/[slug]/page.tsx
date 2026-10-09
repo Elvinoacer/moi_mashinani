@@ -136,13 +136,13 @@ function Checkout({ slug }: { slug: string }) {
       {payment.state === 'COMPLETE' ? <>
         <CheckCircle2 className="mx-auto h-14 w-14 text-[#335e41]" />
         <h2 className="font-display text-2xl font-bold">Payment verified</h2>
-        <p className="text-sm text-[#667064]">IntaSend has confirmed KSh {payment.amountKes} for {payment.weeks} {payment.weeks === 1 ? 'week' : 'weeks'} of {PROMOTION_PLANS[payment.planId].name} promotion. Your dashboard shows the current promotion dates.</p>
+        {payment.planId === 'PRO' ? <p className="text-sm text-[#667064]">Pro payment verified. View your dashboard for the updated plan dates.</p> : <p className="text-sm text-[#667064]">IntaSend has confirmed KSh {payment.amountKes} for {payment.weeks} {payment.weeks === 1 ? 'week' : 'weeks'} of {PROMOTION_PLANS[payment.planId].name} promotion. Your dashboard shows the current promotion dates.</p>}
         <p className="break-all text-xs">Receipt: {payment.receiptNumber || payment.id}<br />Reference: {payment.providerRef || payment.apiRef}</p>
         <Link href={`/dashboard/${business.slug}`} className={`${button} inline-block`}>View your dashboard</Link>
       </> : <>
         {['FAILED', 'EXPIRED'].includes(payment.state) ? <AlertCircle className="mx-auto h-12 w-12 text-[#a7302d]" /> : <RefreshCw className="mx-auto h-12 w-12 text-[#335e41]" />}
         <h2 className="font-display text-2xl font-bold">{payment.state === 'FAILED' ? 'Payment incomplete' : 'Waiting for payment confirmation'}</h2>
-        <p className="text-sm text-[#667064]">KSh {payment.amountKes} · {PROMOTION_PLANS[payment.planId].name} · {payment.weeks} {payment.weeks === 1 ? 'week' : 'weeks'}</p>
+        <p className="text-sm text-[#667064]">KSh {payment.amountKes} · {(payment.planId === 'PRO' ? 'Pro catalogue' : PROMOTION_PLANS[payment.planId].name)} · {payment.planId === 'PRO' ? '1 month' : `${payment.weeks} ${payment.weeks === 1 ? 'week' : 'weeks'}`}</p>
         <p className="text-sm text-[#667064]">{payment.failedReason || 'Complete the payment on IntaSend. Your promotion activates after payment is confirmed.'}</p>
         <div className="flex flex-wrap justify-center gap-3">
           <button type="button" onClick={resume} disabled={busy} className={button}>{busy ? 'Please wait…' : 'Open IntaSend checkout'}</button>

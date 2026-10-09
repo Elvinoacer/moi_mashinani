@@ -34,9 +34,9 @@ export function r2Storage() {
 }
 
 // All images are validated and re-encoded by the route before any object is written.
-export async function uploadPhotosToR2(accountId: string, contents: Buffer[]): Promise<string[]> {
+export async function uploadPhotosToR2(accountId: string, contents: Buffer[], ids?: string[]): Promise<string[]> {
   const { client, bucket, publicUrl, prefix } = r2Storage();
-  const keys = contents.map(() => `${prefix}/photos/${encodeURIComponent(accountId)}/${randomUUID()}.webp`);
+  const keys = contents.map((_, index) => `${prefix}/photos/${encodeURIComponent(accountId)}/${ids?.[index] || randomUUID()}.webp`);
   const attempted: string[] = [];
   try {
     for (const [index, content] of contents.entries()) {
@@ -56,4 +56,22 @@ export async function uploadPhotosToR2(accountId: string, contents: Buffer[]): P
   } finally {
     client.destroy();
   }
+}
+
+export async function deletePhotosFromR2(urls: string[], signal?: AbortSignal): Promise<void> {
+  if (!urls.length) return;
+  const {client,bucket,publicUrl,prefix} = r2Storage();
+  try {
+    for (const url of urls) {
+      if (!url.startsWith(`${publicUrl}/${prefix}/photos/`)) throw new ApiError(400, 'Invalid stored photo');
+      const Key = url.slice(publicUrl.length + 1);
+      await client.send(new DeleteObjectCommand({Bucket:bucket,Key}),signal ? {abortSignal:signal} : undefined);
+    }
+  } finally { client.destroy(); }
+}
+
+export function photoUrlsForIds(accountId: string, ids: string[]): string[] {
+  const {client,publicUrl,prefix} = r2Storage();
+  client.destroy();
+  return ids.map(id => `${publicUrl}/${prefix}/photos/${encodeURIComponent(accountId)}/${id}.webp`);
 }

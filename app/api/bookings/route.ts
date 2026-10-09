@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Store, mapPrismaBooking } from '@/lib/store';
 import { prisma } from '@/lib/prisma';
 import { requireUser, requireBusinessAccess } from '@/lib/auth';
+import { visibleProducts } from '@/lib/catalog-plan';
 import { apiError, ApiError, assertSameOrigin, jsonBody, textField } from '@/lib/api';
 import { phoneField } from '@/lib/business-input';
 import { rateLimit } from '@/lib/rate-limit';
@@ -22,7 +23,7 @@ export async function POST(req:NextRequest) {
     if (!business || business.status !== 'ACTIVE') throw new ApiError(404,'Business is unavailable');
     if (business.isTemporarilyClosed) throw new ApiError(409,'This business is temporarily closed');
     const serviceName = textField(body.serviceName,'Service',150,true);
-    if (!['General inquiry','General Inquiry'].includes(serviceName) && !business.services.some(s => s.name === serviceName)) throw new ApiError(400,'Choose a service offered by this business');
+    if (!['General inquiry','General Inquiry'].includes(serviceName) && !visibleProducts(business).some(s => s.name === serviceName)) throw new ApiError(400,'Choose a service offered by this business');
     const day = textField(body.day,'Day',10,true);
     const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Nairobi',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
     const parsedDay = new Date(`${day}T00:00:00Z`);

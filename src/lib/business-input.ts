@@ -3,6 +3,7 @@ import { ApiError, textField } from './api';
 import { CATEGORIES, ZONES } from './constants';
 import { formatKenyanPhone } from './payments';
 import type { Business, BusinessHours, ServiceItem } from './types';
+import { visibleProducts } from './catalog-plan';
 
 export function phoneField(value: unknown, required = true) {
   const raw = textField(value, 'Phone number', 30, required);
@@ -76,7 +77,7 @@ export function businessInput(body: Record<string, unknown>, partial = false): P
     result.hours = hours;
   }
   if (body.services !== undefined) {
-    if (!Array.isArray(body.services) || body.services.length > 30) throw new ApiError(400, 'Add at most 30 products or services');
+    if (!Array.isArray(body.services)) throw new ApiError(400, 'Products or services must be a list');
     result.services = body.services.map((item):ServiceItem => {
       if (!item || typeof item !== 'object') throw new ApiError(400, 'Invalid product or service');
       const service: ServiceItem = {id:textField(item.id,'Service ID',100) || randomUUID(),name:textField(item.name,'Product or service name',150,true)};
@@ -105,5 +106,5 @@ export function businessInput(body: Record<string, unknown>, partial = false): P
 export function publicBusiness(business: Business): Business {
   const { ownerId, ownerEmail, ownerName, ownerPhone, claimCode, ambassadorId, invitationSentAt, invitationError, emailVerifiedAt, moderationReason, ...safe } = business;
   void ownerId; void ownerEmail; void ownerName; void ownerPhone; void claimCode; void ambassadorId; void invitationSentAt; void invitationError; void emailVerifiedAt; void moderationReason;
-  return { ...safe, metrics: {views:0,calls:0,whatsapp:0,directions:0,bookingRequests:0,impressions:0,lastWeekViews:0,lastWeekCalls:0,lastWeekWhatsapp:0} };
+  return { ...safe, services: visibleProducts(business), metrics: {views:0,calls:0,whatsapp:0,directions:0,bookingRequests:0,impressions:0,lastWeekViews:0,lastWeekCalls:0,lastWeekWhatsapp:0} };
 }

@@ -109,7 +109,7 @@ export async function createIntaSendCheckout(payment: PaymentRecord, email: stri
     phone_number: payment.phone,
     api_ref: payment.apiRef,
     unique_api_ref: true,
-    redirect_url: `${config.appOrigin}/promote/${encodeURIComponent(slug)}?payment=${encodeURIComponent(payment.id)}`,
+    redirect_url: `${config.appOrigin}/${payment.planId === 'PRO' ? 'pro' : 'promote'}/${encodeURIComponent(slug)}?payment=${encodeURIComponent(payment.id)}`,
     host: config.appOrigin,
     country: 'KE',
     mobile_tarrif: 'BUSINESS-PAYS',

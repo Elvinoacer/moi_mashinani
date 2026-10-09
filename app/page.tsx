@@ -34,6 +34,7 @@ import {
 import styles from "./home.module.css";
 import { CategoryBrowser } from "@/components/CategoryBrowser";
 import { SiteBrand } from "@/components/SiteBrand";
+import { publicBusiness } from "@/lib/business-input";
 
 const shortcuts = [
   { slug: 'food-drinks', label: 'Food & refreshments', icon: UtensilsCrossed, tone: 'peach' },
@@ -198,7 +199,7 @@ export default async function HomePage() {
     (business) => business.status === "ACTIVE" && !business.isTemporarilyClosed,
   );
   // Only serialize the public fields needed by the discovery cards.
-  const businesses: LandingBusiness[] = active.map(
+  const businesses: LandingBusiness[] = active.map(publicBusiness).map(
     ({
       id,
       name,

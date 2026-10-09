@@ -63,6 +63,8 @@ export interface Business {
   activeTier: Tier;
   tierEndsAt?: string;
   tierStartsAt?: string;
+  proStartsAt?: string;
+  proEndsAt?: string;
   availableNowUntil?: string; // ISO date string
   isTemporarilyClosed?: boolean;
   temporarilyClosedUntil?: string;
@@ -123,7 +125,7 @@ export interface PaymentRecord {
   apiRef: string;
   businessId: string;
   businessName: string;
-  planId: 'RECOMMENDED' | 'FEATURED';
+  planId: 'RECOMMENDED' | 'FEATURED' | 'PRO';
   weeks: number;
   amountKes: number;
   phone: string;

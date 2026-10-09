@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { afterEach, beforeEach, mock, test } from 'node:test';
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { NextRequest } from 'next/server';
@@ -68,10 +69,22 @@ test('photo route authenticates, validates the whole batch and sends re-encoded 
   const originalQuery = prisma.$queryRaw;
   prisma.accountSession.findUnique = mock.fn(async () => ({
     expiresAt: new Date(Date.now() + 60000),
-    account: { id: 'owner', email: 'owner@test.invalid', name: 'Owner', role: 'BUSINESS', emailVerifiedAt: new Date() },
+    account: { id: 'owner', email: 'owner@test.invalid', name: 'Owner', role: 'ADMIN', emailVerifiedAt: new Date() },
   })) as unknown as typeof originalFindSession;
   prisma.$queryRaw = mock.fn(async () => [{ count: 1 }]) as typeof originalQuery;
   prisma.uploadedPhoto.create = mock.fn(() => { throw new Error('New photos must not be stored in PostgreSQL'); }) as typeof originalCreatePhoto;
+  const media: Array<{id:string;accountId:string;businessId:string|null;url:string|null;bytes:number;state:string}> = [];
+  const originalTransaction = prisma.$transaction;
+  const originalMedia = {findMany:prisma.businessMedia.findMany,create:prisma.businessMedia.create,update:prisma.businessMedia.update,updateMany:prisma.businessMedia.updateMany};
+  prisma.$transaction = mock.fn(async (operation: unknown) => typeof operation === 'function' ? operation(prisma) : Promise.all(operation as Promise<unknown>[])) as unknown as typeof originalTransaction;
+  prisma.businessMedia.findMany = mock.fn(async () => media) as unknown as typeof originalMedia.findMany;
+  prisma.businessMedia.create = mock.fn(async ({data}: {data:{accountId:string;businessId?:string;bytes:number}}) => {
+    const record={...data,id:randomUUID(),businessId:data.businessId || null,url:null,state:'RESERVED'};media.push(record);return record;
+  }) as unknown as typeof originalMedia.create;
+  prisma.businessMedia.update = mock.fn(async ({where,data}:{where:{id:string};data:Record<string,unknown>}) => {
+    const record=media.find(item=>item.id===where.id)!;Object.assign(record,data);return record;
+  }) as unknown as typeof originalMedia.update;
+  prisma.businessMedia.updateMany = mock.fn(async ({data}:{data:Record<string,unknown>}) => {media.forEach(record=>Object.assign(record,data));return {count:media.length};}) as unknown as typeof originalMedia.updateMany;
   mock.method(S3Client.prototype, 'send', async (command: PutObjectCommand) => { writes.push(command); return {}; });
   const png = await sharp({ create: { width: 1800, height: 200, channels: 3, background: '#335e41' } }).png().toBuffer();
   function request(files: Buffer[], signedIn = true, origin = 'https://app.test.invalid') {
@@ -97,12 +110,17 @@ test('photo route authenticates, validates the whole batch and sends re-encoded 
     assert.equal(metadata.format, 'webp');
     assert.equal(metadata.width, 1600);
     assert.equal(metadata.exif, undefined);
+    assert.equal(media[0].bytes,(writes[0].input.Body as Buffer).length);
+    assert.equal(media[0].state,'READY');
+    assert.equal(media[0].url,photos[0]);
     const { businessInput } = await import('../src/lib/business-input');
     assert.deepEqual(businessInput({ photos }, true).photos, photos);
   } finally {
     prisma.accountSession.findUnique = originalFindSession;
     prisma.uploadedPhoto.create = originalCreatePhoto;
     prisma.$queryRaw = originalQuery;
+    prisma.$transaction = originalTransaction;
+    Object.assign(prisma.businessMedia,originalMedia);
     await prisma.$disconnect();
   }
 });

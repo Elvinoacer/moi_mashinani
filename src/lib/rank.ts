@@ -1,3 +1,4 @@
+import { CATEGORIES, categoryMatches, categorySearchText } from './categories';
 import { Business, Tier } from './types';
 
 export interface RankConfig {
@@ -90,7 +91,7 @@ export function computeRelevance(business: Business, query: string, targetCatego
   let score = 0;
 
   // Category match via explicit targetCategory param
-  if (targetCategory && (business.primaryCategory === targetCategory || business.extraCategories.includes(targetCategory))) {
+  if (targetCategory && categoryMatches(business, targetCategory)) {
     score += 0.6;
   }
 
@@ -105,7 +106,8 @@ export function computeRelevance(business: Business, query: string, targetCatego
   }
 
   // Primary category slug match with query words (e.g. "food" matches "food-cafes")
-  const catSlugs = [business.primaryCategory, ...business.extraCategories].join(' ').toLowerCase();
+  const categorySlugs = [business.primaryCategory, ...business.extraCategories];
+  const catSlugs = [categorySlugs.join(' '), ...CATEGORIES.filter(category => categorySlugs.includes(category.slug)).map(categorySearchText)].join(' ').toLowerCase();
   for (const word of searchWords) {
     if (catSlugs.includes(word) && word.length > 2) {
       score += 0.35;
@@ -203,7 +205,7 @@ export function rankBusinesses(
     (b) =>
       b.status === 'ACTIVE' &&
       !b.isTemporarilyClosed &&
-      (!targetCategory || b.primaryCategory === targetCategory || b.extraCategories.includes(targetCategory))
+      (!targetCategory || categoryMatches(b, targetCategory))
   );
 
   const scored: ScoredCandidate[] = activeListings.map((business) => {

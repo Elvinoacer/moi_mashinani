@@ -4,6 +4,8 @@ import React, { useState, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Business } from '@/lib/types';
+import { CategorySelect } from '@/components/CategorySelect';
+import { categoryMatches } from '@/lib/categories';
 import { BusinessCard } from '@/components/BusinessCard';
 import { useNow } from '@/lib/useNow';
 import {
@@ -49,21 +51,6 @@ const RANGE_OPTIONS = [
   { meters: 500, label: '500m', subtext: '< 7 min walk', zoom: '2x' },
   { meters: 1000, label: '1.0 km', subtext: '< 14 min walk', zoom: '1x' },
   { meters: 1500, label: '1.5 km', subtext: 'All Kesses', zoom: '0.7x' },
-];
-
-const CATEGORY_FILTERS = [
-  { id: 'all', label: 'All Fundis & Shops' },
-  { id: 'phone-laptop-repair', label: 'Phone & Laptop Repair' },
-  { id: 'printing-cyber', label: 'Printing & Cyber' },
-  { id: 'hair-beauty-kinyozi', label: 'Salon & Kinyozi' },
-  { id: 'food-cafes', label: 'Food & Cafes' },
-  { id: 'gas-groceries', label: 'Gas & Groceries' },
-  { id: 'hostels-rooms', label: 'Hostels & Rentals' },
-  { id: 'wifi-tech-gadgets', label: 'Wi-Fi & Gadgets' },
-  { id: 'tutors-academics', label: 'Tutors & Academics' },
-  { id: 'tailoring-fashion', label: 'Tailoring & Fashion' },
-  { id: 'photography-video', label: 'Photography & Media' },
-  { id: 'cakes-bakes', label: 'Cakes & Bakery' },
 ];
 
 const ZONE_FILTERS = [
@@ -440,8 +427,7 @@ function CampusRadarDiscoveryInner({
     if (selectedCategory !== 'all') {
       list = list.filter(
         (b) =>
-          b.primaryCategory === selectedCategory ||
-          b.extraCategories?.includes(selectedCategory)
+          categoryMatches(b, selectedCategory)
       );
     }
 
@@ -475,15 +461,6 @@ function CampusRadarDiscoveryInner({
     const counts: Record<string, number> = { all: businesses.length };
     for (const b of businesses) {
       counts[b.zone] = (counts[b.zone] || 0) + 1;
-    }
-    return counts;
-  }, [businesses]);
-
-  // Category counts
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: businesses.length };
-    for (const b of businesses) {
-      counts[b.primaryCategory] = (counts[b.primaryCategory] || 0) + 1;
     }
     return counts;
   }, [businesses]);
@@ -597,7 +574,7 @@ function CampusRadarDiscoveryInner({
             <span>AUTHENTIC CAMPUS SONAR RADAR & LOCATION NAVIGATOR</span>
           </div>
           <h2 className="font-display font-black text-2xl sm:text-3xl text-[#001C3B] uppercase tracking-tight">
-            Explore Fundis & Shops Around Moi Campus
+            Explore Businesses Around Moi Campus
           </h2>
           <p className="text-xs sm:text-sm text-[#594045] mt-1 max-w-2xl font-body">
             Authentic sonar radar with concentric distance rings, live walking times, radial crosshairs, and schematic campus road maps connecting Moi Main Gate to student hostels.
@@ -843,40 +820,7 @@ function CampusRadarDiscoveryInner({
           })}
         </div>
 
-        {/* Category chips */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          <span className="text-[11px] font-bold text-[#594045] uppercase tracking-wider shrink-0">
-            Category:
-          </span>
-          {CATEGORY_FILTERS.map((cat) => {
-            const count = categoryCounts[cat.id] || 0;
-            const active = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`text-xs font-semibold px-2.5 py-1 rounded-md border border-[#001C3B] press-action flex items-center gap-1.5 shrink-0 transition-all ${
-                  active
-                    ? 'bg-[#001C3B] text-white shadow-[1px_1px_0px_#001C3B]'
-                    : 'bg-white hover:bg-[#E7EEFF] text-[#001C3B]'
-                }`}
-              >
-                {cat.id !== 'all' && (
-                  <CategoryIcon slug={cat.id} className="w-3.5 h-3.5" />
-                )}
-                <span>{cat.label}</span>
-                <span
-                  className={`text-[10px] font-bold px-1.5 rounded-full ${
-                    active ? 'bg-[#FFC53D] text-[#001C3B]' : 'bg-[#F0F3FF] text-[#594045]'
-                  }`}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <div className="max-w-md"><CategorySelect allowAll value={selectedCategory === 'all' ? '' : selectedCategory} onChange={value => setSelectedCategory(value || 'all')} /></div>
       </div>
 
       {/* VIEW MODE 1: AUTHENTIC SONAR RADAR */}
@@ -1886,7 +1830,7 @@ function CampusRadarDiscoveryInner({
               No businesses found matching current filters.
             </h4>
             <p className="text-xs text-[#594045]">
-              Try resetting your category or selecting &quot;All Kesses&quot; to discover fundis across campus.
+              Try resetting your category or selecting &quot;All Kesses&quot; to discover businesses across campus.
             </p>
           </div>
         )}

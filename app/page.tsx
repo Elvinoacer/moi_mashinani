@@ -5,8 +5,7 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Check,
-  ChevronDown,
-  Compass,
+
   Headphones,
   MapPin,
   MessageCircle,
@@ -20,6 +19,10 @@ import {
   UtensilsCrossed,
   Wrench,
   Building2,
+  HeartPulse,
+  Bike,
+  CreditCard,
+  Camera,
 } from "lucide-react";
 import { Store } from "@/lib/store";
 import { CATEGORIES, ZONES } from "@/lib/constants";
@@ -29,45 +32,21 @@ import {
   type LandingBusiness,
 } from "@/components/landing/Discovery";
 import styles from "./home.module.css";
+import { CategoryBrowser } from "@/components/CategoryBrowser";
 
 const shortcuts = [
-  {
-    slug: "food-cafes",
-    label: "Food & drinks",
-    icon: UtensilsCrossed,
-    tone: "peach",
-  },
-  {
-    slug: "hair-beauty-kinyozi",
-    label: "Beauty & hair",
-    icon: Scissors,
-    tone: "pink",
-  },
-  {
-    slug: "wifi-tech-gadgets",
-    label: "Tech & gadgets",
-    icon: Headphones,
-    tone: "lavender",
-  },
-  {
-    slug: "phone-laptop-repair",
-    label: "Repairs & fundis",
-    icon: Wrench,
-    tone: "yellow",
-  },
-  {
-    slug: "printing-cyber",
-    label: "Printing & cyber",
-    icon: Printer,
-    tone: "blue",
-  },
-  { slug: "laundry-mama-fua", label: "Laundry", icon: Shirt, tone: "mint" },
-  {
-    slug: "hostels-rooms",
-    label: "Places to stay",
-    icon: Building2,
-    tone: "sand",
-  },
+  { slug: 'food-drinks', label: 'Food & refreshments', icon: UtensilsCrossed, tone: 'peach' },
+  { slug: 'daily-essentials', label: 'Daily essentials', icon: ShoppingBag, tone: 'mint' },
+  { slug: 'housing-home', label: 'Housing & home', icon: Building2, tone: 'sand' },
+  { slug: 'fashion-clothing', label: 'Clothes & shoes', icon: Shirt, tone: 'pink' },
+  { slug: 'beauty-care', label: 'Beauty & hair', icon: Scissors, tone: 'pink' },
+  { slug: 'tech-electronics', label: 'Tech & electronics', icon: Headphones, tone: 'lavender' },
+  { slug: 'study-career', label: 'Study & career', icon: Printer, tone: 'blue' },
+  { slug: 'health-wellness', label: 'Health & wellness', icon: HeartPulse, tone: 'mint' },
+  { slug: 'transport-delivery', label: 'Transport & delivery', icon: Bike, tone: 'yellow' },
+  { slug: 'money-services', label: 'Money & services', icon: CreditCard, tone: 'sand' },
+  { slug: 'leisure-events', label: 'Leisure & events', icon: Camera, tone: 'peach' },
+  { slug: 'cleaning-repairs', label: 'Cleaning & repairs', icon: Wrench, tone: 'yellow' },
 ];
 
 function Brand() {
@@ -239,6 +218,7 @@ export default async function HomePage() {
       slug,
       tagline,
       primaryCategory,
+      extraCategories,
       zone,
       coverPhoto,
       verificationLevel,
@@ -251,6 +231,7 @@ export default async function HomePage() {
       slug,
       tagline,
       primaryCategory,
+      extraCategories,
       zone,
       coverPhoto,
       verificationLevel,
@@ -364,34 +345,19 @@ export default async function HomePage() {
           </div>
           <div className={styles.categoryGrid}>
             {shortcuts.map(({ slug, label, icon: Icon, tone }) => (
-              <Link key={slug} href={`/c/${slug}`} className={styles.category}>
+              <Link key={slug} href={`/search?category=${slug}`} className={styles.category}>
                 <span className={`${styles.categoryIcon} ${styles[tone]}`}>
                   <Icon size={27} strokeWidth={1.65} />
                 </span>
                 <span>{label}</span>
               </Link>
             ))}
-            <Link href="/search" className={styles.category}>
-              <span className={`${styles.categoryIcon} ${styles.allIcon}`}>
-                <Compass size={27} strokeWidth={1.65} />
-              </span>
-              <span>
-                Explore all <ArrowUpRight size={13} />
-              </span>
-            </Link>
+
           </div>
           <details className={styles.moreCategories}>
-            <summary>
-              All {CATEGORIES.length} categories <ChevronDown size={15} />
-            </summary>
-            <div>
-              {CATEGORIES.map((category) => (
-                <Link href={`/c/${category.slug}`} key={category.slug}>
-                  {category.name}
-                  <ArrowUpRight size={14} />
-                </Link>
-              ))}
-            </div>
+            <summary>Browse all {CATEGORIES.length} business types</summary>
+            <CategoryBrowser />
+            <Link href="/categories" className="inline-flex py-3 text-sm font-semibold text-[#335e41]">Open all categories →</Link>
           </details>
         </section>
         <section

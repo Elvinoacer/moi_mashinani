@@ -14,7 +14,7 @@ const manrope = localFont({
 export const metadata: Metadata = {
   title: "MoiMashinani | Kesses Campus Business Directory — Moi University",
   description:
-    "Find trusted phone repair, printing, braids, laundry, cooking gas, hostels, and student services in seconds around Moi University Main Campus (Kesses). Two taps to Call or WhatsApp.",
+    "Find food, refreshments, groceries, housing, clothing, health, transport, study essentials and local services around Moi University Main Campus (Kesses). Call or WhatsApp businesses directly.",
   icons: {
     icon: "/favicon.ico",
   },

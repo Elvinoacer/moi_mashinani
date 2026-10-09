@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { prisma } from '../src/lib/prisma';
 import { Store } from '../src/lib/store';
+import { CATEGORIES } from '../src/lib/categories';
 
 function assert(condition: boolean, msg: string) {
   if (!condition) {
@@ -19,7 +20,7 @@ async function runPrismaVerification() {
   assert(bizCount >= 12, `PostgreSQL has the canonical seeded businesses (found: ${bizCount})`);
 
   const catCount = await prisma.category.count();
-  assert(catCount === 12, `PostgreSQL has 12 categories (found: ${catCount})`);
+  assert(catCount >= CATEGORIES.length, `PostgreSQL has the campus category catalogue (found: ${catCount})`);
 
   const zoneCount = await prisma.zone.count();
   assert(zoneCount === 8, `PostgreSQL has 8 zones (found: ${zoneCount})`);
@@ -30,7 +31,7 @@ async function runPrismaVerification() {
 
   // 3. Test Store.getCategories() and Store.getZones()
   const dbCategories = await Store.getCategories();
-  assert(dbCategories.length === 12, `Store.getCategories() returned ${dbCategories.length} categories`);
+  assert(dbCategories.length === CATEGORIES.length, `Store.getCategories() returned ${dbCategories.length} categories`);
 
   const dbZones = await Store.getZones();
   assert(dbZones.length === 8, `Store.getZones() returned ${dbZones.length} zones`);

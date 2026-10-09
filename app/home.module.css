@@ -606,7 +606,7 @@
 }
 .categoryGrid {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 13px;
 }
 .category {
@@ -691,27 +691,6 @@
 }
 .moreCategories[open] summary svg {
   transform: rotate(180deg);
-}
-.moreCategories > div {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding: 18px 4px 10px;
-}
-.moreCategories > div a {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 5px;
-  min-height: 44px;
-  padding: 9px 12px;
-  font-size: 11px;
-  border: 1px solid #dde3d3;
-  border-radius: 8px;
-  background: #fff;
-}
-.moreCategories > div a:hover {
-  background: #edf1e3;
 }
 .discoverySection {
   padding: 53px 0 58px;
@@ -1432,14 +1411,6 @@
   }
   .moreCategories {
     margin-top: 19px;
-  }
-  .moreCategories > div {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 7px;
-  }
-  .moreCategories > div a {
-    font-size: 10px;
-    padding: 10px;
   }
   .discoverySection {
     padding: 32px 0 34px;

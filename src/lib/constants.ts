@@ -1,4 +1,4 @@
-import { Category, Zone, Business, ProblemReport, PaymentRecord, ServiceRequest } from './types';
+import { Zone, Business, ProblemReport, PaymentRecord, ServiceRequest } from './types';
 
 export const ZONES: Zone[] = [
   {
@@ -83,104 +83,7 @@ export const ZONES: Zone[] = [
   },
 ];
 
-export const CATEGORIES: Category[] = [
-  {
-    id: 'phone-laptop-repair',
-    slug: 'phone-laptop-repair',
-    name: 'Phone & Laptop Repair',
-    icon: 'build',
-    description: 'Screens, batteries, charging ports, water damage & OS installation',
-    color: '#335e41',
-  },
-  {
-    id: 'printing-cyber',
-    slug: 'printing-cyber',
-    name: 'Printing & Cyber',
-    icon: 'print',
-    description: 'Thesis binding, glossy color printing, passport photos & HELB loans',
-    color: '#557c6a',
-  },
-  {
-    id: 'hair-beauty-kinyozi',
-    slug: 'hair-beauty-kinyozi',
-    name: 'Salons & Kinyozi',
-    icon: 'content_cut',
-    description: 'Knotless braids, dreadlocks retwist, fades, salon styling & pedicures',
-    color: '#8b795c',
-  },
-  {
-    id: 'food-cafes',
-    slug: 'food-cafes',
-    name: 'Food & Cafes',
-    icon: 'restaurant',
-    description: 'Fast bites, loaded chips, layered chapo, smokies & hostel delivery',
-    color: '#945b36',
-  },
-  {
-    id: 'laundry-mama-fua',
-    slug: 'laundry-mama-fua',
-    name: 'Laundry & Mama Fua',
-    icon: 'local_laundry_service',
-    description: 'Hostel pickup, clothes washing, duvet cleaning, pressing & folding',
-    color: '#557c6a',
-  },
-  {
-    id: 'gas-groceries',
-    slug: 'gas-groceries',
-    name: 'Cooking Gas & Groceries',
-    icon: 'local_fire_department',
-    description: '6kg & 13kg cooking gas refill delivery to hostel floor & fresh greens',
-    color: '#335e41',
-  },
-  {
-    id: 'hostels-rooms',
-    slug: 'hostels-rooms',
-    name: 'Hostels & Vacancies',
-    icon: 'apartment',
-    description: 'Verified bedsitters, single rooms, token electricity & caretakers',
-    color: '#4d6350',
-  },
-  {
-    id: 'photography-video',
-    slug: 'photography-video',
-    name: 'Photography & Media',
-    icon: 'photo_camera',
-    description: 'Graduation shoots, studio portraits, events, video coverage & prints',
-    color: '#945b36',
-  },
-  {
-    id: 'tutors-academics',
-    slug: 'tutors-academics',
-    name: 'Tutors & Revision',
-    icon: 'school',
-    description: 'Engineering, Calculus, Medical sciences, Economics & past papers',
-    color: '#557c6a',
-  },
-  {
-    id: 'tailoring-fashion',
-    slug: 'tailoring-fashion',
-    name: 'Tailoring & Alterations',
-    icon: 'checkroom',
-    description: 'Custom dresses, graduation suit sizing, zip repair & curtains',
-    color: '#8b795c',
-  },
-  {
-    id: 'wifi-tech-gadgets',
-    slug: 'wifi-tech-gadgets',
-    name: 'Wi-Fi & Tech Gadgets',
-    icon: 'router',
-    description: 'Portable routers, original fast chargers, flash drives & cords',
-    color: '#183e35',
-  },
-  {
-    id: 'cakes-bakes',
-    slug: 'cakes-bakes',
-    name: 'Cakes & Bakery',
-    icon: 'cake',
-    description: 'Custom birthday cakes, mini cupcakes & campus celebration snacks',
-    color: '#945b36',
-  },
-];
+export { CATEGORIES } from './categories';
 
 export const SEED_BUSINESSES: Business[] = [
   {

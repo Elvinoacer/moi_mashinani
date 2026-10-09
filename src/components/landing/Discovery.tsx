@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, BadgeCheck, ChevronDown, MapPin, Search, Store } from 'lucide-react';
 import type { Business, ServiceItem } from '@/lib/types';
 import styles from './discovery.module.css';
+import { CATEGORY_GROUPS, categoryMatches } from '@/lib/categories';
 
 export type LandingBusiness = Pick<
   Business,
@@ -15,6 +16,7 @@ export type LandingBusiness = Pick<
   | 'slug'
   | 'tagline'
   | 'primaryCategory'
+  | 'extraCategories'
   | 'zone'
   | 'coverPhoto'
   | 'verificationLevel'
@@ -69,12 +71,9 @@ export function LandingSearch({ zones }: { zones: { slug: string; name: string }
 }
 
 const filters = [
-  { id: 'all', label: 'All finds', categories: [] as string[], browseCategory: '', browseLabel: 'all businesses' },
-  { id: 'food', label: 'Food & drinks', categories: ['food-cafes', 'cakes-bakes'], browseCategory: 'food-cafes', browseLabel: 'food & cafes' },
-  { id: 'beauty', label: 'Beauty & care', categories: ['hair-beauty-kinyozi'], browseCategory: 'hair-beauty-kinyozi', browseLabel: 'salons & kinyozi' },
-  { id: 'tech', label: 'Tech & repair', categories: ['phone-laptop-repair', 'wifi-tech-gadgets'], browseCategory: 'phone-laptop-repair', browseLabel: 'phone & laptop repair' },
-  { id: 'essentials', label: 'Everyday essentials', categories: ['printing-cyber', 'laundry-mama-fua', 'gas-groceries', 'tailoring-fashion'], browseCategory: 'gas-groceries', browseLabel: 'gas & groceries' },
-] as const;
+  { id: 'all', label: 'All finds', browseCategory: '', browseLabel: 'all businesses' },
+  ...CATEGORY_GROUPS.map(group => ({ id: group.slug, label: group.name, browseCategory: group.slug, browseLabel: group.name.toLowerCase() })),
+];
 
 function coverSource(source: string) {
   if (!source) return '';
@@ -164,7 +163,7 @@ export function LocalDiscoveries({ businesses }: { businesses: LandingBusiness[]
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]['id']>('all');
   const selectedFilter = filters.find((filter) => filter.id === activeFilter) || filters[0];
   const visibleBusinesses = businesses
-    .filter((business) => activeFilter === 'all' || (selectedFilter.categories as readonly string[]).includes(business.primaryCategory))
+    .filter((business) => activeFilter === 'all' || categoryMatches(business, selectedFilter.browseCategory))
     .slice(0, 4);
 
   return (
@@ -176,19 +175,11 @@ export function LocalDiscoveries({ businesses }: { businesses: LandingBusiness[]
         </div>
         <Link className={styles.browseLink} href="/search">Browse all <ArrowUpRight size={18} aria-hidden="true" /></Link>
       </div>
-      <div className={styles.filters} role="group" aria-label="Filter local discoveries">
-        {filters.map((filter) => (
-          <button
-            type="button"
-            key={filter.id}
-            className={`${styles.filterButton} ${activeFilter === filter.id ? styles.activeFilter : ''}`}
-            aria-pressed={activeFilter === filter.id}
-            aria-controls="local-discoveries-results"
-            onClick={() => setActiveFilter(filter.id)}
-          >
-            {filter.label}
-          </button>
-        ))}
+      <div className={styles.filters}>
+        <label htmlFor="local-discovery-category" className={styles.srOnly}>Filter local discoveries</label>
+        <select id="local-discovery-category" value={activeFilter} onChange={event => setActiveFilter(event.target.value)} aria-controls="local-discoveries-results" className="max-w-full rounded-xl border border-[#dfe5d8] bg-white px-4 py-3 text-sm font-semibold text-[#243b32] focus:outline-2 focus:outline-[#335e41]">
+          {filters.map(filter => <option key={filter.id} value={filter.id}>{filter.label}</option>)}
+        </select>
       </div>
       <p className={styles.srOnly} role="status">
         {visibleBusinesses.length} {visibleBusinesses.length === 1 ? 'business' : 'businesses'} shown. {selectedFilter.label}.

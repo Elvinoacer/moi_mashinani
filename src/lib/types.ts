@@ -86,6 +86,7 @@ export interface Business {
 }
 
 export interface Category {
+  group?: string;
   id: string;
   slug: string;
   name: string;

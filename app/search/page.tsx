@@ -10,6 +10,8 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { DemandModal } from '@/components/DemandModal';
 import { CATEGORIES, ZONES } from '@/lib/constants';
+import { CATEGORY_GROUPS } from '@/lib/categories';
+import { CategorySelect } from '@/components/CategorySelect';
 import { Business, Tier } from '@/lib/types';
 import { Search, CheckCircle2, Tag, AlertCircle, Info, X } from '@/components/icons';
 
@@ -82,7 +84,7 @@ function SearchContent() {
   };
 
   const currentZoneObj = ZONES.find((z) => z.slug === zoneParam) || ZONES[0];
-  const currentCategoryObj = CATEGORIES.find((c) => c.slug === categoryParam);
+  const currentCategoryObj = CATEGORIES.find((c) => c.slug === categoryParam) || CATEGORY_GROUPS.find(group => group.slug === categoryParam);
 
   return (
     <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
@@ -132,18 +134,7 @@ function SearchContent() {
             </select>
 
             {/* Category Selector */}
-            <select
-              value={categoryParam}
-              onChange={(e) => updateParam('category', e.target.value)}
-              className="bg-[#e9eedf] font-bold text-[#243b32] signboard-border rounded-full px-3 py-1.5 focus:outline-none"
-            >
-              <option value="">All Categories</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <CategorySelect allowAll value={categoryParam} onChange={value => updateParam('category', value)} className="w-full bg-[#e9eedf] font-bold text-[#243b32] signboard-border rounded-lg px-3 py-2 focus:outline-2 focus:outline-[#335e41]" />
 
             {/* Toggle: Available Now */}
             <button

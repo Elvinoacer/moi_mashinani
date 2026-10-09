@@ -1,4 +1,5 @@
 import React from 'react';
+import { CATEGORIES } from '@/lib/categories';
 import {
   Search,
   MapPin,
@@ -219,7 +220,23 @@ export function CategoryIcon({
       return <Bike className={className} />;
     case 'pharmacy-health':
       return <HeartPulse className={className} />;
-    default:
-      return <Store className={className} />;
+    default: {
+      const group = CATEGORIES.find(category => category.slug === slug)?.group ?? slug;
+      const Icon = {
+        'food-drinks': UtensilsCrossed,
+        'daily-essentials': ShoppingBag,
+        'housing-home': Building2,
+        'fashion-clothing': Shirt,
+        'beauty-care': Scissors,
+        'health-wellness': HeartPulse,
+        'tech-electronics': Smartphone,
+        'study-career': GraduationCap,
+        'transport-delivery': Bike,
+        'money-services': CreditCard,
+        'leisure-events': Camera,
+        'cleaning-repairs': Wrench,
+      }[group] ?? Store;
+      return <Icon className={className} />;
+    }
   }
 }

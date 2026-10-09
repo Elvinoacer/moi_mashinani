@@ -30,6 +30,7 @@ async function main() {
     await admin.getByRole('button',{name:'Sign in',exact:true}).click();
     await expect(admin.getByRole('heading',{name:'Enroll a business',exact:true})).toBeVisible({timeout:90000});
     await admin.getByLabel('Owner name *',{exact:true}).fill('Browser Owner');await admin.getByLabel('Owner email *',{exact:true}).fill(ownerEmail);
+    await admin.getByRole('combobox',{name:'Category',exact:true}).selectOption('phone-laptop-repair');
     await admin.getByLabel('Business name *',{exact:true}).fill(shopName);await admin.getByLabel('Description *',{exact:true}).fill('We repair phones and sell accessories for the campus community.');
     await admin.getByLabel('Phone number *',{exact:true}).fill('0712345678');await admin.getByLabel('Nearby landmark *',{exact:true}).fill('Across the campus gate');
     await admin.getByLabel('Product or service name',{exact:true}).fill('Screen diagnosis');await admin.getByLabel('Price from (KES)',{exact:true}).fill('150');

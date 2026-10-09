@@ -534,16 +534,17 @@ export const Store = {
   },
 
   async getCategories(): Promise<Category[]> {
-    const [records, counts] = await Promise.all([prisma.category.findMany({orderBy:{name:'asc'}}), prisma.business.groupBy({by:['primaryCategory'],where:{status:'ACTIVE',isTemporarilyClosed:false},_count:{_all:true}})]);
-    return records.map((c) => ({
-      id: c.id,
-      slug: c.slug,
-      name: c.name,
-      icon: c.icon,
-      description: c.description,
-      color: c.color,
-      count: counts.find(count => count.primaryCategory === c.slug)?._count._all || 0,
-    }));
+    const businesses = await prisma.business.findMany({
+      where: { status: 'ACTIVE', isTemporarilyClosed: false },
+      select: { primaryCategory: true, extraCategories: true },
+    });
+    const counts = new Map<string, number>();
+    for (const business of businesses) {
+      for (const slug of new Set([business.primaryCategory, ...business.extraCategories])) {
+        counts.set(slug, (counts.get(slug) ?? 0) + 1);
+      }
+    }
+    return CATEGORIES.map(category => ({ ...category, count: counts.get(category.slug) ?? 0 }));
   },
 
   async getZones(): Promise<Zone[]> {

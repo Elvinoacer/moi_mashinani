@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, MapPin } from "lucide-react";
-import { CATEGORIES, ZONES } from "@/lib/constants";
+import { ZONES } from "@/lib/constants";
+import { CATEGORY_GROUPS } from '@/lib/categories';
 import { SiteBrand } from "@/components/SiteBrand";
 
 export function Footer() {
@@ -16,8 +17,8 @@ export function Footer() {
           <div>
             <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">Explore nearby</h2>
             <nav aria-label="Popular categories" className="flex flex-col items-start gap-3">
-              {CATEGORIES.slice(0, 5).map((category) => <Link key={category.slug} href={"/c/" + category.slug} className="text-[12px] text-[#667064] hover:text-[#183e35]">{category.name}</Link>)}
-              <Link href="/search" className="inline-flex items-center gap-1 text-[12px] font-bold text-[#335e41]">All categories <ArrowUpRight size={13} /></Link>
+              {CATEGORY_GROUPS.slice(0, 6).map((category) => <Link key={category.slug} href={"/search?category=" + category.slug} className="text-[12px] text-[#667064] hover:text-[#183e35]">{category.name}</Link>)}
+              <Link href="/categories" className="inline-flex items-center gap-1 text-[12px] font-bold text-[#335e41]">All categories <ArrowUpRight size={13} /></Link>
             </nav>
           </div>
           <div>

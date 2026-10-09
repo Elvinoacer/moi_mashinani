@@ -4,7 +4,8 @@ import { useState, type FormEvent, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Camera, CheckCircle2, Plus, Trash2, Upload } from 'lucide-react';
-import { CATEGORIES, ZONES } from '@/lib/constants';
+import { ZONES } from '@/lib/constants';
+import { CategorySelect } from '@/components/CategorySelect';
 import type { Business, BusinessHours } from '@/lib/types';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -16,7 +17,7 @@ type EnrollmentResult = { business: Business; invitation: { sent: boolean; error
 function initialHours(): BusinessHours { return Object.fromEntries(DAYS.map((day) => [day, { open: '08:00', close: '18:00', closed: day === 'Sunday' }])); }
 
 export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 'admin' | 'public'; onEnrolled?: () => void }) {
-  const [details, setDetails] = useState({ ownerName: '', ownerEmail: '', name: '', primaryCategory: CATEGORIES[0].slug, tagline: '', description: '', phone: '', whatsapp: '', zone: 'kesses-centre', landmark: '', address: '', latitude: '', longitude: '', studentDiscount: '' });
+  const [details, setDetails] = useState({ ownerName: '', ownerEmail: '', name: '', primaryCategory: '', tagline: '', description: '', phone: '', whatsapp: '', zone: 'kesses-centre', landmark: '', address: '', latitude: '', longitude: '', studentDiscount: '' });
   const [hours, setHours] = useState(initialHours);
   const [serviceModes, setServiceModes] = useState<string[]>(['at_shop']);
   const [products, setProducts] = useState<ProductDraft[]>([{ id: 'initial-product', name: '', price: '', unit: '', photo: '' }]);
@@ -100,7 +101,7 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
     <p className="text-sm text-[#667064]">{mode === 'admin' ? 'Collect the owner’s details during your visit. Save the listing and send their account verification email in one step.' : 'Tell us about your business. We will email you a link to verify your account and review your listing.'} Fields marked * are required.</p>
     <fieldset disabled={submitting} className="space-y-5 disabled:opacity-75"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Owner & business</legend><div className="grid gap-4 sm:grid-cols-2">
       {detailInput('ownerName', 'Owner name', { required: true, maxLength: 100, autoComplete: 'name' })}{detailInput('ownerEmail', 'Owner email', { required: true, type: 'email', maxLength: 254, autoComplete: 'email', placeholder: 'owner@example.com' })}{detailInput('name', 'Business name', { required: true, maxLength: 120, placeholder: 'e.g. Kesses Fresh Groceries' })}
-      <label><span className={labelClass}>Category *</span><select aria-label="Category" value={details.primaryCategory} onChange={(event) => setDetails((current) => ({ ...current, primaryCategory: event.target.value }))} className={inputClass}>{CATEGORIES.map((item) => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>
+      <div><span className={labelClass}>Business type *</span><CategorySelect value={details.primaryCategory} onChange={value => setDetails(current => ({ ...current, primaryCategory: value }))} className={inputClass} required /></div>
     </div><div>{detailInput('tagline', 'Short tagline', { maxLength: 160, placeholder: 'What makes this business useful to students?' })}</div><label className="block"><span className={labelClass}>Description *</span><textarea required minLength={20} maxLength={3000} rows={3} value={details.description} onChange={(event) => setDetails((current) => ({ ...current, description: event.target.value }))} className={inputClass} placeholder="Describe what the business sells, services offered, and what customers should know." /></label></fieldset>
     <fieldset disabled={submitting} className="space-y-4 disabled:opacity-75"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Location & contact</legend><div className="grid gap-4 sm:grid-cols-2">
       {detailInput('phone', 'Phone number', { required: true, type: 'tel', autoComplete: 'tel', placeholder: '0712 345 678' })}{detailInput('whatsapp', 'WhatsApp number', { type: 'tel', placeholder: 'Same as phone if left blank' })}

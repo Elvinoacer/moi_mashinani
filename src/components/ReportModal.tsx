@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Business } from '@/lib/types';
-import { AlertCircle, X, CheckCircle2 } from '@/components/icons';
+import { CheckCircle2 } from '@/components/icons';
+import { ModalFrame } from '@/components/ModalFrame';
 
 interface ReportModalProps {
   business: Business;
@@ -14,13 +15,16 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
   const [details, setDetails] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+    setError('');
     setLoading(true);
 
     try {
-      await fetch('/api/reports', {
+      const response = await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -30,35 +34,24 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
           details: details.trim() || undefined,
         }),
       });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not submit your request. Please try again.');
       setSubmitted(true);
     } catch (err) {
-      console.error('Error submitting report:', err);
+      setError(err instanceof Error ? err.message : 'Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#243b32]/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl max-w-md w-full overflow-hidden">
-        <div className="bg-[#fce7e1] px-4 py-3 border-b-2 border-[#dfe5d8] flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[#a7302d]">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <h2 className="font-display font-bold text-base md:text-lg text-[#243b32] uppercase">
-              Report a Problem: {business.name}
-            </h2>
-          </div>
-          <button onClick={onClose} className="text-[#243b32] hover:text-[#a7302d] p-1">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <ModalFrame title={`Report a problem: ${business.name}`} onClose={onClose}>
         {submitted ? (
           <div className="p-6 text-center space-y-3">
             <CheckCircle2 className="w-12 h-12 text-[#335e41] mx-auto" />
             <h3 className="font-display font-bold text-xl text-[#243b32]">Report Received</h3>
             <p className="text-sm text-[#667064]">
-              Thanks. Our student verification team will review this business within 24 hours.
+              Thanks. Your report has been saved for our moderation team to review.
             </p>
             <button
               onClick={onClose}
@@ -69,6 +62,7 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
+            {error && <p role="alert" className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">{error}</p>}
             <div>
               <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
                 What is the issue?
@@ -105,6 +99,7 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
                 Additional Details (Optional)
               </label>
               <textarea
+                maxLength={1000}
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 rows={2}
@@ -131,7 +126,6 @@ export function ReportModal({ business, onClose }: ReportModalProps) {
             </div>
           </form>
         )}
-      </div>
-    </div>
+    </ModalFrame>
   );
 }

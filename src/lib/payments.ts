@@ -41,28 +41,17 @@ export function calculateUpgrade(
   chargeKes: number;
   remainingDays: number;
 } {
-  const targetWeeklyPrice = PROMOTION_PLANS[targetPlan].priceKesWeek;
-  const basePrice = targetWeeklyPrice * weeks;
-
-  if (
-    currentBusiness.activeTier === 'RECOMMENDED' &&
-    targetPlan === 'FEATURED' &&
-    currentBusiness.tierEndsAt
-  ) {
-    const now = Date.now();
-    const ends = new Date(currentBusiness.tierEndsAt).getTime();
-    if (ends > now) {
-      const remainingDays = Math.ceil((ends - now) / 864e5);
-      const oldWeeklyPrice = PROMOTION_PLANS.RECOMMENDED.priceKesWeek;
-      const credit = Math.floor((oldWeeklyPrice * remainingDays) / 7);
-      const rawCharge = basePrice - credit;
-      // Round up to nearest KES 5, minimum KES 20
-      const roundedCharge = Math.max(20, Math.ceil(rawCharge / 5) * 5);
-      return { creditKes: credit, chargeKes: roundedCharge, remainingDays };
-    }
+  // The same server-calculated price applies to renewals and upgrades. Keeping
+  // the price independent of an expiring tier prevents a credit being spent twice.
+  void currentBusiness;
+  if (!Object.hasOwn(PROMOTION_PLANS, targetPlan) || ![1, 2, 4].includes(weeks)) {
+    throw new Error('Choose a valid promotion plan and 1, 2, or 4 weeks');
   }
-
-  return { creditKes: 0, chargeKes: basePrice, remainingDays: 0 };
+  return {
+    creditKes: 0,
+    chargeKes: PROMOTION_PLANS[targetPlan].priceKesWeek * weeks,
+    remainingDays: 0,
+  };
 }
 
 export function formatKenyanPhone(input: string): string {

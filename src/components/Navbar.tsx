@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Award, Check, ChevronDown, Menu, Plus, Search, ShieldAlert, X, MapPin } from "lucide-react";
@@ -23,6 +23,34 @@ function NavbarInner() {
   const [zoneOpen, setZoneOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [user, setUser] = useState<{ name: string; role: 'ADMIN' | 'BUSINESS' } | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
+  const [accountError, setAccountError] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/auth/me', { cache: 'no-store', signal: controller.signal })
+      .then(async (response) => {
+        if (response.ok) setUser((await response.json()).user || null);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [pathname]);
+
+  async function signOut() {
+    setSigningOut(true);
+    setAccountError('');
+    try {
+      const response = await fetch('/api/auth/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('Could not sign out. Please try again.');
+      setUser(null);
+      setMobileOpen(false);
+      router.replace('/login');
+      router.refresh();
+    } catch (cause) {
+      setAccountError(cause instanceof Error ? cause.message : 'Could not sign out.');
+    } finally { setSigningOut(false); }
+  }
 
   function selectZone(zone: string) {
     setZoneOpen(false);
@@ -89,10 +117,11 @@ function NavbarInner() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/onboard" className="inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-[#183e35] px-3.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4">
+          {user ? <button type="button" onClick={signOut} disabled={signingOut} className="hidden min-h-10 px-2 text-[11px] font-semibold text-[#335e41] disabled:opacity-50 sm:inline-flex sm:items-center">{signingOut ? 'Signing out…' : 'Sign out'}</button> : <Link href="/login" className="hidden min-h-10 items-center px-2 text-[11px] font-semibold text-[#335e41] sm:inline-flex">Sign in</Link>}
+          <Link href={user?.role === 'ADMIN' ? '/admin/enroll' : '/onboard'} className="inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-[#183e35] px-3.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4">
             <Plus size={16} />
-            <span className="hidden sm:inline">List your business</span><span className="sm:hidden">List free</span>
-            <span className="hidden rounded bg-[#d9f279] px-1.5 py-0.5 text-[9px] font-bold text-[#264b36] lg:inline">Free</span>
+            <span className="hidden sm:inline">{user?.role === 'ADMIN' ? 'Enroll business' : 'List your business'}</span><span className="sm:hidden">{user?.role === 'ADMIN' ? 'Enroll' : 'List free'}</span>
+            {user?.role !== 'ADMIN' && <span className="hidden rounded bg-[#d9f279] px-1.5 py-0.5 text-[9px] font-bold text-[#264b36] lg:inline">Free</span>}
           </Link>
           <button type="button" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((value) => !value)}
@@ -101,6 +130,7 @@ function NavbarInner() {
           </button>
         </div>
       </div>
+      {accountError && <p role="alert" className="bg-[#fce7e1] px-5 py-2 text-sm text-[#8f2424]">{accountError}</p>}
       {mobileOpen && (
         <div className="border-t border-[#e3e7dc] bg-[#f7f8f2] px-5 pb-5 pt-4 lg:hidden">
           <form onSubmit={submitSearch} role="search" className="flex gap-2">
@@ -117,11 +147,12 @@ function NavbarInner() {
             </select>
           </label>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {[{ href: "/", label: "Home" }, ...navLinks, { href: "/admin", label: "Admin" }].map(({ href, label }) => (
+            {[{ href: "/", label: "Home" }, ...navLinks, ...(user?.role === 'ADMIN' ? [{ href: '/admin', label: 'Admin console' }, { href: '/admin/enroll', label: 'Enroll business' }] : []), ...(!user ? [{ href: '/login', label: 'Sign in' }] : [])].map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
                 className="rounded-xl border border-[#e3e7dc] bg-white px-3 py-3 text-xs font-semibold text-[#335e41] hover:bg-[#e9eedf]">{label}</Link>
             ))}
           </div>
+          {user && <div className="mt-3 flex items-center justify-between gap-3 text-sm text-[#335e41]"><span>Signed in as {user.name}</span><button type="button" disabled={signingOut} onClick={signOut} className="font-semibold underline">{signingOut ? 'Signing out…' : 'Sign out'}</button></div>}
           <div className="mt-3 flex items-center gap-2 text-xs text-[#667064]"><Award size={15} /> Built for Moi University & Kesses <ShieldAlert size={15} className="ml-auto" /></div>
         </div>
       )}

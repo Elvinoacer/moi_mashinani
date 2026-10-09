@@ -1,0 +1,211 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Business {
+  id                     String    @id
+  name                   String
+  slug                   String    @unique
+  tagline                String
+  description            String
+  primaryCategory        String
+  extraCategories        String[]  @default([])
+  tags                   String[]  @default([])
+  serviceModes           String[]  @default([])
+  phone                  String
+  whatsapp               String
+  campus                 String    @default("Moi University (Kesses Main Campus)")
+  zone                   String
+  servesZones            String[]  @default([])
+  landmark               String
+  address                String?
+  mapPin                 Json?
+  walkTime               String?
+  hours                  Json
+  services               Json
+  priceLevel             Int       @default(1)
+  studentDiscount        String?
+  photos                 String[]  @default([])
+  coverPhoto             String
+  activeTier             String    @default("NONE")
+  tierEndsAt             DateTime?
+  tierStartsAt           DateTime?
+  availableNowUntil      DateTime?
+  isTemporarilyClosed    Boolean   @default(false)
+  temporarilyClosedUntil DateTime?
+  status                 String    @default("PENDING")
+  verificationLevel      String    @default("L0")
+  moderationReason       String?
+  claimCode              String?
+  isClaimed              Boolean   @default(false)
+  ownerPhone             String?
+  ownerId                String?
+  ownerEmail             String?
+  ownerName              String?
+  invitationSentAt       DateTime?
+  invitationError        String?
+  owner                  Account? @relation(fields: [ownerId], references: [id])
+  ambassadorId           String?
+  profileStrength        Int       @default(0)
+  metrics                Json
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([primaryCategory])
+  @@index([zone])
+  @@index([status])
+  @@index([activeTier])
+  @@index([ownerId])
+}
+
+model ProblemReport {
+  id           String    @id
+  businessId   String
+  businessName String
+  reason       String
+  details      String?
+  sessionId    String    @default("session_anon")
+  createdAt    DateTime  @default(now())
+  status       String    @default("OPEN")
+
+  @@index([businessId])
+  @@index([status])
+}
+
+model PaymentRecord {
+  id            String    @id
+  apiRef        String    @unique
+  businessId    String
+  businessName  String
+  planId        String
+  weeks         Int       @default(1)
+  amountKes     Int       @default(100)
+  phone         String
+  state         String    @default("PENDING")
+  receiptNumber String?
+  method        String    @default("STK_PUSH")
+  mpesaRef      String?
+  failedReason  String?
+  createdAt     DateTime  @default(now())
+  paidAt        DateTime?
+  provider      String    @default("INTASEND")
+  currency      String    @default("KES")
+  checkoutId    String?   @unique
+  checkoutUrl   String?
+  checkoutSignature String?
+  providerInvoiceId String? @unique
+  providerRef   String?
+  verifiedAt    DateTime?
+  quoteTier     String?
+  quoteTierEndsAt DateTime?
+
+  @@index([businessId])
+  @@index([state])
+}
+
+model ServiceRequest {
+  id           String    @id
+  query        String
+  zone         String    @default("all")
+  contactPhone String?
+  createdAt    DateTime  @default(now())
+
+  @@index([zone])
+}
+
+model BookingIntent {
+  id          String    @id
+  businessId  String
+  serviceName String    @default("General inquiry")
+  day         String    @default("Today")
+  time        String    @default("Afternoon")
+  studentName String    @default("Student")
+  note        String?
+  contactPhone String?
+  status      String @default("NEW")
+  createdAt   DateTime  @default(now())
+
+  @@index([businessId])
+}
+
+model Account {
+  id              String @id @default(uuid())
+  email           String @unique
+  name            String
+  role            String @default("BUSINESS")
+  passwordHash    String?
+  emailVerifiedAt DateTime?
+  createdAt       DateTime @default(now())
+  businesses      Business[]
+  sessions        AccountSession[]
+  tokens          VerificationToken[]
+  uploads         UploadedPhoto[]
+}
+
+model AccountSession {
+  id        String @id @default(uuid())
+  tokenHash String @unique
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+
+model VerificationToken {
+  id        String @id @default(uuid())
+  tokenHash String @unique
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  purpose   String @default("INVITE")
+  businessId String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([accountId])
+}
+
+model UploadedPhoto {
+  id        String @id @default(uuid())
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  content   Bytes
+  mimeType  String @default("image/webp")
+  createdAt DateTime @default(now())
+}
+
+model RequestLimit {
+  key       String @id
+  count     Int @default(0)
+  resetsAt  DateTime
+  @@index([resetsAt])
+}
+
+model Category {
+  id          String    @id
+  slug        String    @unique
+  name        String
+  icon        String
+  description String
+  color       String
+  count       Int       @default(0)
+}
+
+model Zone {
+  id                     String    @id
+  slug                   String    @unique
+  name                   String
+  landmarkHint           String
+  description            String
+  center                 Json?
+  walkTimeFromGate       String?
+  distanceFromGateMeters Int?
+}

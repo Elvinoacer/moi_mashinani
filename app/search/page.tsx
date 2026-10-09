@@ -29,31 +29,38 @@ function SearchContent() {
   const discountParam = searchParams.get('discount') === 'true';
   const sortParam = searchParams.get('sort') || 'best_match';
 
-  const [searchInput, setSearchInput] = useState(queryParam);
+  const [searchDraft, setSearchDraft] = useState<{ query: string; text: string } | null>(null);
+  const searchInput = searchDraft?.query === queryParam ? searchDraft.text : queryParam;
+  const [error, setError] = useState('');
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
     const params = new URLSearchParams(searchParams.toString());
-    fetch(`/api/businesses?${params.toString()}`)
-      .then((res) => res.json())
+    fetch(`/api/businesses?${params.toString()}`, { signal: controller.signal })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Could not load search results. Please try again.');
+        return data;
+      })
       .then((data) => {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setResults(data.results || []);
+          setError('');
           setLoading(false);
         }
       })
       .catch((err) => {
-        if (!cancelled) {
-          console.error('Failed to load search results:', err);
+        if (!controller.signal.aborted) {
+          setError(err instanceof Error ? err.message : 'Connection error. Please try again.');
           setLoading(false);
         }
       });
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [searchParams]);
 
@@ -63,13 +70,14 @@ function SearchContent() {
   };
 
   const updateParam = (key: string, value: string) => {
-    setLoading(true);
     const params = new URLSearchParams(searchParams.toString());
     if (!value || value === 'all' || value === 'false') {
       params.delete(key);
     } else {
       params.set(key, value);
     }
+    if (params.toString() === searchParams.toString()) return;
+    setLoading(true);
     router.push(`/search?${params.toString()}`);
   };
 
@@ -95,7 +103,7 @@ function SearchContent() {
               <input
                 type="text"
                 value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
+                onChange={(e) => setSearchDraft({ query: queryParam, text: e.target.value })}
                 placeholder="Search fundi, repair, braids, cyber, food..."
                 className="w-full bg-[#e9eedf] signboard-border rounded-lg pl-11 pr-4 py-2.5 text-sm text-[#243b32] focus:outline-none"
               />
@@ -192,6 +200,7 @@ function SearchContent() {
           </div>
         </section>
 
+        {error && <p role="alert" className="rounded bg-[#fce7e1] p-4 text-sm text-[#a7302d]">{error}</p>}
         {/* Results summary & sort */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
           <div>

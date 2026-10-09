@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MoiMashinani
 
-## Getting Started
+Campus business discovery, field enrollment, merchant accounts and IntaSend promotion checkout.
 
-First, run the development server:
+Read the [complete platform user guide](docs/platform-user-guide.md) for all student/customer, admin and business actions, daily workflows, payments and troubleshooting.
 
-```bash
+```sh
+npm install
+# Configure .env from .env.example
+npm run db:migrate
+npm run admin:create
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The administrator visits businesses, records their details/products/photos in `/admin/enroll`, and sends an email invitation. Owners verify the email, set a password, and manage their own business in the merchant dashboard. Customers discover businesses, contact them, request bookings and report issues. The admin manages approvals, reports and owner invitations.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Read [Business enrollment and account setup](docs/onboarding.md) for environment configuration, existing database baselining and administrator creation. Read [IntaSend payments](docs/payments.md) for checkout and webhook setup.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Validation:
 
-## Learn More
+```sh
+npm run lint
+npx tsc --noEmit
+npm run build
+npm run test:engine
+npm run test:payments
+```
 
-To learn more about Next.js, take a look at the following resources:
+The [isolated workflow harness](docs/onboarding.md#testing) runs PostgreSQL, HTTP, email and browser journeys with synthetic records and no external payments/emails.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See the [verification record](docs/verification.md) for tested workflows and the remaining external-service setup.

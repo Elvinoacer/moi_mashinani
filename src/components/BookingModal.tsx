@@ -1,201 +1,96 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Business } from '@/lib/types';
-import { Calendar, X, WhatsAppIcon } from '@/components/icons';
+import { WhatsAppIcon } from '@/components/icons';
+import { ModalFrame } from '@/components/ModalFrame';
 
-interface BookingModalProps {
-  business: Business;
-  onClose: () => void;
+const fieldClass = 'w-full rounded border border-[#dfe5d8] bg-[#e9eedf] px-3 py-2 text-sm text-[#243b32]';
+
+function todayInKenya() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Nairobi', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 }
 
-export function BookingModal({ business, onClose }: BookingModalProps) {
-  const [selectedService, setSelectedService] = useState(
-    business.services[0]?.name || 'General Inquiry'
-  );
-  const [selectedDay, setSelectedDay] = useState('Today');
+export function BookingModal({ business, onClose }: { business: Business; onClose: () => void }) {
+  const [selectedService, setSelectedService] = useState(business.services[0]?.name || 'General inquiry');
+  const [selectedDay, setSelectedDay] = useState(todayInKenya);
   const [selectedTime, setSelectedTime] = useState('Afternoon (2:00 - 4:00 PM)');
   const [studentName, setStudentName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const days = ['Today', 'Tomorrow', 'This Friday', 'This Saturday'];
-  const times = [
-    'Morning (9:00 - 11:00 AM)',
-    'Afternoon (2:00 - 4:00 PM)',
-    'Evening (5:00 - 7:30 PM)',
-  ];
-
-  const handleSendBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
+  async function handleSendBooking(event: React.FormEvent) {
+    event.preventDefault();
+    if (isSubmitting) return;
+    setError('');
     setIsSubmitting(true);
-
-    const name = studentName.trim() || 'Moi University Student';
-
-    // Record booking intent in database
     try {
-      await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          businessId: business.id,
-          serviceName: selectedService,
-          day: selectedDay,
-          time: selectedTime,
-          studentName: name,
-          note: note.trim() || undefined,
-        }),
+      const response = await fetch('/api/bookings', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId: business.id, serviceName: selectedService, day: selectedDay,
+          time: selectedTime, studentName: studentName.trim(), contactPhone: contactPhone.trim(), note: note.trim() }),
       });
-    } catch (err) {
-      console.error('Failed to log booking:', err);
-    }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Your booking request could not be saved. Please try again.');
+      setSubmitted(true);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'Connection error. Please try again.');
+    } finally { setIsSubmitting(false); }
+  }
 
-    // Prepare WhatsApp message
-    const cleanPhone = business.whatsapp.replace(/\D/g, '');
-    const message = `Hi ${business.name}, I'd like to book "${selectedService}" for ${selectedDay} around ${selectedTime}. I'm near ${business.zone}. Name: ${name}.${
-      note ? ` Note: ${note}.` : ''
-    } (via MoiMashinani)`;
-
-    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-    setIsSubmitting(false);
-    onClose();
-  };
+  const phoneDigits = business.whatsapp.replace(/\D/g, '').replace(/^0/, '254');
+  const message = `Hi ${business.name}, I requested "${selectedService}" for ${selectedDay} around ${selectedTime} on MoiMashinani. My name is ${studentName.trim()} and my phone is ${contactPhone.trim()}.${note.trim() ? ` Note: ${note.trim()}.` : ''} Please confirm availability.`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#243b32]/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        {/* Header */}
-        <div className="bg-[#edf2e5] px-4 py-3 border-b-2 border-[#dfe5d8] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-[#183e35]" />
-            <h2 className="font-display font-bold text-lg text-[#243b32] uppercase">
-              Request Booking with {business.name}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-[#243b32] hover:text-[#a7302d] p-1 rounded-full press-action"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <ModalFrame title={`Request a booking with ${business.name}`} onClose={onClose}>
+      {submitted ? (
+        <div className="space-y-4 p-6 text-center">
+          <h3 className="font-display text-xl font-bold text-[#243b32]">Booking request saved</h3>
+          <p className="text-sm text-[#667064]">The owner can now see your request. Contact them on WhatsApp and wait for confirmation before visiting.</p>
+          <a href={`https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-[#243b32]">
+            <WhatsAppIcon className="h-5 w-5" /> Continue on WhatsApp
+          </a>
+          <button type="button" onClick={onClose} className="block w-full text-sm font-bold text-[#667064]">Done</button>
         </div>
-
-        {/* Form Body */}
-        <form onSubmit={handleSendBooking} className="p-4 md:p-6 space-y-4">
-          {/* Service picker */}
-          <div>
-            <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
-              Select Service
-            </label>
-            <select
-              value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
-              className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
-            >
-              {business.services.map((s) => (
-                <option key={s.id} value={s.name}>
-                  {s.name} {s.priceFrom ? `(from KSh ${s.priceFrom.toLocaleString()})` : ''}
-                </option>
-              ))}
-              <option value="General inquiry / price check">General inquiry / Price check</option>
+      ) : (
+        <form onSubmit={handleSendBooking} className="space-y-4 p-4 md:p-6">
+          <p className="text-sm text-[#667064]">Choose your preferred time. This is a request; the business will confirm availability with you.</p>
+          {error && <p role="alert" className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">{error}</p>}
+          <label className="block text-xs font-bold text-[#243b32]">Service
+            <select value={selectedService} onChange={(event) => setSelectedService(event.target.value)} className={`${fieldClass} mt-1`}>
+              {business.services.map((service) => <option key={service.id} value={service.name}>{service.name}{service.priceFrom !== undefined ? ` (from KSh ${service.priceFrom.toLocaleString()})` : ''}</option>)}
+              <option value="General inquiry">General inquiry / price check</option>
             </select>
-          </div>
-
-          {/* Day chips */}
-          <div>
-            <label className="block text-xs font-bold text-[#243b32] uppercase mb-1.5">
-              Preferred Day
+          </label>
+          <label className="block text-xs font-bold text-[#243b32]">Preferred date (Kenya time)
+            <input type="date" required min={todayInKenya()} value={selectedDay} onChange={(event) => setSelectedDay(event.target.value)} className={`${fieldClass} mt-1`} />
+          </label>
+          <label className="block text-xs font-bold text-[#243b32]">Preferred time
+            <select value={selectedTime} onChange={(event) => setSelectedTime(event.target.value)} className={`${fieldClass} mt-1`}>
+              {['Morning (9:00 - 11:00 AM)', 'Afternoon (2:00 - 4:00 PM)', 'Evening (5:00 - 7:30 PM)'].map((time) => <option key={time}>{time}</option>)}
+            </select>
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block text-xs font-bold text-[#243b32]">Your name
+              <input required maxLength={100} value={studentName} onChange={(event) => setStudentName(event.target.value)} autoComplete="name" className={`${fieldClass} mt-1`} />
             </label>
-            <div className="flex flex-wrap gap-2">
-              {days.map((day) => (
-                <button
-                  type="button"
-                  key={day}
-                  onClick={() => setSelectedDay(day)}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-full signboard-border press-action ${
-                    selectedDay === day
-                      ? 'bg-[#243b32] text-white signboard-shadow'
-                      : 'bg-[#f7f8f2] text-[#243b32]'
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Time chips */}
-          <div>
-            <label className="block text-xs font-bold text-[#243b32] uppercase mb-1.5">
-              Time Window
+            <label className="block text-xs font-bold text-[#243b32]">Your phone / WhatsApp
+              <input required type="tel" maxLength={20} value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} autoComplete="tel" placeholder="0712 345 678" className={`${fieldClass} mt-1`} />
             </label>
-            <div className="flex flex-wrap gap-2">
-              {times.map((t) => (
-                <button
-                  type="button"
-                  key={t}
-                  onClick={() => setSelectedTime(t)}
-                  className={`text-xs font-bold px-3 py-1.5 rounded-full signboard-border press-action ${
-                    selectedTime === t
-                      ? 'bg-[#243b32] text-white signboard-shadow'
-                      : 'bg-[#f7f8f2] text-[#243b32]'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
           </div>
-
-          {/* Student Name */}
-          <div>
-            <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
-              Your Name (Optional)
-            </label>
-            <input
-              type="text"
-              value={studentName}
-              onChange={(e) => setStudentName(e.target.value)}
-              placeholder="e.g. Wanjiru (Hostel 6)"
-              className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
-            />
-          </div>
-
-          {/* Note */}
-          <div>
-            <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
-              Extra Note / Device Model / Location
-            </label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              placeholder="e.g. iPhone 11 screen is completely blank, or can you come to Stage?"
-              className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
-            />
-          </div>
-
-          {/* Submit */}
-          <div className="pt-2 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-bold text-[#667064] hover:text-[#243b32]"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-[#25D366] hover:bg-[#20ba5a] text-[#243b32] font-display font-bold text-sm uppercase py-2.5 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
-            >
-              <WhatsAppIcon className="w-5 h-5" />
-              <span>Send on WhatsApp</span>
-            </button>
-          </div>
+          <label className="block text-xs font-bold text-[#243b32]">Extra note (optional)
+            <textarea maxLength={1000} rows={2} value={note} onChange={(event) => setNote(event.target.value)} className={`${fieldClass} mt-1`} />
+          </label>
+          <p className="text-xs text-[#667064]">Your name, phone and note are shared with this business to respond to your request.</p>
+          <button type="submit" disabled={isSubmitting || business.isTemporarilyClosed || business.status !== 'ACTIVE'} className="w-full rounded-full bg-[#335e41] px-5 py-3 text-sm font-bold text-white disabled:opacity-50">
+            {isSubmitting ? 'Saving request...' : business.isTemporarilyClosed ? 'Business temporarily closed' : 'Submit booking request'}
+          </button>
         </form>
-      </div>
-    </div>
+      )}
+    </ModalFrame>
   );
 }

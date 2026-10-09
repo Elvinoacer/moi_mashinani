@@ -19,6 +19,7 @@ export default function CategoryPage({
   const { category } = use(params);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const categoryObj = CATEGORIES.find((c) => c.slug === category) || {
     id: category,
@@ -30,16 +31,12 @@ export default function CategoryPage({
   };
 
   useEffect(() => {
-    fetch(`/api/businesses?category=${category}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setBusinesses(data.results || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load category businesses:', err);
-        setLoading(false);
-      });
+    const controller = new AbortController();
+    fetch(`/api/businesses?category=${encodeURIComponent(category)}`, { signal: controller.signal })
+      .then(async response => { const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Could not load businesses. Please reload.'); return data; })
+      .then(data => { if (!controller.signal.aborted) { setBusinesses(data.results || []); setError(''); setLoading(false); } })
+      .catch(cause => { if (!controller.signal.aborted) { setError(cause instanceof Error ? cause.message : 'Connection error. Please reload.'); setLoading(false); } });
+    return () => controller.abort();
   }, [category]);
 
   return (
@@ -85,7 +82,7 @@ export default function CategoryPage({
             </Link>
           </div>
 
-          {loading ? (
+          {error ? <p role="alert" className="rounded-xl bg-white p-5 text-sm text-[#a7302d]">{error}</p> : loading ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"></div>

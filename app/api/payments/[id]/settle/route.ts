@@ -1,23 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Store } from '@/lib/store';
+import { NextResponse } from 'next/server';
 
-export async function POST(
-  req: NextRequest,
-  props: { params: Promise<{ id: string }> }
-) {
-  const { id } = await props.params;
-  try {
-    const body = await req.json();
-    const { success = true, mpesaRef } = body;
-
-    const settled = Store.settlePayment(id, success, mpesaRef);
-    if (!settled) {
-      return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(settled);
-  } catch (err) {
-    console.error('Error settling payment:', err);
-    return NextResponse.json({ error: 'Failed to settle payment' }, { status: 500 });
-  }
+// A browser must never be able to mark its own payment successful.
+export async function POST() {
+  return NextResponse.json({ error: 'Client settlement is disabled. Verify your payment through IntaSend.' }, { status: 410 });
 }

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { ZONES } from '@/lib/constants';
-import { HelpCircle, X, CheckCircle2 } from '@/components/icons';
+import { CheckCircle2 } from '@/components/icons';
+import { ModalFrame } from '@/components/ModalFrame';
 
 interface DemandModalProps {
   initialQuery?: string;
@@ -15,14 +16,17 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
   const [phone, setPhone] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+    if (loading) return;
+    setError('');
     setLoading(true);
 
     try {
-      await fetch('/api/demand', {
+      const response = await fetch('/api/demand', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -31,35 +35,24 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
           contactPhone: phone.trim() || undefined,
         }),
       });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not submit your request. Please try again.');
       setSubmitted(true);
     } catch (err) {
-      console.error('Error submitting demand request:', err);
+      setError(err instanceof Error ? err.message : 'Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#243b32]/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-xl max-w-md w-full overflow-hidden">
-        <div className="bg-[#edf2e5] px-4 py-3 border-b-2 border-[#dfe5d8] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-[#183e35]" />
-            <h2 className="font-display font-bold text-base md:text-lg text-[#243b32] uppercase">
-              Can&apos;t Find It? Tell Us
-            </h2>
-          </div>
-          <button onClick={onClose} className="text-[#243b32] hover:text-[#a7302d] p-1">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <ModalFrame title={'Tell us what you need'} onClose={onClose}>
         {submitted ? (
           <div className="p-6 text-center space-y-3">
             <CheckCircle2 className="w-12 h-12 text-[#335e41] mx-auto" />
             <h3 className="font-display font-bold text-xl text-[#243b32]">Got It!</h3>
             <p className="text-sm text-[#667064]">
-              We&apos;ve sent your request to our student field ambassadors. We&apos;ll scout and onboard a verified provider around campus soon!
+              Your request has been saved. Our team can use it to find providers around campus.
             </p>
             <button
               onClick={onClose}
@@ -70,6 +63,7 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
+            {error && <p role="alert" className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">{error}</p>}
             <p className="text-xs text-[#667064]">
               If you couldn&apos;t find a specific fundi, service, or product near campus, tell us. Our ambassadors onboard new shops every week.
             </p>
@@ -81,6 +75,7 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
               <input
                 type="text"
                 required
+                maxLength={200}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="e.g. Electrician, Dentist, PS5 Lounge, Watch repair..."
@@ -97,7 +92,7 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
                 onChange={(e) => setZone(e.target.value)}
                 className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
               >
-                {ZONES.map((z) => (
+                {ZONES.filter((z) => z.slug !== 'all').map((z) => (
                   <option key={z.slug} value={z.slug}>
                     {z.name} ({z.landmarkHint})
                   </option>
@@ -111,6 +106,7 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
               </label>
               <input
                 type="tel"
+                maxLength={20}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="07XX XXX XXX (We'll notify you when listed)"
@@ -136,7 +132,6 @@ export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
             </div>
           </form>
         )}
-      </div>
-    </div>
+    </ModalFrame>
   );
 }

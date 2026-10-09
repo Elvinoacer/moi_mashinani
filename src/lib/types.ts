@@ -11,6 +11,7 @@ export interface ServiceItem {
   priceTo?: number;
   unit?: string;
   note?: string;
+  photo?: string;
 }
 
 export interface BusinessHours {
@@ -67,9 +68,16 @@ export interface Business {
   temporarilyClosedUntil?: string;
   status: ListingStatus;
   verificationLevel: VerificationLevel;
+  moderationReason?: string;
   claimCode?: string;
   isClaimed: boolean;
   ownerPhone?: string;
+  ownerId?: string;
+  ownerEmail?: string;
+  ownerName?: string;
+  emailVerifiedAt?: string;
+  invitationSentAt?: string;
+  invitationError?: string;
   ambassadorId?: string;
   profileStrength: number;
   metrics: BusinessMetrics;
@@ -120,7 +128,17 @@ export interface PaymentRecord {
   phone: string;
   state: 'CREATED' | 'PENDING' | 'PROCESSING' | 'COMPLETE' | 'FAILED' | 'EXPIRED';
   receiptNumber?: string;
-  method: 'STK_PUSH' | 'MANUAL_MPESA';
+  method: 'STK_PUSH' | 'MANUAL_MPESA' | 'INTASEND_CHECKOUT';
+  provider?: string;
+  currency?: string;
+  checkoutId?: string;
+  checkoutUrl?: string;
+  checkoutSignature?: string;
+  providerInvoiceId?: string;
+  providerRef?: string;
+  verifiedAt?: string;
+  quoteTier?: string;
+  quoteTierEndsAt?: string;
   mpesaRef?: string;
   failedReason?: string;
   createdAt: string;
@@ -143,5 +161,7 @@ export interface BookingIntent {
   time: string;
   studentName: string;
   note?: string;
+  contactPhone?: string;
+  status: 'NEW' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
   createdAt: string;
 }

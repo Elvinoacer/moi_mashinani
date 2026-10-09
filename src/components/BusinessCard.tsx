@@ -47,7 +47,7 @@ export function BusinessCard({
   const [imageFailed, setImageFailed] = useState(false);
   const now = useNow();
 
-  const tier = effectiveTier || business.activeTier;
+  const tier = effectiveTier ?? (business.tierEndsAt && new Date(business.tierEndsAt).getTime() <= now ? 'NONE' : business.activeTier);
   const promoted = tier === 'FEATURED' || tier === 'RECOMMENDED';
   const available = !business.isTemporarilyClosed && Boolean(
     business.availableNowUntil && new Date(business.availableNowUntil).getTime() > now
@@ -63,7 +63,7 @@ export function BusinessCard({
   const firstService = services.find((service) => service.name.trim()) || services[0];
   const prices = services
     .map((service) => service.priceFrom)
-    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price > 0);
+    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price >= 0);
   const lowestPrice = prices.length ? Math.min(...prices) : undefined;
   const displayService = services.find((service) => lowestPrice !== undefined && service.priceFrom === lowestPrice) || firstService;
   const distance = distanceLabel || business.walkTime || 'Near campus';
@@ -190,7 +190,7 @@ export function BusinessCard({
                 </button>
               )}
               {services.length > 0 && (
-                <button type="button" onClick={() => setBookingOpen(true)} className={styles.utility}>
+                <button type="button" disabled={Boolean(business.isTemporarilyClosed) || business.status !== 'ACTIVE'} onClick={() => setBookingOpen(true)} className={styles.utility}>
                   <Clock3 size={15} aria-hidden="true" /> Request booking
                 </button>
               )}

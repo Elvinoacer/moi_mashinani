@@ -1,60 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
-
-export async function POST(req: NextRequest) {
+import { requireAdmin } from '@/lib/auth';
+import { ApiError, apiError, assertSameOrigin, jsonBody, textField } from '@/lib/api';
+export async function POST(req:NextRequest) {
   try {
-    const { action, targetId, reason } = await req.json();
-
-    if (action === 'approve_listing') {
-      const updated = Store.updateBusiness(targetId, {
-        status: 'ACTIVE',
-        verificationLevel: 'L2',
-      });
-      return NextResponse.json({ success: true, business: updated });
+    assertSameOrigin(req); await requireAdmin(req);
+    const body = await jsonBody(req);
+    const action = textField(body.action,'Action',50,true);
+    const id = textField(body.targetId,'Target ID',100,true);
+    if (['resolve_report','suspend_reported'].includes(action)) {
+      const success = await Store.resolveReport(id,action === 'resolve_report' ? 'RESOLVED':'SUSPENDED');
+      if (!success) throw new ApiError(404,'Report not found');
+      return NextResponse.json({success:true});
     }
-
-    if (action === 'reject_listing') {
-      const updated = Store.updateBusiness(targetId, {
-        status: 'REJECTED',
-      });
-      return NextResponse.json({ success: true, business: updated, reason });
-    }
-
-    if (action === 'suspend_listing') {
-      const updated = Store.updateBusiness(targetId, {
-        status: 'SUSPENDED',
-      });
-      return NextResponse.json({ success: true, business: updated });
-    }
-
-    if (action === 'restore_listing') {
-      const updated = Store.updateBusiness(targetId, {
-        status: 'ACTIVE',
-      });
-      return NextResponse.json({ success: true, business: updated });
-    }
-
-    if (action === 'toggle_verified') {
-      const biz = Store.getBusinessById(targetId);
-      if (!biz) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-      const nextLevel = biz.verificationLevel === 'L2' ? 'L1' : 'L2';
-      const updated = Store.updateBusiness(targetId, { verificationLevel: nextLevel });
-      return NextResponse.json({ success: true, business: updated });
-    }
-
-    if (action === 'resolve_report') {
-      const success = Store.resolveReport(targetId, 'DISMISSED');
-      return NextResponse.json({ success });
-    }
-
-    if (action === 'suspend_reported') {
-      const success = Store.resolveReport(targetId, 'SUSPENDED');
-      return NextResponse.json({ success });
-    }
-
-    return NextResponse.json({ error: 'Unknown admin action' }, { status: 400 });
-  } catch (err) {
-    console.error('Error handling admin action:', err);
-    return NextResponse.json({ error: 'Admin action failed' }, { status: 500 });
-  }
+    const business = await Store.getBusinessById(id);
+    if (!business) throw new ApiError(404,'Business not found');
+    const updates = action === 'approve_listing' || action === 'restore_listing' ? {status:'ACTIVE' as const, moderationReason:''}
+      : action === 'reject_listing' ? {status:'REJECTED' as const,moderationReason:textField(body.reason,'Rejection reason',300,true)}
+      : action === 'suspend_listing' ? {status:'SUSPENDED' as const,moderationReason:textField(body.reason,'Suspension reason',300) || 'Suspended by the administrator'}
+      : action === 'toggle_verified' ? {verificationLevel:business.verificationLevel === 'L2' ? 'L1' as const:'L2' as const}:null;
+    if (!updates) throw new ApiError(400,'Unknown admin action');
+    return NextResponse.json({success:true,business:await Store.updateBusiness(id,updates)});
+  } catch(error) { return apiError(error); }
 }

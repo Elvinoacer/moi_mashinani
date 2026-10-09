@@ -228,7 +228,7 @@ function NeighborhoodScene() {
 
 export default async function HomePage() {
   await connection();
-  const active = Store.getBusinesses().filter(
+  const active = (await Store.getBusinesses()).filter(
     (business) => business.status === "ACTIVE" && !business.isTemporarilyClosed,
   );
   // Only serialize the public fields needed by the discovery cards.

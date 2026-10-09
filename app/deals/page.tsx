@@ -8,20 +8,20 @@ import { BottomNav } from '@/components/BottomNav';
 import { Business } from '@/lib/types';
 import { BusinessCard } from '@/components/BusinessCard';
 import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
-import { CheckCircle2, Tag, Percent, ShieldCheck } from '@/components/icons';
+import { CheckCircle2, Tag, ShieldCheck } from '@/components/icons';
 
 export default function DealsAndSafetyPage() {
   const [dealBusinesses, setDealBusinesses] = useState<Business[]>([]);
   const [dealLoading, setDealLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('/api/businesses?discount=true')
-      .then((res) => res.json())
-      .then((data) => {
-        setDealBusinesses(data.results || []);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setDealLoading(false));
+    const controller = new AbortController();
+    fetch('/api/businesses?discount=true', { signal: controller.signal })
+      .then(async response => { const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Could not load student deals. Please reload.'); return data; })
+      .then(data => { if (!controller.signal.aborted) { setDealBusinesses(data.results || []); setDealLoading(false); } })
+      .catch(cause => { if (!controller.signal.aborted) { setError(cause instanceof Error ? cause.message : 'Connection error. Please reload.'); setDealLoading(false); } });
+    return () => controller.abort();
   }, []);
 
   return (
@@ -53,7 +53,7 @@ export default function DealsAndSafetyPage() {
             <span className="text-xs text-[#667064]">Show Student ID to claim</span>
           </div>
 
-          {dealLoading ? (
+          {error ? <p role="alert" className="rounded-xl bg-white p-5 text-sm text-[#a7302d]">{error}</p> : dealLoading ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((item) => (
                 <div key={item} className="h-[460px] animate-pulse rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf]" />

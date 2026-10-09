@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
@@ -28,12 +30,7 @@ import {
   ExternalLink,
 } from '@/components/icons';
 
-export default function BusinessProfilePage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = use(params);
+function BusinessProfile({ slug }: { slug: string }) {
   const now = useNow();
   const [business, setBusiness] = useState<Business | null>(null);
   const [similarBusinesses, setSimilarBusinesses] = useState<Business[]>([]);
@@ -43,38 +40,31 @@ export default function BusinessProfilePage({
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [shareToast, setShareToast] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/businesses/${slug}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Not found');
-        return res.json();
-      })
-      .then((data: Business) => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const response = await fetch(`/api/businesses/${encodeURIComponent(slug)}`, { signal: controller.signal, cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(response.status === 404 ? 'This business is not available.' : data.error || 'Could not load the business. Please try again.');
+        if (controller.signal.aborted) return;
         setBusiness(data);
-        setLoading(false);
-
-        // Record profile view
-        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-          navigator.sendBeacon(
-            '/api/events',
-            JSON.stringify({ businessId: data.id, type: 'view' })
-          );
+        if (data.status === 'ACTIVE' && navigator.sendBeacon) {
+          navigator.sendBeacon('/api/events', JSON.stringify({ businessId: data.id, type: 'view' }));
         }
-
-        // Fetch similar businesses
-        fetch(`/api/businesses?category=${data.primaryCategory}`)
-          .then((r) => r.json())
-          .then((catData) => {
-            const others = (catData.results || []).filter((b: Business) => b.id !== data.id);
-            setSimilarBusinesses(others.slice(0, 3));
-          })
-          .catch(() => {});
-      })
-      .catch((err) => {
-        console.error('Failed to load business:', err);
-        setLoading(false);
-      });
+        const similar = await fetch(`/api/businesses?category=${encodeURIComponent(data.primaryCategory)}`, { signal: controller.signal });
+        if (similar.ok) {
+          const related = await similar.json();
+          if (!controller.signal.aborted) setSimilarBusinesses((related.results || []).filter((item: Business) => item.id !== data.id).slice(0, 3));
+        }
+      } catch (failure) {
+        if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : 'Connection error. Please reload.');
+      } finally { if (!controller.signal.aborted) setLoading(false); }
+    }
+    void load();
+    return () => controller.abort();
   }, [slug]);
 
   if (loading) {
@@ -100,7 +90,7 @@ export default function BusinessProfilePage({
             Business Not Found
           </h1>
           <p className="text-sm text-[#667064]">
-            This shop may have changed its address or been removed.
+            {error || 'This shop may have changed its address or been removed.'}
           </p>
           <Link
             href="/search"
@@ -113,10 +103,12 @@ export default function BusinessProfilePage({
     );
   }
 
-  const isFeatured = business.activeTier === 'FEATURED';
-  const isRecommended = business.activeTier === 'RECOMMENDED';
+  const galleryPhotos = Array.from(new Set([business.coverPhoto, ...business.photos].filter(Boolean)));
+  const promotionActive = Boolean(business.tierEndsAt && new Date(business.tierEndsAt).getTime() > now);
+  const isFeatured = business.activeTier === 'FEATURED' && promotionActive;
+  const isRecommended = business.activeTier === 'RECOMMENDED' && promotionActive;
   const isAvailableNow = Boolean(
-    business.availableNowUntil && new Date(business.availableNowUntil).getTime() > now
+    !business.isTemporarilyClosed && business.availableNowUntil && new Date(business.availableNowUntil).getTime() > now
   );
 
   const handleCall = () => {
@@ -163,18 +155,20 @@ export default function BusinessProfilePage({
         // Fallback
       }
     }
-    navigator.clipboard.writeText(url);
-    setShareToast(true);
-    setTimeout(() => setShareToast(false), 2500);
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2500);
+    } catch { setError('Could not copy the link. Copy the address from your browser to share this business.'); }
   };
 
-  const cleanPhone = business.whatsapp.replace(/\D/g, '');
+  const cleanPhone = business.whatsapp.replace(/\D/g, '').replace(/^0/, '254');
   const prefilledText = encodeURIComponent(
     `Hi ${business.name}, I found you on MoiMashinani. I need help with ${business.services[0]?.name || 'your services'}. Are you available today?`
   );
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${prefilledText}`;
 
-  const currentDayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  const currentDayName = new Date(now || 0).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'Africa/Nairobi' });
   const todayHours = business.hours[currentDayName];
 
   return (
@@ -182,6 +176,9 @@ export default function BusinessProfilePage({
       <Navbar />
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">
+        {error && <p role="alert" className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">{error}</p>}
+        {business.status !== 'ACTIVE' && <p className="rounded bg-[#eff4da] p-3 text-sm text-[#526936]">Owner preview: this listing is {business.status.toLowerCase()} and is not available for customer bookings.</p>}
+        {business.isTemporarilyClosed && <p className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">This business is temporarily closed. Contact the owner for reopening information.</p>}
         {/* Breadcrumb & Share Header */}
         <div className="flex items-center justify-between text-xs font-semibold text-[#667064]">
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -206,6 +203,7 @@ export default function BusinessProfilePage({
               onClick={() => setReportModalOpen(true)}
               className="text-[#758071] hover:text-[#a7302d] p-1"
               title="Report issue"
+              aria-label="Report issue"
             >
               <AlertCircle className="w-4 h-4" />
             </button>
@@ -215,10 +213,9 @@ export default function BusinessProfilePage({
         {/* GALLERY SECTION */}
         <div className="profile-gallery bg-white signboard-border-thick signboard-shadow-lg rounded-xl overflow-hidden">
           <div className="relative h-64 sm:h-80 md:h-96 w-full bg-[#edf2e5]">
-            {business.photos.length > 0 ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={business.photos[activePhotoIdx] || business.coverPhoto}
+            {galleryPhotos.length > 0 ? (
+              <Image unoptimized width={1200} height={800}
+                src={galleryPhotos[activePhotoIdx] || galleryPhotos[0]}
                 alt={business.name}
                 className="w-full h-full object-cover"
               />
@@ -229,27 +226,28 @@ export default function BusinessProfilePage({
             )}
 
             {/* Photo Counter Badge */}
-            {business.photos.length > 1 && (
+            {galleryPhotos.length > 1 && (
               <div className="absolute bottom-3 right-3 bg-[#243b32]/80 text-white font-display text-xs font-bold px-2.5 py-1 rounded-full signboard-border backdrop-blur-xs">
-                {activePhotoIdx + 1} / {business.photos.length}
+                {activePhotoIdx + 1} / {galleryPhotos.length}
               </div>
             )}
           </div>
 
           {/* Photo Thumbnails Strip */}
-          {business.photos.length > 1 && (
+          {galleryPhotos.length > 1 && (
             <div className="p-3 bg-[#ffffff] border-t border-[#dfe5d8] flex gap-2 overflow-x-auto">
-              {business.photos.map((photo, i) => (
+              {galleryPhotos.map((photo, i) => (
                 <button
                   key={i}
+                  aria-label={`View photo ${i + 1}`}
                   type="button"
                   onClick={() => setActivePhotoIdx(i)}
                   className={`w-16 h-16 rounded overflow-hidden signboard-border shrink-0 press-action ${
                     activePhotoIdx === i ? 'ring-2 ring-[#183e35]' : 'opacity-70'
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photo} alt="" className="w-full h-full object-cover" />
+
+                  <Image unoptimized width={1200} height={800} src={photo} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -309,7 +307,7 @@ export default function BusinessProfilePage({
 
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4 text-[#335e41] flex-shrink-0" />
-              {todayHours && !todayHours.closed ? (
+              {business.isTemporarilyClosed ? <span className="font-bold text-[#a7302d]">Temporarily closed</span> : !todayHours ? <span>Hours not provided</span> : todayHours.appointmentOnly && !todayHours.closed ? <span>By appointment today</span> : !todayHours.closed ? (
                 <span>
                   <strong className="text-[#335e41]">Open today:</strong> {todayHours.open} - {todayHours.close}
                 </span>
@@ -324,14 +322,14 @@ export default function BusinessProfilePage({
             <div className="p-3 bg-[#eff4da] signboard-border rounded-lg flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 text-[#526936]">
                 <Store className="w-4 h-4 flex-shrink-0" />
-                <span>Is this your shop? Claim it with your ambassador code to manage it.</span>
+                <span>Own this business? Verify your email invitation to manage your listing.</span>
               </div>
               <button
                 type="button"
                 onClick={() => setClaimModalOpen(true)}
                 className="bg-[#243b32] text-white px-3 py-1 rounded-full font-bold uppercase text-[10px]"
               >
-                Claim Shop
+                Owner Access
               </button>
             </div>
           )}
@@ -360,10 +358,11 @@ export default function BusinessProfilePage({
             <button
               type="button"
               onClick={() => setBookingModalOpen(true)}
+              disabled={Boolean(business.isTemporarilyClosed) || business.status !== 'ACTIVE'}
               className="bg-white hover:bg-[#e9eedf] text-[#243b32] font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4 text-[#183e35]" />
-              <span>Request Booking</span>
+              <span>{business.isTemporarilyClosed ? 'Bookings paused' : 'Request Booking'}</span>
             </button>
           </div>
         </div>
@@ -412,12 +411,13 @@ export default function BusinessProfilePage({
             {business.services.map((item) => (
               <div key={item.id} className="py-3 flex items-center justify-between gap-4">
                 <div>
+                  {item.photo && <div className="mb-2"><Image unoptimized width={1200} height={800} src={item.photo} alt={item.name} className="h-24 w-24 rounded-lg object-cover" /></div>}
                   <div className="font-semibold text-sm text-[#243b32]">{item.name}</div>
                   {item.note && <div className="text-xs text-[#667064] mt-0.5">{item.note}</div>}
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-display font-bold text-base text-[#243b32]">
-                    {item.priceFrom ? `KSh ${item.priceFrom.toLocaleString()}` : 'Contact for price'}
+                    {item.priceFrom !== undefined ? `KSh ${item.priceFrom.toLocaleString()}` : 'Contact for price'}
                     {item.unit ? ` / ${item.unit}` : ''}
                   </div>
                 </div>
@@ -455,7 +455,7 @@ export default function BusinessProfilePage({
                   }`}
                 >
                   <span className="capitalize">{day}</span>
-                  <span>{hrs.closed ? 'Closed' : `${hrs.open} - ${hrs.close}`}</span>
+                  <span>{hrs.closed ? 'Closed' : hrs.appointmentOnly ? `By appointment · ${hrs.open} - ${hrs.close}` : `${hrs.open} - ${hrs.close}`}</span>
                 </div>
               );
             })}
@@ -493,9 +493,7 @@ export default function BusinessProfilePage({
                   <strong>GPS:</strong> {business.mapPin.lat.toFixed(4)}° N, {business.mapPin.lng.toFixed(4)}° E
                 </span>
               )}
-              <span className="text-[#335e41] font-semibold">
-                ✓ Physically verified on campus
-              </span>
+              {business.verificationLevel !== 'L0' && <span className="text-[#335e41] font-semibold">✓ Verified by the listing team</span>}
             </div>
           </div>
 
@@ -591,4 +589,9 @@ export default function BusinessProfilePage({
       )}
     </div>
   );
+}
+
+export default function BusinessProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  return <BusinessProfile key={slug} slug={slug} />;
 }

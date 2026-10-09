@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
-
-export async function GET() {
-  const requests = Store.getServiceRequests();
-  return NextResponse.json(requests);
+import { requireAdmin } from '@/lib/auth';
+import { apiError, ApiError, assertSameOrigin, jsonBody, textField } from '@/lib/api';
+import { phoneField } from '@/lib/business-input';
+import { ZONES } from '@/lib/constants';
+import { rateLimit } from '@/lib/rate-limit';
+export async function GET(req:NextRequest) {
+  try { await requireAdmin(req); return NextResponse.json(await Store.getServiceRequests(),{headers:{'Cache-Control':'no-store'}}); } catch(error) { return apiError(error); }
 }
-
-export async function POST(req: NextRequest) {
+export async function POST(req:NextRequest) {
   try {
-    const body = await req.json();
-    const created = Store.createServiceRequest(body);
-    return NextResponse.json(created, { status: 201 });
-  } catch (err) {
-    console.error('Error logging demand:', err);
-    return NextResponse.json({ error: 'Failed to record request' }, { status: 400 });
-  }
+    assertSameOrigin(req); await rateLimit(req,'demand',10);
+    const body = await jsonBody(req);
+    const zone = textField(body.zone,'Zone',100) || 'all';
+    if (zone !== 'all' && !ZONES.some(z => z.slug === zone)) throw new ApiError(400,'Unknown zone');
+    return NextResponse.json(await Store.createServiceRequest({query:textField(body.query,'Service needed',500,true),zone,contactPhone:body.contactPhone ? phoneField(body.contactPhone):undefined}),{status:201});
+  } catch(error) { return apiError(error); }
 }

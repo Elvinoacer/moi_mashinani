@@ -4,24 +4,53 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "tsx prisma/seed.ts",
+    "db:migrate": "prisma migrate deploy --config prisma7.config.ts",
+    "admin:create": "tsx scripts/create-admin.ts",
+    "test:engine": "tsx scripts/test-engine.ts",
+    "test:r2": "tsx --test scripts/test-r2.ts",
+    "test:r2:live": "tsx scripts/test-r2-live.ts",
+    "test:payments": "tsx --test scripts/test-payments.ts",
+    "test:db": "tsx scripts/test-prisma-db.ts",
+    "test:harness": "tsx scripts/test-harness.ts",
+    "test:workflows": "tsx scripts/test-workflows.ts",
+    "test:payment-routes": "tsx scripts/test-payment-routes.ts",
+    "test:browser": "tsx scripts/test-browser.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1148.0",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
     "lucide-react": "^1.52.0",
     "next": "16.3.8",
+    "nodemailer": "^10.0.16",
+    "pg": "^8.23.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/smtp-server": "^3.5.13",
+    "dotenv": "^18.0.6",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "prisma": "^7.10.0",
+    "smtp-server": "^3.19.18",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

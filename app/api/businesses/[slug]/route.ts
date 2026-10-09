@@ -1,37 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
-
-export async function GET(
-  req: NextRequest,
-  props: { params: Promise<{ slug: string }> }
-) {
-  const { slug } = await props.params;
-  const business = Store.getBusinessBySlug(slug) || Store.getBusinessById(slug);
-
-  if (!business) {
-    return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-  }
-
-  return NextResponse.json(business);
-}
-
-export async function PATCH(
-  req: NextRequest,
-  props: { params: Promise<{ slug: string }> }
-) {
-  const { slug } = await props.params;
-  const business = Store.getBusinessBySlug(slug) || Store.getBusinessById(slug);
-
-  if (!business) {
-    return NextResponse.json({ error: 'Business not found' }, { status: 404 });
-  }
-
+import { getCurrentUser, requireBusinessAccess } from '@/lib/auth';
+import { ApiError, apiError, assertSameOrigin, jsonBody } from '@/lib/api';
+import { businessInput, publicBusiness } from '@/lib/business-input';
+export async function GET(req:NextRequest,props:{params:Promise<{slug:string}>}) {
   try {
-    const body = await req.json();
-    const updated = Store.updateBusiness(business.id, body);
+    const {slug} = await props.params;
+    const business = await Store.getBusinessBySlug(slug) || await Store.getBusinessById(slug);
+    if (!business) throw new ApiError(404,'Business not found');
+    const user = await getCurrentUser(req);
+    const canManage = user && (user.role === 'ADMIN' || user.id === business.ownerId);
+    if (business.status !== 'ACTIVE' && !canManage) throw new ApiError(404,'Business not found');
+    return NextResponse.json(canManage ? business : publicBusiness(business),{headers:{'Cache-Control':'no-store'}});
+  } catch(error) { return apiError(error); }
+}
+export async function PATCH(req:NextRequest,props:{params:Promise<{slug:string}>}) {
+  try {
+    assertSameOrigin(req);
+    const {slug} = await props.params;
+    const business = await Store.getBusinessBySlug(slug) || await Store.getBusinessById(slug);
+    if (!business) throw new ApiError(404,'Business not found');
+    await requireBusinessAccess(req,business);
+    const body = await jsonBody(req);
+    const fields = businessInput(body,true);
+    if (!Object.keys(fields).length) throw new ApiError(400,'No editable business details were supplied');
+    // Changes to paid tiers, ownership, verification and moderation are never accepted here.
+    const updated = await Store.updateBusiness(business.id,fields);
     return NextResponse.json(updated);
-  } catch (err) {
-    console.error('Error updating business:', err);
-    return NextResponse.json({ error: 'Failed to update business' }, { status: 400 });
-  }
+  } catch(error) { return apiError(error); }
 }

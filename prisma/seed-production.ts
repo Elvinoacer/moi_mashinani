@@ -4,15 +4,15 @@ import { CATEGORIES, ZONES } from '../src/lib/constants';
 
 async function main() {
   // Insert reference data only. Preserve any categories/zones edited by administrators.
-  await prisma.$transaction([
-    ...CATEGORIES.map(category => prisma.category.upsert({
+  await prisma.$transaction(async tx => {
+    for (const category of CATEGORIES) await tx.category.upsert({
       where: { id: category.id }, update: {},
       create: {
         id: category.id, slug: category.slug, name: category.name,
         icon: category.icon, description: category.description, color: category.color, count: 0,
       },
-    })),
-    ...ZONES.map(zone => prisma.zone.upsert({
+    });
+    for (const zone of ZONES) await tx.zone.upsert({
       where: { id: zone.id }, update: {},
       create: {
         id: zone.id, slug: zone.slug, name: zone.name,
@@ -21,12 +21,13 @@ async function main() {
         walkTimeFromGate: zone.walkTimeFromGate,
         distanceFromGateMeters: zone.distanceFromGateMeters,
       },
-    })),
-  ]);
+    });
+  }, { maxWait: 20000, timeout: 60000 });
   console.log(`Production reference data ready: ${CATEGORIES.length} categories and ${ZONES.length} zones. Existing records preserved.`);
 }
 
-main().catch(() => {
-  console.error('Production reference data setup failed. Check the database connection and migration status.');
+main().catch(error => {
+  console.error('Production reference data setup failed.', error instanceof Error ? error.name : 'Unknown error',
+    error && typeof error === 'object' && 'code' in error ? error.code : '');
   process.exitCode = 1;
 }).finally(() => prisma.$disconnect());

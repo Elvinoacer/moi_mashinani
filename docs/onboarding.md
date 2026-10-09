@@ -16,6 +16,8 @@ Account verification establishes email ownership. Listing approval and field ver
 
 ## Initial setup
 
+See [production setup](production.md) for the Neon pooled/direct connections, reference-only production seed and readiness checks. A new production database needs `npm run db:migrate` followed by `npm run seed:production`; do not run the demo seed against production.
+
 Copy `.env.example` to your environment and supply `DATABASE_URL`, `APP_URL`, `RESEND_API_KEY` and `EMAIL_FROM`. Use a sender whose domain is verified in Resend. All email requests use the Resend HTTPS API. `APP_URL` must be the public HTTPS origin for email/payment return links.
 
 Configure the server-only `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT` and `R2_PUBLIC_URL`. Set `R2_KEY_PREFIX=moimashinani` to keep this app’s media separate in the shared `gtss` bucket. New image keys are `moimashinani/photos/<account-id>/<uuid>.webp`. `NEXT_PUBLIC_R2_PUBLIC_URL` may mirror the public URL; credentials must never use the `NEXT_PUBLIC_` prefix. Enable public reads for the configured URL. Uploads go through the authenticated app server, so browser upload CORS rules are unnecessary. Missing R2 configuration returns 503; failed writes return 502 and attempt to remove partial uploads.

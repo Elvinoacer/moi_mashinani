@@ -8,6 +8,7 @@ Read the [complete platform user guide](docs/platform-user-guide.md) for all stu
 npm install
 # Configure .env from .env.example
 npm run db:migrate
+npm run seed:production
 npm run admin:create
 npm run dev
 ```
@@ -15,6 +16,8 @@ npm run dev
 The administrator visits businesses, records their details/products/photos in `/admin/enroll`, and sends an email invitation. Owners verify the email, set a password, and manage their own business in the merchant dashboard. Customers discover businesses, contact them, request bookings and report issues. The admin manages approvals, reports and owner invitations.
 
 Read [Business enrollment and account setup](docs/onboarding.md) for environment configuration, existing database baselining and administrator creation. Read [IntaSend payments](docs/payments.md) for checkout and webhook setup.
+
+For production, follow [production setup](docs/production.md). `npm run check:production` reports database and configuration requirements; `npm run seed:production` loads only categories and zones.
 
 Validation:
 

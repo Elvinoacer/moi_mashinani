@@ -46,7 +46,7 @@ Verify the public URL after deployment: discovery/category/zone requests must su
 
 - All three migrations applied to the production Neon database; Prisma schema diff reports no differences.
 - Database contains 12 categories, 8 zones and one verified administrator. Businesses, payments and bookings are empty.
-- `https://moimashinani.vercel.app/api/categories` and `/api/zones` return 200 with 12 and 8 records respectively.
+- `https://moimashinani.gtss.software/api/categories` and `/api/zones` return 200 with 12 and 8 records respectively.
 - The administrator signed in successfully on the public deployment, `/api/auth/me` confirmed the administrator role, and the verification session was logged out.
 - Production build, TypeScript, focused lint and the five storage tests passed.
 - The one-time `ADMIN_PASSWORD` was cleared from `.env` after sign-in verification.

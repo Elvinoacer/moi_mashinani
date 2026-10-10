@@ -1,14 +1,14 @@
 # Catalogue plans
 
-| Feature | Free | Pro |
-| --- | --- | --- |
-| Price | KES 0 | KES 500 per calendar month |
-| Public products/services | 5 | Unlimited |
-| Total hosted image storage | 25 MB per business | Unlimited |
-| Shop gallery | 8 photos | 8 photos |
-| Source image size | 5 MB per image | 5 MB per image |
-| Stored image size | Up to 1 MB, automatically compressed | Up to 1 MB, automatically compressed |
-| Promotion/ranking | Purchased separately | Purchased separately |
+| Feature                    | Free                                 | Pro                                  |
+| -------------------------- | ------------------------------------ | ------------------------------------ |
+| Price                      | KES 0                                | KES 500 per calendar month           |
+| Public products/services   | 5                                    | Unlimited                            |
+| Total hosted image storage | 25 MB per business                   | Unlimited                            |
+| Shop gallery               | 8 photos                             | 8 photos                             |
+| Source image size          | 5 MB per image                       | 5 MB per image                       |
+| Stored image size          | Up to 1 MB, automatically compressed | Up to 1 MB, automatically compressed |
+| Promotion/ranking          | Purchased separately                 | Purchased separately                 |
 
 A product and a service each occupy one catalogue slot. Images are rotated, resized to at most 1600px and re-encoded as WebP without EXIF metadata. Browsers compress before uploading and send batches of at most three images, keeping requests below Vercel's 4.5 MB request-body limit. The server independently validates and compresses every image.
 
@@ -34,17 +34,17 @@ Old images predate byte accounting. Each existing hosted image without a ledger 
 
 Create a job at <https://console.cron-job.org/jobs> with:
 
-| Setting | Value |
-| --- | --- |
-| Title | MoiMashinani plan reminders and media cleanup |
-| URL | `https://moimashinani.vercel.app/api/cron/catalog-plans` (use your deployed origin if it changes) |
-| Method | GET |
-| Schedule | Every 15 minutes, every day |
-| Time zone | Africa/Nairobi |
-| Custom header name | `Authorization` |
-| Custom header value | `Bearer ` followed by the **unquoted** `CRON_SECRET` value from `.env` |
-| Request body / basic authentication | None |
-| Notifications | Enable failures, recovery and automatic job-disable notifications |
+| Setting                             | Value                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Title                               | MoiMashinani plan reminders and media cleanup                                                        |
+| URL                                 | `https://moimashinani.gtss.software/api/cron/catalog-plans` (use your deployed origin if it changes) |
+| Method                              | GET                                                                                                  |
+| Schedule                            | Every 15 minutes, every day                                                                          |
+| Time zone                           | Africa/Nairobi                                                                                       |
+| Custom header name                  | `Authorization`                                                                                      |
+| Custom header value                 | `Bearer ` followed by the **unquoted** `CRON_SECRET` value from `.env`                               |
+| Request body / basic authentication | None                                                                                                 |
+| Notifications                       | Enable failures, recovery and automatic job-disable notifications                                    |
 
 Keep the secret out of URL query parameters, screenshots and source control. Set the same value as `CRON_SECRET` in the **production host's environment**, then redeploy/restart; editing local `.env` does not update Vercel. The endpoint must be publicly reachable by cron-job.org, with its own Bearer authentication. Test the job after deploying. A healthy run returns HTTP 200 and a compact JSON summary. HTTP 401 means the header does not match; HTTP 503 reports missing configuration or provider delivery/cleanup failures. HTTP 404 means the route has not been deployed to that URL.
 

@@ -1,5 +1,5 @@
 import { nextProEnd, productLimitError, PRO_PRICE_KES } from './catalog-plan';
-import { attachMedia, mediaReferences } from './media-storage';
+import { attachMedia, mediaReferences, queueRemovedMedia } from './media-storage';
 import { randomUUID } from 'node:crypto';
 import { ApiError } from './api';
 import { Prisma } from '../generated/prisma/client';
@@ -294,6 +294,7 @@ export const Store = {
       if (limitError) throw new ApiError(409, limitError);
       if (updates.services !== undefined || updates.photos !== undefined || updates.coverPhoto !== undefined) {
         await attachMedia(tx, id, mediaReferences(mappedExisting), mediaReferences(merged), mediaAccountId);
+        await queueRemovedMedia(tx, id, mediaReferences(mappedExisting), mediaReferences(merged), mediaAccountId);
       }
       const newStrength = computeProfileStrength(merged);
 

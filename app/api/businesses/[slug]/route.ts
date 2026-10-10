@@ -3,7 +3,7 @@ import { Store } from '@/lib/store';
 import { getCurrentUser, requireBusinessAccess } from '@/lib/auth';
 import { ApiError, apiError, assertSameOrigin, jsonBody } from '@/lib/api';
 import { businessInput, publicBusiness } from '@/lib/business-input';
-import { cleanRemovedMedia, mediaReferences } from '@/lib/media-storage';
+import { cleanRemovedMedia } from '@/lib/media-storage';
 export async function GET(req:NextRequest,props:{params:Promise<{slug:string}>}) {
   try {
     const {slug} = await props.params;
@@ -27,7 +27,7 @@ export async function PATCH(req:NextRequest,props:{params:Promise<{slug:string}>
     if (!Object.keys(fields).length) throw new ApiError(400,'No editable business details were supplied');
     // Changes to paid tiers, ownership, verification and moderation are never accepted here.
     const updated = await Store.updateBusiness(business.id,fields,user.id);
-    if (updated) await cleanRemovedMedia(business.id, mediaReferences(business), mediaReferences(updated));
-    return NextResponse.json(updated);
+    const mediaCleanup = updated ? await cleanRemovedMedia(business.id) : undefined;
+    return NextResponse.json({...updated,mediaCleanup});
   } catch(error) { return apiError(error); }
 }

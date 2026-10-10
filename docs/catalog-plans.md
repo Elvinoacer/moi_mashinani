@@ -70,3 +70,11 @@ Owners receive email at the 7-, 3- and 1-day thresholds and once after expiry. A
 `npm run test:catalog:browser` uses those synthetic fixtures and a local server at `http://127.0.0.1:3101`. It checks Free/Pro/expired dashboard states, selecting the five public products, mobile checkout, and client image compression. Upload and payment provider requests are intercepted; no real purchase or provider write occurs.
 
 `npm run test:uploads:browser` checks the shared upload UI (validation, transport progress, server processing, upload retry and save retry) and public booking from the homepage, search and mobile profiles. Run it against the same disposable local fixtures/server after `test:catalog:db`. The test uses a local mock upload provider; student bookings and gallery/item saves go into the disposable database, never production. It also checks the owner can read the saved booking.
+
+## Removing products and photos
+
+Removing a product, replacing its photo, or removing a gallery/cover photo queues unused media for deletion in the same database transaction as the edit. Cleanup then deletes the R2 object and releases its tracked storage allocation. Older R2 uploads are added to the cleanup ledger; older database-backed photos are deleted from `UploadedPhoto`. External image URLs are not owned by this application and are not deleted.
+
+Photos referenced by any remaining product, gallery or cover are kept until the final reference is removed, including older photos shared across businesses. Failed cloud deletions remain in `DELETING` state and continue counting toward storage until deletion succeeds. The existing authenticated `/api/cron/catalog-plans` job prioritizes queued deletions immediately, without the 24-hour abandoned-upload waiting period. Ensure that the cron-job.org job is active in production; no additional GitHub configuration is needed.
+
+Edit responses include `mediaCleanup` counts (`deleted`, `pending`, `retained`). Direct draft-photo deletion returns HTTP 202 with `pending: true` when cleanup is queued, HTTP 409 for a still-referenced photo, and HTTP 403 for another owner's media. Dashboard and enrollment screens display deletion progress, pending cleanup, and failures. This change requires deployment but no additional database migration.

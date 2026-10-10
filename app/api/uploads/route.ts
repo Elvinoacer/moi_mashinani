@@ -74,10 +74,24 @@ export async function DELETE(req: NextRequest) {
     const user = await requireUser(req);
     const url = new URL(req.url).searchParams.get('url');
     if (!url) throw new ApiError(400, 'Choose a photo to remove');
-    const asset = await prisma.businessMedia.findUnique({where:{url},include:{business:{select:{ownerId:true}}}});
+    let asset = await prisma.businessMedia.findUnique({where:{url},include:{business:{select:{ownerId:true}}}});
+    if (!asset && /^\/api\/uploads\/[0-9a-f-]{36}$/.test(url)) {
+      const legacy = await prisma.uploadedPhoto.findUnique({where:{id:url.split('/').pop()!}});
+      if (legacy) {
+        if (user.role !== 'ADMIN' && legacy.accountId !== user.id) throw new ApiError(403, 'You can only remove your own photos');
+        asset = await prisma.businessMedia.upsert({where:{url},create:{url,accountId:legacy.accountId,bytes:legacy.content.length,state:'READY'},update:{},include:{business:{select:{ownerId:true}}}});
+      }
+    }
     if (!asset) return NextResponse.json({removed:false});
     if (user.role !== 'ADMIN' && !(asset.business ? asset.business.ownerId === user.id : asset.accountId === user.id)) throw new ApiError(403, 'You can only remove your own photos');
-    if (!await removeUnusedMedia(asset.id)) throw new ApiError(409, 'Remove this photo from your products and business gallery first');
+    try {
+      if (!await removeUnusedMedia(asset.id)) throw new ApiError(409, 'Remove this photo from your products and business gallery first');
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) throw error;
+      const queued = await prisma.businessMedia.findUnique({where:{id:asset.id},select:{state:true}});
+      if (queued?.state !== 'DELETING') throw error;
+      return NextResponse.json({removed:false,pending:true,message:'Photo removal is queued. Storage is temporarily unavailable; automatic cleanup will retry.'},{status:202});
+    }
     return NextResponse.json({removed:true});
   } catch (error) { return apiError(error); }
 }

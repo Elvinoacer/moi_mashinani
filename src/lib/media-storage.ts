@@ -72,7 +72,22 @@ export async function attachMedia(tx: Prisma.TransactionClient, businessId: stri
   }
 }
 
-/** Reference check and DELETING state prevent an image being attached while it is removed from R2. */
+/** Persist cleanup in the same transaction as the edit, including uploads made before the ledger existed. */
+export async function queueRemovedMedia(tx: Prisma.TransactionClient, businessId: string, previous: string[], next: string[], accountId?: string) {
+  for (const url of previous.filter(url => hostedMediaUrl(url) && !next.includes(url))) {
+    const existing = await tx.businessMedia.findUnique({where:{url}});
+    if (existing) await tx.businessMedia.update({where:{id:existing.id},data:{state:'DELETING'}});
+    else {
+      const business = await tx.business.findUniqueOrThrow({where:{id:businessId},select:{ownerId:true}});
+      const uploader = business.ownerId || accountId;
+      if (!uploader) throw new ApiError(409, 'An administrator must remove this older photo.');
+      const legacy = url.startsWith('/api/uploads/') ? await tx.uploadedPhoto.findUnique({where:{id:url.split('/').pop()!}}) : null;
+      await tx.businessMedia.create({data:{url,businessId,accountId:legacy?.accountId || uploader,bytes:legacy?.content.length || MAX_UPLOAD_BYTES,state:'DELETING'}});
+    }
+  }
+}
+
+/** DELETING prevents reattachment; check all businesses to protect older shared photos. */
 export async function removeUnusedMedia(id: string, signal?: AbortSignal): Promise<boolean> {
   signal?.throwIfAborted();
   const asset = await prisma.$transaction(async tx => {
@@ -82,20 +97,32 @@ export async function removeUnusedMedia(id: string, signal?: AbortSignal): Promi
     else await tx.$queryRaw`SELECT "id" FROM "Account" WHERE "id" = ${initial.accountId} FOR UPDATE`;
     const current = await tx.businessMedia.findUnique({where:{id}});
     if (!current) return null;
-    const business = current.businessId ? await tx.business.findUnique({where:{id:current.businessId}}) : null;
-    if (business && current.url && mediaReferences(business).includes(current.url)) return null;
+    if (current.url) {
+      const references = await tx.$queryRaw<Array<{id:string}>>`
+        SELECT "id" FROM "Business" WHERE ${current.url} = ANY("photos") OR "coverPhoto" = ${current.url}
+        OR EXISTS (SELECT 1 FROM jsonb_array_elements("services") item WHERE item->>'photo' = ${current.url}) LIMIT 1`;
+      if (references.length) return null;
+    }
     return tx.businessMedia.update({where:{id},data:{state:'DELETING'}});
   }, {maxWait:signal ? 5000 : 20000,timeout:signal ? 5000 : 30000});
   if (!asset) return false;
-  // Keep the record/quota until object deletion succeeds. The scheduled job retries failures.
-  if (asset.url) await deletePhotosFromR2([asset.url],signal);
+  // Retain the ledger and quota until storage confirms deletion. Missing objects are safe to retry.
+  if (asset.url?.startsWith('/api/uploads/')) await prisma.uploadedPhoto.deleteMany({where:{id:asset.url.split('/').pop()!}});
+  else if (asset.url) await deletePhotosFromR2([asset.url],signal ?? AbortSignal.timeout(10000));
   await prisma.businessMedia.deleteMany({where:{id:asset.id,state:'DELETING'}});
   return true;
 }
 
-export async function cleanRemovedMedia(businessId: string, previous: string[], next: string[]) {
-  const removed = previous.filter(url => !next.includes(url));
-  const assets = await prisma.businessMedia.findMany({where:{businessId,url:{in:removed}},select:{id:true}});
+export async function cleanRemovedMedia(businessId: string) {
+  const assets = await prisma.businessMedia.findMany({where:{businessId,state:'DELETING'},select:{id:true}});
   const results = await Promise.allSettled(assets.map(asset => removeUnusedMedia(asset.id)));
-  for (const result of results) if (result.status === 'rejected') console.error('Deferred photo cleanup:', result.reason instanceof Error ? result.reason.message : 'Storage deletion failed');
+  const summary = {deleted:0,pending:0,retained:0};
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      summary.pending++;
+      console.error('Deferred photo cleanup:', result.reason instanceof Error ? result.reason.message : 'Storage deletion failed');
+    } else if (result.value) summary.deleted++;
+    else summary.retained++;
+  }
+  return summary;
 }

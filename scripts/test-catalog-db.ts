@@ -26,7 +26,8 @@ async function main() {
   await prisma.$executeRaw`TRUNCATE "Business", "Account", "PaymentRecord", "RequestLimit" CASCADE`;
   Object.assign(process.env,{APP_URL:'http://127.0.0.1:3101',R2_ENDPOINT:'https://r2.test.invalid',R2_BUCKET_NAME:'test',R2_PUBLIC_URL:'https://media.test.invalid',R2_KEY_PREFIX:'moimashinani',R2_ACCESS_KEY_ID:'fake',R2_SECRET_ACCESS_KEY:'fake',CRON_SECRET:'synthetic-cron-secret'});
   const writes: Array<PutObjectCommand|DeleteObjectCommand> = [];
-  mock.method(S3Client.prototype,'send',async(command:PutObjectCommand|DeleteObjectCommand)=>{writes.push(command);return {};});
+  let failDeletion = false;
+  mock.method(S3Client.prototype,'send',async(command:PutObjectCommand|DeleteObjectCommand)=>{writes.push(command);if (failDeletion && command instanceof DeleteObjectCommand) throw new Error("Synthetic storage outage");return {};});
   const owner=await prisma.account.create({data:{email:`catalog-${randomUUID()}@test.invalid`,name:'Catalog Owner',emailVerifiedAt:new Date()}});
   const other=await prisma.account.create({data:{email:`other-${randomUUID()}@test.invalid`,name:'Other Owner',emailVerifiedAt:new Date()}});
   const token=await newSession(owner.id);const otherToken=await newSession(other.id);
@@ -114,6 +115,73 @@ async function main() {
   assert.equal((await upload(uploadRequest(business.id))).status,201,'Pro may upload above Free allocation');
   await prisma.businessMedia.deleteMany({where:{businessId:business.id}});
   console.log('PASS atomic storage reservation, upload compression, ownership, quota enforcement and safe object deletion');
+
+  // Legacy assets must enter the durable cleanup ledger; protect references in other businesses.
+  const legacyUrl = `https://media.test.invalid/moimashinani/photos/${owner.id}/${randomUUID()}.webp`;
+  await prisma.business.update({where:{id:business.id},data:{photos:[legacyUrl],coverPhoto:legacyUrl}});
+  const sharing = await Store.createBusiness({name:`Sharing ${randomUUID()}`,primaryCategory:'food-cafes',ownerId:other.id,status:'ACTIVE'});
+  await prisma.business.update({where:{id:sharing.id},data:{photos:[legacyUrl]}});
+  const retained = await patchBusiness(request('PATCH',{photos:[],coverPhoto:''}),props);
+  assert.equal(retained.status,200);assert.equal((await retained.json()).mediaCleanup.retained,1);
+  assert.ok(!writes.some(command => command instanceof DeleteObjectCommand && command.input.Key?.includes(legacyUrl.split('/').pop()!)));
+  await prisma.business.update({where:{id:sharing.id},data:{photos:[]}});
+  failDeletion = true;
+  const failedCleanup = await runPlanMaintenance(new Date(),async()=>{});
+  assert.ok(failedCleanup.cleanupFailed > 0,'Fresh queued removals retry without waiting 24 hours');
+  assert.equal((await prisma.businessMedia.findUniqueOrThrow({where:{url:legacyUrl}})).state,'DELETING');
+  failDeletion = false;
+  await runPlanMaintenance(new Date(),async()=>{});
+  assert.equal(await prisma.businessMedia.findUnique({where:{url:legacyUrl}}),null);
+
+  const oldPhoto = await prisma.uploadedPhoto.create({data:{accountId:owner.id,content:Buffer.from('legacy-photo')}});
+  const oldUrl = `/api/uploads/${oldPhoto.id}`;
+  await prisma.business.update({where:{id:business.id},data:{services:[{id:'legacy-item',name:'Legacy item',photo:oldUrl}]}});
+  assert.equal((await deleteProduct(request('DELETE',{id:'legacy-item'}),props)).status,200);
+  assert.equal(await prisma.uploadedPhoto.findUnique({where:{id:oldPhoto.id}}),null);
+
+  const legacyDraft = await prisma.uploadedPhoto.create({data:{accountId:owner.id,content:Buffer.from('legacy-draft')}});
+  const draftRequest = (signedToken=token) => new NextRequest(`http://127.0.0.1:3101/api/uploads?url=${encodeURIComponent(`/api/uploads/${legacyDraft.id}`)}`,{method:'DELETE',headers:{Cookie:`mm_session=${signedToken}`,Origin:process.env.APP_URL!}});
+  assert.equal((await deletePhoto(draftRequest(otherToken))).status,403);
+  assert.equal((await deletePhoto(draftRequest())).status,200);
+  assert.equal(await prisma.uploadedPhoto.findUnique({where:{id:legacyDraft.id}}),null);
+
+  const retryUpload = await upload(uploadRequest(business.id));
+  assert.equal(retryUpload.status,201);
+  const retryUrl = (await retryUpload.json()).photos[0];
+  await Store.updateBusiness(business.id,{services:[{id:'retry-item',name:'Retry item',photo:retryUrl}]},owner.id);
+  failDeletion = true;
+  const failedDelete = await deleteProduct(request('DELETE',{id:'retry-item'}),props);
+  assert.equal(failedDelete.status,200);assert.equal((await failedDelete.json()).mediaCleanup.pending,1);
+  assert.equal((await Store.getBusinessById(business.id))!.services.length,0);
+  const pendingAsset = await prisma.businessMedia.findUniqueOrThrow({where:{url:retryUrl}});
+  assert.equal(pendingAsset.state,'DELETING');assert.ok(pendingAsset.bytes > 0);
+  failDeletion = false;
+  await runPlanMaintenance(new Date(),async()=>{});
+  assert.equal(await prisma.businessMedia.findUnique({where:{url:retryUrl}}),null);
+
+  const directUpload = await upload(uploadRequest(business.id));
+  const directUrl = (await directUpload.json()).photos[0];
+  const directRequest = (signedToken=token) => new NextRequest(`http://127.0.0.1:3101/api/uploads?url=${encodeURIComponent(directUrl)}`,{method:'DELETE',headers:{Cookie:`mm_session=${signedToken}`,Origin:process.env.APP_URL!}});
+  assert.equal((await deletePhoto(directRequest(otherToken))).status,403);
+  failDeletion = true;
+  const directPending = await deletePhoto(directRequest());
+  assert.equal(directPending.status,202);assert.equal((await directPending.json()).pending,true);
+  failDeletion = false;
+  assert.equal((await deletePhoto(directRequest())).status,200);
+  assert.equal(await prisma.businessMedia.findUnique({where:{url:directUrl}}),null);
+  assert.equal((await deletePhoto(directRequest())).status,200,'Repeated deletion is idempotent');
+
+  const sharedUpload = await upload(uploadRequest(business.id));
+  const sharedUrl = (await sharedUpload.json()).photos[0];
+  await Store.updateBusiness(business.id,{photos:[sharedUrl],coverPhoto:sharedUrl,services:[{id:'shared-item',name:'Shared item',photo:sharedUrl}]},owner.id);
+  const beforeSharedDelete = writes.length;
+  assert.equal((await deleteProduct(request('DELETE',{id:'shared-item'}),props)).status,200);
+  assert.equal(writes.length,beforeSharedDelete,'Gallery and cover still reference the product image');
+  assert.ok(await prisma.businessMedia.findUnique({where:{url:sharedUrl}}));
+  assert.equal((await patchBusiness(request('PATCH',{photos:[],coverPhoto:''}),props)).status,200);
+  assert.equal(await prisma.businessMedia.findUnique({where:{url:sharedUrl}}),null);
+  console.log('PASS legacy cloud/database cleanup, shared reference protection and durable fresh deletion retries');
+
 
   const end=new Date('2027-03-20T09:00:00Z');await prisma.business.update({where:{id:business.id},data:{proEndsAt:end}});
   const sent:number[]=[];

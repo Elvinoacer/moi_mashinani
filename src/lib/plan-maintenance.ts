@@ -50,10 +50,10 @@ export async function runPlanMaintenance(now = new Date(), send = sendProPlanEma
   const cutoff = new Date(now.getTime()-864e5);
   const unused = await prisma.$queryRaw<Array<{id:string}>>`
     SELECT m."id" FROM "BusinessMedia" m LEFT JOIN "Business" b ON b."id" = m."businessId"
-    WHERE m."createdAt" < ${cutoff} AND (b."id" IS NULL OR m."url" IS NULL OR
+    WHERE (m."state" = 'DELETING' OR m."createdAt" < ${cutoff}) AND (b."id" IS NULL OR m."url" IS NULL OR
       (NOT (m."url" = ANY(b."photos")) AND m."url" <> b."coverPhoto" AND
        NOT EXISTS (SELECT 1 FROM jsonb_array_elements(b."services") item WHERE item->>'photo' = m."url")))
-    ORDER BY m."createdAt" ASC LIMIT ${batchSize}`;
+    ORDER BY CASE WHEN m."state" = 'DELETING' THEN 0 ELSE 1 END, m."createdAt" ASC LIMIT ${batchSize}`;
   for (const asset of unused) {
     if (Date.now() - started > budgetMs || options.signal?.aborted) break;
     try {if (await removeUnusedMedia(asset.id,options.signal)) result.cleaned++;} catch {result.cleanupFailed++;}

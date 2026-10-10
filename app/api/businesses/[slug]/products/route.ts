@@ -5,7 +5,7 @@ import { requireBusinessAccess } from '@/lib/auth';
 import { ApiError, apiError, assertSameOrigin, jsonBody, textField } from '@/lib/api';
 import { businessInput } from '@/lib/business-input';
 import { productLimitError } from '@/lib/catalog-plan';
-import { attachMedia, cleanRemovedMedia, mediaReferences } from '@/lib/media-storage';
+import { attachMedia, cleanRemovedMedia, mediaReferences, queueRemovedMedia } from '@/lib/media-storage';
 import type { ServiceItem } from '@/lib/types';
 
 async function mutate(req: NextRequest, props: {params: Promise<{slug:string}>}, method: 'POST' | 'PATCH' | 'DELETE') {
@@ -18,7 +18,7 @@ async function mutate(req: NextRequest, props: {params: Promise<{slug:string}>},
     const body = await jsonBody(req);
     const item = method !== 'DELETE' ? businessInput({services:[body]} , true).services![0] : null;
     const id = item?.id || textField(body.id, 'Product ID', 100, true);
-    const previous = await prisma.$transaction(async tx => {
+    await prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${initial.id} FOR UPDATE`;
       const business = await tx.business.findUniqueOrThrow({where:{id:initial.id}});
       const before = Array.isArray(business.services) ? business.services as unknown as ServiceItem[] : [];
@@ -30,13 +30,14 @@ async function mutate(req: NextRequest, props: {params: Promise<{slug:string}>},
       const error = productLimitError({proEndsAt:business.proEndsAt?.toISOString()}, before, services);
       if (error) throw new ApiError(409, error);
       await attachMedia(tx, business.id, mediaReferences(business), mediaReferences({...business,services}), user.id);
+      await queueRemovedMedia(tx, business.id, mediaReferences(business), mediaReferences({...business,services}), user.id);
       const profileStrength = computeProfileStrength({...mapPrismaBusiness(business),services});
       await tx.business.update({where:{id:business.id},data:{services:JSON.parse(JSON.stringify(services)),profileStrength}});
       return mediaReferences(business);
     }, {maxWait:20000,timeout:30000});
     const updated = await Store.getBusinessById(initial.id);
-    await cleanRemovedMedia(initial.id, previous, mediaReferences(updated!));
-    return NextResponse.json(updated);
+    const mediaCleanup = await cleanRemovedMedia(initial.id);
+    return NextResponse.json({...updated,mediaCleanup});
   } catch (error) { return apiError(error); }
 }
 export const POST = (req:NextRequest,props:{params:Promise<{slug:string}>}) => mutate(req,props,'POST');

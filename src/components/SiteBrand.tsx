@@ -7,7 +7,7 @@ export function SiteBrand({ small = false, className = '' }: { small?: boolean; 
     <Link href="/" aria-label="MoiMashinani home" className={`inline-flex shrink-0 items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#335e41] ${className}`}>
       <Image
         src="/brand/moimashinani-logo.svg"
-        alt="MoiMashinani"
+        alt="MoiMashinani — Moi University Campus Business Directory"
         width={300}
         height={64}
         unoptimized

@@ -108,7 +108,13 @@ export function BusinessCard({
         <Link href={'/b/' + business.slug} className={styles.media} aria-label={'View ' + business.name + ' profile'}>
           {photo && !imageFailed ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photo} alt="" loading="lazy" className={styles.cover} onError={() => setImageFailed(true)} />
+            <img
+              src={photo}
+              alt={`${business.name} — ${categoryName} in ${zoneName}, Moi University Kesses`}
+              loading="lazy"
+              className={styles.cover}
+              onError={() => setImageFailed(true)}
+            />
           ) : (
             <div className={styles.fallback} aria-hidden="true">
               <span className={styles.fallbackOrbit} />

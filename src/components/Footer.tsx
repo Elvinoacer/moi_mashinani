@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import { ZONES } from "@/lib/constants";
-import { CATEGORY_GROUPS } from '@/lib/categories';
 import { SiteBrand } from "@/components/SiteBrand";
 
 export function Footer() {
@@ -15,10 +14,15 @@ export function Footer() {
             <p className="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold text-[#335e41]"><MapPin size={14} /> Made for Moi. Rooted in Kesses.</p>
           </div>
           <div>
-            <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">Explore nearby</h2>
-            <nav aria-label="Popular categories" className="flex flex-col items-start gap-3">
-              {CATEGORY_GROUPS.slice(0, 6).map((category) => <Link key={category.slug} href={"/search?category=" + category.slug} className="text-[12px] text-[#667064] hover:text-[#183e35]">{category.name}</Link>)}
-              <Link href="/categories" className="inline-flex items-center gap-1 text-[12px] font-bold text-[#335e41]">All categories <ArrowUpRight size={13} /></Link>
+            <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">Top categories</h2>
+            <nav aria-label="Popular categories" className="flex flex-col items-start gap-2.5">
+              <Link href="/c/food-cafes" className="text-[12px] text-[#667064] hover:text-[#183e35]">Food & Cafes</Link>
+              <Link href="/c/hostels-rooms" className="text-[12px] text-[#667064] hover:text-[#183e35]">Hostels & Bedsitters</Link>
+              <Link href="/c/phone-laptop-repair" className="text-[12px] text-[#667064] hover:text-[#183e35]">Phone & Laptop Repair</Link>
+              <Link href="/c/hair-beauty-kinyozi" className="text-[12px] text-[#667064] hover:text-[#183e35]">Kinyozi & Hair Salons</Link>
+              <Link href="/c/printing-cyber" className="text-[12px] text-[#667064] hover:text-[#183e35]">Cyber & Printing</Link>
+              <Link href="/c/gas-groceries" className="text-[12px] text-[#667064] hover:text-[#183e35]">Cooking Gas & Groceries</Link>
+              <Link href="/categories" className="inline-flex items-center gap-1 text-[12px] font-bold text-[#335e41]">All 65 categories <ArrowUpRight size={13} /></Link>
             </nav>
           </div>
           <div>

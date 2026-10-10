@@ -15,6 +15,7 @@
     "test:metrics": "tsx scripts/test-metrics.ts",
     "test:engine": "tsx scripts/test-engine.ts",
     "test:categories": "tsx --test scripts/test-categories.ts",
+    "test:seo": "tsx --test scripts/test-seo.ts",
     "test:catalog": "tsx --test scripts/test-catalog-plan.ts",
     "test:catalog:db": "tsx scripts/test-catalog-db.ts",
     "test:catalog:browser": "tsx scripts/test-catalog-browser.ts",

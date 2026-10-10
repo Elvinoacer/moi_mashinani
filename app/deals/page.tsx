@@ -1,164 +1,89 @@
-'use client';
+import type { Metadata } from 'next';
+import { Store } from '@/lib/store';
+import { SEED_BUSINESSES } from '@/lib/constants';
+import {
+  SITE_URL,
+  CORE_CAMPUS_KEYWORDS,
+  generateBreadcrumbSchema,
+  safeJsonLd,
+} from '@/lib/seo';
+import type { Business } from '@/lib/types';
+import { DealsPageClient } from './DealsPageClient';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { Business } from '@/lib/types';
-import { BusinessCard } from '@/components/BusinessCard';
-import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
-import { CheckCircle2, Tag, ShieldCheck } from '@/components/icons';
+export const metadata: Metadata = {
+  title: 'Student Deals, Discounts & Campus Trust Guide | Moi University (Kesses)',
+  description:
+    'Exclusive Moi University student discounts in Kesses: save money on food, phone repairs, haircuts, printing and campus essentials with our safety guide.',
+  keywords: [
+    'student discounts Moi University',
+    'campus deals Kesses',
+    'cheap food Moi University',
+    'student offers Eldoret',
+    'Moi University discounts',
+    'cheap kinyozi Kesses',
+    ...CORE_CAMPUS_KEYWORDS.slice(0, 15),
+  ],
+  alternates: {
+    canonical: '/deals',
+  },
+  openGraph: {
+    title: 'Student Deals, Discounts & Campus Trust Guide | Moi University (Kesses)',
+    description:
+      'Exclusive Moi University student discounts in Kesses. Save money on food, phone repairs, haircuts, printing and campus essentials.',
+    url: '/deals',
+    siteName: 'MoiMashinani',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Student Deals & Discounts | Moi University (Kesses)',
+    description: 'Find active student discounts and budget offers around campus.',
+  },
+};
 
-export default function DealsAndSafetyPage() {
-  const [dealBusinesses, setDealBusinesses] = useState<Business[]>([]);
-  const [dealLoading, setDealLoading] = useState(true);
-  const [error, setError] = useState('');
+async function fetchDeals(): Promise<Business[]> {
+  try {
+    const all = await Store.getBusinesses();
+    return all.filter((b) => Boolean(b.studentDiscount) && b.status === 'ACTIVE');
+  } catch {
+    return SEED_BUSINESSES.filter((b) => Boolean(b.studentDiscount) && b.status === 'ACTIVE');
+  }
+}
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/businesses?discount=true', { signal: controller.signal })
-      .then(async response => { const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Could not load student deals. Please reload.'); return data; })
-      .then(data => { if (!controller.signal.aborted) { setDealBusinesses(data.results || []); setDealLoading(false); } })
-      .catch(cause => { if (!controller.signal.aborted) { setError(cause instanceof Error ? cause.message : 'Connection error. Please reload.'); setDealLoading(false); } });
-    return () => controller.abort();
-  }, []);
+export default async function DealsAndSafetyPage() {
+  const deals = await fetchDeals();
+
+  const breadcrumbsSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Student Deals', url: '/deals' },
+  ]);
+
+  const dealsItemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Active Moi University Student Discounts & Offers',
+    description: 'Verified student discounts in Kesses across food, electronics repair, haircuts, and supplies.',
+    numberOfItems: deals.length,
+    itemListElement: deals.map((biz, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: `${biz.name} — ${biz.studentDiscount}`,
+      url: `${SITE_URL}/b/${biz.slug}`,
+      description: biz.studentDiscount,
+    })),
+  };
 
   return (
-    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
-      <Navbar />
-
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pb-20 md:pb-12">
-        {/* Header Banner */}
-        <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8">
-          <div className="inline-flex items-center gap-1.5 bg-[#e9eedf] text-[#526936] text-xs font-display font-bold px-3 py-1 rounded-full border border-[#dfe5d8] mb-3">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>STUDENT PERKS & SAFETY HUB</span>
-          </div>
-          <h1 className="font-display font-black text-3xl md:text-5xl text-[#243b32] uppercase tracking-tight">
-            Campus Deals & Trust Guide
-          </h1>
-          <p className="text-sm md:text-base text-[#667064] mt-2 max-w-2xl leading-relaxed font-body">
-            Moi University student discounts, safety tips for hiring campus fundis, and how our L0 to L2 verification levels protect your money.
-          </p>
-        </section>
-
-        {/* ACTIVE STUDENT DEALS GRID */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight flex items-center gap-2">
-              <Tag className="w-6 h-6 text-[#526936]" />
-              <span>Active Student Discounts</span>
-            </h2>
-            <span className="text-xs text-[#667064]">Show Student ID to claim</span>
-          </div>
-
-          {error ? <p role="alert" className="rounded-xl bg-white p-5 text-sm text-[#a7302d]">{error}</p> : dealLoading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="h-[460px] animate-pulse rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf]" />
-              ))}
-            </div>
-          ) : dealBusinesses.length ? (
-            <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {dealBusinesses.map((biz) => (
-                <BusinessCard key={biz.id} business={biz} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[22px] border border-[#dce6d1] bg-white px-6 py-10 text-center">
-              <Tag className="mx-auto mb-3 h-9 w-9 text-[#6f8949]" />
-              <h3 className="text-lg font-bold text-[#183e35]">Fresh student deals are on their way.</h3>
-              <p className="mt-2 text-sm text-[#667064]">Explore nearby businesses while owners prepare their next offers.</p>
-              <Link href="/search" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#183e35] px-5 text-sm font-semibold text-white">Explore local businesses →</Link>
-            </div>
-          )}
-        </section>
-
-        <JoinNeighborhoodCard />
-
-        {/* TRUST & VERIFICATION LEVELS */}
-        <section className="bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8 space-y-6">
-          <div>
-            <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-[#335e41]" />
-              <span>How MoiMashinani Protects Students</span>
-            </h2>
-            <p className="text-xs md:text-sm text-[#667064] mt-1 font-body">
-              Every merchant on this directory is verified through a 3-tier safety standard:
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-body">
-            <div className="p-4 bg-[#e9eedf] rounded-xl border border-[#dfe5d8] space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#667064]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#758071]"></span>
-                Level 0: Listed
-              </div>
-              <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Basic Community Entry
-              </h3>
-              <p className="text-xs text-[#667064] leading-relaxed">
-                Initial entry. Unconfirmed phone or address. Students should exercise standard caution before making large advance payments.
-              </p>
-            </div>
-
-            <div className="p-4 bg-[#e9eedf] rounded-xl border border-[#dfe5d8] space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#335e41]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#335e41]"></span>
-                Level 1: Phone Confirmed
-              </div>
-              <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Owner OTP Verified
-              </h3>
-              <p className="text-xs text-[#667064] leading-relaxed">
-                The owner verified their Kenyan Safaricom line via SMS OTP code. The owner has answered student calls directly.
-              </p>
-            </div>
-
-            <div className="p-4 bg-[#edf2e5] border-2 border-[#335e41] rounded-xl shadow-sm space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#335e41]">
-                <CheckCircle2 className="w-4 h-4 text-[#335e41]" />
-                Level 2: Team Verified
-              </div>
-              <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Physical Shopfront Checked
-              </h3>
-              <p className="text-xs text-[#243b32] leading-relaxed">
-                Physically scouted by student ambassadors. Real photos of tools/shelves, verified landmark, and confirmed prices.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 5 GOLDEN RULES FOR CAMPUS TRADE */}
-        <section className="bg-[#edf2e5] border border-[#dfe5d8] rounded-2xl p-6 md:p-8 space-y-4">
-          <h2 className="font-display font-black text-2xl text-[#243b32] uppercase">
-            5 Golden Rules for Hiring Campus Services
-          </h2>
-
-          <div className="space-y-3 text-sm text-[#243b32] font-body">
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>1. Inspect before full payment:</strong> Always test replaced screens, laptop keyboards, or tailored clothes before leaving the kiosk.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>2. Pay via M-Pesa Buy Goods / Till:</strong> Official till numbers provide clear transactional audit trails.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>3. Never send deposit to unverified phone numbers:</strong> For hostels or room deposits, visit in person first.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>4. Report ghost or inactive numbers:</strong> Click the three dots on any profile to report outdated contacts.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>5. Agree on diagnosis costs upfront:</strong> Confirm whether opening a phone or laptop incurs a diagnostic fee.
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-      <BottomNav />
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbsSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(dealsItemListSchema) }}
+      />
+      <DealsPageClient initialDeals={deals} />
+    </>
   );
 }

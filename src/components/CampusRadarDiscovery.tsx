@@ -191,7 +191,7 @@ function SpotlightCard({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={business.coverPhoto || business.photos[0]}
-            alt={business.name}
+            alt={`${business.name} storefront in ${business.zone}, Moi University Kesses`}
             className="w-full h-full object-cover"
           />
         </div>

@@ -28,7 +28,7 @@ function AdminConsoleContent() {
   const [error, setError] = useState('');
   const [busyTarget, setBusyTarget] = useState('');
   const [listingSearch, setListingSearch] = useState('');
-  const [siteOrigin, setSiteOrigin] = useState('');
+  const [siteOrigin] = useState(() => (typeof window !== 'undefined' ? window.location.origin : ''));
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
 
   const [expiringPromotions, setExpiringPromotions] = useState<Business[]>([]);
@@ -52,7 +52,7 @@ function AdminConsoleContent() {
     }).finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { setSiteOrigin(window.location.origin); void refreshData(); }, [refreshData]);
+  useEffect(() => { void refreshData(); }, [refreshData]);
 
   const handleAdminAction = async (action: string, targetId: string, reason?: string) => {
     if (busyTarget) return;

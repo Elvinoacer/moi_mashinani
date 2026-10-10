@@ -1,123 +1,149 @@
-'use client';
+import type { Metadata } from 'next';
+import { notFound, redirect } from 'next/navigation';
+import { CATEGORIES, SEED_BUSINESSES } from '@/lib/constants';
+import { CATEGORY_GROUPS, categoryMatches } from '@/lib/categories';
+import { Store } from '@/lib/store';
+import {
+  CATEGORY_ALIASES,
+  getCategorySeoData,
+  generateBreadcrumbSchema,
+  generateCategoryItemListSchema,
+  safeJsonLd,
+} from '@/lib/seo';
+import type { Business, Category } from '@/lib/types';
+import { CategoryPageClient } from './CategoryPageClient';
 
-import React, { useState, useEffect, use } from 'react';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { BusinessCard } from '@/components/BusinessCard';
-import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
-import { CATEGORIES } from '@/lib/constants';
-import { Business } from '@/lib/types';
-import { CategoryIcon, Store } from '@/components/icons';
-
-export default function CategoryPage({
-  params,
-}: {
+interface CategoryPageProps {
   params: Promise<{ category: string }>;
-}) {
-  const { category } = use(params);
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+}
 
-  const categoryObj = CATEGORIES.find((c) => c.slug === category) || {
-    id: category,
-    slug: category,
-    name: category.replace(/-/g, ' ').toUpperCase(),
-    icon: 'storefront',
-    description: 'Services and local businesses around Moi University Main Campus.',
+async function fetchCategoryBusinesses(categorySlug: string): Promise<Business[]> {
+  try {
+    const all = await Store.getBusinesses();
+    return all.filter(
+      (b) =>
+        b.status === 'ACTIVE' &&
+        categoryMatches(b, categorySlug)
+    );
+  } catch {
+    return SEED_BUSINESSES.filter(
+      (b) =>
+        b.status === 'ACTIVE' &&
+        categoryMatches(b, categorySlug)
+    );
+  }
+}
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { category: rawCategorySlug } = await params;
+  const categorySlug = CATEGORY_ALIASES[rawCategorySlug] || rawCategorySlug;
+
+  const leafCategory = CATEGORIES.find((c) => c.slug === categorySlug);
+  const groupCategory = CATEGORY_GROUPS.find((g) => g.slug === categorySlug);
+
+  if (!leafCategory && !groupCategory) {
+    return {
+      title: 'Category Not Found | MoiMashinani',
+      description: 'Campus category not found on MoiMashinani.',
+      robots: { index: false, follow: true },
+    };
+  }
+
+  const seo = getCategorySeoData(categorySlug);
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    alternates: {
+      canonical: `/c/${categorySlug}`,
+    },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: `/c/${categorySlug}`,
+      siteName: 'MoiMashinani',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  };
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { category: rawCategorySlug } = await params;
+
+  // Handle aliases (e.g. hostels-rentals -> hostels-rooms) with 301 redirect
+  if (CATEGORY_ALIASES[rawCategorySlug]) {
+    redirect(`/c/${CATEGORY_ALIASES[rawCategorySlug]}`);
+  }
+
+  const categorySlug = rawCategorySlug;
+  const leafCategory = CATEGORIES.find((c) => c.slug === categorySlug);
+  const groupCategory = CATEGORY_GROUPS.find((g) => g.slug === categorySlug);
+
+  if (!leafCategory && !groupCategory) {
+    return notFound();
+  }
+
+  const categoryObj: Category = leafCategory || {
+    id: groupCategory!.slug,
+    slug: groupCategory!.slug,
+    name: groupCategory!.name,
+    icon: groupCategory!.icon,
+    description: `All ${groupCategory!.name.toLowerCase()} around Moi University Main Campus (Kesses).`,
     color: '#183e35',
+    group: groupCategory!.slug,
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(`/api/businesses?category=${encodeURIComponent(category)}`, { signal: controller.signal })
-      .then(async response => { const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Could not load businesses. Please reload.'); return data; })
-      .then(data => { if (!controller.signal.aborted) { setBusinesses(data.results || []); setError(''); setLoading(false); } })
-      .catch(cause => { if (!controller.signal.aborted) { setError(cause instanceof Error ? cause.message : 'Connection error. Please reload.'); setLoading(false); } });
-    return () => controller.abort();
-  }, [category]);
+  const businesses = await fetchCategoryBusinesses(categorySlug);
+
+  // If group, related are the leaf categories inside that group
+  // If leaf, related are peer categories in the same group
+  const relatedCategories = leafCategory
+    ? CATEGORIES.filter((c) => c.group === categoryObj.group && c.slug !== categorySlug).slice(0, 6)
+    : CATEGORIES.filter((c) => c.group === groupCategory!.slug).slice(0, 8);
+
+  const seo = getCategorySeoData(categorySlug);
+
+  const breadcrumbItems = [
+    { name: 'Home', url: '/' },
+    { name: 'Categories', url: '/categories' },
+  ];
+
+  if (leafCategory && seo.groupName && seo.groupName !== 'Campus Services') {
+    const parentGroup = CATEGORY_GROUPS.find((g) => g.slug === leafCategory.group);
+    if (parentGroup) {
+      breadcrumbItems.push({ name: parentGroup.name, url: `/c/${parentGroup.slug}` });
+    }
+  }
+
+  breadcrumbItems.push({ name: categoryObj.name, url: `/c/${categorySlug}` });
+
+  const breadcrumbsSchema = generateBreadcrumbSchema(breadcrumbItems);
+  const itemListSchema = generateCategoryItemListSchema(categorySlug, businesses);
 
   return (
-    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
-      <Navbar />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20 md:pb-12">
-        {/* Category Header Banner */}
-        <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-5 md:p-8 flex items-start gap-4">
-          <div
-            className="w-14 h-14 md:w-16 md:h-16 rounded-xl border border-[#dfe5d8] flex items-center justify-center shrink-0"
-            style={{ backgroundColor: `${categoryObj.color}15`, color: categoryObj.color }}
-          >
-            <CategoryIcon slug={categoryObj.slug} className="w-8 h-8" />
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase">
-              <Link href="/" className="hover:underline">Home</Link>
-              <span>/</span>
-              <span>Category</span>
-            </div>
-            <h1 className="font-display font-black text-2xl md:text-4xl text-[#243b32] uppercase tracking-tight mt-1">
-              {categoryObj.name}
-            </h1>
-            <p className="text-sm text-[#667064] mt-1 max-w-2xl font-body">
-              {categoryObj.description}
-            </p>
-          </div>
-        </section>
-
-        {/* Listings in this Category */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-lg md:text-xl text-[#243b32] uppercase">
-              {loading ? 'Finding shops...' : `${businesses.length} local businesses in Kesses`}
-            </h2>
-            <Link
-              href={`/search?category=${category}`}
-              className="text-xs font-bold text-[#183e35] hover:underline"
-            >
-              Open in Advanced Filter →
-            </Link>
-          </div>
-
-          {error ? <p role="alert" className="rounded-xl bg-white p-5 text-sm text-[#a7302d]">{error}</p> : loading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"></div>
-              ))}
-            </div>
-          ) : businesses.length > 0 ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {businesses.map((biz) => (
-                <BusinessCard key={biz.id} business={biz} />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white p-8 rounded-2xl border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] text-center space-y-3">
-              <Store className="w-12 h-12 text-[#758071] mx-auto" />
-              <h3 className="font-display font-bold text-xl text-[#243b32]">
-                No businesses listed in this category yet!
-              </h3>
-              <p className="text-sm text-[#667064] font-body">
-                Be the first to list your business here for free.
-              </p>
-              <Link
-                href="/onboard"
-                className="inline-block bg-[#335e41] text-white px-5 py-2.5 rounded-full font-bold text-xs uppercase border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] press-action"
-              >
-                + List Your Shop
-              </Link>
-            </div>
-          )}
-        </section>
-        <JoinNeighborhoodCard />
-
-      </main>
-
-      <Footer />
-      <BottomNav />
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbsSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(itemListSchema) }}
+      />
+      <CategoryPageClient
+        categorySlug={categorySlug}
+        categoryObj={categoryObj}
+        initialBusinesses={businesses}
+        relatedCategories={relatedCategories}
+        popularSearches={seo.synonyms.slice(0, 8)}
+      />
+    </>
   );
 }
+

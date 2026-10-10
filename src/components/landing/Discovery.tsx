@@ -123,7 +123,7 @@ function DiscoveryCard({ business }: { business: LandingBusiness }) {
         {imageSource && !imageFailed ? (
           <Image
             src={imageSource}
-            alt=""
+            alt={`${business.name} — ${business.categoryName} in ${business.zoneName}, Moi University`}
             fill
             sizes="(max-width: 580px) calc(100vw - 40px), (max-width: 1000px) 45vw, 300px"
             unoptimized

@@ -1,5 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+
+export const metadata: Metadata = {
+  title: "MoiMashinani — Moi University Campus Business Directory | Kesses",
+  description:
+    "Find food, kibandas, student hostels, bedsitters, kinyozi salons, phone repairs, groceries, printing and campus fundis around Moi University Main Campus (Kesses). Direct WhatsApp & call contacts.",
+  alternates: {
+    canonical: "/",
+  },
+};
 import {
   ArrowDown,
   ArrowDownRight,

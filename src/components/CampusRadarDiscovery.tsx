@@ -8,6 +8,7 @@ import { CategorySelect } from '@/components/CategorySelect';
 import { categoryMatches } from '@/lib/categories';
 import { BusinessCard } from '@/components/BusinessCard';
 import { useNow } from '@/lib/useNow';
+import { trackBusinessEvent } from '@/lib/track-business-event';
 import {
   CAMPUS_ANCHORS,
   CampusAnchor,
@@ -245,6 +246,7 @@ function SpotlightCard({
       {/* Instant Action CTAs: 1-Tap Google Maps + Two-Tap Call & WhatsApp */}
       <div className="space-y-2 pt-1">
         <a
+          onClick={() => trackBusinessEvent(business.id, 'directions')}
           href={buildGoogleMapsUrl({
             destCoords: business.mapPin,
             originCoords: currentCoords,
@@ -262,6 +264,7 @@ function SpotlightCard({
 
         <div className="grid grid-cols-2 gap-2">
           <a
+            onClick={() => trackBusinessEvent(business.id, 'call')}
             href={`tel:${business.phone}`}
             className="bg-[#C2185B] hover:bg-[#9E1049] text-white text-xs font-display font-bold py-2.5 px-3 rounded-xl border-[1.5px] border-[#001C3B] shadow-[1px_1px_0px_#001C3B] press-action flex items-center justify-center gap-1.5"
           >
@@ -269,6 +272,7 @@ function SpotlightCard({
             <span>Call Shop</span>
           </a>
           <a
+            onClick={() => trackBusinessEvent(business.id, 'whatsapp')}
             href={`https://wa.me/${business.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(
               `Habari ${business.name}, nimeona biashara yako kwa MoiMashinani campus directory. Uko open saa hii?`
             )}`}

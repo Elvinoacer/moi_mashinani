@@ -8,6 +8,7 @@ import { ReportModal } from './ReportModal';
 import { CATEGORIES, ZONES } from '@/lib/constants';
 import { buildGoogleMapsUrl } from '@/lib/geo';
 import { useNow } from '@/lib/useNow';
+import { trackBusinessEvent } from '@/lib/track-business-event';
 import type { Business, Tier } from '@/lib/types';
 import styles from './BusinessCard.module.css';
 
@@ -76,9 +77,7 @@ export function BusinessCard({
   const whatsappUrl = 'https://wa.me/' + whatsappPhone + '?text=' + whatsappMessage;
 
   function record(type: 'call' | 'whatsapp' | 'directions') {
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/events', JSON.stringify({ businessId: business.id, type }));
-    }
+    trackBusinessEvent(business.id, type);
   }
 
   function handleCall() {

@@ -12,6 +12,7 @@
     "check:production": "tsx scripts/check-production.ts",
     "db:migrate": "prisma migrate deploy --config prisma7.config.ts",
     "admin:create": "tsx scripts/create-admin.ts",
+    "test:metrics": "tsx scripts/test-metrics.ts",
     "test:engine": "tsx scripts/test-engine.ts",
     "test:categories": "tsx --test scripts/test-categories.ts",
     "test:catalog": "tsx --test scripts/test-catalog-plan.ts",

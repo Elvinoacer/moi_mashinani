@@ -36,13 +36,13 @@ async function shutdown(exitCode = 0) {
 process.once('SIGINT',()=>void shutdown());process.once('SIGTERM',()=>void shutdown());
 async function main() {
   await control.connect(); await control.query(`CREATE DATABASE "${dbName}"`);
-  const env: NodeJS.ProcessEnv = {...process.env,DATABASE_URL:databaseUrl,APP_URL:'http://127.0.0.1:3100',RESEND_API_KEY:'re_test_harness',EMAIL_FROM:'MoiMashinani Test <accounts@test.invalid>',NEXT_DIST_DIR:'.next-test',INTASEND_PUBLIC_KEY:'',INTASEND_SECRET_KEY:'',INTASEND_WEBHOOK_CHALLENGE:'',ADMIN_EMAIL:admin.email,ADMIN_PASSWORD:admin.password,NODE_ENV:'development'};
+  const env: NodeJS.ProcessEnv = {...process.env,DATABASE_URL:databaseUrl,DATABASE_URL_UNPOOLED:databaseUrl,APP_URL:'http://127.0.0.1:3100',RESEND_API_KEY:'re_test_harness',EMAIL_FROM:'MoiMashinani Test <accounts@test.invalid>',NEXT_DIST_DIR:'.next-test',INTASEND_PUBLIC_KEY:'',INTASEND_SECRET_KEY:'',INTASEND_WEBHOOK_CHALLENGE:'',ADMIN_EMAIL:admin.email,ADMIN_PASSWORD:admin.password,NODE_ENV:'development'};
   await command(['node_modules/prisma/build/index.js','migrate','deploy','--config','prisma7.config.ts'],env);
   await command(['node_modules/tsx/dist/cli.mjs','prisma/seed.ts'],env);
   await command(['node_modules/tsx/dist/cli.mjs','scripts/create-admin.ts'],env);
   writeFileSync(contextPath,JSON.stringify({databaseUrl,baseUrl:env.APP_URL,admin,mailPath},null,2),{mode:0o600});
   writeFileSync(mailPath,'[]',{mode:0o600});
-  const runningServer = spawn(process.execPath,['--import',resolve('scripts/mock-resend.mjs'),'node_modules/next/dist/bin/next','dev','--hostname','127.0.0.1','--port','3100'],{env,stdio:'inherit'});
+  const runningServer = spawn(process.execPath,['--import',resolve('scripts/mock-resend.mjs'),'node_modules/next/dist/bin/next','dev','--webpack','--hostname','127.0.0.1','--port','3100'],{env,stdio:'inherit'});
   server = runningServer;
   runningServer.once('exit',code=>void shutdown(code ? 1 : 0));
   console.log('Workflow harness context ready at '+contextPath);

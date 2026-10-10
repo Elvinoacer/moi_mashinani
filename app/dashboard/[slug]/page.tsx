@@ -11,7 +11,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { AccountGate } from '@/components/AccountGate';
-import { Business, BusinessHours, BookingIntent, PaymentRecord, ServiceItem } from '@/lib/types';
+import { Business, BusinessHours, BusinessMetrics, BookingIntent, PaymentRecord, ServiceItem } from '@/lib/types';
 import { ZONES } from '@/lib/constants';
 import { useNow } from '@/lib/useNow';
 import { CatalogPlanPanel, type CatalogUsage } from '@/components/CatalogPlanPanel';
@@ -45,6 +45,9 @@ function BusinessDashboard({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [billingError, setBillingError] = useState('');
+  const [metricsError, setMetricsError] = useState('');
+  const [metricsRefresh, setMetricsRefresh] = useState(0);
+  const [metricsRefreshing, setMetricsRefreshing] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState('');
@@ -88,6 +91,43 @@ function BusinessDashboard({ slug }: { slug: string }) {
     void load();
     return () => controller.abort();
   }, [slug]);
+
+  const businessId = business?.id;
+  useEffect(() => {
+    if (!businessId) return;
+    const controller = new AbortController();
+    let inFlight = false;
+    async function refreshMetrics() {
+      if (document.visibilityState === 'hidden' || inFlight) return;
+      inFlight = true;
+      setMetricsRefreshing(true);
+      try {
+        const metrics = await fetch(`/api/businesses/${encodeURIComponent(slug)}/metrics`, {
+          signal: controller.signal, cache: 'no-store',
+        }).then(readResponse<BusinessMetrics>);
+        if (!controller.signal.aborted) {
+          setBusiness(current => current && current.id === businessId ? { ...current, metrics } : current);
+          setMetricsError('');
+        }
+      } catch (failure) {
+        if (!controller.signal.aborted) setMetricsError(failure instanceof Error ? failure.message : 'Could not refresh metrics.');
+      } finally {
+        inFlight = false;
+        if (!controller.signal.aborted) setMetricsRefreshing(false);
+      }
+    }
+    void refreshMetrics();
+    const onFocus = () => { void refreshMetrics(); };
+    const interval = window.setInterval(onFocus, 30000);
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onFocus);
+    return () => {
+      controller.abort();
+      window.clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus);
+    };
+  }, [slug, businessId, metricsRefresh]);
 
   async function patchBusiness(fields: Partial<Business>) {
     const updated = await fetch(`/api/businesses/${encodeURIComponent(slug)}`, {
@@ -179,6 +219,11 @@ function BusinessDashboard({ slug }: { slug: string }) {
           <button type="button" disabled={Boolean(busy) || business.isTemporarilyClosed || business.status !== 'ACTIVE'} aria-pressed={isAvailable} onClick={() => void runAction('available', async () => setBusiness(await fetch(`/api/businesses/${slug}/toggle-available`, { method: 'POST' }).then(readResponse<Business & {mediaCleanup?: {deleted:number;pending:number;retained:number}}>)), isAvailable ? 'Available now turned off.' : 'Available now enabled for 4 hours.')} className={buttonClass}>{isAvailable ? 'Turn off Available now' : 'Available now for 4 hours'}</button>
           <button type="button" disabled={Boolean(busy)} aria-pressed={Boolean(business.isTemporarilyClosed)} onClick={() => void runAction('closed', () => patchBusiness({ isTemporarilyClosed: !business.isTemporarilyClosed }), business.isTemporarilyClosed ? 'Business reopened.' : 'Business marked temporarily closed.')} className="rounded-full border border-[#dfe5d8] px-5 py-2.5 text-sm font-bold disabled:opacity-50">{business.isTemporarilyClosed ? 'Reopen business' : 'Mark temporarily closed'}</button>
         </div><p className="text-xs text-[#667064]">Customers see your current availability. Temporarily closing the listing pauses booking requests.</p></div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs text-[#667064]">All-time activity · Updates every 30 seconds and when you return to this tab. Calls and WhatsApp count button taps.</p>
+          <button type="button" disabled={metricsRefreshing} onClick={() => setMetricsRefresh(value => value + 1)} className="flex items-center gap-1 text-xs font-bold text-[#335e41] disabled:opacity-50"><RefreshCw className="h-4 w-4" />{metricsRefreshing ? 'Refreshing metrics…' : 'Refresh metrics'}</button>
+        </div>
+        {metricsError && <p role="alert" className="text-sm text-[#a7302d]">Metrics could not be refreshed. Showing the last loaded counts. {metricsError}</p>}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">{[['Profile views', business.metrics.views], ['Calls', business.metrics.calls], ['WhatsApp', business.metrics.whatsapp], ['Directions clicks', business.metrics.directions], ['Booking requests', business.metrics.bookingRequests]].map(([label, value]) => <div key={label} className="rounded-xl bg-white p-4 signboard-border"><p className="text-xs text-[#667064]">{label}</p><p className="font-display text-3xl font-bold text-[#243b32]">{value}</p></div>)}</div>
         <div className={panelClass}><h2 className="font-display text-xl font-bold">Promotion status</h2><p className="text-sm">{tierActive ? `${business.activeTier} placement until ${new Date(business.tierEndsAt!).toLocaleString('en-GB', { timeZone: 'Africa/Nairobi' })}` : 'Free organic listing'}</p><p className="text-xs text-[#667064]">Paid placement activates after payment verification.</p></div>
       </div>}

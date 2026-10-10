@@ -364,11 +364,11 @@ export const Store = {
     return false;
   },
 
-  async recordEvent(businessId: string, eventType: 'view' | 'call' | 'whatsapp' | 'directions' | 'booking'): Promise<void> {
+  async recordEvent(businessId: string, eventType: 'view' | 'call' | 'whatsapp' | 'directions' | 'booking', db: Prisma.TransactionClient = prisma): Promise<void> {
     const key = {view:'views',call:'calls',whatsapp:'whatsapp',directions:'directions',booking:'bookingRequests'}[eventType];
     if (!key) return;
     // Increment in SQL so simultaneous customer interactions cannot overwrite one another.
-    await prisma.$executeRaw`
+    await db.$executeRaw`
       UPDATE "Business" SET "metrics" = jsonb_set("metrics"::jsonb, ARRAY[${key}]::text[],
         to_jsonb(COALESCE(("metrics"->>${key})::int, 0) + 1)), "updatedAt" = NOW() WHERE "id" = ${businessId}`;
   },
@@ -528,23 +528,26 @@ export const Store = {
 
   async createBookingIntent(payload: Partial<BookingIntent>): Promise<BookingIntent> {
     const id = `book_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-    const created = await prisma.bookingIntent.create({
-      data: {
-        id,
-        businessId: payload.businessId || '',
-        serviceName: payload.serviceName || 'General inquiry',
-        day: payload.day || 'Today',
-        time: payload.time || 'Afternoon',
-        studentName: payload.studentName || 'Student',
-        note: payload.note || null,
-        contactPhone: payload.contactPhone || null,
-        status: 'NEW',
-      },
-    });
+    const created = await prisma.$transaction(async tx => {
+      const booking = await tx.bookingIntent.create({
+        data: {
+          id,
+          businessId: payload.businessId || '',
+          serviceName: payload.serviceName || 'General inquiry',
+          day: payload.day || 'Today',
+          time: payload.time || 'Afternoon',
+          studentName: payload.studentName || 'Student',
+          note: payload.note || null,
+          contactPhone: payload.contactPhone || null,
+          status: 'NEW',
+        },
+      });
+      if (payload.businessId) {
+        await Store.recordEvent(payload.businessId, 'booking', tx);
+      }
 
-    if (payload.businessId) {
-      await Store.recordEvent(payload.businessId, 'booking');
-    }
+      return booking;
+    });
 
     return mapPrismaBooking(created);
   },

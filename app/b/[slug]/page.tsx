@@ -13,6 +13,7 @@ import { ClaimModal } from '@/components/ClaimModal';
 import { BusinessCard } from '@/components/BusinessCard';
 import { Business } from '@/lib/types';
 import { useNow } from '@/lib/useNow';
+import { trackBusinessEvent } from '@/lib/track-business-event';
 import {
   Store,
   Share2,
@@ -52,9 +53,7 @@ function BusinessProfile({ slug }: { slug: string }) {
         if (!response.ok) throw new Error(response.status === 404 ? 'This business is not available.' : data.error || 'Could not load the business. Please try again.');
         if (controller.signal.aborted) return;
         setBusiness(data);
-        if (data.status === 'ACTIVE' && navigator.sendBeacon) {
-          navigator.sendBeacon('/api/events', JSON.stringify({ businessId: data.id, type: 'view' }));
-        }
+        if (data.status === 'ACTIVE') trackBusinessEvent(data.id, 'view');
         const similar = await fetch(`/api/businesses?category=${encodeURIComponent(data.primaryCategory)}`, { signal: controller.signal });
         if (similar.ok) {
           const related = await similar.json();
@@ -112,28 +111,11 @@ function BusinessProfile({ slug }: { slug: string }) {
     !business.isTemporarilyClosed && business.availableNowUntil && new Date(business.availableNowUntil).getTime() > now
   );
 
-  const handleCall = () => {
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/events', JSON.stringify({ businessId: business.id, type: 'call' }));
-    }
-  };
-
-  const handleWhatsApp = () => {
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon(
-        '/api/events',
-        JSON.stringify({ businessId: business.id, type: 'whatsapp' })
-      );
-    }
-  };
+  const handleCall = () => trackBusinessEvent(business.id, 'call');
+  const handleWhatsApp = () => trackBusinessEvent(business.id, 'whatsapp');
 
   const handleDirections = () => {
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon(
-        '/api/events',
-        JSON.stringify({ businessId: business.id, type: 'directions' })
-      );
-    }
+    trackBusinessEvent(business.id, 'directions');
     const mapsUrl = business.mapPin
       ? `https://www.google.com/maps/dir/?api=1&destination=${business.mapPin.lat},${business.mapPin.lng}&travelmode=walking`
       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(

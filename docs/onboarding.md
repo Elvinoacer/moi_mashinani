@@ -48,6 +48,7 @@ In another terminal run:
 
 ```sh
 npm run test:workflows
+npm run test:metrics
 npm run test:payment-routes
 npx playwright install chromium
 npm run test:browser

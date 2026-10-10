@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Business } from '@/lib/types';
+import { trackBusinessEvent } from '@/lib/track-business-event';
 import { WhatsAppIcon } from '@/components/icons';
 import { ModalFrame } from '@/components/ModalFrame';
 
@@ -52,7 +53,7 @@ export function BookingModal({ business, onClose, initialService }: { business: 
         <div className="space-y-4 p-6 text-center">
           <h3 aria-live="polite" className="font-display text-xl font-bold text-[#243b32]">Booking request saved</h3>
           <p className="text-sm text-[#667064]">The owner can now see your request. Contact them on WhatsApp and wait for confirmation before visiting.</p>
-          {phoneDigits && <a href={`https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
+          {phoneDigits && <a onClick={() => trackBusinessEvent(business.id, 'whatsapp')} href={`https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-[#243b32]">
             <WhatsAppIcon className="h-5 w-5" /> Continue on WhatsApp
           </a>}

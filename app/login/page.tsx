@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { PasswordField } from '@/components/PasswordField';
 
 function LoginForm() {
   const router = useRouter();
@@ -34,7 +35,7 @@ function LoginForm() {
   return <section className="rounded-2xl border border-[#dfe5d8] bg-white p-6 md:p-8 space-y-5">
     <div><h1 className="font-display text-2xl font-bold text-[#243b32]">{requestLink ? 'Get an account link' : 'Sign in'}</h1><p className="mt-2 text-sm text-[#667064]">{requestLink ? 'Request a new link if your invitation expired, you need to verify your email, or you forgot your password.' : 'Manage your business profile, customer requests and promotions.'}</p></div>
     <form onSubmit={submit} className="space-y-4"><label className="block"><span className="mb-1.5 block text-xs font-bold text-[#243b32]">Email address</span><input required type="email" maxLength={254} autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} disabled={busy} className={inputClass} /></label>
-      {!requestLink && <label className="block"><span className="mb-1.5 block text-xs font-bold text-[#243b32]">Password</span><input required type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} className={inputClass} /></label>}
+      {!requestLink && <PasswordField label="Password" required autoComplete="current-password" maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} className={inputClass} />}
       {error && <p role="alert" className="rounded-xl bg-[#fce7e1] p-3 text-sm text-[#8f2424]">{error}</p>}{message && <p role="status" className="rounded-xl bg-[#edf2e5] p-3 text-sm text-[#335e41]">{message}</p>}
       <button disabled={busy} type="submit" className="w-full rounded-xl bg-[#243b32] py-3 text-sm font-bold text-white disabled:opacity-50">{busy ? 'Please wait…' : requestLink ? 'Email account link' : 'Sign in'}</button>
     </form>

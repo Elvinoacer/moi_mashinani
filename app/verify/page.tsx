@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { PasswordField } from '@/components/PasswordField';
 
 function VerificationForm() {
   const params = useSearchParams();
@@ -32,7 +33,7 @@ function VerificationForm() {
   return <section className="rounded-2xl border border-[#dfe5d8] bg-white p-6 md:p-8 space-y-5">
     <h1 className="font-display text-2xl font-bold text-[#243b32]">Verify your account</h1>
     {token ? <><p className="text-sm text-[#667064]">Set a password to complete account setup and sign in. Use at least 12 characters. If this invitation adds a business to an existing account, enter your existing password instead.</p>
-      <form onSubmit={verify} className="space-y-4"><label className="block"><span className="mb-1.5 block text-xs font-bold text-[#243b32]">Password</span><input required type="password" autoComplete="new-password" minLength={12} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} className={inputClass} /></label><label className="block"><span className="mb-1.5 block text-xs font-bold text-[#243b32]">Confirm password</span><input required type="password" autoComplete="new-password" minLength={12} maxLength={128} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} disabled={busy} className={inputClass} /></label>
+      <form onSubmit={verify} className="space-y-4"><PasswordField label="Password" required autoComplete="new-password" minLength={12} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} className={inputClass} /><PasswordField label="Confirm password" required autoComplete="new-password" minLength={12} maxLength={128} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} disabled={busy} className={inputClass} />
       {error && <p role="alert" className="rounded-xl bg-[#fce7e1] p-3 text-sm text-[#8f2424]">{error}</p>}
       <button type="submit" disabled={busy} className="w-full rounded-xl bg-[#243b32] py-3 text-sm font-bold text-white disabled:opacity-50">{busy ? 'Verifying…' : 'Verify & open my account'}</button></form></> : <p role="alert" className="rounded-xl bg-[#fce7e1] p-3 text-sm text-[#8f2424]">This link is missing its verification code. Open the complete link from your email or request a new one.</p>}
     <Link href="/login" className="inline-block text-sm font-semibold text-[#335e41] underline">Link expired? Request a new account link</Link>

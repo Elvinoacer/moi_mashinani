@@ -38,6 +38,17 @@ async function main() {
     await admin.getByLabel('Business and product photos',{exact:true}).setInputFiles({name:'shop.png',mimeType:'image/png',buffer:photo});
     await expect(admin.getByRole('img',{name:'Business photo 1',exact:true})).toBeVisible({timeout:45000});
     await admin.getByLabel('Product photo',{exact:true}).selectOption({label:'Photo 1 (cover)'});
+    for (const width of [320, 360, 390, 430, 768]) {
+    await admin.setViewportSize({width,height:844});
+    const clippedInputs = await admin.locator('input[type="time"]').evaluateAll((inputs) =>
+    inputs.filter(input => {const rect = input.getBoundingClientRect(); return rect.left < -1 || rect.right > window.innerWidth + 1;})
+    .map(input => input.getAttribute('aria-label')));
+    assert.deepEqual(clippedInputs,[],`Opening hours time inputs clipped at ${width}px`);
+    }
+    await expect(admin.getByLabel('Sunday opening time',{exact:true})).toBeDisabled();
+    await admin.getByLabel('Sunday closed',{exact:true}).uncheck();
+    await expect(admin.getByLabel('Sunday opening time',{exact:true})).toBeEnabled();
+    await admin.getByLabel('Sunday closed',{exact:true}).check();
     await admin.setViewportSize({width:390,height:844});
     await admin.screenshot({path:'/tmp/moimashinani-browser/mobile-enrollment.png',fullPage:true});
     assert.ok(await admin.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth),'Mobile enrollment has no horizontal overflow');

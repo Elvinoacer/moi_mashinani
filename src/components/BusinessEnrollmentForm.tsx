@@ -110,7 +110,49 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
       {detailInput('landmark', 'Nearby landmark', { required: true, maxLength: 240, placeholder: 'e.g. Opposite the main gate' })}{detailInput('address', 'Address or directions', { maxLength: 300 })}
     </div><div className="rounded-xl border border-[#dfe5d8] p-4 space-y-3"><p className="text-xs text-[#667064]">Optional map pin: capture your location while standing at the business, or enter its coordinates.</p><button type="button" onClick={useCurrentLocation} disabled={locating || submitting} className="text-sm font-bold text-[#335e41] disabled:opacity-50">{locating ? 'Finding location…' : 'Use current location'}</button><div className="grid gap-3 sm:grid-cols-2">{detailInput('latitude', 'Latitude', { type: 'number', step: 'any', placeholder: 'e.g. 0.2831' })}{detailInput('longitude', 'Longitude', { type: 'number', step: 'any', placeholder: 'e.g. 35.2905' })}</div></div><div><span className={labelClass}>How customers are served *</span><div className="flex flex-wrap gap-3">{[['at_shop', 'At the shop'], ['comes_to_you', 'Comes to you'], ['delivery', 'Delivery'], ['online', 'Online']].map(([value, label]) => <label key={value} className="flex items-center gap-2 text-sm text-[#243b32]"><input type="checkbox" checked={serviceModes.includes(value)} onChange={(event) => setServiceModes((current) => event.target.checked ? [...current, value] : current.filter((item) => item !== value))} className="accent-[#335e41]" />{label}</label>)}</div></div></fieldset>
     <fieldset disabled={submitting} className="space-y-3 disabled:opacity-75"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Opening hours</legend><p className="text-xs text-[#667064]">Times are in Kenya time. Closing time can be the next morning for overnight businesses.</p>
-      {DAYS.map((day, index) => <div key={day} className="grid grid-cols-[85px_1fr_1fr] gap-2 items-center sm:grid-cols-[100px_1fr_1fr_90px]"><span className="text-xs font-bold text-[#243b32]">{DAY_LABELS[index]}</span><input type="time" aria-label={`${DAY_LABELS[index]} opening time`} disabled={hours[day].closed || submitting} required={!hours[day].closed} value={hours[day].open} onChange={(event) => setHours((current) => ({ ...current, [day]: { ...current[day], open: event.target.value } }))} className={`${inputClass} disabled:opacity-40`} /><input type="time" aria-label={`${DAY_LABELS[index]} closing time`} disabled={hours[day].closed || submitting} required={!hours[day].closed} value={hours[day].close} onChange={(event) => setHours((current) => ({ ...current, [day]: { ...current[day], close: event.target.value } }))} className={`${inputClass} disabled:opacity-40`} /><label className="col-start-2 flex gap-2 items-center text-xs text-[#243b32] sm:col-start-auto"><input type="checkbox" checked={!!hours[day].closed} onChange={(event) => setHours((current) => ({ ...current, [day]: { ...current[day], closed: event.target.checked } }))} className="accent-[#335e41]" />Closed</label></div>)}
+      {DAYS.map((day, index) => (
+        <div key={day} className="min-w-0 rounded-xl border border-[#dfe5d8] bg-[#fbfcf7] p-3 sm:p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-sm font-bold text-[#243b32]">{DAY_LABELS[index]}</span>
+            <label className="inline-flex shrink-0 items-center gap-2 text-sm text-[#243b32]">
+              <input
+                type="checkbox"
+                aria-label={`${DAY_LABELS[index]} closed`}
+                checked={!!hours[day].closed}
+                onChange={(event) => setHours((current) => ({ ...current, [day]: { ...current[day], closed: event.target.checked } }))}
+                className="h-4 w-4 accent-[#335e41]"
+              />
+              Closed
+            </label>
+          </div>
+          <div className="grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-3">
+            <label className="block min-w-0 text-xs font-semibold text-[#4f6256]">
+              <span className="mb-1.5 block">Opens</span>
+              <input
+                type="time"
+                aria-label={`${DAY_LABELS[index]} opening time`}
+                disabled={hours[day].closed || submitting}
+                required={!hours[day].closed}
+                value={hours[day].open}
+                onChange={(event) => setHours((current) => ({ ...current, [day]: { ...current[day], open: event.target.value } }))}
+                className={`${inputClass} min-w-0 max-w-full disabled:opacity-40`}
+              />
+            </label>
+            <label className="block min-w-0 text-xs font-semibold text-[#4f6256]">
+              <span className="mb-1.5 block">Closes</span>
+              <input
+                type="time"
+                aria-label={`${DAY_LABELS[index]} closing time`}
+                disabled={hours[day].closed || submitting}
+                required={!hours[day].closed}
+                value={hours[day].close}
+                onChange={(event) => setHours((current) => ({ ...current, [day]: { ...current[day], close: event.target.value } }))}
+                className={`${inputClass} min-w-0 max-w-full disabled:opacity-40`}
+              />
+            </label>
+          </div>
+        </div>
+      ))}
     </fieldset>
     {mode === 'admin' ? <fieldset disabled={submitting || Boolean(removingPhoto)} className="space-y-4"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Place & product photos</legend><p className="text-sm text-[#667064]">Add up to 8 clear photos of the shop and a few products. The first photo is the cover. JPG, PNG or WebP; up to 5 MB each before automatic compression. Free includes 25 MB total.</p><PhotoUploader label="Business and product photos" multiple camera maxFiles={8-photos.length} disabled={submitting || photos.length>=8} disabledReason="Your gallery is full. Remove a photo before adding more." onBusyChange={setUploading} onUploaded={urls=>setPhotos(current=>[...current,...urls])} readyMessage="Uploaded. Submit this form to save the photos with the business." saveMessage="Adding photos to this form…" />
       {(removingPhoto || photoNotice) && <p role="status" className="text-sm text-[#335e41]">{removingPhoto ? 'Deleting photo from storage…' : photoNotice}</p>}

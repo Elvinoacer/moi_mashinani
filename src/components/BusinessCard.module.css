@@ -392,3 +392,7 @@
   .card,.cover,.mediaArrow,.call,.whatsapp,.utility,.report { transition: none !important; }
   .card:hover { transform: none; }
 }
+
+.booking { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 44px; margin-top: 14px; border: 0; border-radius: 999px; background: #183e35; color: white; font-size: 13px; font-weight: 750; cursor: pointer; }
+.booking:disabled { opacity: .55; cursor: not-allowed; }
+.bookingNote { margin: 7px 0 0; color: #667064; text-align: center; font-size: 10px; }

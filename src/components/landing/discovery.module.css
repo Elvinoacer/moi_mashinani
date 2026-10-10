@@ -727,3 +727,11 @@
   .card::before,.cardArrow { transition: none; }
   .card:hover,.card:hover .cardArrow { transform: none; }
 }
+
+.profileLink { display: block; color: inherit; text-decoration: none; border-radius: inherit; }
+.profileLink:focus-visible { outline: 3px solid #84a14b; outline-offset: -3px; }
+.bookingAction { padding: 0 19px 19px; }
+.bookingAction button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; width: 100%; border: 0; border-radius: 999px; background: #183e35; color: white; font-size: 13px; font-weight: 700; cursor: pointer; }
+.bookingAction button:disabled { opacity: .55; cursor: not-allowed; }
+.bookingAction button:focus-visible { outline: 3px solid #84a14b; outline-offset: 3px; }
+.bookingAction p { margin: 8px 0 0; font-size: 10px; color: #667064; text-align: center; }

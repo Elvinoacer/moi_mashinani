@@ -1,7 +1,12 @@
 'use client';
 
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from '@/components/icons';
+
+const subscribe = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
 
 export function ModalFrame({ title, onClose, children }: {
   title: string;
@@ -10,14 +15,18 @@ export function ModalFrame({ title, onClose, children }: {
 }) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const mounted = useSyncExternalStore(subscribe, clientSnapshot, serverSnapshot);
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
 
   useEffect(() => {
+    if (!mounted) return;
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     dialogRef.current?.focus();
     function handleKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') closeRef.current();
       if (event.key !== 'Tab') return;
       const elements = dialogRef.current?.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]');
       if (!elements?.length) return;
@@ -37,9 +46,10 @@ export function ModalFrame({ title, onClose, children }: {
       document.removeEventListener('keydown', handleKey);
       previousFocus?.focus();
     };
-  }, [onClose]);
+  }, [mounted]);
 
-  return (
+  // Layout transforms and container queries must not constrain the fixed dialog.
+  return mounted ? createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-[#243b32]/60 p-4 backdrop-blur-xs">
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}
         className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-xl bg-white signboard-border-thick signboard-shadow-lg">
@@ -49,6 +59,6 @@ export function ModalFrame({ title, onClose, children }: {
         </div>
         {children}
       </div>
-    </div>
-  );
+    </div>, document.body
+  ) : null;
 }

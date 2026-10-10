@@ -11,8 +11,10 @@ function todayInKenya() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Nairobi', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 }
 
-export function BookingModal({ business, onClose }: { business: Business; onClose: () => void }) {
-  const [selectedService, setSelectedService] = useState(business.services[0]?.name || 'General inquiry');
+export type BookingBusiness = Pick<Business,'id'|'name'|'services'|'whatsapp'|'phone'|'status'|'isTemporarilyClosed'>;
+
+export function BookingModal({ business, onClose, initialService }: { business: BookingBusiness; onClose: () => void; initialService?:string }) {
+  const [selectedService, setSelectedService] = useState(initialService || business.services[0]?.name || 'General inquiry');
   const [selectedDay, setSelectedDay] = useState(todayInKenya);
   const [selectedTime, setSelectedTime] = useState('Afternoon (2:00 - 4:00 PM)');
   const [studentName, setStudentName] = useState('');
@@ -41,27 +43,27 @@ export function BookingModal({ business, onClose }: { business: Business; onClos
     } finally { setIsSubmitting(false); }
   }
 
-  const phoneDigits = business.whatsapp.replace(/\D/g, '').replace(/^0/, '254');
+  const phoneDigits = (business.whatsapp || business.phone || '').replace(/\D/g, '').replace(/^0/, '254');
   const message = `Hi ${business.name}, I requested "${selectedService}" for ${selectedDay} around ${selectedTime} on MoiMashinani. My name is ${studentName.trim()} and my phone is ${contactPhone.trim()}.${note.trim() ? ` Note: ${note.trim()}.` : ''} Please confirm availability.`;
 
   return (
     <ModalFrame title={`Request a booking with ${business.name}`} onClose={onClose}>
       {submitted ? (
         <div className="space-y-4 p-6 text-center">
-          <h3 className="font-display text-xl font-bold text-[#243b32]">Booking request saved</h3>
+          <h3 aria-live="polite" className="font-display text-xl font-bold text-[#243b32]">Booking request saved</h3>
           <p className="text-sm text-[#667064]">The owner can now see your request. Contact them on WhatsApp and wait for confirmation before visiting.</p>
-          <a href={`https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
+          {phoneDigits && <a href={`https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-[#243b32]">
             <WhatsAppIcon className="h-5 w-5" /> Continue on WhatsApp
-          </a>
+          </a>}
           <button type="button" onClick={onClose} className="block w-full text-sm font-bold text-[#667064]">Done</button>
         </div>
       ) : (
-        <form onSubmit={handleSendBooking} className="space-y-4 p-4 md:p-6">
-          <p className="text-sm text-[#667064]">Choose your preferred time. This is a request; the business will confirm availability with you.</p>
+        <form onSubmit={handleSendBooking} aria-busy={isSubmitting} className="space-y-4 p-4 md:p-6">
+          <p className="text-sm text-[#667064]">No account needed. Choose your preferred time; the business will confirm availability with you.</p>
           {error && <p role="alert" className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">{error}</p>}
           <label className="block text-xs font-bold text-[#243b32]">Service
-            <select value={selectedService} onChange={(event) => setSelectedService(event.target.value)} className={`${fieldClass} mt-1`}>
+            <select aria-label="Service" value={selectedService} onChange={(event) => setSelectedService(event.target.value)} className={`${fieldClass} mt-1`}>
               {business.services.map((service) => <option key={service.id} value={service.name}>{service.name}{service.priceFrom !== undefined ? ` (from KSh ${service.priceFrom.toLocaleString()})` : ''}</option>)}
               <option value="General inquiry">General inquiry / price check</option>
             </select>

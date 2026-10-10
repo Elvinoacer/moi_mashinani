@@ -213,6 +213,10 @@ export default async function HomePage() {
       services,
       studentDiscount,
       serviceModes,
+      phone,
+      whatsapp,
+      status,
+      isTemporarilyClosed,
     }) => ({
       id,
       name,
@@ -226,6 +230,10 @@ export default async function HomePage() {
       services,
       studentDiscount,
       serviceModes,
+      phone,
+      whatsapp,
+      status,
+      isTemporarilyClosed,
       categoryName:
         CATEGORIES.find((category) => category.slug === primaryCategory)
           ?.name ?? "Local business",

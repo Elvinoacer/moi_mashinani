@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, BadgeCheck, ChevronDown, MapPin, Search, Store } from 'lucide-react';
 import type { Business, ServiceItem } from '@/lib/types';
 import styles from './discovery.module.css';
+import { BookingModal } from '@/components/BookingModal';
 import { CATEGORY_GROUPS, categoryMatches } from '@/lib/categories';
 
 export type LandingBusiness = Pick<
@@ -23,6 +24,10 @@ export type LandingBusiness = Pick<
   | 'services'
   | 'studentDiscount'
   | 'serviceModes'
+  | 'phone'
+  | 'whatsapp'
+  | 'status'
+  | 'isTemporarilyClosed'
 > & { categoryName: string; zoneName: string };
 
 const popularSearches = ['Printing', 'Phone repair', 'Braids', 'Gas refill'];
@@ -105,12 +110,15 @@ function servicePrice(service: ServiceItem | undefined) {
 
 function DiscoveryCard({ business }: { business: LandingBusiness }) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [bookingOpen,setBookingOpen] = useState(false);
   const imageSource = coverSource(business.coverPhoto);
   const firstService = business.services[0];
   const price = servicePrice(firstService);
 
   return (
-    <Link href={`/b/${business.slug}`} className={styles.card}>
+    <>
+    <article className={styles.card}>
+    <Link href={`/b/${business.slug}`} className={styles.profileLink} aria-label={`View ${business.name} profile`}>
       <div className={styles.cardMedia}>
         {imageSource && !imageFailed ? (
           <Image
@@ -156,6 +164,15 @@ function DiscoveryCard({ business }: { business: LandingBusiness }) {
         </div>
       </div>
     </Link>
+    <div className={styles.bookingAction}>
+      <button type="button" disabled={business.isTemporarilyClosed || business.status!=='ACTIVE'} onClick={()=>setBookingOpen(true)} aria-label={`Request booking with ${business.name}`}>
+        {business.isTemporarilyClosed ? 'Bookings paused' : 'Request booking'} <ArrowUpRight size={16} aria-hidden="true" />
+      </button>
+      <p>{business.isTemporarilyClosed ? 'This business is temporarily closed.' : 'No account needed · owner confirms availability'}</p>
+    </div>
+    </article>
+    {bookingOpen&&<BookingModal business={business} onClose={()=>setBookingOpen(false)}/>}
+    </>
   );
 }
 

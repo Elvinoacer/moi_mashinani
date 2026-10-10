@@ -17,6 +17,7 @@
     "test:catalog": "tsx --test scripts/test-catalog-plan.ts",
     "test:catalog:db": "tsx scripts/test-catalog-db.ts",
     "test:catalog:browser": "tsx scripts/test-catalog-browser.ts",
+    "test:uploads:browser": "tsx scripts/test-upload-booking-browser.ts",
     "test:r2": "tsx --test scripts/test-r2.ts",
     "test:r2:live": "tsx scripts/test-r2-live.ts",
     "test:mail": "tsx --test scripts/test-mail.ts",

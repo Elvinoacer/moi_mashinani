@@ -35,7 +35,7 @@ async function main() {
     await admin.getByLabel('Phone number *',{exact:true}).fill('0712345678');await admin.getByLabel('Nearby landmark *',{exact:true}).fill('Across the campus gate');
     await admin.getByLabel('Product or service name',{exact:true}).fill('Screen diagnosis');await admin.getByLabel('Price from (KES)',{exact:true}).fill('150');
     const photo = await sharp({create:{width:300,height:200,channels:3,background:'#335e41'}}).png().toBuffer();
-    await admin.getByLabel('Choose business and product photos',{exact:true}).setInputFiles({name:'shop.png',mimeType:'image/png',buffer:photo});
+    await admin.getByLabel('Business and product photos',{exact:true}).setInputFiles({name:'shop.png',mimeType:'image/png',buffer:photo});
     await expect(admin.getByRole('img',{name:'Business photo 1',exact:true})).toBeVisible({timeout:45000});
     await admin.getByLabel('Product photo',{exact:true}).selectOption({label:'Photo 1 (cover)'});
     await admin.setViewportSize({width:390,height:844});

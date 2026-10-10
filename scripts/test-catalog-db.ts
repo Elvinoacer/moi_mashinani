@@ -135,6 +135,8 @@ async function main() {
   const pro=await Store.createBusiness({name:'Pro Catalogue Test',ownerId:owner.id,status:'ACTIVE',primaryCategory:'food-cafes',phone:'+254712345678',zone:'kesses-centre',services:Array.from({length:35},(_,i)=>({id:`large-${i}`,name:`Pro Product ${i+1}`,priceFrom:150}))});
   await prisma.business.update({where:{id:pro.id},data:{proEndsAt:new Date(Date.now()+3*864e5)}});
   await prisma.business.update({where:{id:business.id},data:{proEndsAt:new Date(Date.now()-864e5)}});
-  writeFileSync('/tmp/moimashinani-catalog-context.json',JSON.stringify({token,freeSlug:free.slug,proSlug:pro.slug,expiredSlug:business.slug,businessId:business.id}),{mode:0o600});
+  const admin=await prisma.account.create({data:{email:`upload-admin-${randomUUID()}@test.invalid`,name:'Upload Test Admin',role:'ADMIN',emailVerifiedAt:new Date()}});
+  const adminToken=await newSession(admin.id);
+  writeFileSync('/tmp/moimashinani-catalog-context.json',JSON.stringify({token,adminToken,freeSlug:free.slug,proSlug:pro.slug,expiredSlug:business.slug,businessId:business.id}),{mode:0o600});
 }
 main().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{mock.restoreAll();await prisma.$disconnect();});

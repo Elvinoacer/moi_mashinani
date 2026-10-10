@@ -172,6 +172,10 @@ export function BusinessCard({
             <div className={styles.discount}><Tag size={14} aria-hidden="true" /><span>{business.studentDiscount}</span></div>
           )}
 
+          <button type="button" disabled={Boolean(business.isTemporarilyClosed) || business.status !== 'ACTIVE'} onClick={()=>setBookingOpen(true)} className={styles.booking} aria-label={`Request booking with ${business.name}`}>
+            <Clock3 size={16} aria-hidden="true" /> {business.isTemporarilyClosed ? 'Bookings paused' : 'Request booking'}
+          </button>
+          <p className={styles.bookingNote}>{business.isTemporarilyClosed ? 'This business is temporarily closed.' : 'No account needed · owner confirms availability'}</p>
           <div className={styles.actions}>
             <a href={'tel:' + business.phone} onClick={handleCall} className={styles.call} aria-label={'Call ' + business.name}>
               <Phone size={16} aria-hidden="true" /> <span>Call shop</span>
@@ -187,11 +191,6 @@ export function BusinessCard({
               {showDirectionsButton && (
                 <button type="button" onClick={handleDirections} className={styles.utility}>
                   <Navigation2 size={15} aria-hidden="true" /> Directions
-                </button>
-              )}
-              {services.length > 0 && (
-                <button type="button" disabled={Boolean(business.isTemporarilyClosed) || business.status !== 'ACTIVE'} onClick={() => setBookingOpen(true)} className={styles.utility}>
-                  <Clock3 size={15} aria-hidden="true" /> Request booking
                 </button>
               )}
               <Link href={'/b/' + business.slug} className={styles.utility}>

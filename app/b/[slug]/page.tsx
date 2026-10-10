@@ -37,6 +37,7 @@ function BusinessProfile({ slug }: { slug: string }) {
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [loading, setLoading] = useState(true);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [bookingService,setBookingService] = useState<string>();
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [shareToast, setShareToast] = useState(false);
@@ -357,7 +358,7 @@ function BusinessProfile({ slug }: { slug: string }) {
             </a>
             <button
               type="button"
-              onClick={() => setBookingModalOpen(true)}
+              onClick={() => {setBookingService(undefined);setBookingModalOpen(true);}}
               disabled={Boolean(business.isTemporarilyClosed) || business.status !== 'ACTIVE'}
               className="bg-white hover:bg-[#e9eedf] text-[#243b32] font-display font-bold text-sm uppercase py-3 px-4 rounded-full signboard-border signboard-shadow press-action flex items-center justify-center gap-2"
             >
@@ -420,6 +421,7 @@ function BusinessProfile({ slug }: { slug: string }) {
                     {item.priceFrom !== undefined ? `KSh ${item.priceFrom.toLocaleString()}` : 'Contact for price'}
                     {item.unit ? ` / ${item.unit}` : ''}
                   </div>
+                  <button type="button" disabled={Boolean(business.isTemporarilyClosed) || business.status!=='ACTIVE'} onClick={()=>{setBookingService(item.name);setBookingModalOpen(true);}} className="mt-2 rounded-full border border-[#335e41] px-3 py-2 text-xs font-bold text-[#335e41] disabled:opacity-50" aria-label={`Request ${item.name}`}>Request this item</button>
                 </div>
               </div>
             ))}
@@ -533,7 +535,8 @@ function BusinessProfile({ slug }: { slug: string }) {
       </main>
 
       {/* STICKY BOTTOM CONTACT BAR (MOBILE THUMB-REACH) */}
-      <div className="md:hidden fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 bg-[#f7f8f2]/95 backdrop-blur border-t border-[#dfe5d8] px-3 py-2.5 z-40 shadow-[0_-5px_20px_#243b3210] grid grid-cols-2 gap-2">
+      <div className="md:hidden fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 bg-[#f7f8f2]/95 backdrop-blur border-t border-[#dfe5d8] px-3 py-2.5 z-40 shadow-[0_-5px_20px_#243b3210] grid grid-cols-3 gap-2">
+        <button type="button" disabled={Boolean(business.isTemporarilyClosed) || business.status!=='ACTIVE'} onClick={()=>{setBookingService(undefined);setBookingModalOpen(true);}} className="rounded-full bg-[#243b32] px-2 py-2.5 text-xs font-bold text-white disabled:opacity-50"><Calendar className="mr-1 inline h-4 w-4"/>{business.isTemporarilyClosed ? 'Paused' : 'Book'}</button>
         <a
           href={`tel:${business.phone}`}
           onClick={handleCall}
@@ -562,6 +565,7 @@ function BusinessProfile({ slug }: { slug: string }) {
       {bookingModalOpen && (
         <BookingModal
           business={business}
+          initialService={bookingService}
           onClose={() => setBookingModalOpen(false)}
         />
       )}

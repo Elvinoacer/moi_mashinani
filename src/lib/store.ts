@@ -1,5 +1,6 @@
 import { queueNotice, queueAdmins, listingNotice } from './notifications';
 import { nextProEnd, productLimitError, PRO_PRICE_KES } from './catalog-plan';
+import { isPromotionPlan, promotionEndAfterPayment } from './payments';
 import { attachMedia, mediaReferences, queueRemovedMedia } from './media-storage';
 import { randomUUID } from 'node:crypto';
 import { ApiError } from './api';
@@ -394,13 +395,23 @@ export const Store = {
     return false;
   },
 
-  async recordEvent(businessId: string, eventType: 'view' | 'call' | 'whatsapp' | 'directions' | 'booking', db: Prisma.TransactionClient = prisma): Promise<void> {
-    const key = {view:'views',call:'calls',whatsapp:'whatsapp',directions:'directions',booking:'bookingRequests'}[eventType];
+  async recordEvent(businessId: string, eventType: 'view' | 'call' | 'whatsapp' | 'directions' | 'booking' | 'impression', db: Prisma.TransactionClient = prisma): Promise<void> {
+    const key = {view:'views',call:'calls',whatsapp:'whatsapp',directions:'directions',booking:'bookingRequests',impression:'impressions'}[eventType];
     if (!key) return;
     // Increment in SQL so simultaneous customer interactions cannot overwrite one another.
     await db.$executeRaw`
       UPDATE "Business" SET "metrics" = jsonb_set("metrics"::jsonb, ARRAY[${key}]::text[],
         to_jsonb(COALESCE(("metrics"->>${key})::int, 0) + 1)), "updatedAt" = NOW() WHERE "id" = ${businessId}`;
+  },
+
+  async recordImpressions(businessIds: string[], db: Prisma.TransactionClient = prisma): Promise<void> {
+    const validIds = Array.from(new Set(businessIds.filter(Boolean))).slice(0, 30);
+    if (!validIds.length) return;
+    for (const id of validIds) {
+      await db.$executeRaw`
+        UPDATE "Business" SET "metrics" = jsonb_set("metrics"::jsonb, '{impressions}',
+          to_jsonb(COALESCE(("metrics"->>'impressions')::int, 0) + 1)), "updatedAt" = NOW() WHERE "id" = ${id}`;
+    }
   },
 
   async toggleAvailableNow(businessId: string, durationHours = 4): Promise<Business | undefined> {
@@ -440,7 +451,7 @@ export const Store = {
     });
     await queueAdmins(tx,`report/${id}`,{kind:'COMPLAINT',title:'A customer complaint needs review',body:`A complaint about ${created.businessName} has been submitted. Review the report privately before taking action.`,path:'/admin?queue=reports',button:'Review complaint'});
     return created;
-    });
+    }, {maxWait:20000,timeout:30000});
     return mapPrismaReport(created);
   },
 
@@ -455,7 +466,7 @@ export const Store = {
       }
       if (report.status !== 'RESOLVED' && report.status !== 'DISMISSED') await queueAdmins(tx,`report/${reportId}/resolved`,{kind:'COMPLAINT_RESOLVED',title:'A customer complaint was reviewed',body:`The complaint about ${report.businessName} has been reviewed. Action: ${action.toLowerCase()}.`,path:'/admin?queue=reports',button:'View moderation'});
       return true;
-    });
+    }, {maxWait:20000,timeout:30000});
   },
 
   async getPayments(): Promise<PaymentRecord[]> {
@@ -493,7 +504,7 @@ export const Store = {
         quoteTier:payload.quoteTier,quoteTierEndsAt:payload.quoteTierEndsAt ? new Date(payload.quoteTierEndsAt) : null,
       }});
       return mapPrismaPayment(created);
-    });
+    }, {maxWait:20000,timeout:30000});
   },
 
   async updatePayment(id: string, updates: Partial<PaymentRecord>): Promise<PaymentRecord | undefined> {
@@ -513,7 +524,7 @@ export const Store = {
         if (business) await queueNotice(tx,business.ownerId,`payment/${id}/${updates.state}`,{kind:'PAYMENT',title:'Your payment needs attention',body:'Your payment did not complete. Check its status in your dashboard before starting another payment.',path:`/dashboard/${business.slug}?tab=billing`,button:'Review payment'});
       }
       return mapPrismaPayment(await tx.paymentRecord.update({where:{id},data}));
-    });
+    }, {maxWait:20000,timeout:30000});
   },
 
   async confirmVerifiedPayment(id: string, proof: {invoiceId: string; providerRef?: string; state: string; failedReason?: string}): Promise<PaymentRecord | undefined> {
@@ -534,16 +545,11 @@ export const Store = {
           proEndsAt: nextProEnd(business.proEndsAt, now),
         }});
       } else {
-      const active = business.tierEndsAt && business.tierEndsAt > now;
-      const sameTier = active && business.activeTier === payment.planId;
-      // A late lower-tier payment cannot erase an already-active Featured plan.
-      if (!(active && business.activeTier === 'FEATURED' && payment.planId === 'RECOMMENDED')) {
-        const start = sameTier ? business.tierEndsAt! : now;
-        await tx.business.update({where:{id:business.id},data:{activeTier:payment.planId,tierStartsAt:sameTier ? business.tierStartsAt : now,tierEndsAt:new Date(start.getTime()+payment.weeks*7*864e5)}});
-      } else {
-        // Preserve the purchased Recommended entitlement after the Featured term by adding its value as Featured time.
-        await tx.business.update({where:{id:business.id},data:{tierEndsAt:new Date(business.tierEndsAt!.getTime()+payment.weeks*7*864e5/2)}});
-      }
+        if (!isPromotionPlan(payment.planId)) throw new ApiError(400, 'Unknown promotion plan');
+        // No paid time is lost: renewals queue after the current end, upgrades carry the remaining
+        // value over as Featured time, and a late Recommended payment never interrupts Featured.
+        const next = promotionEndAfterPayment(business, payment.planId, payment.weeks, now);
+        await tx.business.update({where:{id:business.id},data:{activeTier:next.activeTier,tierStartsAt:next.tierStartsAt,tierEndsAt:next.tierEndsAt}});
       }
       await queueNotice(tx,business.ownerId,`payment/${id}/complete`,{kind:'PAYMENT',title:'Payment confirmed — your plan is active',body:`Your KES ${payment.amountKes} payment for ${payment.planId} has been verified. View your active plan and payment history in your dashboard.`,path:`/dashboard/${business.slug}?tab=billing`,button:'View my active plan'});
       await queueAdmins(tx,`payment/${id}/complete`,{kind:'PAYMENT',title:'A business payment was confirmed',body:`${business.name}: KES ${payment.amountKes} for ${payment.planId}.`,path:`/dashboard/${business.slug}?tab=billing`,button:'View payments'});
@@ -571,7 +577,7 @@ export const Store = {
     });
     await queueAdmins(tx,`request/${id}`,{kind:'SERVICE_REQUEST',title:'New service request or suggestion',body:`Someone is looking for: ${created.query}. Area: ${created.zone}. Open the admin dashboard to review and follow up.`,path:'/admin?queue=demand',button:'View request'});
     return created;
-    });
+    }, {maxWait:20000,timeout:30000});
     return mapPrismaServiceRequest(created);
   },
 
@@ -579,7 +585,8 @@ export const Store = {
     const id = `book_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const created = await prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${payload.businessId || ''} FOR UPDATE`;
-      if (!await tx.business.findUnique({where:{id:payload.businessId || ''},select:{id:true}})) throw new ApiError(404, 'Business not found');
+      const business = await tx.business.findUnique({where:{id:payload.businessId || ''}});
+      if (!business) throw new ApiError(404, 'Business not found');
       const booking = await tx.bookingIntent.create({
         data: {
           id,
@@ -598,12 +605,11 @@ export const Store = {
         await Store.recordEvent(payload.businessId, 'booking', tx);
       }
 
-      const business = await tx.business.findUnique({where:{id:booking.businessId}});
-      if (business) await queueNotice(tx,business.ownerId,`booking/${id}`,{kind:'BOOKING',title:`New customer request for ${business.name}`,body:`A customer has requested ${booking.serviceName} for ${booking.day} at ${booking.time}. Open your dashboard to review their contact details and respond.`,path:`/dashboard/${business.slug}?tab=bookings`,button:'View customer request'});
-      await queueAdmins(tx,`booking/${id}`,{kind:'BOOKING',title:'New booking or customer inquiry',body:`${business?.name || 'A business'} has received a customer request.`,path:business ? `/dashboard/${business.slug}?tab=bookings`:'/admin',button:'View customer requests'});
-      if (requesterId) await queueNotice(tx,requesterId,`booking/${id}/submitted`,{kind:'BOOKING',title:'Your customer request was sent',body:`Your request for ${booking.serviceName} was sent to ${business?.name || 'the business'}. This is a request, not a confirmed booking. We will notify you when the business updates it.`,path:'/dashboard?notifications=1',button:'View my notifications'});
+      await queueNotice(tx,business.ownerId,`booking/${id}`,{kind:'BOOKING',title:`New customer request for ${business.name}`,body:`A customer has requested ${booking.serviceName} for ${booking.day} at ${booking.time}. Open your dashboard to review their contact details and respond.`,path:`/dashboard/${business.slug}?tab=bookings`,button:'View customer request'});
+      await queueAdmins(tx,`booking/${id}`,{kind:'BOOKING',title:'New booking or customer inquiry',body:`${business.name || 'A business'} has received a customer request.`,path:`/dashboard/${business.slug}?tab=bookings`,button:'View customer requests'});
+      if (requesterId) await queueNotice(tx,requesterId,`booking/${id}/submitted`,{kind:'BOOKING',title:'Your customer request was sent',body:`Your request for ${booking.serviceName} was sent to ${business.name || 'the business'}. This is a request, not a confirmed booking. We will notify you when the business updates it.`,path:'/dashboard?notifications=1',button:'View my notifications'});
       return booking;
-    });
+    }, {maxWait:20000,timeout:30000});
 
     return mapPrismaBooking(created);
   },

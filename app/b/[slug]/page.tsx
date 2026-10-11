@@ -26,7 +26,12 @@ async function fetchBusiness(slug: string): Promise<Business | undefined> {
   return SEED_BUSINESSES.find((b) => b.slug === slug);
 }
 
-async function fetchSimilarBusinesses(category: string, currentId: string): Promise<Business[]> {
+async function fetchSimilarBusinesses(business: Business): Promise<Business[]> {
+  if (business.activeTier === 'FEATURED' && (!business.tierEndsAt || new Date(business.tierEndsAt).getTime() > Date.now())) {
+    return [];
+  }
+  const category = business.primaryCategory;
+  const currentId = business.id;
   const catObj = CATEGORIES.find((c) => c.slug === category);
   const groupSlug = catObj?.group;
 
@@ -115,7 +120,7 @@ export default async function BusinessProfilePage({ params }: PageProps) {
     return notFound();
   }
 
-  const similarBusinesses = await fetchSimilarBusinesses(business.primaryCategory, business.id);
+  const similarBusinesses = await fetchSimilarBusinesses(business);
   const categoryName = CATEGORIES.find((c) => c.slug === business.primaryCategory)?.name || business.primaryCategory.replace(/-/g, ' ');
 
   const breadcrumbsSchema = generateBreadcrumbSchema([

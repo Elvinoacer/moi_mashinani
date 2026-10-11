@@ -64,10 +64,14 @@ test('configuration fails closed without credentials, HTTPS origin, or matching 
   assert.equal(live.baseUrl, 'https://api.intasend.com/api/v1');
 });
 
-test('server prices enforce allowed durations and full-price upgrades', () => {
+test('server prices enforce allowed durations and bundle discounts', () => {
   const business = { activeTier: 'RECOMMENDED', tierEndsAt: '2099-01-01T00:00:00.000Z' } as Business;
   assert.equal(calculateUpgrade(business, 'FEATURED', 1).chargeKes, 200);
-  assert.equal(calculateUpgrade(business, 'FEATURED', 4).chargeKes, 800);
+  assert.equal(calculateUpgrade(business, 'FEATURED', 2).chargeKes, 380);
+  assert.equal(calculateUpgrade(business, 'FEATURED', 4).chargeKes, 600);
+  assert.equal(calculateUpgrade(business, 'RECOMMENDED', 1).chargeKes, 100);
+  assert.equal(calculateUpgrade(business, 'RECOMMENDED', 2).chargeKes, 190);
+  assert.equal(calculateUpgrade(business, 'RECOMMENDED', 4).chargeKes, 300);
   for (const duration of [0, -1, 0.5, 52, NaN]) assert.throws(() => calculateUpgrade(business, 'FEATURED', duration));
   assert.equal(formatKenyanPhone('+254 712 345 678'), '254712345678');
   assert.equal(formatKenyanPhone('0712345678'), '254712345678');

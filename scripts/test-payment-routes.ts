@@ -28,7 +28,7 @@ async function main() {
     if (endpoint.endsWith('/checkout/')) {
       checkoutCalls++;reference=body.api_ref;amount=body.amount;
       assert.equal(body.unique_api_ref,true);assert.equal((init?.headers as Record<string,string>)['X-IntaSend-Public-API-Key'],'ISPubKey_test_mock');
-      return Response.json({id:'checkout-route-test',url:'https://sandbox.intasend.com/checkout/checkout-route-test/express/',signature:'private-provider-signature',amount:400,currency:'KES'});
+      return Response.json({id:'checkout-route-test',url:'https://sandbox.intasend.com/checkout/checkout-route-test/express/',signature:'private-provider-signature',amount:380,currency:'KES'});
     }
     assert.equal((init?.headers as Record<string,string>).Authorization,'Bearer ISSecretKey_test_mock');
     return Response.json({invoice:{invoice_id:invoiceId,api_ref:reference,value:mismatch ? '1.00':String(amount),currency:'KES',state,provider_ref:'MPESA_ROUTE_TEST'}});
@@ -36,7 +36,7 @@ async function main() {
   try {
     const created = await checkoutRoute.POST(req('/api/payments',{businessId:business.id,planId:'FEATURED',weeks:2,amountKes:1}));
     const payload = await created.json();assert.equal(created.status,200,JSON.stringify(payload));paymentId=payload.payment.id;
-    assert.equal(payload.payment.amountKes,400);assert.equal(payload.payment.checkoutSignature,undefined);
+    assert.equal(payload.payment.amountKes,380);assert.equal(payload.payment.checkoutSignature,undefined);
     assert.equal((await Store.getBusinessById(business.id))!.activeTier,'NONE');
     console.log('PASS checkout route overrides client amount, persists provider checkout and redacts private signature');
     const params = {params:Promise.resolve({id:paymentId!})};

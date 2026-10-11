@@ -57,14 +57,25 @@ export async function GET(req: NextRequest) {
   // Run official ranking engine
   const ranked = rankBusinesses(businesses, q, zone, category, undefined, sessionId);
 
-  // If explicit sort selected
+  // If explicit sort selected, preserve paid tier guarantees (top-block Featured and Recommended priority)
   let finalCandidates = ranked;
-  if (sort === 'nearest') {
-    finalCandidates = [...ranked].sort((a, b) => b.proximity - a.proximity);
-  } else if (sort === 'newest') {
-    finalCandidates = [...ranked].sort(
-      (a, b) => new Date(b.business.createdAt).getTime() - new Date(a.business.createdAt).getTime()
-    );
+  if (sort === 'nearest' || sort === 'newest' || sort === 'alphabetical') {
+    const topBlock = ranked.filter((c) => c.effectiveTier === 'FEATURED' && c.relevance >= 0.5);
+    const topBlockIds = new Set(topBlock.map((c) => c.business.id));
+    const promoted = ranked.filter((c) => c.effectiveTier !== 'NONE' && !topBlockIds.has(c.business.id));
+    const organic = ranked.filter((c) => c.effectiveTier === 'NONE');
+
+    const sortFn = sort === 'nearest'
+      ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) => b.proximity - a.proximity
+      : sort === 'newest'
+      ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) => new Date(b.business.createdAt).getTime() - new Date(a.business.createdAt).getTime()
+      : (a: (typeof ranked)[0], b: (typeof ranked)[0]) => a.business.name.localeCompare(b.business.name);
+
+    finalCandidates = [
+      ...[...topBlock].sort(sortFn),
+      ...[...promoted].sort(sortFn),
+      ...[...organic].sort(sortFn),
+    ];
   }
 
   const results = finalCandidates.map((c) => ({
@@ -74,6 +85,12 @@ export async function GET(req: NextRequest) {
     proximityScore: c.proximity,
     totalRankScore: c.totalScore,
   }));
+
+  // Track impressions for top-returned listings asynchronously
+  if (results.length > 0) {
+    const topIds = results.slice(0, 10).map((r) => r.id);
+    void Store.recordImpressions(topIds).catch(() => {});
+  }
 
   return NextResponse.json({
     results,

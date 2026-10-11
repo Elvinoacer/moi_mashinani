@@ -67,6 +67,7 @@ model Business {
   @@index([zone])
   @@index([status])
   @@index([activeTier])
+  @@index([tierEndsAt])
   @@index([ownerId])
   @@index([proEndsAt])
 }

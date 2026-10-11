@@ -15,7 +15,7 @@ export async function GET(req:NextRequest) {
     const actual = Buffer.from(req.headers.get('authorization') || '');
     if (actual.length !== expected.length || !timingSafeEqual(actual,expected)) throw new ApiError(401, 'Unauthorized');
     // cron-job.org allows 30 seconds. Persisted notices let later calls continue the batch safely.
-    after(() => deliverNotifications(10,5000).then(() => {}).catch(() => {}));
+    try { after(() => deliverNotifications(10,5000).then(() => {}).catch(() => {})); } catch { void deliverNotifications(10,5000).catch(() => {}); }
     const signal = AbortSignal.timeout(20000);
     const result = await runPlanMaintenance(new Date(),
       (email,name,slug,end,stage,key) => sendProPlanEmail(email,name,slug,end,stage,key,fetch,signal),

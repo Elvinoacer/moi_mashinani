@@ -37,6 +37,7 @@ import {
 import { Store } from "@/lib/store";
 import { CATEGORIES, ZONES } from "@/lib/constants";
 import {
+  FeaturedSpotlight,
   LandingSearch,
   LocalDiscoveries,
   type LandingBusiness,
@@ -231,6 +232,8 @@ export default async function HomePage() {
       whatsapp,
       status,
       isTemporarilyClosed,
+      activeTier,
+      tierEndsAt,
     }) => ({
       id,
       name,
@@ -248,6 +251,8 @@ export default async function HomePage() {
       whatsapp,
       status,
       isTemporarilyClosed,
+      activeTier,
+      tierEndsAt,
       categoryName:
         CATEGORIES.find((category) => category.slug === primaryCategory)
           ?.name ?? "Local business",
@@ -378,6 +383,7 @@ export default async function HomePage() {
           id="discover"
           aria-label="Discover local businesses"
         >
+          <FeaturedSpotlight businesses={businesses} />
           <LocalDiscoveries businesses={ordered} />
         </section>
         <section

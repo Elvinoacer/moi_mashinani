@@ -226,6 +226,127 @@ function BusinessDashboard({ slug }: { slug: string }) {
         </div>
         {metricsError && <p role="alert" className="text-sm text-[#a7302d]">Metrics could not be refreshed. Showing the last loaded counts. {metricsError}</p>}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">{[['Profile views', business.metrics.views], ['Calls', business.metrics.calls], ['WhatsApp', business.metrics.whatsapp], ['Directions clicks', business.metrics.directions], ['Booking requests', business.metrics.bookingRequests]].map(([label, value]) => <div key={label} className="rounded-xl bg-white p-4 signboard-border"><p className="text-xs text-[#667064]">{label}</p><p className="font-display text-3xl font-bold text-[#243b32]">{value}</p></div>)}</div>
+
+        {/* Performance & ROI Transparency Breakdown */}
+        <div className="rounded-xl border border-[#dfe5d8] bg-white p-5 signboard-shadow-sm space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 className="font-display text-base font-bold text-[#243b32]">
+                Customer Engagement & Conversion Rate
+              </h3>
+              <p className="text-xs text-[#667064]">Clear breakdown of how views turn into paying campus customers</p>
+            </div>
+            <span className="rounded-full bg-[#edf2e5] px-3 py-1 text-xs font-bold text-[#335e41]">
+              Transparent ROI
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
+              <p className="text-xs text-[#667064]">Search impressions</p>
+              <p className="font-display text-2xl font-bold text-[#243b32]">
+                {business.metrics.impressions ?? 0}
+              </p>
+              <p className="text-[11px] text-[#667064] mt-1">Times your shop appeared in campus searches</p>
+            </div>
+            <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
+              <p className="text-xs text-[#667064]">Direct customer contacts</p>
+              <p className="font-display text-2xl font-bold text-[#243b32]">
+                {business.metrics.calls + business.metrics.whatsapp + business.metrics.directions + business.metrics.bookingRequests}
+              </p>
+              <p className="text-[11px] text-[#667064] mt-1">Calls, WhatsApp, directions & bookings</p>
+            </div>
+            <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
+              <p className="text-xs text-[#667064]">Contact conversion rate</p>
+              <p className="font-display text-2xl font-bold text-[#335e41]">
+                {business.metrics.views > 0
+                  ? `${Math.round(((business.metrics.calls + business.metrics.whatsapp + business.metrics.directions + business.metrics.bookingRequests) / business.metrics.views) * 100)}%`
+                  : '0%'}
+              </p>
+              <p className="text-[11px] text-[#667064] mt-1">Of profile visitors who reached out or booked</p>
+            </div>
+          </div>
+        </div>
+
+        {/* High-Converting Promotion Banner */}
+        {!tierActive ? (
+          <div className="relative overflow-hidden rounded-2xl border-2 border-[#183e35] bg-gradient-to-br from-[#183e35] via-[#243b32] to-[#142e26] p-6 text-white shadow-lg">
+            <div className="relative z-10 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ffc53d] px-3 py-1 text-xs font-black uppercase tracking-wider text-[#243b32]">
+                  ★ Campus Promotion
+                </span>
+                <span className="rounded-full bg-white/10 backdrop-blur-sm px-3 py-1 text-xs font-bold text-[#d9f279]">
+                  4 weeks for the price of 3 (Save 25%)
+                </span>
+              </div>
+
+              <div>
+                <h2 className="font-display text-2xl font-black text-white">
+                  Promote your business for wider campus reach
+                </h2>
+                <p className="mt-1 text-sm text-[#dfe5d8]">
+                  Get guaranteed top-3 slots in search, front-page spotlight, and competitor protection across Moi University.
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4 pt-1">
+                <div className="rounded-xl bg-white/10 backdrop-blur-sm p-3 border border-white/10">
+                  <p className="text-xs font-bold text-[#d9f279]">Top 3 Placement</p>
+                  <p className="text-xs text-[#cfdbcb] mt-0.5">Guaranteed top slots on matching campus searches & category pages</p>
+                </div>
+                <div className="rounded-xl bg-white/10 backdrop-blur-sm p-3 border border-white/10">
+                  <p className="text-xs font-bold text-[#d9f279]">Homepage Spotlight</p>
+                  <p className="text-xs text-[#cfdbcb] mt-0.5">Featured on the front page seen by hundreds of campus visitors daily</p>
+                </div>
+                <div className="rounded-xl bg-white/10 backdrop-blur-sm p-3 border border-white/10">
+                  <p className="text-xs font-bold text-[#d9f279]">Competitor Protection</p>
+                  <p className="text-xs text-[#cfdbcb] mt-0.5">Zero competitor recommendations shown on your profile page</p>
+                </div>
+                <div className="rounded-xl bg-white/10 backdrop-blur-sm p-3 border border-white/10">
+                  <p className="text-xs font-bold text-[#d9f279]">Featured Badge</p>
+                  <p className="text-xs text-[#cfdbcb] mt-0.5">Vibrant Jua Yellow badge that builds instant student trust</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-white/10">
+                <div className="text-xs text-[#cfdbcb]">
+                  Starting from only <strong className="text-white">KES 100/week</strong> (Recommended) or <strong className="text-white">KES 200/week</strong> (Featured) · Bundle discounts up to 25% off
+                </div>
+                <Link
+                  href={`/promote/${business.slug}`}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#d9f279] px-6 py-2.5 text-sm font-black text-[#183e35] transition hover:bg-[#cbf057] shadow-sm"
+                >
+                  <Rocket className="h-4 w-4" />
+                  Promote your business now →
+                </Link>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border-2 border-[#ffc53d] bg-[#fffdf5] p-6 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-[#ffc53d] px-3 py-1 text-xs font-black uppercase tracking-wider text-[#243b32]">
+                  ★ Active {business.activeTier} Promotion
+                </span>
+                <span className="text-xs font-bold text-[#667064]">
+                  Ends: {new Date(business.tierEndsAt!).toLocaleString('en-GB', { timeZone: 'Africa/Nairobi' })}
+                </span>
+              </div>
+              <Link
+                href={`/promote/${business.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#243b32] px-4 py-2 text-xs font-bold text-white hover:bg-[#183e35] transition"
+              >
+                Extend promotion (Save up to 25%) →
+              </Link>
+            </div>
+            <p className="text-sm text-[#4a584e]">
+              Your business currently receives top priority campus ranking, homepage spotlight, and protected profile status. Bundle discount (up to 25% off) is automatically preserved when renewing.
+            </p>
+          </div>
+        )}
+
         <div className={panelClass}><h2 className="font-display text-xl font-bold">Promotion status</h2><p className="text-sm">{tierActive ? `${business.activeTier} placement until ${new Date(business.tierEndsAt!).toLocaleString('en-GB', { timeZone: 'Africa/Nairobi' })}` : 'Free organic listing'}</p><p className="text-xs text-[#667064]">Paid placement activates after payment verification.</p></div>
       </div>}
 

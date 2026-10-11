@@ -9,6 +9,7 @@ import { BusinessCard } from '@/components/BusinessCard';
 import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
 import { Business, Category } from '@/lib/types';
 import { CategoryIcon, Store } from '@/components/icons';
+import { useNow } from '@/lib/useNow';
 
 interface CategoryPageClientProps {
   categorySlug: string;
@@ -25,6 +26,7 @@ export function CategoryPageClient({
   relatedCategories = [],
   popularSearches = [],
 }: CategoryPageClientProps) {
+  const now = useNow();
   const [businesses, setBusinesses] = useState<Business[]>(initialBusinesses ?? []);
   const [loading, setLoading] = useState(initialBusinesses === undefined);
   const [error, setError] = useState('');
@@ -109,11 +111,51 @@ export function CategoryPageClient({
               ))}
             </div>
           ) : businesses.length > 0 ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {businesses.map((biz) => (
-                <BusinessCard key={biz.id} business={biz} />
-              ))}
-            </div>
+            (() => {
+              const featuredInCat = businesses.filter(
+                (b) => b.activeTier === 'FEATURED' && (!b.tierEndsAt || new Date(b.tierEndsAt).getTime() > now)
+              );
+              const otherBusinesses = businesses.filter(
+                (b) => !featuredInCat.some((f) => f.id === b.id)
+              );
+
+              return (
+                <div className="space-y-6">
+                  {featuredInCat.length > 0 && (
+                    <div className="space-y-3 rounded-2xl border-2 border-[#ffc53d] bg-[#fffdf5] p-5 shadow-[0_6px_20px_rgba(255,197,61,0.15)]">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-[#ffc53d] px-2.5 py-1 text-xs font-black uppercase tracking-wider text-[#243b32]">
+                          ★ Featured Spotlight
+                        </span>
+                        <span className="text-xs font-bold text-[#667064]">
+                          Top recommended in {categoryObj.name}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                        {featuredInCat.map((biz) => (
+                          <BusinessCard key={biz.id} business={biz} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {otherBusinesses.length > 0 && (
+                    <div className="space-y-3">
+                      {featuredInCat.length > 0 && (
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-[#667064]">
+                          All {categoryObj.name} in Kesses ({otherBusinesses.length})
+                        </h3>
+                      )}
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                        {otherBusinesses.map((biz) => (
+                          <BusinessCard key={biz.id} business={biz} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()
           ) : (
             <div className="bg-white p-8 rounded-2xl border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] text-center space-y-3">
               <Store className="w-12 h-12 text-[#758071] mx-auto" />

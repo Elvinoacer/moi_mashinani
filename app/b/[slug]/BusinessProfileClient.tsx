@@ -79,17 +79,22 @@ export function BusinessProfileClient({
         setBusiness(data);
         if (data.status === 'ACTIVE') trackBusinessEvent(data.id, 'view');
 
-        const similar = await fetch(
-          `/api/businesses?category=${encodeURIComponent(data.primaryCategory)}`,
-          { signal: controller.signal }
-        );
-        if (similar.ok) {
-          const related = await similar.json();
-          if (!controller.signal.aborted) {
-            setSimilarBusinesses(
-              (related.results || []).filter((item: Business) => item.id !== data.id).slice(0, 3)
-            );
+        const isFeatured = data.activeTier === 'FEATURED' && (!data.tierEndsAt || new Date(data.tierEndsAt).getTime() > Date.now());
+        if (!isFeatured) {
+          const similar = await fetch(
+            `/api/businesses?category=${encodeURIComponent(data.primaryCategory)}`,
+            { signal: controller.signal }
+          );
+          if (similar.ok) {
+            const related = await similar.json();
+            if (!controller.signal.aborted) {
+              setSimilarBusinesses(
+                (related.results || []).filter((item: Business) => item.id !== data.id).slice(0, 3)
+              );
+            }
           }
+        } else {
+          setSimilarBusinesses([]);
         }
       } catch (failure) {
         if (!controller.signal.aborted) {
@@ -508,8 +513,23 @@ export function BusinessProfileClient({
           </div>
         </div>
 
-        {/* SIMILAR BUSINESSES IN THIS CATEGORY */}
-        {similarBusinesses.length > 0 && (
+        {/* SIMILAR BUSINESSES IN THIS CATEGORY - Suppressed on Featured profiles */}
+        {business.activeTier === 'FEATURED' && (!business.tierEndsAt || new Date(business.tierEndsAt).getTime() > now) ? (
+          <div className="pt-6 border-t border-[#dfe5d8]">
+            <div className="rounded-2xl border-2 border-[#ffc53d] bg-[#fffdf5] p-5 shadow-[0_4px_16px_rgba(255,197,61,0.15)] flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffc53d] text-[#243b32] font-black text-xl shadow-sm">★</span>
+                <div>
+                  <p className="font-display font-black text-sm text-[#243b32] uppercase tracking-wide">Featured Campus Partner</p>
+                  <p className="text-xs text-[#667064]">This business is an official top-rated priority provider on MoiMashinani with direct customer contact.</p>
+                </div>
+              </div>
+              <Link href={`/c/${business.primaryCategory}`} className="inline-flex items-center gap-1 rounded-full border border-[#dfe5d8] bg-white px-4 py-2 text-xs font-bold text-[#335e41] hover:bg-[#edf2e5] transition">
+                Explore {business.primaryCategory.replace(/-/g, ' ')} category →
+              </Link>
+            </div>
+          </div>
+        ) : similarBusinesses.length > 0 ? (
           <div className="pt-6 border-t border-[#dfe5d8] space-y-4">
             <h2 className="font-display font-black text-xl text-[#243b32] uppercase tracking-tight">
               More {business.primaryCategory.replace(/-/g, ' ')} nearby
@@ -520,7 +540,7 @@ export function BusinessProfileClient({
               ))}
             </div>
           </div>
-        )}
+        ) : null}
       </main>
 
       <Footer />

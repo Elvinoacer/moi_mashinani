@@ -9,6 +9,7 @@ import type { Business, ServiceItem } from '@/lib/types';
 import styles from './discovery.module.css';
 import { BookingModal } from '@/components/BookingModal';
 import { CATEGORY_GROUPS, categoryMatches } from '@/lib/categories';
+import { useNow } from '@/lib/useNow';
 
 export type LandingBusiness = Pick<
   Business,
@@ -28,6 +29,8 @@ export type LandingBusiness = Pick<
   | 'whatsapp'
   | 'status'
   | 'isTemporarilyClosed'
+  | 'activeTier'
+  | 'tierEndsAt'
 > & { categoryName: string; zoneName: string };
 
 const popularSearches = ['Printing', 'Phone repair', 'Braids', 'Gas refill'];
@@ -109,6 +112,7 @@ function servicePrice(service: ServiceItem | undefined) {
 }
 
 function DiscoveryCard({ business }: { business: LandingBusiness }) {
+  const now = useNow();
   const [imageFailed, setImageFailed] = useState(false);
   const [bookingOpen,setBookingOpen] = useState(false);
   const imageSource = coverSource(business.coverPhoto);
@@ -137,7 +141,14 @@ function DiscoveryCard({ business }: { business: LandingBusiness }) {
             <Store size={52} strokeWidth={1.15} />
           </div>
         )}
-        <span className={styles.categoryPill}>{business.categoryName}</span>
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+          {business.activeTier === 'FEATURED' && (!business.tierEndsAt || new Date(business.tierEndsAt).getTime() > now) && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#ffc53d] px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider text-[#243b32] shadow-sm">
+              ★ Featured
+            </span>
+          )}
+          <span className={styles.categoryPill}>{business.categoryName}</span>
+        </div>
         <span className={styles.cardArrow} aria-hidden="true"><ArrowUpRight size={19} /></span>
       </div>
       <div className={styles.cardContent}>
@@ -220,3 +231,119 @@ export function LocalDiscoveries({ businesses }: { businesses: LandingBusiness[]
     </section>
   );
 }
+
+export function FeaturedSpotlight({ businesses }: { businesses: LandingBusiness[] }) {
+  const now = useNow();
+  const featured = businesses.filter(
+    (b) => b.activeTier === 'FEATURED' && (!b.tierEndsAt || new Date(b.tierEndsAt).getTime() > now)
+  );
+  if (featured.length === 0) return null;
+
+  return (
+    <section className="mb-10 space-y-4" aria-labelledby="featured-spotlight-heading">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#fff4cc] px-3 py-1 text-xs font-black uppercase tracking-wider text-[#9a6700] border border-[#ffe082]">
+            <span className="text-[#e69500]">★</span> Campus Featured Spotlight
+          </div>
+          <h2 id="featured-spotlight-heading" className="mt-2 font-display text-2xl md:text-3xl font-black text-[#243b32] tracking-tight">
+            Featured around campus
+          </h2>
+          <p className="text-sm text-[#667064]">
+            Top campus services and student fundis with verified locations & fast contacts
+          </p>
+        </div>
+        <Link href="/search" className="inline-flex items-center gap-1 text-xs font-bold text-[#335e41] hover:underline">
+          View all verified listings →
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {featured.map((biz) => {
+          const firstService = biz.services[0];
+          const price = servicePrice(firstService);
+          const imgSrc = coverSource(biz.coverPhoto);
+          return (
+            <article
+              key={biz.id}
+              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white border-2 border-[#ffc53d] shadow-[0_8px_24px_rgba(255,197,61,0.18)] transition-all hover:shadow-[0_12px_32px_rgba(255,197,61,0.25)] hover:-translate-y-0.5"
+            >
+              <Link href={`/b/${biz.slug}`} className="block">
+                <div className="relative h-44 w-full bg-[#f4f7f2] overflow-hidden">
+                  {imgSrc ? (
+                    <Image
+                      src={imgSrc}
+                      alt={biz.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-[#758071]">
+                      <Store size={44} />
+                    </div>
+                  )}
+                  <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#ffc53d] px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-[#243b32] shadow-sm">
+                      ★ Featured
+                    </span>
+                    <span className="rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-[#243b32]">
+                      {biz.categoryName}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-2">
+                  <div className="flex items-center gap-1 text-xs text-[#667064]">
+                    <MapPin size={12} className="text-[#335e41]" />
+                    <span>{biz.zoneName}</span>
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-[#243b32] group-hover:text-[#183e35] transition-colors flex items-center justify-between">
+                    <span>{biz.name}</span>
+                    <ArrowUpRight size={16} className="text-[#667064] group-hover:text-[#243b32] transition-colors" />
+                  </h3>
+                  <p className="line-clamp-2 text-xs text-[#4a584e] leading-relaxed">
+                    {biz.tagline || firstService?.name || biz.categoryName}
+                  </p>
+                  {biz.studentDiscount && (
+                    <div className="rounded-lg bg-[#eff4da] px-2.5 py-1 text-[11px] font-bold text-[#526936]">
+                      🎓 {biz.studentDiscount}
+                    </div>
+                  )}
+                </div>
+              </Link>
+
+              <div className="p-4 pt-0 mt-auto border-t border-[#f0f4ec] flex items-center justify-between gap-2 text-xs">
+                <span className="font-semibold text-[#243b32]">
+                  {price || 'Browse services'}
+                </span>
+                <div className="flex items-center gap-2">
+                  {biz.whatsapp && (
+                    <a
+                      href={`https://wa.me/${biz.whatsapp.replace(/\D/g, '').replace(/^0/, '254')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded-full bg-[#e8f7ee] text-[#128c7e] px-3 py-1.5 font-bold hover:bg-[#d0f0de] transition"
+                    >
+                      WhatsApp
+                    </a>
+                  )}
+                  {biz.phone && (
+                    <a
+                      href={`tel:${biz.phone}`}
+                      className="inline-flex items-center gap-1 rounded-full bg-[#edf2e5] text-[#243b32] px-3 py-1.5 font-bold hover:bg-[#dfe5d8] transition"
+                    >
+                      Call
+                    </a>
+                  )}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+

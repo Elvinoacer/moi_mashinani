@@ -13,25 +13,22 @@ import {
 import type { Business, Category } from '@/lib/types';
 import { CategoryPageClient } from './CategoryPageClient';
 
+import { rankBusinesses } from '@/lib/rank';
+
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
 async function fetchCategoryBusinesses(categorySlug: string): Promise<Business[]> {
+  let list: Business[] = [];
   try {
-    const all = await Store.getBusinesses();
-    return all.filter(
-      (b) =>
-        b.status === 'ACTIVE' &&
-        categoryMatches(b, categorySlug)
-    );
+    list = await Store.getBusinesses();
   } catch {
-    return SEED_BUSINESSES.filter(
-      (b) =>
-        b.status === 'ACTIVE' &&
-        categoryMatches(b, categorySlug)
-    );
+    list = SEED_BUSINESSES;
   }
+  const matching = list.filter((b) => b.status === 'ACTIVE' && categoryMatches(b, categorySlug));
+  const ranked = rankBusinesses(matching, '', 'all', categorySlug);
+  return ranked.map((c) => c.business);
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {

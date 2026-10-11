@@ -6,7 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { AccountGate } from '@/components/AccountGate';
-import { calculateUpgrade, PROMOTION_PLANS } from '@/lib/payments';
+import { calculateUpgrade, PROMOTION_PLANS, promotionPrice } from '@/lib/payments';
 import { useNow } from '@/lib/useNow';
 import type { Business, PaymentRecord } from '@/lib/types';
 import { Tag, RefreshCw, CheckCircle2, AlertCircle } from '@/components/icons';
@@ -153,26 +153,152 @@ function Checkout({ slug }: { slug: string }) {
     </div> : <form onSubmit={start} className={panel}>
       <fieldset>
         <legend className="mb-3 font-display text-lg font-bold">1. Choose your promotion</legend>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {(['RECOMMENDED', 'FEATURED'] as const).map((plan) => <label key={plan} className={`cursor-pointer rounded-xl border p-4 ${selectedPlan === plan ? 'border-[#335e41] bg-[#edf2e5]' : 'border-[#dfe5d8]'} ${plan === 'RECOMMENDED' && featuredActive ? 'opacity-50' : ''}`}>
-            <input type="radio" name="plan" value={plan} checked={selectedPlan === plan} disabled={plan === 'RECOMMENDED' && featuredActive} onChange={() => setSelectedPlan(plan)} className="mr-2" />
-            <span className="font-bold">{PROMOTION_PLANS[plan].name}</span>
-            <p className="mt-2 font-bold">KSh {PROMOTION_PLANS[plan].priceKesWeek}/week</p>
-            <p className="mt-2 text-xs text-[#667064]">{plan === 'FEATURED' ? 'Priority placement in search and homepage Featured sections.' : 'Placement above free listings and a Recommended badge.'}</p>
-          </label>)}
+        <div className="grid gap-4 sm:grid-cols-2">
+          {(['RECOMMENDED', 'FEATURED'] as const).map((plan) => (
+            <label
+              key={plan}
+              className={`relative flex flex-col justify-between cursor-pointer rounded-2xl border-2 p-5 transition ${
+                selectedPlan === plan
+                  ? plan === 'FEATURED'
+                    ? 'border-[#ffc53d] bg-[#fffdf5] ring-2 ring-[#ffc53d]'
+                    : 'border-[#335e41] bg-[#edf2e5] ring-2 ring-[#335e41]'
+                  : 'border-[#dfe5d8] bg-white hover:border-[#667064]'
+              } ${plan === 'RECOMMENDED' && featuredActive ? 'opacity-50 pointer-events-none' : ''}`}
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="plan"
+                      value={plan}
+                      checked={selectedPlan === plan}
+                      disabled={plan === 'RECOMMENDED' && featuredActive}
+                      onChange={() => setSelectedPlan(plan)}
+                      className="accent-[#183e35]"
+                    />
+                    <span className="font-display font-black text-lg text-[#243b32]">
+                      {PROMOTION_PLANS[plan].name}
+                    </span>
+                  </div>
+                  {plan === 'FEATURED' && (
+                    <span className="rounded-full bg-[#ffc53d] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#243b32]">
+                      Top Tier
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="font-display text-2xl font-black text-[#243b32]">
+                    KSh {PROMOTION_PLANS[plan].priceKesWeek}
+                  </span>
+                  <span className="text-xs text-[#667064]">/ week</span>
+                </div>
+
+                <p className="mt-2 text-xs text-[#667064] leading-relaxed">
+                  {PROMOTION_PLANS[plan].description}
+                </p>
+
+                <ul className="mt-4 space-y-2 border-t border-[#dfe5d8] pt-3 text-xs text-[#243b32]">
+                  {PROMOTION_PLANS[plan].perks.map((perk) => (
+                    <li key={perk} className="flex items-start gap-1.5 font-medium">
+                      <CheckCircle2 className="h-4 w-4 text-[#335e41] shrink-0 mt-0.5" />
+                      <span>{perk}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </label>
+          ))}
         </div>
       </fieldset>
+
       <fieldset>
-        <legend className="mb-3 font-display text-lg font-bold">2. Choose duration</legend>
-        <div className="flex gap-3">{[1, 2, 4].map((duration) => <button key={duration} type="button" aria-pressed={duration === weeks} onClick={() => setWeeks(duration)} className={`flex-1 rounded-lg border py-3 text-sm font-bold ${weeks === duration ? 'bg-[#243b32] text-white' : 'border-[#dfe5d8]'}`}>{duration} {duration === 1 ? 'week' : 'weeks'}</button>)}</div>
-        <p className="mt-2 text-xs text-[#667064]">Estimated end: {estimatedEnd}. The promotion begins when payment is verified. Renewals extend your current promotion.</p>
+        <div className="mb-3 flex items-center justify-between">
+          <legend className="font-display text-lg font-bold">2. Choose duration & bundle savings</legend>
+          <span className="rounded-full bg-[#eff4da] px-2.5 py-0.5 text-xs font-bold text-[#526936]">
+            Bundle & Save up to 25%
+          </span>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[1, 2, 4].map((duration) => {
+            const quote = promotionPrice(selectedPlan, duration);
+            const isSelected = weeks === duration;
+            return (
+              <button
+                key={duration}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setWeeks(duration)}
+                className={`relative flex flex-col items-center justify-between rounded-xl border-2 p-4 text-center transition ${
+                  isSelected
+                    ? 'border-[#335e41] bg-[#edf2e5]'
+                    : 'border-[#dfe5d8] bg-white hover:border-[#667064]'
+                }`}
+              >
+                {duration === 4 && (
+                  <span className="absolute -top-2.5 rounded-full bg-[#ffc53d] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-[#243b32] shadow-sm">
+                    4 for price of 3 · 25% Off
+                  </span>
+                )}
+                {duration === 2 && (
+                  <span className="absolute -top-2.5 rounded-full bg-[#d9f279] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#183e35] shadow-sm">
+                    5% Off
+                  </span>
+                )}
+                <span className="font-bold text-sm text-[#243b32] mt-1">
+                  {duration} {duration === 1 ? 'week' : 'weeks'}
+                </span>
+                <div className="mt-1 flex items-baseline gap-1.5">
+                  <span className="font-display text-xl font-black text-[#243b32]">
+                    KSh {quote.chargeKes}
+                  </span>
+                  {quote.savingsKes > 0 && (
+                    <span className="text-xs text-[#758071] line-through">
+                      KSh {quote.fullPriceKes}
+                    </span>
+                  )}
+                </div>
+                {quote.savingsKes > 0 ? (
+                  <span className="mt-1 text-xs font-bold text-[#335e41]">
+                    Save KSh {quote.savingsKes}
+                  </span>
+                ) : (
+                  <span className="mt-1 text-xs text-[#667064]">Standard rate</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-xs text-[#667064]">Estimated end: <strong>{estimatedEnd}</strong>. Paid time is never lost: renewing adds the purchased time to your current term.</p>
       </fieldset>
+
       <div>
         <label htmlFor="payment-phone" className="mb-2 block font-display text-lg font-bold">3. Payment phone number</label>
         <input id="payment-phone" type="tel" autoComplete="tel" required value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="0712345678" className="w-full rounded-lg border border-[#dfe5d8] p-3" />
-        <p className="mt-2 text-xs text-[#667064]">Choose M-Pesa or another available payment method on IntaSend&apos;s secure checkout.</p>
+        <p className="mt-2 text-xs text-[#667064]">Choose M-Pesa or card on IntaSend&apos;s secure checkout.</p>
       </div>
-      <div className="flex items-center justify-between rounded-xl bg-[#edf2e5] p-4"><span>Total</span><strong className="font-display text-2xl">KSh {chargeKes}</strong></div>
+
+      <div className="flex flex-wrap items-center justify-between rounded-xl bg-[#edf2e5] p-4 gap-2">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-wider text-[#667064]">Total</span>
+          <div className="flex items-baseline gap-2">
+            <strong className="font-display text-3xl font-black text-[#243b32]">KSh {chargeKes}</strong>
+            {promotionPrice(selectedPlan, weeks).savingsKes > 0 && (
+              <span className="text-sm text-[#758071] line-through">
+                KSh {promotionPrice(selectedPlan, weeks).fullPriceKes}
+              </span>
+            )}
+          </div>
+        </div>
+        {promotionPrice(selectedPlan, weeks).savingsKes > 0 && (
+          <span className="rounded-full bg-[#d9f279] px-3 py-1 text-xs font-black text-[#183e35]">
+            Save KSh {promotionPrice(selectedPlan, weeks).savingsKes} ({weeks === 4 ? '4 weeks for price of 3 / 25% off' : '5% off'})
+          </span>
+        )}
+      </div>
+
       {business.status !== 'ACTIVE' && <p className="text-sm text-[#a7302d]">Your listing needs administrator approval before you can promote it.</p>}
       <button type="submit" disabled={busy || business.status !== 'ACTIVE'} className={`${button} flex w-full items-center justify-center gap-2`}><Tag className="h-5 w-5" />{busy ? 'Opening checkout…' : `Pay KSh ${chargeKes} with IntaSend`}</button>
       <p className="text-xs text-[#667064]">A one-time payment. You choose when to renew. Enter your M-Pesa PIN only in the prompt on your phone.</p>

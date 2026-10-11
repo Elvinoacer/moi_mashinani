@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { AccountGate } from '@/components/AccountGate';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -18,12 +19,14 @@ import {
   WhatsAppIcon,
 } from '@/src/components/icons';
 
+type AdminQueue = 'moderation' | 'renewal' | 'reports' | 'demand' | 'accounts' | 'listings';
 function AdminConsoleContent() {
+  const searchParams = useSearchParams();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [reports, setReports] = useState<ProblemReport[]>([]);
   const [demandRequests, setDemandRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeQueue, setActiveQueue] = useState<'moderation' | 'renewal' | 'reports' | 'demand' | 'accounts' | 'listings'>('moderation');
+  const [activeQueue, setActiveQueue] = useState<AdminQueue>(() => {const queue=searchParams.get('queue');return ['moderation','renewal','reports','demand','accounts','listings'].includes(queue || '') ? queue as AdminQueue : 'moderation';});
   const [actionMessage, setActionMessage] = useState('');
   const [error, setError] = useState('');
   const [busyTarget, setBusyTarget] = useState('');
@@ -439,5 +442,5 @@ function AdminConsoleContent() {
 }
 
 export default function AdminConsolePage() {
-  return <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]"><Navbar /><main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-6"><AccountGate requiredRole="ADMIN"><AdminConsoleContent /></AccountGate></main><Footer /><BottomNav /></div>;
+  return <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]"><Navbar /><main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-6"><AccountGate requiredRole="ADMIN"><Suspense fallback={<p role="status">Loading admin queue…</p>}><AdminConsoleContent /></Suspense></AccountGate></main><Footer /><BottomNav /></div>;
 }

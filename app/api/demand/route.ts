@@ -1,3 +1,4 @@
+import { withNotificationDelivery } from '@/lib/notification-response';
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
 import { requireAdmin } from '@/lib/auth';
@@ -14,6 +15,6 @@ export async function POST(req:NextRequest) {
     const body = await jsonBody(req);
     const zone = textField(body.zone,'Zone',100) || 'all';
     if (zone !== 'all' && !ZONES.some(z => z.slug === zone)) throw new ApiError(400,'Unknown zone');
-    return NextResponse.json(await Store.createServiceRequest({query:textField(body.query,'Service needed',500,true),zone,contactPhone:body.contactPhone ? phoneField(body.contactPhone):undefined}),{status:201});
+    return withNotificationDelivery(NextResponse.json(await Store.createServiceRequest({query:textField(body.query,'Service needed',500,true),zone,contactPhone:body.contactPhone ? phoneField(body.contactPhone):undefined}),{status:201}));
   } catch(error) { return apiError(error); }
 }

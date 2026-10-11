@@ -19,7 +19,7 @@ async function request(path:string, options:{method?:string;body?:unknown;cookie
 }
 function emailToken(email:string) {
   const messages = JSON.parse(readFileSync(context.mailPath,'utf8')) as Array<{to:string[];message:string}>;
-  const latest = messages.filter(message=>message.to.includes(email)).at(-1);
+  const latest = messages.filter(message=>message.to.includes(email) && message.message.includes('/verify?token=')).at(-1);
   assert.ok(latest,'Verification email accepted by mocked Resend');
   const decoded = latest.message.replace(/=\r?\n/g,'').replace(/=([0-9A-F]{2})/g,(_,hex)=>String.fromCharCode(parseInt(hex,16)));
   const token = decoded.match(/\/verify\?token=([a-f0-9]{64})/)?.[1];

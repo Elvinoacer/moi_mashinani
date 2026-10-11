@@ -1,4 +1,5 @@
 import { ApiError } from './api';
+import { notificationEmail } from './notification-content';
 
 export function applicationUrl() {
   const configured = process.env.APP_URL;
@@ -19,7 +20,7 @@ export async function sendVerificationEmail(email: string, name: string, token: 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [email], subject, text }),
+      body: JSON.stringify({ from, to: [email], subject, text, html: notificationEmail(subject, purpose === 'RESET' ? 'Reset your password securely. This button expires in 24 hours and works once. If you did not request this, ignore this email.' : 'Verify your email and set up your password. Then add profile, shop and product photos to help customers choose your business. This button expires in 24 hours and works once.', purpose === 'RESET' ? 'Reset password' : 'Verify my account', link, name) }),
       cache: 'no-store', signal: AbortSignal.timeout(15000),
     });
     if (!response.ok) throw new ApiError(503, 'The email provider did not accept the invitation');
@@ -42,8 +43,21 @@ export async function sendProPlanEmail(email: string, businessName: string, slug
   const text = `Hello,\n\n${expired ? 'Your Pro plan has ended' : 'Your Pro plan is ending soon'} for ${businessName}.\nEnd date: ${date} (East Africa Time).\n\nPro is KES 500 for one calendar month. Renewal is manual: open the link below and complete a new checkout. We will never charge you automatically. Renewing early adds a month after your current end date.\n${link}\n\n${expired ? 'Your listing is now on Free' : 'After expiry, your listing returns to Free'}: 5 public products/services and 25 MB of image storage. Extra products and existing photos stay saved; additional uploads may be paused until you reduce usage or renew. No content is automatically deleted.\n\nMoiMashinani`;
   const response = await fetcher('https://api.resend.com/emails', {
     method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json','Idempotency-Key':idempotencyKey},
-    body:JSON.stringify({from,to:[email],subject,text}),cache:'no-store',signal:signal ? AbortSignal.any([signal,AbortSignal.timeout(5000)]) : AbortSignal.timeout(15000),
+    body:JSON.stringify({from,to:[email],subject,text,html:notificationEmail(subject,text.split("\n\n").slice(1,-1).join("\n\n").replace(link, "Use the button below to renew."),"Renew Pro",link)}),cache:'no-store',signal:signal ? AbortSignal.any([signal,AbortSignal.timeout(5000)]) : AbortSignal.timeout(15000),
   });
   const result = await response.json() as {id?:string};
   if (!response.ok || !result.id) throw new ApiError(503, 'The email provider did not accept the Pro reminder');
+}
+
+export async function sendNotificationEmail(email: string, name: string, title: string, body: string, button: string, url: string, key: string) {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.EMAIL_FROM?.trim();
+  if (!apiKey || !from) throw new ApiError(503, 'Notification email is not configured');
+  const response = await fetch('https://api.resend.com/emails', {
+    method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json','Idempotency-Key':key},
+    body:JSON.stringify({from,to:[email],subject:title,html:notificationEmail(title,body,button,url,name),text:`Hello ${name},\n\n${title}\n\n${body}\n\n${button}: ${url}\n\nMoiMashinani`}),
+    cache:'no-store',signal:AbortSignal.timeout(8000),
+  });
+  const result = await response.json() as {id?:string};
+  if (!response.ok || !result.id) throw new ApiError(503, 'Notification email was not accepted');
 }

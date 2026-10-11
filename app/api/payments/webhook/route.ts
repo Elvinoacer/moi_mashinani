@@ -1,3 +1,4 @@
+import { withNotificationDelivery } from '@/lib/notification-response';
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
 import { apiError } from '@/lib/api';
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     // Webhook fields never authorize fulfilment. Reconcile against the
     // authenticated IntaSend payment status before activating a promotion.
     await reconcilePayment(payment, Store, event.invoice_id, config);
-    return NextResponse.json({ received: true });
+    return withNotificationDelivery(NextResponse.json({ received: true }));
   } catch (error) {
     return error instanceof IntaSendError ? NextResponse.json({ error: error.message }, { status: error.status }) : apiError(error);
   }

@@ -1,3 +1,4 @@
+import { queueNotice } from './notifications';
 import { prisma } from './prisma';
 import { reminderStage } from './catalog-plan';
 import { sendProPlanEmail } from './mail';
@@ -37,6 +38,7 @@ export async function runPlanMaintenance(now = new Date(), send = sendProPlanEma
       if (current?.proEndsAt?.getTime() !== business.proEndsAt.getTime()) {
         await prisma.planNotice.update({where:{id:notice.id},data:{claimedAt:null}});result.skipped++;continue;
       }
+      await prisma.$transaction(tx => queueNotice(tx,business.ownerId,`plan/${notice.id}`,{kind:'PLAN_EXPIRY',title:stage === 0 ? 'Your Pro plan has ended' : `Your Pro plan ends in ${stage} days`,body:`${business.name}: ${stage === 0 ? 'your listing has returned to Free. Your content remains saved.' : 'renew to keep Pro benefits without interruption.'} Renew manually from your dashboard; you will not be charged automatically.`,path:`/pro/${business.slug}`,button:'Review & renew Pro'},['PUSH']));
       await send(business.owner.email,business.name,business.slug,business.proEndsAt,stage,`pro/${business.id}/${business.proEndsAt.toISOString()}/${stage}`);
       await prisma.planNotice.updateMany({where:{id:notice.id,claimedAt},data:{sentAt:new Date(),claimedAt:null,error:null}});
       result.sent++;

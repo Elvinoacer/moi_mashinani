@@ -1,3 +1,4 @@
+import { withNotificationDelivery } from '@/lib/notification-response';
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
 import { requireAdmin } from '@/lib/auth';
@@ -15,6 +16,6 @@ export async function POST(req:NextRequest) {
     if (!business || business.status !== 'ACTIVE') throw new ApiError(404,'Business not found');
     const reason = textField(body.reason,'Reason',40,true);
     if (!['wrong_number','not_responding','closed_down','scam','inappropriate','other'].includes(reason)) throw new ApiError(400,'Invalid report reason');
-    return NextResponse.json(await Store.createReport({businessId:business.id,businessName:business.name,reason:reason as ProblemReport['reason'],details:textField(body.details,'Details',2000),sessionId:textField(body.sessionId,'Session',100)}),{status:201});
+    return withNotificationDelivery(NextResponse.json(await Store.createReport({businessId:business.id,businessName:business.name,reason:reason as ProblemReport['reason'],details:textField(body.details,'Details',2000),sessionId:textField(body.sessionId,'Session',100)}),{status:201}));
   } catch(error) { return apiError(error); }
 }

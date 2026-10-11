@@ -74,7 +74,7 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
       });
       const data = await response.json();
       if (!response.ok || !data.business) throw new Error(data.error || 'Could not save the business. Your details are still here; please try again.');
-      setResult(data); window.scrollTo({ top: 0, behavior: 'smooth' }); onEnrolled?.();
+      setResult(data); if (mode !== 'admin') window.dispatchEvent(new Event('mm:listing-submitted')); window.scrollTo({ top: 0, behavior: 'smooth' }); onEnrolled?.();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not save the business. Please try again.'); }
     finally { setSubmitting(false); }
   }

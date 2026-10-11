@@ -1,3 +1,5 @@
+import { NotificationCenter } from '@/components/NotificationCenter';
+import { Suspense } from 'react';
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import {
@@ -93,6 +95,7 @@ export default function RootLayout({
       </head>
       <body className={`${manrope.variable} min-h-full flex flex-col bg-[#f7f8f2] text-[#243b32] antialiased`}>
         {children}
+        <Suspense fallback={null}><NotificationCenter /></Suspense>
       </body>
     </html>
   );

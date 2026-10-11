@@ -15,7 +15,7 @@ const errors:string[] = [];
 function track(page:Page) { page.setDefaultTimeout(45000);page.setDefaultNavigationTimeout(90000);page.on('pageerror',error=>errors.push(error.message)); }
 function tokenFromMail() {
   const mail = JSON.parse(readFileSync(context.mailPath,'utf8')) as Array<{to:string[];message:string}>;
-  const latest = mail.filter(message=>message.to.includes(ownerEmail)).at(-1)!;
+  const latest = mail.filter(message=>message.to.includes(ownerEmail) && message.message.includes('/verify?token=')).at(-1)!;
   const text = latest.message.replace(/=\r?\n/g,'').replace(/=([0-9A-F]{2})/g,(_,hex)=>String.fromCharCode(parseInt(hex,16)));
   return text.match(/\/verify\?token=([a-f0-9]{64})/)![1];
 }

@@ -1,3 +1,4 @@
+import { queueNotice, queueAdmins, listingNotice } from './notifications';
 import { nextProEnd, productLimitError, PRO_PRICE_KES } from './catalog-plan';
 import { attachMedia, mediaReferences, queueRemovedMedia } from './media-storage';
 import { randomUUID } from 'node:crypto';
@@ -279,6 +280,8 @@ export const Store = {
       },
     });
 
+    await queueAdmins(client, `listing/${id}/created`, {kind:'NEW_LISTING',title:created.status === 'PENDING' ? 'A new listing needs review' : 'A business has been enrolled',body:`${created.name} has been submitted. Review its details and verification status.`,path:created.status === 'PENDING' ? '/admin?queue=moderation':'/admin?queue=accounts',button:'Review listings'});
+    await queueNotice(client,created.ownerId,`listing/${id}/created`,{kind:'LISTING_SUBMITTED',title:created.status === 'PENDING' ? 'Your listing is awaiting review' : 'Your business listing is live',body:created.status === 'PENDING' ? 'We have received your listing. Verify your email using your account invitation. We will notify you when your listing is reviewed.' : 'Verify your email using your account invitation, then add your profile, shop and product photos from the dashboard.',path:`/dashboard/${created.slug}`,button:'Open business dashboard'}, ['EMAIL','PUSH'], id);
     return mapPrismaBusiness(created);
   },
 
@@ -342,6 +345,8 @@ export const Store = {
         where: { id },
         data: prismaUpdateData,
       });
+      if (existing.status !== updated.status) await listingNotice(tx,updated,`listing/${id}/status/${updated.updatedAt.toISOString()}`);
+      else if (existing.verificationLevel !== updated.verificationLevel) await queueNotice(tx,updated.ownerId,`listing/${id}/verification/${updated.updatedAt.toISOString()}`,{kind:'VERIFICATION',title:updated.verificationLevel === 'L2' ? 'Your business is verified' : 'Your verification status changed',body:updated.verificationLevel === 'L2' ? 'Your verified badge is ready. Add clear profile and product photos, update your catalogue and keep your opening hours current.' : 'Open your dashboard to review your current verification status.',path:`/dashboard/${updated.slug}`,button:'Complete my profile'});
       return mapPrismaBusiness(updated);
     }, {maxWait:20000,timeout:30000});
   },
@@ -396,7 +401,8 @@ export const Store = {
 
   async createReport(report: Partial<ProblemReport>): Promise<ProblemReport> {
     const id = `rep_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-    const created = await prisma.problemReport.create({
+    const created = await prisma.$transaction(async tx => {
+    const created = await tx.problemReport.create({
       data: {
         id,
         businessId: report.businessId || '',
@@ -407,6 +413,9 @@ export const Store = {
         status: 'OPEN',
       },
     });
+    await queueAdmins(tx,`report/${id}`,{kind:'COMPLAINT',title:'A customer complaint needs review',body:`A complaint about ${created.businessName} has been submitted. Review the report privately before taking action.`,path:'/admin?queue=reports',button:'Review complaint'});
+    return created;
+    });
     return mapPrismaReport(created);
   },
 
@@ -415,7 +424,11 @@ export const Store = {
       const report = await tx.problemReport.findUnique({where:{id:reportId}});
       if (!report) return false;
       await tx.problemReport.update({where:{id:reportId},data:{status:action === 'DISMISSED' ? 'DISMISSED':'RESOLVED'}});
-      if (action === 'SUSPENDED') await tx.business.update({where:{id:report.businessId},data:{status:'SUSPENDED',moderationReason:`Customer report: ${report.reason.replaceAll('_',' ')}`}});
+      if (action === 'SUSPENDED') {
+        const business = await tx.business.update({where:{id:report.businessId},data:{status:'SUSPENDED',moderationReason:`Customer report: ${report.reason.replaceAll('_',' ')}`}});
+        await listingNotice(tx,business,`report/${reportId}/suspension`);
+      }
+      if (report.status !== 'RESOLVED' && report.status !== 'DISMISSED') await queueAdmins(tx,`report/${reportId}/resolved`,{kind:'COMPLAINT_RESOLVED',title:'A customer complaint was reviewed',body:`The complaint about ${report.businessName} has been reviewed. Action: ${action.toLowerCase()}.`,path:'/admin?queue=reports',button:'View moderation'});
       return true;
     });
   },
@@ -469,6 +482,10 @@ export const Store = {
       }
       // Completion must always pass through confirmVerifiedPayment and its atomic activation.
       if (data.state === 'COMPLETE') throw new ApiError(400,'Verified completion is required');
+      if (updates.state && current.state !== updates.state && ['FAILED','CANCELLED'].includes(updates.state)) {
+        const business = await tx.business.findUnique({where:{id:current.businessId}});
+        if (business) await queueNotice(tx,business.ownerId,`payment/${id}/${updates.state}`,{kind:'PAYMENT',title:'Your payment needs attention',body:'Your payment did not complete. Check its status in your dashboard before starting another payment.',path:`/dashboard/${business.slug}?tab=billing`,button:'Review payment'});
+      }
       return mapPrismaPayment(await tx.paymentRecord.update({where:{id},data}));
     });
   },
@@ -502,6 +519,8 @@ export const Store = {
         await tx.business.update({where:{id:business.id},data:{tierEndsAt:new Date(business.tierEndsAt!.getTime()+payment.weeks*7*864e5/2)}});
       }
       }
+      await queueNotice(tx,business.ownerId,`payment/${id}/complete`,{kind:'PAYMENT',title:'Payment confirmed — your plan is active',body:`Your KES ${payment.amountKes} payment for ${payment.planId} has been verified. View your active plan and payment history in your dashboard.`,path:`/dashboard/${business.slug}?tab=billing`,button:'View my active plan'});
+      await queueAdmins(tx,`payment/${id}/complete`,{kind:'PAYMENT',title:'A business payment was confirmed',body:`${business.name}: KES ${payment.amountKes} for ${payment.planId}.`,path:`/dashboard/${business.slug}?tab=billing`,button:'View payments'});
       return mapPrismaPayment(await tx.paymentRecord.update({where:{id},data:{state:'COMPLETE',providerInvoiceId:proof.invoiceId,providerRef:proof.providerRef,mpesaRef:proof.providerRef,receiptNumber:proof.invoiceId,paidAt:now,verifiedAt:now,failedReason:null}}));
     }, {maxWait:20000,timeout:30000});
   },
@@ -515,7 +534,8 @@ export const Store = {
 
   async createServiceRequest(payload: Partial<ServiceRequest>): Promise<ServiceRequest> {
     const id = `req_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-    const created = await prisma.serviceRequest.create({
+    const created = await prisma.$transaction(async tx => {
+    const created = await tx.serviceRequest.create({
       data: {
         id,
         query: payload.query || '',
@@ -523,16 +543,20 @@ export const Store = {
         contactPhone: payload.contactPhone || null,
       },
     });
+    await queueAdmins(tx,`request/${id}`,{kind:'SERVICE_REQUEST',title:'New service request or suggestion',body:`Someone is looking for: ${created.query}. Area: ${created.zone}. Open the admin dashboard to review and follow up.`,path:'/admin?queue=demand',button:'View request'});
+    return created;
+    });
     return mapPrismaServiceRequest(created);
   },
 
-  async createBookingIntent(payload: Partial<BookingIntent>): Promise<BookingIntent> {
+  async createBookingIntent(payload: Partial<BookingIntent>, requesterId?: string): Promise<BookingIntent> {
     const id = `book_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const created = await prisma.$transaction(async tx => {
       const booking = await tx.bookingIntent.create({
         data: {
           id,
           businessId: payload.businessId || '',
+          requesterId: requesterId || null,
           serviceName: payload.serviceName || 'General inquiry',
           day: payload.day || 'Today',
           time: payload.time || 'Afternoon',
@@ -546,6 +570,10 @@ export const Store = {
         await Store.recordEvent(payload.businessId, 'booking', tx);
       }
 
+      const business = await tx.business.findUnique({where:{id:booking.businessId}});
+      if (business) await queueNotice(tx,business.ownerId,`booking/${id}`,{kind:'BOOKING',title:`New customer request for ${business.name}`,body:`A customer has requested ${booking.serviceName} for ${booking.day} at ${booking.time}. Open your dashboard to review their contact details and respond.`,path:`/dashboard/${business.slug}?tab=bookings`,button:'View customer request'});
+      await queueAdmins(tx,`booking/${id}`,{kind:'BOOKING',title:'New booking or customer inquiry',body:`${business?.name || 'A business'} has received a customer request.`,path:business ? `/dashboard/${business.slug}?tab=bookings`:'/admin',button:'View customer requests'});
+      if (requesterId) await queueNotice(tx,requesterId,`booking/${id}/submitted`,{kind:'BOOKING',title:'Your customer request was sent',body:`Your request for ${booking.serviceName} was sent to ${business?.name || 'the business'}. This is a request, not a confirmed booking. We will notify you when the business updates it.`,path:'/dashboard?notifications=1',button:'View my notifications'});
       return booking;
     });
 

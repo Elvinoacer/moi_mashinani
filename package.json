@@ -28,7 +28,10 @@
     "test:harness": "tsx scripts/test-harness.ts",
     "test:workflows": "tsx scripts/test-workflows.ts",
     "test:payment-routes": "tsx scripts/test-payment-routes.ts",
-    "test:browser": "tsx scripts/test-browser.ts"
+    "test:browser": "tsx scripts/test-browser.ts",
+    "test:notifications": "tsx --test scripts/test-notifications.ts",
+    "test:notifications:workflows": "tsx scripts/test-notification-workflows.ts",
+    "test:notifications:browser": "tsx scripts/test-notification-browser.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -37,6 +40,8 @@
     "@aws-sdk/client-s3": "^3.1148.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "firebase": "^12.4.0",
+    "firebase-admin": "^13.5.0",
     "lucide-react": "^1.52.0",
     "next": "16.3.8",
     "pg": "^8.23.1",
@@ -58,5 +63,9 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@firebase/app": "0.14.4",
+    "@firebase/app-compat": "0.5.4"
   }
 }

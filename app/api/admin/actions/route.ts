@@ -1,3 +1,4 @@
+import { withNotificationDelivery } from '@/lib/notification-response';
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
 import { requireAdmin } from '@/lib/auth';
@@ -11,7 +12,7 @@ export async function POST(req:NextRequest) {
     if (['resolve_report','suspend_reported'].includes(action)) {
       const success = await Store.resolveReport(id,action === 'resolve_report' ? 'RESOLVED':'SUSPENDED');
       if (!success) throw new ApiError(404,'Report not found');
-      return NextResponse.json({success:true});
+      return withNotificationDelivery(NextResponse.json({success:true}));
     }
     const business = await Store.getBusinessById(id);
     if (!business) throw new ApiError(404,'Business not found');
@@ -20,6 +21,6 @@ export async function POST(req:NextRequest) {
       : action === 'suspend_listing' ? {status:'SUSPENDED' as const,moderationReason:textField(body.reason,'Suspension reason',300) || 'Suspended by the administrator'}
       : action === 'toggle_verified' ? {verificationLevel:business.verificationLevel === 'L2' ? 'L1' as const:'L2' as const}:null;
     if (!updates) throw new ApiError(400,'Unknown admin action');
-    return NextResponse.json({success:true,business:await Store.updateBusiness(id,updates)});
+    return withNotificationDelivery(NextResponse.json({success:true,business:await Store.updateBusiness(id,updates)}));
   } catch(error) { return apiError(error); }
 }

@@ -4,9 +4,9 @@ import { CategorySelect } from '@/components/CategorySelect';
 
 import Image from 'next/image';
 
-import { use, useEffect, useState } from 'react';
+import { Suspense, use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
@@ -37,6 +37,7 @@ async function readResponse<T>(response: Response): Promise<T> {
 
 function BusinessDashboard({ slug }: { slug: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const now = useNow();
   const [business, setBusiness] = useState<Business | null>(null);
   const [ownedBusinesses, setOwnedBusinesses] = useState<Business[]>([]);
@@ -51,7 +52,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
   const [bookingError, setBookingError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState('');
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [activeTab, setActiveTab] = useState<Tab>(() => {const tab=searchParams.get('tab');return tabs.includes(tab as Tab) ? tab as Tab : 'overview';});
   const [draft, setDraft] = useState({ name: '', tagline: '', description: '', phone: '', whatsapp: '', landmark: '', address: '', zone: '', primaryCategory: '', studentDiscount: '', latitude:'', longitude:'' });
   const [hours, setHours] = useState<BusinessHours>({});
   const [serviceId, setServiceId] = useState('');
@@ -254,5 +255,5 @@ function BusinessDashboard({ slug }: { slug: string }) {
 
 export default function BusinessDashboardPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  return <div className="interior-page flex min-h-screen flex-col bg-[#f7f8f2]"><Navbar /><AccountGate requiredRole="BUSINESS" slug={slug}><BusinessDashboard key={slug} slug={slug} /></AccountGate><Footer /><BottomNav /></div>;
+  return <div className="interior-page flex min-h-screen flex-col bg-[#f7f8f2]"><Navbar /><AccountGate requiredRole="BUSINESS" slug={slug}><Suspense fallback={<p role="status">Loading dashboard…</p>}><BusinessDashboard key={slug} slug={slug} /></Suspense></AccountGate><Footer /><BottomNav /></div>;
 }

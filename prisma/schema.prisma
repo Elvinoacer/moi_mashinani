@@ -127,6 +127,7 @@ model ServiceRequest {
 }
 
 model BookingIntent {
+  requesterId String?
   id          String    @id
   businessId  String
   serviceName String    @default("General inquiry")
@@ -149,6 +150,8 @@ model Account {
   passwordHash    String?
   emailVerifiedAt DateTime?
   createdAt       DateTime @default(now())
+  notifications   Notification[]
+  pushDevices     PushDevice[]
   businesses      Business[]
   sessions        AccountSession[]
   tokens          VerificationToken[]
@@ -243,4 +246,58 @@ model PlanNotice {
   error       String?
   @@unique([businessId, endsAt, daysBefore])
   @@index([sentAt])
+}
+
+// A browser binding is an opaque HttpOnly cookie, never a submitted account ID.
+model PushDevice {
+  id             String @id @default(uuid())
+  bindingHash    String @unique
+  accountId      String
+  account        Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  token          String? @unique
+  scopeBusinessId String?
+  sessionHash    String?
+  enrollmentUntil DateTime?
+  enabled        Boolean @default(true)
+  declined       Boolean @default(false)
+  lastSeenAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  deliveries     NotificationDelivery[]
+  @@index([accountId, enabled])
+  @@index([lastSeenAt])
+}
+
+model Notification {
+  id           String @id @default(uuid())
+  accountId    String
+  account      Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  eventKey     String
+  kind         String
+  title        String
+  body         String
+  path         String
+  button       String
+  createdAt    DateTime @default(now())
+  readAt       DateTime?
+  deliveries   NotificationDelivery[]
+  @@unique([accountId, eventKey])
+  @@index([accountId, createdAt])
+}
+
+model NotificationDelivery {
+  id             String @id @default(uuid())
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  channel        String
+  target         String
+  deviceId       String?
+  device         PushDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  attempts       Int @default(0)
+  nextAttemptAt  DateTime @default(now())
+  claimedAt      DateTime?
+  sentAt         DateTime?
+  stoppedAt      DateTime?
+  error          String?
+  @@unique([notificationId, channel, target])
+  @@index([sentAt, stoppedAt, nextAttemptAt])
 }

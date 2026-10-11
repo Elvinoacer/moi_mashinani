@@ -1,3 +1,5 @@
+import { withNotificationDelivery } from '@/lib/notification-response';
+import { queueNotice } from '@/lib/notifications';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashToken, hashPassword, verifyPassword, newSession, publicUser, setSessionCookie, validatePassword } from '@/lib/auth';
@@ -6,6 +8,7 @@ import { rateLimit } from '@/lib/rate-limit';
 export async function POST(req: NextRequest) {
   try {
     assertSameOrigin(req);
+
     await rateLimit(req,'verify',20);
     const body = await jsonBody(req);
     const token = textField(body.token,'Verification token',64,true);
@@ -20,13 +23,15 @@ export async function POST(req: NextRequest) {
       if (consumed.count !== 1) throw new ApiError(400,'This link has already been used');
       const account = await tx.account.update({where:{id:record.accountId},data:{emailVerifiedAt:record.account.emailVerifiedAt || new Date(),passwordHash:record.purpose === 'RESET' || !record.account.passwordHash ? passwordHash : record.account.passwordHash}});
       if (record.purpose === 'RESET') {
+        await tx.pushDevice.updateMany({where:{accountId:account.id},data:{enabled:false,token:null,enrollmentUntil:null}});
         await tx.accountSession.deleteMany({where:{accountId:account.id}});
         await tx.verificationToken.updateMany({where:{accountId:account.id,usedAt:null},data:{usedAt:new Date()}});
       }
       await tx.business.updateMany({where:{ownerId:account.id},data:{isClaimed:true}});
       const business = record.businessId ? await tx.business.findUnique({where:{id:record.businessId}}) : await tx.business.findFirst({where:{ownerId:account.id}});
+      await queueNotice(tx,account.id,`account/${record.id}/verified`,{kind:'ACCOUNT',title:record.purpose === 'RESET' ? 'Your password has been reset' : 'Your account is ready',body:record.purpose === 'RESET' ? 'Your password was changed and previous sessions were signed out. If you did not make this change, reset your password immediately.' : 'Your email is verified. Open your business dashboard to check listing approval, upload profile and product photos and manage customer requests.',path:business ? `/dashboard/${business.slug}` : '/dashboard',button:'Open my dashboard'});
       return {account,business};
     });
-    return setSessionCookie(NextResponse.json({user:publicUser(result.account),business:result.business ? {slug:result.business.slug,status:result.business.status} : null}),await newSession(result.account.id));
+    return withNotificationDelivery(setSessionCookie(NextResponse.json({user:publicUser(result.account),business:result.business ? {slug:result.business.slug,status:result.business.status} : null}),await newSession(result.account.id)));
   } catch(error) { return apiError(error); }
 }

@@ -1,14 +1,20 @@
 import { withNotificationDelivery } from '@/lib/notification-response';
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
+import { removeUnusedMedia } from '@/lib/media-storage';
 import { Store } from '@/lib/store';
 import { requireAdmin } from '@/lib/auth';
 import { ApiError, apiError, assertSameOrigin, jsonBody, textField } from '@/lib/api';
 export async function POST(req:NextRequest) {
   try {
-    assertSameOrigin(req); await requireAdmin(req);
+    assertSameOrigin(req); const admin = await requireAdmin(req);
     const body = await jsonBody(req);
     const action = textField(body.action,'Action',50,true);
     const id = textField(body.targetId,'Target ID',100,true);
+    if (action === 'delete_listing') {
+      const assets = await Store.deleteBusiness(id,textField(body.confirmationName,'Business name',200,true),admin.id);
+      after(async () => { await Promise.allSettled(assets.map(id => removeUnusedMedia(id))); });
+      return withNotificationDelivery(NextResponse.json({success:true}));
+    }
     if (['resolve_report','suspend_reported'].includes(action)) {
       const success = await Store.resolveReport(id,action === 'resolve_report' ? 'RESOLVED':'SUSPENDED');
       if (!success) throw new ApiError(404,'Report not found');

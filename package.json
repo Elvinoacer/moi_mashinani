@@ -31,7 +31,8 @@
     "test:browser": "tsx scripts/test-browser.ts",
     "test:notifications": "tsx --test scripts/test-notifications.ts",
     "test:notifications:workflows": "tsx scripts/test-notification-workflows.ts",
-    "test:notifications:browser": "tsx scripts/test-notification-browser.ts"
+    "test:notifications:browser": "tsx scripts/test-notification-browser.ts",
+    "test:admin:deletion": "tsx scripts/test-admin-deletion.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

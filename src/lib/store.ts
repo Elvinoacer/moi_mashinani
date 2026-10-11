@@ -201,6 +201,31 @@ export const Store = {
     return record ? mapPrismaBusiness(record) : undefined;
   },
 
+  async deleteBusiness(id: string, confirmationName: string, adminId: string): Promise<string[]> {
+    return prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${id} FOR UPDATE`;
+      const business = await tx.business.findUnique({where:{id}});
+      if (!business) throw new ApiError(404, 'Business not found');
+      if (confirmationName !== business.name) throw new ApiError(409, 'Type the current business name to confirm deletion');
+      const pendingPayment = await tx.paymentRecord.findFirst({where:{businessId:id,state:{in:['CREATED','PENDING','PROCESSING']}}});
+      if (pendingPayment) throw new ApiError(409, 'This business has a pending payment. Wait for it to complete or fail before deleting.');
+      await queueRemovedMedia(tx,id,mediaReferences(business),[],adminId);
+      await tx.businessMedia.updateMany({where:{businessId:id},data:{state:'DELETING'}});
+      const assets = await tx.businessMedia.findMany({where:{businessId:id},select:{id:true}});
+      await tx.verificationToken.deleteMany({where:{businessId:id}});
+      await tx.notificationDelivery.updateMany({where:{sentAt:null,stoppedAt:null,notification:{OR:[{path:`/dashboard/${business.slug}`},{path:{startsWith:`/dashboard/${business.slug}?`}},{path:`/promote/${business.slug}`},{path:{startsWith:`/promote/${business.slug}?`}}]}},data:{stoppedAt:new Date(),error:'Business deleted'}});
+      await queueNotice(tx,business.ownerId,`listing/${id}/deleted`,{kind:'LISTING_DELETED',title:`${business.name} has been deleted`,body:'An administrator permanently deleted your business listing and its bookings. Your owner account remains available. Contact support if you need help.',path:'/dashboard?notifications=1',button:'Open your account'},['EMAIL','PUSH'],id);
+      await queueNotice(tx,adminId,`listing/${id}/deleted/admin`,{kind:'LISTING_DELETED',title:`Deleted ${business.name}`,body:'The business listing and its bookings were permanently deleted. Payment records and complaint history were retained.',path:'/admin?queue=listings',button:'Manage listings'},[]);
+      await tx.pushDevice.updateMany({where:{scopeBusinessId:id},data:{enabled:false,token:null,enrollmentUntil:null}});
+      const bookings = await tx.bookingIntent.findMany({where:{businessId:id,status:{in:['NEW','CONFIRMED']},requesterId:{not:null}}});
+      for (const booking of bookings) await queueNotice(tx,booking.requesterId,`booking/${booking.id}/business-deleted`,{kind:'BOOKING_STATUS',title:'Your customer request was cancelled',body:`${business.name} has been removed from the directory. Your request for ${booking.serviceName} is no longer active.`,path:'/dashboard?notifications=1',button:'View my notifications'});
+      await tx.bookingIntent.deleteMany({where:{businessId:id}});
+      await tx.problemReport.updateMany({where:{businessId:id,status:'OPEN'},data:{status:'RESOLVED'}});
+      await tx.business.delete({where:{id}});
+      return assets.map(asset => asset.id);
+    },{maxWait:20000,timeout:30000});
+  },
+
   async createBusiness(payload: Partial<Business>, client: Prisma.TransactionClient = prisma): Promise<Business> {
     const id = payload.id || `biz_${randomUUID()}`;
     const baseSlug = (payload.name || 'business')
@@ -453,6 +478,7 @@ export const Store = {
   async createPayment(payload: Partial<PaymentRecord>): Promise<PaymentRecord> {
     return prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${payload.businessId || ''} FOR UPDATE`;
+      if (!await tx.business.findUnique({where:{id:payload.businessId || ''},select:{id:true}})) throw new ApiError(404, 'Business not found');
       if (payload.method === 'INTASEND_CHECKOUT') {
         const pending = await tx.paymentRecord.findFirst({where:{businessId:payload.businessId,method:'INTASEND_CHECKOUT',state:{in:['CREATED','PENDING','PROCESSING']}}});
         if (pending) throw new ApiError(409,'A payment is already pending for this business. Check its status or retry it.');
@@ -552,6 +578,8 @@ export const Store = {
   async createBookingIntent(payload: Partial<BookingIntent>, requesterId?: string): Promise<BookingIntent> {
     const id = `book_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const created = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${payload.businessId || ''} FOR UPDATE`;
+      if (!await tx.business.findUnique({where:{id:payload.businessId || ''},select:{id:true}})) throw new ApiError(404, 'Business not found');
       const booking = await tx.bookingIntent.create({
         data: {
           id,

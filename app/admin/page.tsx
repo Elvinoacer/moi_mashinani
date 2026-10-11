@@ -4,6 +4,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AccountGate } from '@/components/AccountGate';
+import { ModalFrame } from '@/components/ModalFrame';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
@@ -31,6 +32,9 @@ function AdminConsoleContent() {
   const [error, setError] = useState('');
   const [busyTarget, setBusyTarget] = useState('');
   const [listingSearch, setListingSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<Business | null>(null);
+  const [confirmationName, setConfirmationName] = useState('');
+  const [deleteError, setDeleteError] = useState('');
   const [siteOrigin] = useState(() => (typeof window !== 'undefined' ? window.location.origin : ''));
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
 
@@ -86,12 +90,34 @@ function AdminConsoleContent() {
     finally { setBusyTarget(''); }
   };
 
+  const deleteBusiness = async () => {
+    if (!deleteTarget || busyTarget || confirmationName !== deleteTarget.name) return;
+    setBusyTarget(deleteTarget.id); setDeleteError(''); setActionMessage('');
+    try {
+      const response = await fetch('/api/admin/actions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete_listing',targetId:deleteTarget.id,confirmationName})});
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Could not delete the business.');
+      setDeleteTarget(null); setConfirmationName('');
+      setActionMessage('Business deleted. Owner notification queued.');
+      setLoading(true); await refreshData();
+    } catch (cause) { setDeleteError(cause instanceof Error ? cause.message : 'Could not delete the business.'); }
+    finally { setBusyTarget(''); }
+  };
+
   const pendingListings = businesses.filter((b) => b.status === 'PENDING');
   const activeListings = businesses.filter((b) => b.status === 'ACTIVE');
   const openReports = reports.filter((r) => r.status === 'OPEN');
 
   return (
     <div className="space-y-6">
+      {deleteTarget && <ModalFrame title="Delete business permanently" onClose={() => {if (!busyTarget) setDeleteTarget(null);}}>
+        <div className="space-y-4 p-5">
+          <p className="text-sm text-[#243b32]">Delete <strong>{deleteTarget.name}</strong>? This permanently removes the listing and its bookings. Payment records, complaint history and the owner account are kept. This cannot be undone.</p>
+          <label className="block text-sm font-bold text-[#243b32]">Type the business name to confirm<input value={confirmationName} onChange={event => setConfirmationName(event.target.value)} disabled={!!busyTarget} autoComplete="off" className="mt-2 w-full rounded-xl border border-[#dfe5d8] px-3 py-2" /></label>
+          {deleteError && <p role="alert" className="text-sm text-[#a7302d]">{deleteError}</p>}
+          <div className="flex justify-end gap-3"><button type="button" disabled={!!busyTarget} onClick={() => setDeleteTarget(null)} className="rounded-xl border border-[#dfe5d8] px-4 py-2 text-sm font-bold">Cancel</button><button type="button" disabled={!!busyTarget || confirmationName !== deleteTarget.name} onClick={deleteBusiness} className="rounded-xl bg-[#a7302d] px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{busyTarget ? 'Deleting…' : 'Delete permanently'}</button></div>
+        </div>
+      </ModalFrame>}
         {/* Header */}
         <div className="page-hero bg-white signboard-border-thick rounded-xl p-5 signboard-shadow flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
           <div>
@@ -206,6 +232,7 @@ function AdminConsoleContent() {
             <div className="flex flex-wrap gap-2"><Link href={`/dashboard/${business.slug}`} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32]">Edit listing & photos</Link>
             <button type="button" disabled={!!busyTarget} onClick={() => handleAdminAction(business.status === 'ACTIVE' ? 'suspend_listing':'restore_listing',business.id)} className={`rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-50 ${business.status === 'ACTIVE' ? 'bg-[#a7302d]' : 'bg-[#335e41]'}`}>{business.status === 'ACTIVE' ? 'Suspend listing' : business.status === 'PENDING' ? 'Approve listing' : 'Restore listing'}</button>
             <button type="button" disabled={!!busyTarget} onClick={() => handleAdminAction('toggle_verified',business.id)} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32] disabled:opacity-50">{business.verificationLevel === 'L2' ? 'Remove field verification' : 'Mark field verified'}</button>
+            <button type="button" disabled={!!busyTarget} onClick={() => {setDeleteTarget(business);setConfirmationName('');setDeleteError('');}} className="rounded-xl border border-[#a7302d] px-3 py-2 text-xs font-bold text-[#a7302d] disabled:opacity-50">Delete business</button>
             </div>
           </article>)}
         </section>}

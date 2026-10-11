@@ -45,6 +45,10 @@ import styles from "./home.module.css";
 import { CategoryBrowser } from "@/components/CategoryBrowser";
 import { SiteBrand } from "@/components/SiteBrand";
 import { publicBusiness } from "@/lib/business-input";
+import {
+  LandingAuthHeader,
+  LandingAuthMobileNav,
+} from "@/components/landing/LandingAuth";
 
 const shortcuts = [
   { slug: 'food-drinks', label: 'Food & refreshments', icon: UtensilsCrossed, tone: 'peach' },
@@ -285,11 +289,14 @@ export default async function HomePage() {
             </Link>
             <a href="#for-business">For your business</a>
           </nav>
-          <Link href="/onboard" className={styles.headerCta}>
-            <Plus size={17} />
-            <span>List your business</span>
-            <span className={styles.freePill}>Free</span>
-          </Link>
+          <div className={styles.headerActions}>
+            <LandingAuthHeader className={styles.loginLink} />
+            <Link href="/onboard" className={styles.headerCta}>
+              <Plus size={17} />
+              <span>List your business</span>
+              <span className={styles.freePill}>Free</span>
+            </Link>
+          </div>
         </div>
       </header>
       <main className={styles.main}>
@@ -466,9 +473,7 @@ export default async function HomePage() {
         <a href="#find">
           <Search size={18} /> Find something
         </a>
-        <Link href="/onboard">
-          <Plus size={18} /> List your business
-        </Link>
+        <LandingAuthMobileNav />
       </nav>
     </div>
   );

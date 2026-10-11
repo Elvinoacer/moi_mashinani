@@ -87,6 +87,29 @@
   background: #859c3a;
   border-radius: 50%;
 }
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.loginLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #335e41;
+  border-radius: 9px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+.loginLink:hover {
+  color: var(--forest);
+  background: #e9eedf;
+}
 .headerCta {
   min-height: 44px;
   display: flex;
@@ -1184,6 +1207,12 @@
     height: 76px;
     padding: 0 22px;
     gap: 8px;
+  }
+  .headerActions {
+    gap: 8px;
+  }
+  .loginLink {
+    display: none;
   }
   .headerCta {
     padding: 10px 11px;

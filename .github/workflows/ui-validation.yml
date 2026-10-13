@@ -52,6 +52,7 @@ jobs:
         run: |
           npm run test:templates
           npm run test:onboarding:integrity
+          npm run test:onboarding:uploads
           npm run test:engine
           npm run test:mail
       - name: Production build

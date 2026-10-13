@@ -16,6 +16,7 @@
     "test:engine": "tsx scripts/test-engine.ts",
     "test:onboarding:integrity": "tsx scripts/test-onboarding-integrity.ts",
     "test:templates": "tsx scripts/test-enrollment-templates.ts",
+    "test:onboarding:uploads": "tsx scripts/test-enrollment-photo-upload.ts",
     "test:categories": "tsx --test scripts/test-categories.ts",
     "test:seo": "tsx --test scripts/test-seo.ts",
     "test:catalog": "tsx --test scripts/test-catalog-plan.ts",

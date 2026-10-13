@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2, Plus, Trash2 } from 'lucide-react';
@@ -37,19 +37,19 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
   const [fieldVisitConfirmed, setFieldVisitConfirmed] = useState(false);
   const [draftMessage, setDraftMessage] = useState('');
   const draftKey = mode === 'admin' ? 'mm-admin-enrollment-draft-v1' : 'mm-public-enrollment-draft-v1';
-  useEffect(() => {
+  function restoreDraft() {
     try {
       const stored = sessionStorage.getItem(draftKey);
-      if (!stored) return;
+      if (!stored) { setDraftMessage('No draft saved in this tab.'); return; }
       const draft = JSON.parse(stored);
-      if (typeof draft.savedAt !== 'number' || Date.now() - draft.savedAt > 24*3600000) { sessionStorage.removeItem(draftKey); return; }
+      if (typeof draft.savedAt !== 'number' || Date.now() - draft.savedAt > 24*3600000) { sessionStorage.removeItem(draftKey);setDraftMessage('The draft has expired.');return; }
       if (draft.details && typeof draft.details === 'object') setDetails(current => ({...current,...draft.details}));
       if (draft.hours && typeof draft.hours === 'object') setHours(draft.hours);
       if (Array.isArray(draft.serviceModes)) setServiceModes(draft.serviceModes);
       if (Array.isArray(draft.products)) setProducts(draft.products);
-      setDraftMessage('Your saved draft was restored. Uploaded photos must be selected again.');
-    } catch { sessionStorage.removeItem(draftKey); }
-  }, [draftKey]);
+      setDraftMessage('Draft restored. Uploaded photos must be selected again.');
+    } catch { sessionStorage.removeItem(draftKey);setDraftMessage('Saved draft could not be read.'); }
+  }
   function saveDraft() {
     try {
       sessionStorage.setItem(draftKey,JSON.stringify({savedAt:Date.now(),details,hours,serviceModes,products}));
@@ -200,7 +200,7 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
       <label className="flex items-start gap-3 text-sm"><input type="checkbox" aria-label="Owner authorized public listing" checked={ownerConsentConfirmed} onChange={event=>setOwnerConsentConfirmed(event.target.checked)} required className="mt-1 accent-[#335e41]" /><span>The owner authorized publication and confirmed the invitation email belongs to them.</span></label>
     </fieldset>}
     {draftMessage && <p role="status" className="text-xs text-[#335e41]">{draftMessage}</p>}
-    <button type="button" onClick={saveDraft} disabled={submitting} className="rounded-xl border border-[#dfe5d8] bg-white px-4 py-2.5 text-sm font-bold text-[#243b32]">Save draft on this device</button>
+    <button type="button" onClick={saveDraft} disabled={submitting} className="rounded-xl border border-[#dfe5d8] bg-white px-4 py-2.5 text-sm font-bold text-[#243b32]">Save draft on this device</button><button type="button" onClick={restoreDraft} disabled={submitting} className="ml-2 rounded-xl border border-[#dfe5d8] px-4 py-2.5 text-sm font-bold text-[#243b32]">Restore saved draft</button>
     {error && <p role="alert" className="rounded-xl bg-[#fce7e1] p-4 text-sm font-semibold text-[#8f2424]">{error}</p>}<p className="text-xs text-[#667064]">Confirm the email address with the owner before submitting. The owner receives a secure verification link and can update these details after signing in.</p><button type="submit" disabled={submitting || uploading || locating} className="w-full rounded-xl bg-[#243b32] px-5 py-3.5 text-sm font-bold text-white disabled:opacity-50">{submitting ? 'Saving business & sending email…' : uploading ? 'Uploading photos…' : mode === 'admin' ? 'Enroll business & email owner' : 'Submit listing & verify email'}</button>
   </form>;
 }

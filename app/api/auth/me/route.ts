@@ -5,7 +5,7 @@ import { apiError } from '@/lib/api';
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser(req);
-    const businesses = user ? (await Store.getBusinesses()).filter(b => user.role === 'ADMIN' || b.ownerId === user.id) : [];
+    const businesses = user ? (await Store.getBusinesses()).filter(b => user.role === 'ADMIN' || (b.ownerId === user.id && b.isClaimed)) : [];
     return NextResponse.json({user,businesses},{headers:{'Cache-Control':'no-store'}});
   } catch(error) { return apiError(error); }
 }

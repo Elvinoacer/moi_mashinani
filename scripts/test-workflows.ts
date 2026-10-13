@@ -38,9 +38,11 @@ async function main() {
   await request('/api/admin/enroll',{method:'POST',cookie:admin.cookie,origin:'https://evil.invalid',body:{}},403);
   check(true,'cross-site admin request rejected');
   const ownerEmail = `owner-${testId}@test.invalid`;
-  const draft = {ownerEmail,ownerName:'Workflow Owner',name:`Workflow Shop ${testId}`,description:'A test workshop offering repairs and accessories near the campus gate.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',whatsapp:'254712345678',landmark:'Test gate',services:[{id:'repair',name:'Phone repair',priceFrom:150}],hours:{Monday:{open:'08:00',close:'20:00'}}};
+  const draft = {ownerEmail,ownerName:'Workflow Owner',name:`Workflow Shop ${testId}`,description:'A test workshop offering repairs and accessories near the campus gate.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',whatsapp:'254712345678',landmark:'Test gate',serviceModes:['at_shop'],fieldVisitConfirmed:true,ownerConsentConfirmed:true,services:[{id:'repair',name:'Phone repair',priceFrom:150}],hours:{Monday:{open:'08:00',close:'20:00'}}};
   const enrolled = await request('/api/admin/enroll',{method:'POST',cookie:admin.cookie,body:draft},201);
   const business = enrolled.data.business;
+  const duplicate = await request('/api/admin/enroll',{method:'POST',cookie:admin.cookie,body:draft},409);
+  check(duplicate.data.error.includes('already'),'duplicate field enrollment is blocked');
   check(enrolled.data.invitation.sent,'admin enrollment delivers owner verification email');
   check(business.status === 'ACTIVE' && business.verificationLevel === 'L2' && !business.isClaimed,'field enrollment publishes inspected business before owner claims account');
   check(!business.mapPin && !business.walkTime && business.photos.length === 0,'enrollment does not invent photos, coordinates or a walking distance');
@@ -51,6 +53,8 @@ async function main() {
   await request('/api/auth/verify',{method:'POST',body:{token:emailToken(ownerEmail),password:'owner password 2026'}},400);
   check(true,'email verification is password validated and single-use');
   const mine = (await request('/api/auth/me',{cookie:owner.cookie})).data;
+  const auditResult = await request(`/api/admin/audit?businessId=${business.id}`,{cookie:admin.cookie});
+  check(auditResult.data.events.some((event:{action:string})=>event.action === 'OWNERSHIP_ACCEPTED'),'owner acceptance records an audit entry');
   check(mine.businesses.length === 1 && mine.businesses[0].id === business.id && mine.user.role === 'BUSINESS','owner sees only their own verified account');
   const publicProfile = (await request(`/api/businesses/${business.slug}`)).data;
   check(!publicProfile.ownerEmail && !publicProfile.ownerId && !publicProfile.claimCode && publicProfile.metrics.views === 0,'public profile excludes owner details and private analytics');
@@ -119,6 +123,7 @@ async function main() {
   check((await request(`/api/businesses/${business.slug}`,{cookie:owner.cookie})).data.activeTier === 'NONE','missing provider credentials and fake settlement never activate promotions');
   const pendingEmail = `pending-${testId}@test.invalid`;
   const pending = await request('/api/businesses',{method:'POST',body:{...draft,ownerEmail:pendingEmail,name:`Pending Shop ${testId}`,status:'ACTIVE',isClaimed:true,activeTier:'FEATURED'}},201);
+  await request('/api/admin/actions',{method:'POST',cookie:admin.cookie,body:{action:'approve_listing',targetId:pending.data.business.id}},409);
   check(pending.data.business.status === 'PENDING' && pending.data.business.activeTier === 'NONE' && !pending.data.business.isClaimed,'public enrollment cannot publish or self-award promotions');
   await request(`/api/businesses/${pending.data.business.slug}`,{},404);
   await request('/api/admin/actions',{method:'POST',cookie:admin.cookie,body:{action:'reject_listing',targetId:pending.data.business.id}},400);
@@ -126,6 +131,9 @@ async function main() {
   const pendingOwner = await request('/api/auth/verify',{method:'POST',body:{token:emailToken(pendingEmail),password:'pending owner password 2026'}});
   const rejected = await request(`/api/businesses/${pending.data.business.slug}`,{cookie:pendingOwner.cookie});
   check(rejected.data.status === 'REJECTED' && rejected.data.moderationReason === 'Please confirm the landmark','rejected owner can see the persisted reason and correct their details');
+  await request(`/api/businesses/${pending.data.business.slug}`,{method:'PATCH',cookie:pendingOwner.cookie,body:{landmark:'Correct landmark beside gate'}});
+  const resubmitted = await request(`/api/businesses/${pending.data.business.slug}/resubmit`,{method:'POST',cookie:pendingOwner.cookie});
+  check(resubmitted.data.business.status === 'PENDING','corrected rejected listing re-enters moderation');
   await request('/api/admin/actions',{method:'POST',cookie:admin.cookie,body:{action:'approve_listing',targetId:pending.data.business.id}});
   check((await request(`/api/businesses/${pending.data.business.slug}`)).data.verificationLevel === 'L0','listing approval does not falsely claim field verification');
   const expiredEmail = `expired-${testId}@test.invalid`;
@@ -147,6 +155,17 @@ async function main() {
   check(resent.data.invitation.sent,'admin can recover email delivery and resend an expired invitation');
   await request('/api/auth/verify',{method:'POST',body:{token:emailToken(expiredEmail),password:'recovery owner password 2026'}});
   await request('/api/auth/verify',{method:'POST',body:{token:expiredToken,password:'recovery owner password 2026'}},400);
+  const second = await request('/api/businesses',{method:'POST',body:{...draft,ownerEmail,name:`Second Business ${testId}`,phone:'0712345000'}},201);
+  check(!(await request('/api/auth/me',{cookie:owner.cookie})).data.businesses.some((b:{id:string})=>b.id===second.data.business.id),'verified account cannot manage unaccepted new business');
+  await request(`/api/businesses/${second.data.business.slug}`,{method:'PATCH',cookie:owner.cookie,body:{tagline:'unauthorized'}},403);
+  const acceptedSecond = await request('/api/auth/verify',{method:'POST',body:{token:emailToken(ownerEmail),password:'owner password 2026'}});
+  check((await request('/api/auth/me',{cookie:acceptedSecond.cookie})).data.businesses.some((b:{id:string})=>b.id===second.data.business.id),'existing owner can accept exactly one new business');
+  const correctedEmail=`corrected-${testId}@test.invalid`;
+  const correction=await request('/api/admin/ownership',{method:'POST',cookie:admin.cookie,body:{businessId:second.data.business.id,ownerName:'Corrected Owner',ownerEmail:correctedEmail}});
+  check(correction.data.invitation.sent,'admin can correct an owner account and resend invite');
+  await request(`/api/businesses/${second.data.business.slug}`,{method:'PATCH',cookie:acceptedSecond.cookie,body:{tagline:'old owner'}},403);
+  const corrected=await request('/api/auth/verify',{method:'POST',body:{token:emailToken(correctedEmail),password:'corrected owner password 2026'}});
+  check((await request('/api/auth/me',{cookie:corrected.cookie})).data.businesses.some((b:{id:string})=>b.id===second.data.business.id),'new owner receives only reassigned business');
   const reset = await request('/api/auth/request-link',{method:'POST',body:{email:ownerEmail}});check(reset.data.success,'owner can request password reset email');
   const resetToken = emailToken(ownerEmail);
   await request('/api/auth/verify',{method:'POST',body:{token:resetToken,password:'new owner password 2026'}});
@@ -154,7 +173,7 @@ async function main() {
   const loggedBack = await request('/api/auth/login',{method:'POST',body:{email:ownerEmail,password:'new owner password 2026'}});
   await request('/api/auth/logout',{method:'POST',cookie:loggedBack.cookie});
   check((await request('/api/auth/me',{cookie:loggedBack.cookie})).data.user === null,'logout revokes the server session');
-  check(await prisma.business.count({where:{id:{in:[business.id,pending.data.business.id,failedPayload.business.id]}}}) === 3,'all workflow records persisted in PostgreSQL');
+  check(await prisma.business.count({where:{id:{in:[business.id,pending.data.business.id,failedPayload.business.id,second.data.business.id]}}}) === 4,'all workflow records persisted in PostgreSQL');
   writeFileSync('/tmp/moimashinani-workflow-results.json',JSON.stringify({passed,testId,businessId:business.id,slug:business.slug,ownerEmail},null,2));
   console.log(`All ${passed} workflow checks passed.`);
 }

@@ -47,6 +47,7 @@ export function businessInput(body: Record<string, unknown>, partial = false): P
   if (body.serviceModes !== undefined) {
     const modes = list(body.serviceModes, 'Service modes', 4);
     if (modes.some(mode => !['at_shop','comes_to_you','delivery','online'].includes(mode))) throw new ApiError(400, 'Unknown service mode');
+    if (!modes.length) throw new ApiError(400, 'Select at least one way customers are served');
     result.serviceModes = modes as Business['serviceModes'];
   }
   if (body.priceLevel !== undefined) {
@@ -72,6 +73,7 @@ export function businessInput(body: Record<string, unknown>, partial = false): P
       if (!['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].includes(day)) throw new ApiError(400, 'Invalid day in opening hours');
       const h = value as BusinessHours[string];
       if (!h || typeof h !== 'object' || !/^([01]\d|2[0-3]):[0-5]\d$/.test(h.open) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(h.close)) throw new ApiError(400, 'Opening hours must use HH:MM');
+      if (!h.closed && h.open === h.close) throw new ApiError(400, 'Opening and closing times must differ');
       hours[day] = {open:h.open,close:h.close,closed:Boolean(h.closed),appointmentOnly:Boolean(h.appointmentOnly)};
     }
     result.hours = hours;

@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
     let businessId: string | undefined;
     if (typeof requestedBusiness === 'string' && requestedBusiness) {
       const business = await prisma.business.findUnique({where:{id:requestedBusiness}});
-      if (!business || (user.role !== 'ADMIN' && business.ownerId !== user.id)) throw new ApiError(403, 'Choose your own business for these uploads');
+      if (!business || (user.role !== 'ADMIN' && (business.ownerId !== user.id || !business.isClaimed))) throw new ApiError(403, 'Choose your own business for these uploads');
       businessId = business.id;
     } else if (user.role !== 'ADMIN') {
-      const businesses = await prisma.business.findMany({where:{ownerId:user.id},select:{id:true}});
+      const businesses = await prisma.business.findMany({where:{ownerId:user.id,isClaimed:true},select:{id:true}});
       if (businesses.length !== 1) throw new ApiError(400, 'Choose the business receiving these photos');
       businessId = businesses[0].id;
     }
@@ -53,6 +53,10 @@ export async function POST(req: NextRequest) {
         if (content.length > MAX_STORED_IMAGE_BYTES) throw new ApiError(413, 'This image is too complex to store. Reduce its dimensions and try again.');
         contents.push(content);
       } catch (error) { if (error instanceof ApiError) throw error; throw new ApiError(400,'Use a valid JPEG, PNG, WebP or supported phone photo'); }
+    }
+    if (!businessId) {
+      const old = await prisma.businessMedia.findMany({where:{accountId:user.id,businessId:null,createdAt:{lt:new Date(Date.now()-24*3600000)}},select:{id:true},take:20});
+      await Promise.allSettled(old.map(asset => removeUnusedMedia(asset.id)));
     }
     const reservations = await reserveMedia(user.id, businessId, contents.map(content => content.length));
     try {
@@ -74,16 +78,16 @@ export async function DELETE(req: NextRequest) {
     const user = await requireUser(req);
     const url = new URL(req.url).searchParams.get('url');
     if (!url) throw new ApiError(400, 'Choose a photo to remove');
-    let asset = await prisma.businessMedia.findUnique({where:{url},include:{business:{select:{ownerId:true}}}});
+    let asset = await prisma.businessMedia.findUnique({where:{url},include:{business:{select:{ownerId:true,isClaimed:true}}}});
     if (!asset && /^\/api\/uploads\/[0-9a-f-]{36}$/.test(url)) {
       const legacy = await prisma.uploadedPhoto.findUnique({where:{id:url.split('/').pop()!}});
       if (legacy) {
         if (user.role !== 'ADMIN' && legacy.accountId !== user.id) throw new ApiError(403, 'You can only remove your own photos');
-        asset = await prisma.businessMedia.upsert({where:{url},create:{url,accountId:legacy.accountId,bytes:legacy.content.length,state:'READY'},update:{},include:{business:{select:{ownerId:true}}}});
+        asset = await prisma.businessMedia.upsert({where:{url},create:{url,accountId:legacy.accountId,bytes:legacy.content.length,state:'READY'},update:{},include:{business:{select:{ownerId:true,isClaimed:true}}}});
       }
     }
     if (!asset) return NextResponse.json({removed:false});
-    if (user.role !== 'ADMIN' && !(asset.business ? asset.business.ownerId === user.id : asset.accountId === user.id)) throw new ApiError(403, 'You can only remove your own photos');
+    if (user.role !== 'ADMIN' && !(asset.business ? asset.business.ownerId === user.id && asset.business.isClaimed : asset.accountId === user.id)) throw new ApiError(403, 'You can only remove your own photos');
     try {
       if (!await removeUnusedMedia(asset.id)) throw new ApiError(409, 'Remove this photo from your products and business gallery first');
     } catch (error) {

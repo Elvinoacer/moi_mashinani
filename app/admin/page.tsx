@@ -34,6 +34,14 @@ function AdminConsoleContent() {
   const [listingSearch, setListingSearch] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<Business | null>(null);
   const [confirmationName, setConfirmationName] = useState('');
+  const [ownerEditTarget, setOwnerEditTarget] = useState<Business | null>(null);
+  const [ownerEditEmail, setOwnerEditEmail] = useState('');
+  const [ownerEditName, setOwnerEditName] = useState('');
+  const [auditTarget, setAuditTarget] = useState<Business | null>(null);
+  const [auditEvents, setAuditEvents] = useState<Array<{id:string;action:string;actorId?:string|null;details?:string|null;createdAt:string}>>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [verificationTarget, setVerificationTarget] = useState<Business | null>(null);
+  const [verificationNote, setVerificationNote] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [siteOrigin] = useState(() => (typeof window !== 'undefined' ? window.location.origin : ''));
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
@@ -90,6 +98,29 @@ function AdminConsoleContent() {
     finally { setBusyTarget(''); }
   };
 
+  const reassignOwner = async () => {
+    if (!ownerEditTarget || busyTarget) return;
+    setBusyTarget(ownerEditTarget.id);setError('');setActionMessage('');
+    try {
+      const response = await fetch('/api/admin/ownership',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessId:ownerEditTarget.id,ownerEmail:ownerEditEmail,ownerName:ownerEditName})});
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Could not update owner');
+      setOwnerEditTarget(null);
+      setActionMessage(data.invitation?.sent ? 'Owner updated; invitation accepted by the email provider.' : 'Owner updated, but invitation delivery failed. Retry from Owner Accounts.');
+      setLoading(true);await refreshData();
+    } catch(cause) {setError(cause instanceof Error ? cause.message : 'Could not change owner');}
+    finally {setBusyTarget('');}
+  };
+  const openAudit = async (business:Business) => {
+    setAuditTarget(business);setAuditEvents([]);setAuditLoading(true);
+    try {
+      const response = await fetch(`/api/admin/audit?businessId=${encodeURIComponent(business.id)}`,{cache:'no-store'});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Audit history unavailable');
+      setAuditEvents(data.events || []);
+    } catch(cause) {setError(cause instanceof Error ? cause.message:'Could not load audit history');}
+    finally {setAuditLoading(false);}
+  };
   const deleteBusiness = async () => {
     if (!deleteTarget || busyTarget || confirmationName !== deleteTarget.name) return;
     setBusyTarget(deleteTarget.id); setDeleteError(''); setActionMessage('');
@@ -110,6 +141,26 @@ function AdminConsoleContent() {
 
   return (
     <div className="space-y-6">
+      {verificationTarget && <ModalFrame title={`Verify ${verificationTarget.name}`} onClose={()=>setVerificationTarget(null)}>
+        <div className="space-y-4 p-5">
+          <p className="text-sm text-[#667064]">Describe what you personally checked before restoring the field verification badge.</p>
+          <textarea aria-label="Field verification evidence" maxLength={500} rows={3} value={verificationNote} onChange={event=>setVerificationNote(event.target.value)} className="w-full rounded-xl border border-[#dfe5d8] px-3 py-2" />
+          <div className="flex justify-end gap-2"><button type="button" onClick={()=>setVerificationTarget(null)} className="rounded-xl border px-4 py-2">Cancel</button><button type="button" disabled={verificationNote.trim().length<12 || !!busyTarget} onClick={()=>{void handleAdminAction('toggle_verified',verificationTarget.id,verificationNote).then(()=>setVerificationTarget(null));}} className="rounded-xl bg-[#243b32] px-4 py-2 text-white">Confirm verification</button></div>
+        </div>
+      </ModalFrame>}
+      {ownerEditTarget && <ModalFrame title={`Update owner for ${ownerEditTarget.name}`} onClose={() => {if(!busyTarget)setOwnerEditTarget(null);}}>
+        <div className="space-y-4 p-5">
+          <p className="text-sm text-[#667064]">The previous owner loses access to this listing. The new owner must accept an invitation. Confirm the new email in person.</p>
+          <label className="block text-sm font-bold">Owner name<input type="text" maxLength={100} required value={ownerEditName} onChange={event=>setOwnerEditName(event.target.value)} className="mt-1 w-full rounded-xl border border-[#dfe5d8] px-3 py-2" /></label>
+          <label className="block text-sm font-bold">Owner email<input type="email" maxLength={254} required value={ownerEditEmail} onChange={event=>setOwnerEditEmail(event.target.value)} className="mt-1 w-full rounded-xl border border-[#dfe5d8] px-3 py-2" /></label>
+          <div className="flex flex-wrap justify-end gap-2"><button type="button" disabled={!!busyTarget} onClick={()=>setOwnerEditTarget(null)} className="rounded-xl border border-[#dfe5d8] px-4 py-2">Cancel</button><button type="button" disabled={!!busyTarget || !ownerEditEmail.includes('@') || !ownerEditName.trim()} onClick={()=>void reassignOwner()} className="rounded-xl bg-[#243b32] px-4 py-2 text-white">Save owner & send invitation</button></div>
+        </div>
+      </ModalFrame>}
+      {auditTarget && <ModalFrame title={`Audit history — ${auditTarget.name}`} onClose={()=>setAuditTarget(null)}>
+        <div className="max-h-[65vh] space-y-3 overflow-y-auto p-5">
+          {auditLoading ? <p role="status">Loading history…</p> : !auditEvents.length ? <p>No recorded enrollment or moderation events.</p> : auditEvents.map(event=><article key={event.id} className="border-b border-[#dfe5d8] pb-3"><p className="text-sm font-bold">{event.action.replaceAll('_',' ')}</p><p className="text-xs text-[#667064]">{new Date(event.createdAt).toLocaleString('en-KE',{timeZone:'Africa/Nairobi'})}{event.actorId ? ` · Actor ${event.actorId}` : ' · System'}</p>{event.details && <p className="mt-1 text-xs">{event.details}</p>}</article>)}
+        </div>
+      </ModalFrame>}
       {deleteTarget && <ModalFrame title="Delete business permanently" onClose={() => {if (!busyTarget) setDeleteTarget(null);}}>
         <div className="space-y-4 p-5">
           <p className="text-sm text-[#243b32]">Delete <strong>{deleteTarget.name}</strong>? This permanently removes the listing and its bookings. Payment records, complaint history and the owner account are kept. This cannot be undone.</p>
@@ -219,8 +270,8 @@ function AdminConsoleContent() {
           <h2 className="font-display font-bold text-xl text-[#243b32]">Business owner accounts</h2>
           <p className="text-sm text-[#667064]">Track account verification and resend email invitations when needed.</p>
           {businesses.filter((business) => business.ownerEmail).length === 0 ? <p className="py-5 text-sm text-[#667064]">No enrolled owner accounts yet. Enroll a business to get started.</p> : businesses.filter((business) => business.ownerEmail).map((business) => <div key={business.id} className="border-t border-[#dfe5d8] py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div><p className="font-bold text-[#243b32]">{business.name}</p><p className="text-sm text-[#667064]">{business.ownerName} · {business.ownerEmail}</p><p className="mt-1 text-xs text-[#335e41]">{business.emailVerifiedAt ? 'Owner email verified' : business.invitationSentAt ? 'Verification email sent · owner has not verified yet' : 'Verification email not sent'}</p>{business.invitationError && <p className="mt-1 text-xs text-[#8f2424]">Email delivery: {business.invitationError}</p>}</div>
-            <div className="flex flex-wrap gap-2"><Link href={`/dashboard/${business.slug}`} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32]">Manage listing</Link>{!business.emailVerifiedAt && <button type="button" onClick={() => resendInvitation(business.id)} disabled={!!busyTarget} className="rounded-xl bg-[#335e41] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">{busyTarget === business.id ? 'Sending…' : 'Resend invitation'}</button>}</div>
+            <div><p className="font-bold text-[#243b32]">{business.name}</p><p className="text-sm text-[#667064]">{business.ownerName} · {business.ownerEmail}</p><p className="mt-1 text-xs text-[#335e41]">{business.isClaimed ? 'Owner accepted business invitation' : business.invitationSentAt ? 'Invitation sent · awaiting owner acceptance' : 'Owner invitation not yet accepted'}</p>{business.invitationError && <p className="mt-1 text-xs text-[#8f2424]">Email delivery: {business.invitationError}</p>}</div>
+            <div className="flex flex-wrap gap-2"><Link href={`/dashboard/${business.slug}`} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32]">Manage listing</Link>{!business.isClaimed && <button type="button" onClick={() => resendInvitation(business.id)} disabled={!!busyTarget} className="rounded-xl bg-[#335e41] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">{busyTarget === business.id ? 'Sending…' : 'Resend invitation'}</button>}<button type="button" disabled={!!busyTarget} onClick={()=>{setOwnerEditTarget(business);setOwnerEditEmail(business.ownerEmail || '');setOwnerEditName(business.ownerName || '');}} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold">Correct owner</button></div>
           </div>)}
         </section>}
 
@@ -230,9 +281,9 @@ function AdminConsoleContent() {
           {businesses.filter(business => `${business.name} ${business.ownerEmail || ''} ${business.zone}`.toLowerCase().includes(listingSearch.toLowerCase())).map(business => <article key={business.id} className="border-t border-[#dfe5d8] py-4 space-y-3">
             <div><h3 className="font-bold text-[#243b32]">{business.name}</h3><p className="text-xs text-[#667064]">{business.status} · {business.verificationLevel === 'L2' ? 'Field verified' : 'Awaiting field verification'} · {business.zone}</p>{business.moderationReason && <p className="mt-1 text-xs text-[#8f2424]">{business.moderationReason}</p>}</div>
             <div className="flex flex-wrap gap-2"><Link href={`/dashboard/${business.slug}`} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32]">Edit listing & photos</Link>
-            <button type="button" disabled={!!busyTarget} onClick={() => handleAdminAction(business.status === 'ACTIVE' ? 'suspend_listing':'restore_listing',business.id)} className={`rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-50 ${business.status === 'ACTIVE' ? 'bg-[#a7302d]' : 'bg-[#335e41]'}`}>{business.status === 'ACTIVE' ? 'Suspend listing' : business.status === 'PENDING' ? 'Approve listing' : 'Restore listing'}</button>
-            <button type="button" disabled={!!busyTarget} onClick={() => handleAdminAction('toggle_verified',business.id)} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32] disabled:opacity-50">{business.verificationLevel === 'L2' ? 'Remove field verification' : 'Mark field verified'}</button>
-            <button type="button" disabled={!!busyTarget} onClick={() => {setDeleteTarget(business);setConfirmationName('');setDeleteError('');}} className="rounded-xl border border-[#a7302d] px-3 py-2 text-xs font-bold text-[#a7302d] disabled:opacity-50">Delete business</button>
+            <button type="button" disabled={!!busyTarget || (['PENDING','REJECTED'].includes(business.status) && !business.isClaimed)} onClick={() => handleAdminAction(business.status === 'ACTIVE' ? 'suspend_listing':business.status === 'PENDING' ? 'approve_listing':'restore_listing',business.id)} className={`rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-50 ${business.status === 'ACTIVE' ? 'bg-[#a7302d]' : 'bg-[#335e41]'}`}>{business.status === 'ACTIVE' ? 'Suspend listing' : business.status === 'PENDING' ? 'Approve listing' : 'Restore listing'}</button>
+            <button type="button" disabled={!!busyTarget} onClick={() => {if(business.verificationLevel === 'L2') void handleAdminAction('toggle_verified',business.id); else {setVerificationTarget(business);setVerificationNote('');}}} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32] disabled:opacity-50">{business.verificationLevel === 'L2' ? 'Remove field verification' : 'Mark field verified'}</button>
+            <button type="button" disabled={!!busyTarget} onClick={()=>void openAudit(business)} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold">Audit history</button><button type="button" disabled={!!busyTarget} onClick={() => {setDeleteTarget(business);setConfirmationName('');setDeleteError('');}} className="rounded-xl border border-[#a7302d] px-3 py-2 text-xs font-bold text-[#a7302d] disabled:opacity-50">Delete business</button>
             </div>
           </article>)}
         </section>}
@@ -274,12 +325,12 @@ function AdminConsoleContent() {
 
                       <div className="flex items-center gap-2 pt-2 sm:pt-0">
                         <button
-                          disabled={!!busyTarget}
+                          disabled={!!busyTarget || !biz.isClaimed || !biz.emailVerifiedAt}
                           onClick={() => handleAdminAction('approve_listing', biz.id)}
                           className="bg-[#335e41] text-white text-xs font-bold px-3.5 py-1.5 rounded-full signboard-border press-action flex items-center gap-1.5"
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>Approve listing</span>
+                          <span>{biz.isClaimed ? 'Approve listing' : 'Awaiting owner acceptance'}</span>
                         </button>
                         <button
                           disabled={!!busyTarget}

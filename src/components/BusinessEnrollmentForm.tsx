@@ -19,7 +19,7 @@ type EnrollmentResult = { business: Business; invitation: { sent: boolean; error
 function initialHours(): BusinessHours { return Object.fromEntries(DAYS.map((day) => [day, { open: '08:00', close: '18:00', closed: day === 'Sunday' }])); }
 
 export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 'admin' | 'public'; onEnrolled?: () => void }) {
-  const [details, setDetails] = useState({ ownerName: '', ownerEmail: '', name: '', primaryCategory: '', tagline: '', description: '', phone: '', whatsapp: '', zone: 'kesses-centre', landmark: '', address: '', latitude: '', longitude: '', studentDiscount: '' });
+  const [details, setDetails] = useState({ ownerName: '', ownerEmail: '', ownerPhone: '', name: '', primaryCategory: '', tagline: '', description: '', phone: '', whatsapp: '', zone: 'kesses-centre', landmark: '', address: '', latitude: '', longitude: '', studentDiscount: '' });
   const [hours, setHours] = useState(initialHours);
   const [serviceModes, setServiceModes] = useState<string[]>(['at_shop']);
   const [products, setProducts] = useState<ProductDraft[]>([{ id: 'initial-product', name: '', price: '', unit: '', photo: '' }]);
@@ -33,6 +33,33 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
   const [result, setResult] = useState<EnrollmentResult | null>(null);
   const [resending, setResending] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
+  const [ownerConsentConfirmed, setOwnerConsentConfirmed] = useState(false);
+  const [fieldVisitConfirmed, setFieldVisitConfirmed] = useState(false);
+  const [draftMessage, setDraftMessage] = useState('');
+  const draftKey = mode === 'admin' ? 'mm-admin-enrollment-draft-v1' : 'mm-public-enrollment-draft-v1';
+  function restoreDraft() {
+    try {
+      const stored = sessionStorage.getItem(draftKey);
+      if (!stored) { setDraftMessage('No draft saved in this tab.'); return; }
+      const draft = JSON.parse(stored);
+      if (typeof draft.savedAt !== 'number' || Date.now() - draft.savedAt > 24*3600000) { sessionStorage.removeItem(draftKey);setDraftMessage('The draft has expired.');return; }
+      if (draft.details && typeof draft.details === 'object') setDetails(current => ({...current,...draft.details}));
+      if (draft.hours && typeof draft.hours === 'object') setHours(draft.hours);
+      if (Array.isArray(draft.serviceModes)) setServiceModes(draft.serviceModes);
+      if (Array.isArray(draft.products)) setProducts(draft.products);
+      setDraftMessage('Draft restored. Uploaded photos must be selected again.');
+    } catch { sessionStorage.removeItem(draftKey);setDraftMessage('Saved draft could not be read.'); }
+  }
+  function saveDraft() {
+    try {
+      sessionStorage.setItem(draftKey,JSON.stringify({savedAt:Date.now(),details,hours,serviceModes,products}));
+      setDraftMessage('Draft saved for this browser tab. It expires after 24 hours; uploaded photos are not included.');
+    } catch { setDraftMessage('Could not save a draft in this browser. Keep this page open until submission.'); }
+  }
+  const lat = Number(details.latitude), lng = Number(details.longitude);
+  const validPin = details.latitude !== '' && details.longitude !== '' && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+  const mapPreview = validPin ? `https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.003}%2C${lat-0.003}%2C${lng+0.003}%2C${lat+0.003}&marker=${lat}%2C${lng}` : '';
+
   async function removePhoto(photo: string) {
     setRemovingPhoto(photo);setError('');setPhotoNotice('');
     try {
@@ -68,12 +95,14 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
       if ((latitude === '') !== (longitude === '')) throw new Error('Enter both latitude and longitude, or leave both blank.');
       const mapPin = latitude && longitude ? { lat: Number(latitude), lng: Number(longitude) } : undefined;
       if (mapPin && (!Number.isFinite(mapPin.lat) || !Number.isFinite(mapPin.lng) || Math.abs(mapPin.lat) > 90 || Math.abs(mapPin.lng) > 180)) throw new Error('Enter valid map coordinates.');
+      if (mode === 'admin' && (!fieldVisitConfirmed || !ownerConsentConfirmed)) throw new Error('Confirm your field visit and the owner’s permission before publishing.');
       const response = await fetch(mode === 'admin' ? '/api/admin/enroll' : '/api/businesses', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...Object.fromEntries(Object.entries(businessDetails).map(([key, value]) => [key, value.trim()])), whatsapp: (details.whatsapp || details.phone).trim(), mapPin, hours, serviceModes, services, photos, coverPhoto: photos[0] || '' }),
+        body: JSON.stringify({ ...Object.fromEntries(Object.entries(businessDetails).map(([key, value]) => [key, value.trim()])), whatsapp: (details.whatsapp || details.phone).trim(), mapPin, hours, serviceModes, services, photos, coverPhoto: photos[0] || '', fieldVisitConfirmed, ownerConsentConfirmed }),
       });
       const data = await response.json();
       if (!response.ok || !data.business) throw new Error(data.error || 'Could not save the business. Your details are still here; please try again.');
+      sessionStorage.removeItem(draftKey);
       setResult(data); if (mode !== 'admin') window.dispatchEvent(new Event('mm:listing-submitted')); window.scrollTo({ top: 0, behavior: 'smooth' }); onEnrolled?.();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not save the business. Please try again.'); }
     finally { setSubmitting(false); }
@@ -85,8 +114,10 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
       const response = await fetch(mode === 'admin' ? '/api/admin/invitations' : '/api/auth/request-link', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mode === 'admin' ? { businessId: result.business.id } : { email: details.ownerEmail }) });
       const data = await response.json();
       if (!response.ok || data.invitation?.sent === false) throw new Error(data.error || data.invitation?.error || 'Could not send the email. Try again shortly.');
-      setResendMessage('A new verification email has been requested. Ask the owner to check their inbox and spam folder.');
-      setResult((current) => current ? { ...current, invitation: { sent: true } } : current);
+      setResendMessage(mode === 'admin'
+        ? 'Email provider accepted a new invitation. Ask the owner to check their inbox and spam.'
+        : 'An account link was requested. Check the inbox and spam folder; contact the administrator if it does not arrive.');
+      if (mode === 'admin') setResult((current) => current ? { ...current, invitation: { sent: true } } : current);
     } catch (cause) { setResendMessage(cause instanceof Error ? cause.message : 'Could not resend the email.'); }
     finally { setResending(false); }
   }
@@ -101,14 +132,14 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
   return <form onSubmit={submit} className="space-y-6 rounded-2xl border border-[#dfe5d8] bg-white p-5 md:p-7">
     <p className="text-sm text-[#667064]">{mode === 'admin' ? 'Collect the owner’s details during your visit. Save the listing and send their account verification email in one step.' : 'Tell us about your business. We will email you a link to verify your account and review your listing.'} Fields marked * are required.</p>
     <fieldset disabled={submitting} className="space-y-5 disabled:opacity-75"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Owner & business</legend><div className="grid gap-4 sm:grid-cols-2">
-      {detailInput('ownerName', 'Owner name', { required: true, maxLength: 100, autoComplete: 'name' })}{detailInput('ownerEmail', 'Owner email', { required: true, type: 'email', maxLength: 254, autoComplete: 'email', placeholder: 'owner@example.com' })}{detailInput('name', 'Business name', { required: true, maxLength: 120, placeholder: 'e.g. Kesses Fresh Groceries' })}
+      {detailInput('ownerName', 'Owner name', { required: true, maxLength: 100, autoComplete: 'name' })}{detailInput('ownerEmail', 'Owner email', { required: true, type: 'email', maxLength: 254, autoComplete: 'email', placeholder: 'owner@example.com' })}{detailInput('ownerPhone', 'Owner contact (optional, private)', { type:'tel', placeholder:'Only if different from business phone' })}{detailInput('name', 'Business name', { required: true, maxLength: 120, placeholder: 'e.g. Kesses Fresh Groceries' })}
       <div><span className={labelClass}>Business type *</span><CategorySelect value={details.primaryCategory} onChange={value => setDetails(current => ({ ...current, primaryCategory: value }))} className={inputClass} required /></div>
     </div><div>{detailInput('tagline', 'Short tagline', { maxLength: 160, placeholder: 'What makes this business useful to students?' })}</div><label className="block"><span className={labelClass}>Description *</span><textarea required minLength={20} maxLength={3000} rows={3} value={details.description} onChange={(event) => setDetails((current) => ({ ...current, description: event.target.value }))} className={inputClass} placeholder="Describe what the business sells, services offered, and what customers should know." /></label></fieldset>
     <fieldset disabled={submitting} className="space-y-4 disabled:opacity-75"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Location & contact</legend><div className="grid gap-4 sm:grid-cols-2">
       {detailInput('phone', 'Phone number', { required: true, type: 'tel', autoComplete: 'tel', placeholder: '0712 345 678' })}{detailInput('whatsapp', 'WhatsApp number', { type: 'tel', placeholder: 'Same as phone if left blank' })}
       <label><span className={labelClass}>Area *</span><select aria-label="Area" value={details.zone} onChange={(event) => setDetails((current) => ({ ...current, zone: event.target.value }))} className={inputClass}>{ZONES.filter((item) => item.slug !== 'all').map((item) => <option key={item.slug} value={item.slug}>{item.name}</option>)}</select></label>
       {detailInput('landmark', 'Nearby landmark', { required: true, maxLength: 240, placeholder: 'e.g. Opposite the main gate' })}{detailInput('address', 'Address or directions', { maxLength: 300 })}
-    </div><div className="rounded-xl border border-[#dfe5d8] p-4 space-y-3"><p className="text-xs text-[#667064]">Optional map pin: capture your location while standing at the business, or enter its coordinates.</p><button type="button" onClick={useCurrentLocation} disabled={locating || submitting} className="text-sm font-bold text-[#335e41] disabled:opacity-50">{locating ? 'Finding location…' : 'Use current location'}</button><div className="grid gap-3 sm:grid-cols-2">{detailInput('latitude', 'Latitude', { type: 'number', step: 'any', placeholder: 'e.g. 0.2831' })}{detailInput('longitude', 'Longitude', { type: 'number', step: 'any', placeholder: 'e.g. 35.2905' })}</div></div><div><span className={labelClass}>How customers are served *</span><div className="flex flex-wrap gap-3">{[['at_shop', 'At the shop'], ['comes_to_you', 'Comes to you'], ['delivery', 'Delivery'], ['online', 'Online']].map(([value, label]) => <label key={value} className="flex items-center gap-2 text-sm text-[#243b32]"><input type="checkbox" checked={serviceModes.includes(value)} onChange={(event) => setServiceModes((current) => event.target.checked ? [...current, value] : current.filter((item) => item !== value))} className="accent-[#335e41]" />{label}</label>)}</div></div></fieldset>
+    </div><div className="rounded-xl border border-[#dfe5d8] p-4 space-y-3"><p className="text-xs text-[#667064]">Optional map pin: capture your location while standing at the business, or enter its coordinates.</p><button type="button" onClick={useCurrentLocation} disabled={locating || submitting} className="text-sm font-bold text-[#335e41] disabled:opacity-50">{locating ? 'Finding location…' : 'Use current location'}</button><div className="grid gap-3 sm:grid-cols-2">{detailInput('latitude', 'Latitude', { type: 'number', step: 'any', placeholder: 'e.g. 0.2831' })}{detailInput('longitude', 'Longitude', { type: 'number', step: 'any', placeholder: 'e.g. 35.2905' })}</div>{validPin && <div className="mt-3 space-y-2"><iframe title="Location pin preview" loading="lazy" src={mapPreview} className="h-52 w-full rounded-xl border border-[#dfe5d8]" /><a className="text-xs font-bold text-[#335e41] underline" href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`} target="_blank" rel="noopener noreferrer">Confirm this pin on OpenStreetMap ↗</a></div>}</div><div><span className={labelClass}>How customers are served *</span><div className="flex flex-wrap gap-3">{[['at_shop', 'At the shop'], ['comes_to_you', 'Comes to you'], ['delivery', 'Delivery'], ['online', 'Online']].map(([value, label]) => <label key={value} className="flex items-center gap-2 text-sm text-[#243b32]"><input type="checkbox" checked={serviceModes.includes(value)} onChange={(event) => setServiceModes((current) => event.target.checked ? [...current, value] : current.filter((item) => item !== value))} className="accent-[#335e41]" />{label}</label>)}</div></div></fieldset>
     <fieldset disabled={submitting} className="space-y-3 disabled:opacity-75"><legend className="mb-4 font-display text-xl font-bold text-[#243b32]">Opening hours</legend><p className="text-xs text-[#667064]">Times are in Kenya time. Closing time can be the next morning for overnight businesses.</p>
       {DAYS.map((day, index) => (
         <div key={day} className="min-w-0 rounded-xl border border-[#dfe5d8] bg-[#fbfcf7] p-3 sm:p-4">
@@ -163,6 +194,13 @@ export function BusinessEnrollmentForm({ mode = 'admin', onEnrolled }: { mode?: 
       {photos.length > 0 && <label><span className={labelClass}>Product photo</span><select aria-label="Product photo" value={product.photo} onChange={(event) => updateProduct(product.id, { photo: event.target.value })} className={inputClass}><option value="">No item photo</option>{photos.map((photo, photoIndex) => <option key={photo} value={photo}>Photo {photoIndex + 1}{photoIndex === 0 ? ' (cover)' : ''}</option>)}</select></label>}</div></div>)}
       {products.length < FREE_PRODUCT_LIMIT && <button type="button" onClick={() => setProducts((current) => [...current, { id: crypto.randomUUID(), name: '', price: '', unit: '', photo: '' }])} className="inline-flex items-center gap-2 text-sm font-bold text-[#335e41]"><Plus size={17} />Add another item</button>}{detailInput('studentDiscount', 'Student discount or offer', { maxLength: 240, placeholder: 'e.g. 10% off with a student ID' })}
     </fieldset>
+    {mode === 'admin' && <fieldset className="space-y-3 rounded-xl border border-[#dfe5d8] bg-[#f7f8f2] p-4" disabled={submitting}>
+      <legend className="text-sm font-bold text-[#243b32]">Field verification before publication</legend>
+      <label className="flex items-start gap-3 text-sm"><input type="checkbox" aria-label="I personally verified the premises" checked={fieldVisitConfirmed} onChange={event=>setFieldVisitConfirmed(event.target.checked)} required className="mt-1 accent-[#335e41]" /><span>I personally visited or reliably verified this business and confirmed its contact and location details.</span></label>
+      <label className="flex items-start gap-3 text-sm"><input type="checkbox" aria-label="Owner authorized public listing" checked={ownerConsentConfirmed} onChange={event=>setOwnerConsentConfirmed(event.target.checked)} required className="mt-1 accent-[#335e41]" /><span>The owner authorized publication and confirmed the invitation email belongs to them.</span></label>
+    </fieldset>}
+    {draftMessage && <p role="status" className="text-xs text-[#335e41]">{draftMessage}</p>}
+    <button type="button" onClick={saveDraft} disabled={submitting} className="rounded-xl border border-[#dfe5d8] bg-white px-4 py-2.5 text-sm font-bold text-[#243b32]">Save draft on this device</button><button type="button" onClick={restoreDraft} disabled={submitting} className="ml-2 rounded-xl border border-[#dfe5d8] px-4 py-2.5 text-sm font-bold text-[#243b32]">Restore saved draft</button>
     {error && <p role="alert" className="rounded-xl bg-[#fce7e1] p-4 text-sm font-semibold text-[#8f2424]">{error}</p>}<p className="text-xs text-[#667064]">Confirm the email address with the owner before submitting. The owner receives a secure verification link and can update these details after signing in.</p><button type="submit" disabled={submitting || uploading || locating} className="w-full rounded-xl bg-[#243b32] px-5 py-3.5 text-sm font-bold text-white disabled:opacity-50">{submitting ? 'Saving business & sending email…' : uploading ? 'Uploading photos…' : mode === 'admin' ? 'Enroll business & email owner' : 'Submit listing & verify email'}</button>
   </form>;
 }

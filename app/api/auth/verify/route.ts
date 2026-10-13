@@ -27,7 +27,11 @@ export async function POST(req: NextRequest) {
         await tx.accountSession.deleteMany({where:{accountId:account.id}});
         await tx.verificationToken.updateMany({where:{accountId:account.id,usedAt:null},data:{usedAt:new Date()}});
       }
-      await tx.business.updateMany({where:{ownerId:account.id},data:{isClaimed:true}});
+      if (record.purpose === 'INVITE' && record.businessId) {
+        const accepted = await tx.business.updateMany({where:{id:record.businessId,ownerId:account.id},data:{isClaimed:true}});
+        if (accepted.count !== 1) throw new ApiError(409, 'This invitation no longer belongs to your account. Ask the administrator for a fresh link.');
+        await tx.businessAudit.create({data:{businessId:record.businessId,actorId:account.id,action:'OWNERSHIP_ACCEPTED'}});
+      }
       const business = record.businessId ? await tx.business.findUnique({where:{id:record.businessId}}) : await tx.business.findFirst({where:{ownerId:account.id}});
       await queueNotice(tx,account.id,`account/${record.id}/verified`,{kind:'ACCOUNT',title:record.purpose === 'RESET' ? 'Your password has been reset' : 'Your account is ready',body:record.purpose === 'RESET' ? 'Your password was changed and previous sessions were signed out. If you did not make this change, reset your password immediately.' : 'Your email is verified. Open your business dashboard to check listing approval, upload profile and product photos and manage customer requests.',path:business ? `/dashboard/${business.slug}` : '/dashboard',button:'Open my dashboard'});
       return {account,business};

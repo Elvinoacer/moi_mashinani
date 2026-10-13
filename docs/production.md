@@ -54,3 +54,7 @@ Verify the public URL after deployment: discovery/category/zone requests must su
 - Dependency audit reports high-severity advisories under Prisma CLI tooling (`mysql2` and `deepmerge-ts`). The app uses PostgreSQL; these are not its database transport. Resolving the tooling advisories requires a compatible Prisma/dependency update; no major downgrade or unverified override was applied.
 
 No external email or payment was sent during these checks.
+
+## Production migration safety
+
+When Vercel sets `VERCEL_ENV=production`, the `npm run build` command automatically runs `prisma migrate deploy` (using `DATABASE_URL_UNPOOLED` when configured) **before** Next.js compilation. Preview and CI builds do not run production migrations. If the database is unreachable or a migration fails, the production deployment fails rather than serving code that expects missing tables. Other hosting platforms should run `npm run db:migrate` ahead of deployment.

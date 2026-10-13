@@ -222,6 +222,7 @@ export const Store = {
       for (const booking of bookings) await queueNotice(tx,booking.requesterId,`booking/${booking.id}/business-deleted`,{kind:'BOOKING_STATUS',title:'Your customer request was cancelled',body:`${business.name} has been removed from the directory. Your request for ${booking.serviceName} is no longer active.`,path:'/dashboard?notifications=1',button:'View my notifications'});
       await tx.bookingIntent.deleteMany({where:{businessId:id}});
       await tx.problemReport.updateMany({where:{businessId:id,status:'OPEN'},data:{status:'RESOLVED'}});
+      await tx.businessAudit.create({data:{businessId:id,actorId:adminId,action:'DELETED',details:'Business listing and bookings removed'}});
       await tx.business.delete({where:{id}});
       return assets.map(asset => asset.id);
     },{maxWait:20000,timeout:30000});
@@ -311,7 +312,7 @@ export const Store = {
     return mapPrismaBusiness(created);
   },
 
-  async updateBusiness(id: string, updates: Partial<Business>, mediaAccountId?: string): Promise<Business | undefined> {
+  async updateBusiness(id: string, updates: Partial<Business>, mediaAccountId?: string, audit?: {actorId:string;action:string;details?:string}): Promise<Business | undefined> {
     return prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${id} FOR UPDATE`;
       const existing = await tx.business.findUnique({ where: { id } });
@@ -366,11 +367,25 @@ export const Store = {
       if (updates.ambassadorId !== undefined) prismaUpdateData.ambassadorId = updates.ambassadorId;
       if (updates.metrics !== undefined) prismaUpdateData.metrics = JSON.parse(JSON.stringify(updates.metrics));
       prismaUpdateData.profileStrength = newStrength;
-
+      const identityFields: (keyof Business)[] = ['name','primaryCategory','phone','whatsapp','landmark','address','mapPin'];
+      const identityChanged = identityFields.some(key => key in updates && (
+        !(key === 'mapPin' && !mappedExisting.mapPin && !updates.mapPin) &&
+        JSON.stringify(mappedExisting[key]) !== JSON.stringify(updates[key])
+      ));
+      if (existing.verificationLevel === 'L2' && identityChanged && updates.verificationLevel === undefined) prismaUpdateData.verificationLevel = 'L1';
       const updated = await tx.business.update({
         where: { id },
         data: prismaUpdateData,
       });
+      if (audit) await tx.businessAudit.create({data:{businessId:id,actorId:audit.actorId,action:audit.action,details:audit.details}});
+      if (identityChanged && existing.verificationLevel === 'L2' && updated.verificationLevel !== 'L2') {
+        await tx.businessAudit.create({data:{businessId:id,actorId:mediaAccountId || null,action:'VERIFICATION_NEEDS_REVIEW',details:'Business identity or contact details were updated'}});
+
+        await queueAdmins(tx,`listing/${id}/recheck/${updated.updatedAt.toISOString()}`,{kind:'VERIFICATION',title:'Business details require re-verification',body:`${updated.name} changed identity or contact details. Review before restoring its verified badge.`,path:'/admin?queue=listings',button:'Review business'});
+      }
+      if (existing.status === 'REJECTED' && updated.status === 'PENDING') {
+        await queueAdmins(tx,`listing/${id}/resubmitted/${updated.updatedAt.toISOString()}`,{kind:'NEW_LISTING',title:'Corrected listing submitted for review',body:`${updated.name} was corrected and resubmitted. Review before approval.`,path:'/admin?queue=moderation',button:'Review corrected listing'});
+      }
       if (existing.status !== updated.status) await listingNotice(tx,updated,`listing/${id}/status/${updated.updatedAt.toISOString()}`);
       else if (existing.verificationLevel !== updated.verificationLevel) await queueNotice(tx,updated.ownerId,`listing/${id}/verification/${updated.updatedAt.toISOString()}`,{kind:'VERIFICATION',title:updated.verificationLevel === 'L2' ? 'Your business is verified' : 'Your verification status changed',body:updated.verificationLevel === 'L2' ? 'Your verified badge is ready. Add clear profile and product photos, update your catalogue and keep your opening hours current.' : 'Open your dashboard to review your current verification status.',path:`/dashboard/${updated.slug}`,button:'Complete my profile'});
       return mapPrismaBusiness(updated);
@@ -463,6 +478,7 @@ export const Store = {
       if (action === 'SUSPENDED') {
         const business = await tx.business.update({where:{id:report.businessId},data:{status:'SUSPENDED',moderationReason:`Customer report: ${report.reason.replaceAll('_',' ')}`}});
         await listingNotice(tx,business,`report/${reportId}/suspension`);
+        await tx.businessAudit.create({data:{businessId:business.id,actorId:null,action:'REPORT_SUSPENSION',details:`Customer report ${reportId}`}});
       }
       if (report.status !== 'RESOLVED' && report.status !== 'DISMISSED') await queueAdmins(tx,`report/${reportId}/resolved`,{kind:'COMPLAINT_RESOLVED',title:'A customer complaint was reviewed',body:`The complaint about ${report.businessName} has been reviewed. Action: ${action.toLowerCase()}.`,path:'/admin?queue=reports',button:'View moderation'});
       return true;

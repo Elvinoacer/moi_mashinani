@@ -12,7 +12,7 @@ export async function GET(req:NextRequest) {
   try {
     const user = await requireUser(req);
     const businessId = req.nextUrl.searchParams.get('businessId');
-    const allowed = (await Store.getBusinesses()).filter(b => user.role === 'ADMIN' || b.ownerId === user.id);
+    const allowed = (await Store.getBusinesses()).filter(b => user.role === 'ADMIN' || (b.ownerId === user.id && b.isClaimed));
     if (businessId && !allowed.some(b => b.id === businessId)) throw new ApiError(403,'You can only read requests for your own business');
     return NextResponse.json(await Store.getBookings(allowed.filter(b => !businessId || b.id === businessId).map(b => b.id)),{headers:{'Cache-Control':'no-store'}});
   } catch(error) { return apiError(error); }

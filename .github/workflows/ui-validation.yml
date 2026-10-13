@@ -11,7 +11,22 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner
+          POSTGRES_DB: moimashinani
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U runner -d moimashinani"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://runner:runner@127.0.0.1:5432/moimashinani
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,5 +43,13 @@ jobs:
         run: npx prisma generate
       - name: Type check
         run: npx tsc --noEmit
+      - name: Initialize test database
+        run: |
+          npm run db:migrate
+          npm run seed:production
+      - name: Unit checks
+        run: |
+          npm run test:engine
+          npm run test:mail
       - name: Production build
         run: npm run build

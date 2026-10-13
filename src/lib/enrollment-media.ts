@@ -25,7 +25,7 @@ export async function claimEnrollmentMedia(tx: Prisma.TransactionClient, session
   }
   if (!pending.length) return;
   if (!hash) throw new ApiError(403,'Enrollment upload session has expired');
-  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${hash}))`;
+  await tx.$queryRaw`SELECT 1 AS locked FROM (SELECT pg_advisory_xact_lock(hashtext(${hash}))) AS guard`;
   const staged=await tx.enrollmentMedia.findMany({where:{sessionHash:hash,url:{in:pending},createdAt:{gte:new Date(Date.now()-ENROLLMENT_MEDIA_WINDOW_MS)}}});
   if(staged.length!==pending.length) throw new ApiError(403,'One or more photos were not uploaded in this enrollment session. Please reupload them.');
   for(const item of staged) {

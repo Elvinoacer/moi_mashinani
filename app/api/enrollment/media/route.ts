@@ -55,7 +55,7 @@ export async function POST(req:NextRequest) {
     const ids=contents.map(()=>randomUUID());
     const urls=photoUrlsForIds(prefix,ids);
     await prisma.$transaction(async tx=>{
-      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${hash}))`;
+      await tx.$queryRaw`SELECT 1 AS locked FROM (SELECT pg_advisory_xact_lock(hashtext(${hash}))) AS guard`;
       const stored=await tx.enrollmentMedia.findMany({where:{sessionHash:hash},select:{bytes:true}});
       if(stored.length+contents.length>ENROLLMENT_MEDIA_MAX_FILES) throw new ApiError(409,'This form supports up to 8 gallery photos and 5 product photos. Remove unused images first.');
       if(stored.reduce((sum,item)=>sum+item.bytes,0)+contents.reduce((sum,item)=>sum+item.length,0)>FREE_STORAGE_BYTES) throw new ApiError(409,'The 25 MB free image allowance is full.');

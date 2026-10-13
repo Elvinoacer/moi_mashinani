@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { ApiError } from './api';
-import type { Prisma } from '../../src/generated/prisma/client';
+import type { Prisma } from '../generated/prisma/client';
 import { hostedMediaUrl } from './media-storage';
 
 export const ENROLLMENT_MEDIA_COOKIE = 'mm_enrollment_media';

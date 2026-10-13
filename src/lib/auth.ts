@@ -53,7 +53,7 @@ export async function requireAdmin(req: NextRequest) {
 }
 export async function requireBusinessAccess(req: NextRequest, business: Business) {
   const user = await requireUser(req);
-  if (user.role !== 'ADMIN' && business.ownerId !== user.id) throw new ApiError(403, 'You can only manage your own business');
+  if (user.role !== 'ADMIN' && (business.ownerId !== user.id || !business.isClaimed)) throw new ApiError(403, 'You can only manage your own business');
   return user;
 }
 export async function newSession(accountId: string) {

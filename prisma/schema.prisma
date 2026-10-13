@@ -72,6 +72,16 @@ model Business {
   @@index([proEndsAt])
 }
 
+model BusinessAudit {
+  id String @id @default(uuid())
+  businessId String
+  actorId String?
+  action String
+  details String?
+  createdAt DateTime @default(now())
+  @@index([businessId, createdAt])
+}
+
 model ProblemReport {
   id           String    @id
   businessId   String

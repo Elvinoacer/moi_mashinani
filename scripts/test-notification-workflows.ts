@@ -23,7 +23,7 @@ async function main() {
   adminId=(await prisma.account.create({data:{email:credentials.email,name:'Notification Workflow Admin',passwordHash:template.passwordHash,role:'ADMIN',emailVerifiedAt:new Date()}})).id;
   const admin=await call('/api/auth/login','POST',credentials);
   const ownerEmail=`notification-${tag}@test.invalid`;
-  const draft={ownerEmail,ownerName:'Notification Owner',name:`Notification Shop ${tag}`,description:'Testing listing and booking notifications safely in isolation.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',landmark:'Campus gate',services:[{id:'repair',name:'Phone repair',priceFrom:100}]};
+  const draft={ownerEmail,ownerName:'Notification Owner',name:`Notification Shop ${tag}`,description:'Testing listing and booking notifications safely in isolation.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',landmark:'Campus gate',serviceModes:['at_shop'],services:[{id:'repair',name:'Phone repair',priceFrom:100}]};
   const enrollment=await call('/api/businesses','POST',draft,'',201);const business=enrollment.data.business;
   check(enrollment.cookie.includes('mm_push_device='),'public enrollment binds an opaque device cookie');
   const guest=await call('/api/notifications/devices','GET',undefined,enrollment.cookie);check(guest.data.eligible,'enrollment browser may request listing alerts');

@@ -38,9 +38,11 @@ async function main() {
   await request('/api/admin/enroll',{method:'POST',cookie:admin.cookie,origin:'https://evil.invalid',body:{}},403);
   check(true,'cross-site admin request rejected');
   const ownerEmail = `owner-${testId}@test.invalid`;
-  const draft = {ownerEmail,ownerName:'Workflow Owner',name:`Workflow Shop ${testId}`,description:'A test workshop offering repairs and accessories near the campus gate.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',whatsapp:'254712345678',landmark:'Test gate',services:[{id:'repair',name:'Phone repair',priceFrom:150}],hours:{Monday:{open:'08:00',close:'20:00'}}};
+  const draft = {ownerEmail,ownerName:'Workflow Owner',name:`Workflow Shop ${testId}`,description:'A test workshop offering repairs and accessories near the campus gate.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',whatsapp:'254712345678',landmark:'Test gate',serviceModes:['at_shop'],fieldVisitConfirmed:true,ownerConsentConfirmed:true,services:[{id:'repair',name:'Phone repair',priceFrom:150}],hours:{Monday:{open:'08:00',close:'20:00'}}};
   const enrolled = await request('/api/admin/enroll',{method:'POST',cookie:admin.cookie,body:draft},201);
   const business = enrolled.data.business;
+  const duplicate = await request('/api/admin/enroll',{method:'POST',cookie:admin.cookie,body:draft},409);
+  check(duplicate.data.error.includes('already'),'duplicate field enrollment is blocked');
   check(enrolled.data.invitation.sent,'admin enrollment delivers owner verification email');
   check(business.status === 'ACTIVE' && business.verificationLevel === 'L2' && !business.isClaimed,'field enrollment publishes inspected business before owner claims account');
   check(!business.mapPin && !business.walkTime && business.photos.length === 0,'enrollment does not invent photos, coordinates or a walking distance');
@@ -51,6 +53,8 @@ async function main() {
   await request('/api/auth/verify',{method:'POST',body:{token:emailToken(ownerEmail),password:'owner password 2026'}},400);
   check(true,'email verification is password validated and single-use');
   const mine = (await request('/api/auth/me',{cookie:owner.cookie})).data;
+  const auditResult = await request(`/api/admin/audit?businessId=${business.id}`,{cookie:admin.cookie});
+  check(auditResult.data.events.some((event:{action:string})=>event.action === 'OWNERSHIP_ACCEPTED'),'owner acceptance records an audit entry');
   check(mine.businesses.length === 1 && mine.businesses[0].id === business.id && mine.user.role === 'BUSINESS','owner sees only their own verified account');
   const publicProfile = (await request(`/api/businesses/${business.slug}`)).data;
   check(!publicProfile.ownerEmail && !publicProfile.ownerId && !publicProfile.claimCode && publicProfile.metrics.views === 0,'public profile excludes owner details and private analytics');

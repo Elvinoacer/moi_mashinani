@@ -205,7 +205,7 @@ Confirm the owner is comfortable with the business details and photos being publ
 8. Wait for photos to finish uploading.
 9. Set the cover photo. The first photo is initially the cover; use **Cover** on another photo to move it first. Use the trash button to remove a photo from the enrollment.
 10. Add **Products, services & prices**. Enter each name, optional **Price from (KES)** and **Price unit**. Choose its **Product photo** from the uploaded photos.
-11. Use **Add another item** for more rows; enrollment supports up to 12. Blank-name rows are omitted.
+11. Use **Add another item** for more rows; enrollment supports up to 5. Blank-name rows are omitted.
 12. Enter any **Student discount or offer**.
 13. Confirm the email spelling with the owner.
 14. Select **Enroll business & email owner**.
@@ -231,7 +231,7 @@ Ask the owner to open the email and complete setup while you are present if poss
 
 If the message says the business was saved but the email could not be sent, do not enroll it again. Fix the email service/configuration and use resend. The saved listing remains available for admin management.
 
-There is no offline enrollment or saved-draft feature. Unsubmitted form edits can be lost if you reload or leave the page.
+Select **Save draft on this device** to preserve form text, products and opening hours in this browser tab for up to 24 hours. This is not server-backed or offline submission: uploaded photos are not saved with the draft. Close the tab on a shared device when finished to clear the browser session.
 
 ### 2.5 Use every admin queue
 
@@ -277,7 +277,7 @@ Changing field verification does not purchase a promotion. Suspending a listing 
 
 Approval publishes the listing but does not automatically mark it field verified. Rejection requires a reason of up to 300 characters. The owner can read the reason in their dashboard and correct their details.
 
-Editing a rejected listing does not automatically resubmit or approve it. After the owner contacts you about the correction, review it through **All listings**, then restore it if appropriate.
+Editing a rejected listing does not automatically resubmit or approve it. After making corrections, the owner can click **Resubmit corrected listing for review** from their dashboard; it returns to the Moderation Queue. The admin reviews it and approves it only after the owner has accepted the email invitation.
 
 Email verification and approval are independent: an owner can verify and edit their account while the listing is still pending/rejected.
 
@@ -293,7 +293,7 @@ Invitation links expire after 24 hours and can be used once. After a replacement
 
 Once an owner is verified, the queue stops offering the unverified-account resend button. The owner can request a password reset from `/login`.
 
-There is no admin screen to change an owner's email or transfer account ownership. If the enrollment email is wrong, ask the platform maintainer to correct the ownership record; do not create duplicate listings to work around it.
+Administrators can correct an owner email and reassign a business in **Owner Accounts → Correct owner**. The previous owner loses management access to that business, any outstanding business invitation links are invalidated, and the new owner must accept an invitation. Do not create duplicate listings to work around an incorrect email.
 
 ### 2.9 Handle customer reports
 
@@ -360,7 +360,7 @@ Admin-initiated checkout requires an actual payment, just like owner-initiated c
 4. Check your email and complete account verification.
 5. Wait for admin approval before customers can discover/book the listing.
 
-Self-registration creates a **PENDING**, **L0**, free listing. It can include up to 12 initial products/services. Public registration defers photo uploads until you have verified and signed in; add photos from your dashboard.
+Self-registration creates a **PENDING**, **L0**, free listing. It can include up to 5 initial products/services. Public registration defers photo uploads until you have verified and signed in; add photos from your dashboard.
 
 If email delivery fails, the business remains saved. Use **Resend verification email** or request an account link at `/login`.
 

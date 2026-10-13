@@ -52,6 +52,8 @@ async function main() {
     await admin.setViewportSize({width:390,height:844});
     await admin.screenshot({path:'/tmp/moimashinani-browser/mobile-enrollment.png',fullPage:true});
     assert.ok(await admin.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth),'Mobile enrollment has no horizontal overflow');
+    await admin.getByLabel('I personally verified the premises').check();
+    await admin.getByLabel('Owner authorized public listing').check();
     const enrollmentResponse = admin.waitForResponse(response=>response.url().endsWith('/api/admin/enroll') && response.request().method()==='POST');
     await admin.getByRole('button',{name:'Enroll business & email owner',exact:true}).click();
     const enrollment = await (await enrollmentResponse).json();assert.ok(enrollment.invitation.sent);

@@ -4,6 +4,7 @@ import { ApiError, apiError, assertSameOrigin, jsonBody, textField } from '@/lib
 import { prisma } from '@/lib/prisma';
 import { inviteAccount } from '@/lib/invitations';
 import { withNotificationDelivery } from '@/lib/notification-response';
+import { queueNotice } from '@/lib/notifications';
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,12 @@ export async function POST(req: NextRequest) {
       const account = await tx.account.upsert({where:{email},create:{email,name,role:'BUSINESS'},update:{}});
       if (account.role === 'ADMIN') throw new ApiError(400,'An administrator cannot be assigned as a business owner');
       await tx.verificationToken.updateMany({where:{businessId,usedAt:null},data:{usedAt:new Date()}});
-      const updated = await tx.business.update({where:{id:businessId},data:{ownerId:account.id,ownerEmail:email,ownerName:name,isClaimed:false,invitationSentAt:null,invitationError:null}});
+      if (old.ownerId && old.ownerId !== account.id) {
+        await tx.notificationDelivery.updateMany({where:{sentAt:null,stoppedAt:null,notification:{accountId:old.ownerId,path:{startsWith:`/dashboard/${old.slug}`}}},data:{stoppedAt:new Date(),error:'Ownership reassigned'}});
+        await tx.pushDevice.updateMany({where:{accountId:old.ownerId,scopeBusinessId:businessId},data:{enabled:false,token:null,enrollmentUntil:null}});
+        await queueNotice(tx,old.ownerId,`listing/${businessId}/ownership-reassigned`,{kind:'ACCOUNT',title:'Business ownership updated',body:`An administrator changed the account assigned to ${old.name}. If this was unexpected, contact support.`,path:'/dashboard',button:'Review your account'});
+      }
+      const updated = await tx.business.update({where:{id:businessId},data:{ownerId:account.id,ownerEmail:email,ownerName:name,ownerPhone:null,isClaimed:false,invitationSentAt:null,invitationError:null}});
       await tx.businessAudit.create({data:{businessId,actorId:admin.id,action:'OWNER_REASSIGNED',details:`Changed from ${old.ownerEmail || 'unassigned'} to ${email}`}});
       return updated;
     });

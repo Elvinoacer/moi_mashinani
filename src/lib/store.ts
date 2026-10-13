@@ -279,7 +279,7 @@ export const Store = {
         campus: payload.campus || 'Moi University (Kesses Main Campus)',
         zone: zoneSlug,
         servesZones: payload.servesZones || [zoneSlug],
-        landmark: payload.landmark || 'Near Campus Gate',
+        landmark: payload.landmark || (payload.mapPin ? 'Location shown on map' : 'Near Campus Gate'),
         address: payload.address || null,
         mapPin: payload.mapPin ? JSON.parse(JSON.stringify(payload.mapPin)) : undefined,
         walkTime: payload.walkTime || null,

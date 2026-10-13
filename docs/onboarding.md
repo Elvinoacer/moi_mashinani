@@ -1,4 +1,16 @@
 # Business enrollment and accounts
+## Guided enrollment (admin and business owners)
+
+Both `/admin/enroll` and `/onboard` now use the same four-step, mobile-first form: **Essentials → Where & when → What you offer → Photos & finish**. The essentials screen prioritizes owner name/email, shop name/category and phone. Optional owner phone and separate WhatsApp are tucked away. The location step requires either a nearby landmark **or** complete latitude/longitude (browser geolocation is supported). Opening hours are entered once for Monday–Friday, with independent Saturday/Sunday hours, common presets and an advanced per-day editor. Contact/service modes remain adjustable.
+
+Selecting a category unlocks the curated template catalogue for every one of the 65 category slugs. One tap selects an item; it can be removed with the same tap, and each free listing can select **at most five** items. Merchants can search, edit product names, leave prices blank, supply price units, or add custom products. Category-based tagline and description suggestions incorporate the actual shop name and area, rotate between variations, and are fully editable. This is generated **suggested copy**, not evidence that the business actually stocks an item or has any license. Only explicitly selected items are saved. Always verify product availability and pharmacy-specific regulatory restrictions before publishing.
+
+## Photos before email verification
+
+Both flows allow gallery and individual product photo uploads **before** the owner accepts an email invitation. Anonymous uploads use `/api/enrollment/media` and an unpredictable, HttpOnly, SameSite cookie. Uploads are resized, re-encoded, stripped of metadata, rate-limited, capped at 16 individual images/25 MB per session and expire after 24 hours. A short-lived `EnrollmentMedia` ledger records the session, URL and byte count without associating the uploader with an email address. Only that browser's cookie may reference or remove its staged media. Submitting a listing atomically validates and transfers those URLs to its `BusinessMedia` ownership ledger; photos never become owned by an account just because its email was entered in an unverified form. The plan maintenance task deletes abandoned staged images after 24 hours. Uploads require properly configured R2 storage; no external photo URLs are accepted during enrollment. The cover is the first gallery image, and up to five catalogue items can each have their own photograph.
+
+Drafts save the step, form and staged image URLs in session storage; an active upload session cookie is required to attach those photos when restoring. If the cookie expires, reupload the images. Registration is still submitted online and owners still accept the email invitation before they can manage the listing. Avoid using the feature for restricted prescription product sales; listing a pharmacy does not imply PPB verification.
+
 
 ## Operator flow
 

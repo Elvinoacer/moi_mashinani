@@ -50,6 +50,7 @@ jobs:
           npm run seed
       - name: Unit checks
         run: |
+          npm run test:templates
           npm run test:onboarding:integrity
           npm run test:engine
           npm run test:mail

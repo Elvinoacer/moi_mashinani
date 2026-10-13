@@ -308,7 +308,7 @@ export const Store = {
     });
 
     await queueAdmins(client, `listing/${id}/created`, {kind:'NEW_LISTING',title:created.status === 'PENDING' ? 'A new listing needs review' : 'A business has been enrolled',body:`${created.name} has been submitted. Review its details and verification status.`,path:created.status === 'PENDING' ? '/admin?queue=moderation':'/admin?queue=accounts',button:'Review listings'});
-    await queueNotice(client,created.ownerId,`listing/${id}/created`,{kind:'LISTING_SUBMITTED',title:created.status === 'PENDING' ? 'Your listing is awaiting review' : 'Your business listing is live',body:created.status === 'PENDING' ? 'We have received your listing. Verify your email using your account invitation. We will notify you when your listing is reviewed.' : 'Verify your email using your account invitation, then add your profile, shop and product photos from the dashboard.',path:`/dashboard/${created.slug}`,button:'Open business dashboard'}, ['EMAIL','PUSH'], id);
+    await queueNotice(client,created.ownerId,`listing/${id}/created`,{kind:'LISTING_SUBMITTED',title:created.status === 'PENDING' ? 'Your listing is awaiting review' : 'Your business listing is live',body:created.status === 'PENDING' ? 'We have received your listing. Verify your email using your account invitation. We will notify you when your listing is reviewed.' : 'Verify your email using your account invitation, then review the shop and product photos already submitted. You can edit your listing from the dashboard.',path:`/dashboard/${created.slug}`,button:'Open business dashboard'}, ['EMAIL','PUSH'], id);
     return mapPrismaBusiness(created);
   },
 

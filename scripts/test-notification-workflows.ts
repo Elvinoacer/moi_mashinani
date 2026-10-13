@@ -25,15 +25,16 @@ async function main() {
   const ownerEmail=`notification-${tag}@test.invalid`;
   const draft={ownerEmail,ownerName:'Notification Owner',name:`Notification Shop ${tag}`,description:'Testing listing and booking notifications safely in isolation.',primaryCategory:'phone-laptop-repair',zone:'kesses-centre',phone:'0712345678',landmark:'Campus gate',serviceModes:['at_shop'],services:[{id:'repair',name:'Phone repair',priceFrom:100}]};
   const enrollment=await call('/api/businesses','POST',draft,'',201);const business=enrollment.data.business;
-  check(enrollment.cookie.includes('mm_push_device='),'public enrollment binds an opaque device cookie');
-  const guest=await call('/api/notifications/devices','GET',undefined,enrollment.cookie);check(guest.data.eligible,'enrollment browser may request listing alerts');
-  await call('/api/notifications','GET',undefined,enrollment.cookie,401);
-  await call('/api/notifications/devices','POST',{action:'register',token:'bad'},enrollment.cookie,400);
-  await call('/api/notifications/devices','POST',{action:'decline'},enrollment.cookie);
-  check((await call('/api/notifications/devices','GET',undefined,enrollment.cookie)).data.declined,'explicit decline persists on server');
+  check(!enrollment.cookie.includes('mm_push_device='),'anonymous enrollment cannot bind a device to someone else’s owner account');
+  await call('/api/notifications/devices','GET',undefined,'',401);
+  await call('/api/notifications','GET',undefined,'',401);
+  await call('/api/notifications/devices','POST',{action:'decline'},'',401);
   const messages=JSON.parse(readFileSync(context.mailPath,'utf8')) as {to:string[];message:string}[];
   const token=messages.filter(m => m.to.includes(ownerEmail) && m.message.includes('/verify?token=')).at(-1)!.message.match(/token=([a-f0-9]{64})/)![1];
   const owner=await call('/api/auth/verify','POST',{token,password:'notification owner password 2026'});
+  const ownerPush=await call('/api/notifications/devices','POST',{action:'decline'},owner.cookie);
+  check(ownerPush.cookie.includes('mm_push_device='),'only a verified account can bind notifications');
+  check((await call('/api/notifications/devices','GET',undefined,`${owner.cookie}; ${ownerPush.cookie}`)).data.declined,'verified owner’s decline is saved');
   await call('/api/admin/actions','POST',{action:'approve_listing',targetId:business.id},admin.cookie);
   const inbox=(await call('/api/notifications','GET',undefined,owner.cookie)).data;
   const approved=inbox.notifications.find((n:{title:string}) => n.title.includes('is approved'));
@@ -61,13 +62,13 @@ async function main() {
   await call('/api/bookings','PATCH',{id:signedBooking.data.id,status:'CANCELLED'},owner.cookie);
   check(await prisma.notification.count({where:{accountId:(await prisma.account.findUniqueOrThrow({where:{email:credentials.email}})).id,eventKey:{startsWith:`booking/${signedBooking.data.id}/CANCELLED`}}}) > 0,'signed-in requester receives booking status notification');
   const binding=await prisma.pushDevice.findFirst({where:{accountId:business.ownerId}});
-  check(binding?.scopeBusinessId === business.id,'pre-verification binding is limited to the submitted listing');
+  check(binding?.scopeBusinessId === null,'verified owner binding can receive only their own account notifications');
   // A temporary fake token exercises scoped enqueue and logout without external Firebase calls.
   await prisma.pushDevice.update({where:{id:binding!.id},data:{enabled:true,declined:false,token:`test-token-${tag}`}});
   await prisma.$transaction(tx=>queueNotice(tx,business.ownerId,'private-account-event',{kind:'TEST',title:'Private account update',body:'Private',path:'/dashboard',button:'Open'}));
-  check(await prisma.notificationDelivery.count({where:{notification:{eventKey:'private-account-event'},channel:'PUSH'}}) === 0,'enrollment device cannot subscribe to private account events');
+  check(await prisma.notificationDelivery.count({where:{notification:{eventKey:'private-account-event'},channel:'PUSH'}}) === 1,'verified owner device can receive private account events');
   await prisma.pushDevice.update({where:{id:binding!.id},data:{scopeBusinessId:null}});
-  await call('/api/auth/logout','POST',undefined,`${owner.cookie}; ${enrollment.cookie}`);
+  await call('/api/auth/logout','POST',undefined,`${owner.cookie}; ${ownerPush.cookie}`);
   check(!(await prisma.pushDevice.findUnique({where:{id:binding!.id}}))?.token,'logout clears this device token');
   // Exercise durable independent-channel retry with a simulated email outage.
   await prisma.notificationDelivery.updateMany({where:{sentAt:null},data:{nextAttemptAt:new Date(Date.now()+864e5)}});

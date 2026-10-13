@@ -1,5 +1,7 @@
 # Notifications
 
+**Owner verification is required for browser push registration.** Anonymous enrollment no longer sets a device binding cookie for an account whose email was only supplied in a public form. This prevents a third party from subscribing to someone else's business notifications. The owner verifies the email invitation and signs in before enabling push notifications.
+
 MoiMashinani saves critical events into an account inbox and a per-channel delivery outbox in the same transaction as the business change. Email uses the existing Resend integration. Push uses Firebase Cloud Messaging with the Web SDK and server-only Admin SDK.
 
 ## Covered events

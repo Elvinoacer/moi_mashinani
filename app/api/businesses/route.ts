@@ -1,5 +1,4 @@
 import { withNotificationDelivery } from '@/lib/notification-response';
-import { enrollmentPushBinding } from '@/lib/push-device';
 import { NextRequest, NextResponse } from 'next/server';
 import { Store } from '@/lib/store';
 import { rankBusinesses } from '@/lib/rank';
@@ -111,7 +110,6 @@ export async function POST(req: NextRequest) {
     await rateLimit(req,'public-enrollment-email',3,3600,normalizeEmail(body.ownerEmail));
     const result = await enrollBusiness(body);
     const response = NextResponse.json({...result,slug:result.business?.slug},{status:201});
-    if (result.business?.ownerId) await enrollmentPushBinding(response,result.business.ownerId,result.business.id);
     return withNotificationDelivery(response);
   } catch(error) { return apiError(error); }
 }

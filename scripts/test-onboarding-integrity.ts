@@ -16,6 +16,7 @@ const draft = {
   services:[{id:'repair',name:'Repair',priceFrom:100}],
 };
 const createdIds:string[]=[];
+async function main() {
 try {
   const pending=await enrollBusiness(draft);
   createdIds.push(pending.business!.id);
@@ -38,3 +39,6 @@ try {
   await prisma.account.deleteMany({where:{email}});
   await prisma.$disconnect();
 }
+
+}
+main().catch(error=>{console.error(error);process.exitCode=1;});

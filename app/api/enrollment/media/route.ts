@@ -15,7 +15,7 @@ const expiresAfter=ENROLLMENT_MEDIA_WINDOW_MS / 1000;
 export async function POST(req:NextRequest) {
   try {
     assertSameOrigin(req);
-    await rateLimit(req,'public-photo-staging',40,3600);
+    await rateLimit(req,'public-photo-staging',120,3600);
     const length=Number(req.headers.get('content-length') || 0);
     if (length>maxRequest) throw new ApiError(413,'Upload no more than three photos at once (5 MB each).');
     if(!req.body) throw new ApiError(400,'Choose photos to upload.');

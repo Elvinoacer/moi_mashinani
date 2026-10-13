@@ -54,6 +54,10 @@ export async function POST(req: NextRequest) {
         contents.push(content);
       } catch (error) { if (error instanceof ApiError) throw error; throw new ApiError(400,'Use a valid JPEG, PNG, WebP or supported phone photo'); }
     }
+    if (!businessId) {
+      const old = await prisma.businessMedia.findMany({where:{accountId:user.id,businessId:null,createdAt:{lt:new Date(Date.now()-24*3600000)}},select:{id:true},take:20});
+      await Promise.allSettled(old.map(asset => removeUnusedMedia(asset.id)));
+    }
     const reservations = await reserveMedia(user.id, businessId, contents.map(content => content.length));
     try {
       const urls = photoUrlsForIds(user.id, reservations.map(asset => asset.id));

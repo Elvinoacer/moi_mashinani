@@ -311,7 +311,7 @@ export const Store = {
     return mapPrismaBusiness(created);
   },
 
-  async updateBusiness(id: string, updates: Partial<Business>, mediaAccountId?: string): Promise<Business | undefined> {
+  async updateBusiness(id: string, updates: Partial<Business>, mediaAccountId?: string, audit?: {actorId:string;action:string;details?:string}): Promise<Business | undefined> {
     return prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${id} FOR UPDATE`;
       const existing = await tx.business.findUnique({ where: { id } });
@@ -366,11 +366,20 @@ export const Store = {
       if (updates.ambassadorId !== undefined) prismaUpdateData.ambassadorId = updates.ambassadorId;
       if (updates.metrics !== undefined) prismaUpdateData.metrics = JSON.parse(JSON.stringify(updates.metrics));
       prismaUpdateData.profileStrength = newStrength;
-
+      const identityFields: (keyof Business)[] = ['name','primaryCategory','phone','whatsapp','landmark','address','mapPin'];
+      const identityChanged = identityFields.some(key => key in updates && (
+        !(key === 'mapPin' && !mappedExisting.mapPin && !updates.mapPin) &&
+        JSON.stringify(mappedExisting[key]) !== JSON.stringify(updates[key])
+      ));
+      if (existing.verificationLevel === 'L2' && identityChanged && updates.verificationLevel === undefined) prismaUpdateData.verificationLevel = 'L1';
       const updated = await tx.business.update({
         where: { id },
         data: prismaUpdateData,
       });
+      if (audit) await tx.businessAudit.create({data:{businessId:id,actorId:audit.actorId,action:audit.action,details:audit.details}});
+      if (identityChanged && existing.verificationLevel === 'L2' && updated.verificationLevel !== 'L2') {
+        await queueAdmins(tx,`listing/${id}/recheck/${updated.updatedAt.toISOString()}`,{kind:'VERIFICATION',title:'Business details require re-verification',body:`${updated.name} changed identity or contact details. Review before restoring its verified badge.`,path:'/admin?queue=listings',button:'Review business'});
+      }
       if (existing.status !== updated.status) await listingNotice(tx,updated,`listing/${id}/status/${updated.updatedAt.toISOString()}`);
       else if (existing.verificationLevel !== updated.verificationLevel) await queueNotice(tx,updated.ownerId,`listing/${id}/verification/${updated.updatedAt.toISOString()}`,{kind:'VERIFICATION',title:updated.verificationLevel === 'L2' ? 'Your business is verified' : 'Your verification status changed',body:updated.verificationLevel === 'L2' ? 'Your verified badge is ready. Add clear profile and product photos, update your catalogue and keep your opening hours current.' : 'Open your dashboard to review your current verification status.',path:`/dashboard/${updated.slug}`,button:'Complete my profile'});
       return mapPrismaBusiness(updated);

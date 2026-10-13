@@ -8,6 +8,7 @@ import { apiError, assertSameOrigin, jsonBody } from '@/lib/api';
 import { publicBusiness } from '@/lib/business-input';
 import { enrollBusiness } from '@/lib/enrollment';
 import { rateLimit } from '@/lib/rate-limit';
+import { normalizeEmail } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
@@ -105,8 +106,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     assertSameOrigin(req);
-    await rateLimit(req,'public-enrollment',5,3600);
-    const result = await enrollBusiness(await jsonBody(req));
+    await rateLimit(req,'public-enrollment',30,3600);
+    const body = await jsonBody(req);
+    await rateLimit(req,'public-enrollment-email',3,3600,normalizeEmail(body.ownerEmail));
+    const result = await enrollBusiness(body);
     const response = NextResponse.json({...result,slug:result.business?.slug},{status:201});
     if (result.business?.ownerId) await enrollmentPushBinding(response,result.business.ownerId,result.business.id);
     return withNotificationDelivery(response);

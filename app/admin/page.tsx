@@ -325,7 +325,7 @@ function AdminConsoleContent() {
 
                       <div className="flex items-center gap-2 pt-2 sm:pt-0">
                         <button
-                          disabled={!!busyTarget}
+                          disabled={!!busyTarget || !biz.isClaimed || !biz.emailVerifiedAt}
                           onClick={() => handleAdminAction('approve_listing', biz.id)}
                           className="bg-[#335e41] text-white text-xs font-bold px-3.5 py-1.5 rounded-full signboard-border press-action flex items-center gap-1.5"
                         >

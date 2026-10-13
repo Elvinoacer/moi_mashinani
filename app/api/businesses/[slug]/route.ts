@@ -10,7 +10,7 @@ export async function GET(req:NextRequest,props:{params:Promise<{slug:string}>})
     const business = await Store.getBusinessBySlug(slug) || await Store.getBusinessById(slug);
     if (!business) throw new ApiError(404,'Business not found');
     const user = await getCurrentUser(req);
-    const canManage = user && (user.role === 'ADMIN' || user.id === business.ownerId);
+    const canManage = user && (user.role === 'ADMIN' || (user.id === business.ownerId && business.isClaimed));
     if (business.status !== 'ACTIVE' && !canManage) throw new ApiError(404,'Business not found');
     return NextResponse.json(canManage ? business : publicBusiness(business),{headers:{'Cache-Control':'no-store'}});
   } catch(error) { return apiError(error); }

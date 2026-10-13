@@ -40,6 +40,8 @@ function AdminConsoleContent() {
   const [auditTarget, setAuditTarget] = useState<Business | null>(null);
   const [auditEvents, setAuditEvents] = useState<Array<{id:string;action:string;actorId?:string|null;details?:string|null;createdAt:string}>>([]);
   const [auditLoading, setAuditLoading] = useState(false);
+  const [verificationTarget, setVerificationTarget] = useState<Business | null>(null);
+  const [verificationNote, setVerificationNote] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [siteOrigin] = useState(() => (typeof window !== 'undefined' ? window.location.origin : ''));
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
@@ -139,6 +141,13 @@ function AdminConsoleContent() {
 
   return (
     <div className="space-y-6">
+      {verificationTarget && <ModalFrame title={`Verify ${verificationTarget.name}`} onClose={()=>setVerificationTarget(null)}>
+        <div className="space-y-4 p-5">
+          <p className="text-sm text-[#667064]">Describe what you personally checked before restoring the field verification badge.</p>
+          <textarea aria-label="Field verification evidence" maxLength={500} rows={3} value={verificationNote} onChange={event=>setVerificationNote(event.target.value)} className="w-full rounded-xl border border-[#dfe5d8] px-3 py-2" />
+          <div className="flex justify-end gap-2"><button type="button" onClick={()=>setVerificationTarget(null)} className="rounded-xl border px-4 py-2">Cancel</button><button type="button" disabled={verificationNote.trim().length<12 || !!busyTarget} onClick={()=>{void handleAdminAction('toggle_verified',verificationTarget.id,verificationNote).then(()=>setVerificationTarget(null));}} className="rounded-xl bg-[#243b32] px-4 py-2 text-white">Confirm verification</button></div>
+        </div>
+      </ModalFrame>}
       {ownerEditTarget && <ModalFrame title={`Update owner for ${ownerEditTarget.name}`} onClose={() => {if(!busyTarget)setOwnerEditTarget(null);}}>
         <div className="space-y-4 p-5">
           <p className="text-sm text-[#667064]">The previous owner loses access to this listing. The new owner must accept an invitation. Confirm the new email in person.</p>
@@ -272,8 +281,8 @@ function AdminConsoleContent() {
           {businesses.filter(business => `${business.name} ${business.ownerEmail || ''} ${business.zone}`.toLowerCase().includes(listingSearch.toLowerCase())).map(business => <article key={business.id} className="border-t border-[#dfe5d8] py-4 space-y-3">
             <div><h3 className="font-bold text-[#243b32]">{business.name}</h3><p className="text-xs text-[#667064]">{business.status} · {business.verificationLevel === 'L2' ? 'Field verified' : 'Awaiting field verification'} · {business.zone}</p>{business.moderationReason && <p className="mt-1 text-xs text-[#8f2424]">{business.moderationReason}</p>}</div>
             <div className="flex flex-wrap gap-2"><Link href={`/dashboard/${business.slug}`} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32]">Edit listing & photos</Link>
-            <button type="button" disabled={!!busyTarget} onClick={() => handleAdminAction(business.status === 'ACTIVE' ? 'suspend_listing':'restore_listing',business.id)} className={`rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-50 ${business.status === 'ACTIVE' ? 'bg-[#a7302d]' : 'bg-[#335e41]'}`}>{business.status === 'ACTIVE' ? 'Suspend listing' : business.status === 'PENDING' ? 'Approve listing' : 'Restore listing'}</button>
-            <button type="button" disabled={!!busyTarget} onClick={() => handleAdminAction('toggle_verified',business.id)} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32] disabled:opacity-50">{business.verificationLevel === 'L2' ? 'Remove field verification' : 'Mark field verified'}</button>
+            <button type="button" disabled={!!busyTarget || (['PENDING','REJECTED'].includes(business.status) && !business.isClaimed)} onClick={() => handleAdminAction(business.status === 'ACTIVE' ? 'suspend_listing':business.status === 'PENDING' ? 'approve_listing':'restore_listing',business.id)} className={`rounded-xl px-3 py-2 text-xs font-bold text-white disabled:opacity-50 ${business.status === 'ACTIVE' ? 'bg-[#a7302d]' : 'bg-[#335e41]'}`}>{business.status === 'ACTIVE' ? 'Suspend listing' : business.status === 'PENDING' ? 'Approve listing' : 'Restore listing'}</button>
+            <button type="button" disabled={!!busyTarget} onClick={() => {if(business.verificationLevel === 'L2') void handleAdminAction('toggle_verified',business.id); else {setVerificationTarget(business);setVerificationNote('');}}} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold text-[#243b32] disabled:opacity-50">{business.verificationLevel === 'L2' ? 'Remove field verification' : 'Mark field verified'}</button>
             <button type="button" disabled={!!busyTarget} onClick={()=>void openAudit(business)} className="rounded-xl border border-[#dfe5d8] px-3 py-2 text-xs font-bold">Audit history</button><button type="button" disabled={!!busyTarget} onClick={() => {setDeleteTarget(business);setConfirmationName('');setDeleteError('');}} className="rounded-xl border border-[#a7302d] px-3 py-2 text-xs font-bold text-[#a7302d] disabled:opacity-50">Delete business</button>
             </div>
           </article>)}
@@ -321,7 +330,7 @@ function AdminConsoleContent() {
                           className="bg-[#335e41] text-white text-xs font-bold px-3.5 py-1.5 rounded-full signboard-border press-action flex items-center gap-1.5"
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>Approve listing</span>
+                          <span>{biz.isClaimed ? 'Approve listing' : 'Awaiting owner acceptance'}</span>
                         </button>
                         <button
                           disabled={!!busyTarget}

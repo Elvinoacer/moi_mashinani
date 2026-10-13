@@ -378,6 +378,8 @@ export const Store = {
       });
       if (audit) await tx.businessAudit.create({data:{businessId:id,actorId:audit.actorId,action:audit.action,details:audit.details}});
       if (identityChanged && existing.verificationLevel === 'L2' && updated.verificationLevel !== 'L2') {
+        await tx.businessAudit.create({data:{businessId:id,actorId:mediaAccountId || null,action:'VERIFICATION_NEEDS_REVIEW',details:'Business identity or contact details were updated'}});
+
         await queueAdmins(tx,`listing/${id}/recheck/${updated.updatedAt.toISOString()}`,{kind:'VERIFICATION',title:'Business details require re-verification',body:`${updated.name} changed identity or contact details. Review before restoring its verified badge.`,path:'/admin?queue=listings',button:'Review business'});
       }
       if (existing.status !== updated.status) await listingNotice(tx,updated,`listing/${id}/status/${updated.updatedAt.toISOString()}`);

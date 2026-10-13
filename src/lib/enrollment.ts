@@ -20,8 +20,8 @@ export async function enrollBusiness(body: Record<string, unknown>, admin = fals
   const ownerEmail = normalizeEmail(body.ownerEmail);
   const ownerName = textField(body.ownerName, 'Owner name', 120, true);
   const business = await prisma.$transaction(async tx => {
-    const fingerprint = [fields.name?.trim().toLowerCase(),fields.zone,fields.phone].join('|');
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${fingerprint}))`;
+    const fingerprint = [fields.name?.trim().toLowerCase(),fields.zone].join('|');
+    await tx.$queryRaw`SELECT 1 AS locked FROM (SELECT pg_advisory_xact_lock(hashtext(${fingerprint}))) AS lock`;
     const nearby = await tx.business.findMany({where:{zone:fields.zone,OR:[{phone:fields.phone},{ownerEmail}]},select:{name:true,phone:true,ownerEmail:true}});
     if (nearby.some(item => item.name.trim().toLowerCase() === fields.name?.trim().toLowerCase() && (item.phone === fields.phone || item.ownerEmail === ownerEmail))) throw new ApiError(409, 'This business appears to be listed already. Open the existing listing instead of submitting again.');
     const owner = await tx.account.upsert({where:{email:ownerEmail},create:{email:ownerEmail,name:ownerName,role:'BUSINESS'},update:{}});

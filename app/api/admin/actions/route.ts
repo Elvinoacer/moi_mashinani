@@ -23,7 +23,8 @@ export async function POST(req:NextRequest) {
     }
     const business = await Store.getBusinessById(id);
     if (!business) throw new ApiError(404,'Business not found');
-    if (action === 'approve_listing') {
+    if (action === 'toggle_verified' && business.verificationLevel !== 'L2' && textField(body.reason,'Field verification evidence',500,true).length < 12) throw new ApiError(400,'Describe the verification evidence (12+ characters)');
+    if (action === 'approve_listing' || (action === 'restore_listing' && ['REJECTED','PENDING'].includes(business.status))) {
       const owner = business.ownerId ? await prisma.account.findUnique({where:{id:business.ownerId},select:{emailVerifiedAt:true}}) : null;
       if (!business.isClaimed || !owner?.emailVerifiedAt) throw new ApiError(409,'The owner must accept their invitation before listing approval');
     }

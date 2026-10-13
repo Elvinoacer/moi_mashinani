@@ -14,7 +14,7 @@ import type {Business,BusinessHours} from '@/lib/types';
 type ProductDraft={id:string;name:string;price:string;unit:string;photo:string};
 type FormResult={business:Business;invitation:{sent:boolean;error?:string}};
 type Details={ownerName:string;ownerEmail:string;ownerPhone:string;name:string;primaryCategory:string;phone:string;whatsapp:string;zone:string;landmark:string;address:string;latitude:string;longitude:string;tagline:string;description:string;studentDiscount:string};
-const box='w-full rounded-2xl border border-[#dce5d9] bg-white px-4 py-3 text-[15px] text-[#1b3b30] outline-none transition focus:border-[#426b50] focus:ring-2 focus:ring-[#b5cf9a]';
+const box='w-full min-w-0 rounded-2xl border border-[#dce5d9] bg-white px-4 py-3 text-[15px] text-[#1b3b30] outline-none transition focus:border-[#426b50] focus:ring-2 focus:ring-[#b5cf9a]';
 const label='mb-1.5 block text-sm font-semibold text-[#254638]';
 const blank:Details={ownerName:'',ownerEmail:'',ownerPhone:'',name:'',primaryCategory:'',phone:'',whatsapp:'',zone:'kesses-centre',landmark:'',address:'',latitude:'',longitude:'',tagline:'',description:'',studentDiscount:''};
 const STEPS=[{title:'The essentials',hint:'Who and what'},{title:'Where & when',hint:'Location and hours'},{title:'What you offer',hint:'Pick from templates'},{title:'Photos & finish',hint:'Ready to list'}];
@@ -35,6 +35,7 @@ export function BusinessEnrollmentForm({mode='admin',onEnrolled}:{mode?:'admin'|
   const [error,setError]=useState('');
   const [note,setNote]=useState('');
   const [variant,setVariant]=useState(0);
+  const [copyEdited,setCopyEdited]=useState(false);
   const [fieldVisitConfirmed,setFieldVisitConfirmed]=useState(false);
   const [ownerConsentConfirmed,setOwnerConsentConfirmed]=useState(false);
   const [result,setResult]=useState<FormResult|null>(null);
@@ -55,6 +56,7 @@ export function BusinessEnrollmentForm({mode='admin',onEnrolled}:{mode?:'admin'|
     setDetails(current=>({...current,primaryCategory:value,tagline:'',description:''}));
     setServiceModes(enrollmentTemplate(value).modes);
     setProducts([]);
+    setCopyEdited(false);
     setQuery('');
     setNote('Choose only products or services this business actually offers. Nothing is published automatically.');
   }
@@ -62,14 +64,17 @@ export function BusinessEnrollmentForm({mode='admin',onEnrolled}:{mode?:'admin'|
     const copy=suggestedEnrollmentCopy(details.primaryCategory,details.name,details.zone,selected.map(p=>p.name),nextVariant);
     setDetails(current=>({...current,...copy}));
     setVariant(nextVariant);
+    setCopyEdited(false);
   }
   function addTemplate(name:string) {
-    if(products.some(item=>item.name.toLowerCase()===name.toLowerCase())) {
-      setProducts(current=>current.filter(item=>item.name.toLowerCase()!==name.toLowerCase()));
-      return;
+    const exists=products.some(item=>item.name.toLowerCase()===name.toLowerCase());
+    if(!exists&&products.length>=FREE_PRODUCT_LIMIT){setError('Free listings include five products or services. Remove one before adding another.');return;}
+    const next=exists?products.filter(item=>item.name.toLowerCase()!==name.toLowerCase()):[...products,{id:crypto.randomUUID(),name,price:'',unit:'',photo:''}];
+    setProducts(next);
+    if(!copyEdited){
+      const copy=suggestedEnrollmentCopy(details.primaryCategory,details.name,details.zone,next.map(p=>p.name),variant);
+      setDetails(current=>({...current,...copy}));
     }
-    if(products.length>=FREE_PRODUCT_LIMIT){setError('Free listings include five products or services. Remove one before adding another.');return;}
-    setProducts(current=>[...current,{id:crypto.randomUUID(),name,price:'',unit:'',photo:''}]);
     setError('');
   }
   function addCustom() {
@@ -84,7 +89,7 @@ export function BusinessEnrollmentForm({mode='admin',onEnrolled}:{mode?:'admin'|
     const first=hours[days[0]];
     return <div className="rounded-2xl border border-[#dce5d9] bg-[#f7f9f3] p-4">
       <div className="mb-3 flex items-center justify-between gap-3"><strong className="text-sm text-[#243c30]">{title}</strong><label className="flex items-center gap-2 text-sm"><input type="checkbox" aria-label={title+' closed'} checked={!!first?.closed} onChange={event=>setPeriod(days,'closed',event.target.checked)} className="accent-[#335e41]"/> Closed</label></div>
-      {!first?.closed&&<div className="grid grid-cols-2 gap-3"><label><span className={label}>Opens</span><input aria-label={title+' opening time'} type="time" className={box} value={first?.open||'08:00'} onChange={event=>setPeriod(days,'open',event.target.value)}/></label><label><span className={label}>Closes</span><input aria-label={title+' closing time'} type="time" className={box} value={first?.close||'18:00'} onChange={event=>setPeriod(days,'close',event.target.value)}/></label></div>}
+      {!first?.closed&&<div className="grid grid-cols-1 gap-3 sm:grid-cols-2"><label><span className={label}>Opens</span><input aria-label={title+' opening time'} type="time" className={box} value={first?.open||'08:00'} onChange={event=>setPeriod(days,'open',event.target.value)}/></label><label><span className={label}>Closes</span><input aria-label={title+' closing time'} type="time" className={box} value={first?.close||'18:00'} onChange={event=>setPeriod(days,'close',event.target.value)}/></label></div>}
     </div>;
   }
   function location() {
@@ -243,8 +248,8 @@ export function BusinessEnrollmentForm({mode='admin',onEnrolled}:{mode?:'admin'|
           </article>)}
         </div>
         <div className="space-y-3 rounded-2xl border border-[#dce5d9] bg-[#f7f9f4] p-4 sm:p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h4 className="flex items-center gap-2 text-lg font-bold text-[#224032]"><Sparkles size={18}/>Suggested business introduction</h4><p className="mt-1 text-xs text-[#6c806e]">Personalized using this business, its category and area. Edit freely; no unverified claims.</p></div><button type="button" onClick={()=>suggestCopy(variant+1)} className="flex items-center gap-1 rounded-xl border border-[#cbd9c6] bg-white px-3 py-2 text-xs font-bold text-[#335e41]"><RotateCw size={14}/>Another version</button></div>
-          <label><span className={label}>Short tagline</span><input maxLength={160} className={box} value={details.tagline} onChange={event=>setDetails(current=>({...current,tagline:event.target.value}))}/></label>
-          <label><span className={label}>Business description</span><textarea minLength={20} maxLength={3000} rows={4} className={box} value={details.description} onChange={event=>setDetails(current=>({...current,description:event.target.value}))}/></label>
+          <label><span className={label}>Short tagline</span><input maxLength={160} className={box} value={details.tagline} onChange={event=>{setCopyEdited(true);setDetails(current=>({...current,tagline:event.target.value}));}}/></label>
+          <label><span className={label}>Business description</span><textarea minLength={20} maxLength={3000} rows={4} className={box} value={details.description} onChange={event=>{setCopyEdited(true);setDetails(current=>({...current,description:event.target.value}));}}/></label>
           <button type="button" onClick={()=>suggestCopy(variant+1)} className="text-xs font-bold text-[#426a4d] underline">Fill from selected products</button>
         </div>
       </section>}

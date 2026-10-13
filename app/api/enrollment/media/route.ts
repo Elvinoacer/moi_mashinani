@@ -18,8 +18,17 @@ export async function POST(req:NextRequest) {
     await rateLimit(req,'public-photo-staging',40,3600);
     const length=Number(req.headers.get('content-length') || 0);
     if (length>maxRequest) throw new ApiError(413,'Upload no more than three photos at once (5 MB each).');
-    const bytes=Buffer.from(await req.arrayBuffer());
-    if(bytes.length>maxRequest) throw new ApiError(413,'Photo upload is too large');
+    if(!req.body) throw new ApiError(400,'Choose photos to upload.');
+    const reader=req.body.getReader();
+    const chunks:Uint8Array[]=[];let total=0;
+    while(true){
+      const next=await reader.read();
+      if(next.done) break;
+      total+=next.value.byteLength;
+      if(total>maxRequest){await reader.cancel();throw new ApiError(413,'Photo upload is too large');}
+      chunks.push(next.value);
+    }
+    const bytes=Buffer.concat(chunks);
     const form=await new Request(req.url,{method:'POST',headers:{'Content-Type':req.headers.get('content-type') || ''},body:bytes}).formData();
     const files=form.getAll('files');
     if(files.length<1 || files.length>3) throw new ApiError(400,'Choose one to three photos per upload');

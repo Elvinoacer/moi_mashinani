@@ -5,7 +5,7 @@ import { requireBusinessAccess } from '@/lib/auth';
 import { ApiError, apiError, assertSameOrigin, jsonBody, textField } from '@/lib/api';
 import { businessInput } from '@/lib/business-input';
 import { productLimitError } from '@/lib/catalog-plan';
-import { attachMedia, cleanRemovedMedia, mediaReferences, queueRemovedMedia } from '@/lib/media-storage';
+import { attachMedia, cleanRemovedMedia, hostedMediaUrl, mediaReferences, queueRemovedMedia } from '@/lib/media-storage';
 import type { ServiceItem } from '@/lib/types';
 
 async function mutate(req: NextRequest, props: {params: Promise<{slug:string}>}, method: 'POST' | 'PATCH' | 'DELETE') {
@@ -18,6 +18,8 @@ async function mutate(req: NextRequest, props: {params: Promise<{slug:string}>},
     const body = await jsonBody(req);
     const item = method !== 'DELETE' ? businessInput({services:[body]} , true).services![0] : null;
     const id = item?.id || textField(body.id, 'Product ID', 100, true);
+    // Reject new arbitrary external URLs; keep already saved legacy assets editable.
+    if (item?.photo && !mediaReferences(initial).includes(item.photo) && !hostedMediaUrl(item.photo)) throw new ApiError(400,'Upload a product photo through MoiMashinani');
     await prisma.$transaction(async tx => {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${initial.id} FOR UPDATE`;
       const business = await tx.business.findUniqueOrThrow({where:{id:initial.id}});

@@ -17,6 +17,7 @@ const draft = {
   services:[{id:'repair',name:'Repair',priceFrom:100}],
 };
 const createdIds:string[]=[];
+const cookie=randomBytes(32).toString('hex');
 async function main() {
 try {
   const pending=await enrollBusiness(draft);
@@ -34,7 +35,6 @@ try {
   assert.ok(audits.some(event=>event.action==='SELF_ENROLLED') && audits.some(event=>event.action==='FIELD_ENROLLED'));
   console.log('PASS admin field verification requires consent and writes an audit event');
   // A staged photo may only be attached by the browser session that uploaded it.
-  const cookie=randomBytes(32).toString('hex');
   const outsider=randomBytes(32).toString('hex');
   const hash=enrollmentMediaHash(cookie)!;
   const url='/api/uploads/'+randomUUID();

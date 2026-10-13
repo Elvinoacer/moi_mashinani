@@ -25,6 +25,8 @@ export async function PATCH(req:NextRequest,props:{params:Promise<{slug:string}>
     const body = await jsonBody(req);
     const fields = businessInput(body,true);
     if (!Object.keys(fields).length) throw new ApiError(400,'No editable business details were supplied');
+    const locationCandidate={...business,...fields};
+    if ((!locationCandidate.landmark?.trim() || locationCandidate.landmark === 'Location shown on map') && !locationCandidate.mapPin) throw new ApiError(400,'Keep a nearby landmark or a map pin so students can find this business.');
     const before = mediaReferences(business);
     const proposed = mediaReferences({...business,...fields});
     if (proposed.some(url => !before.includes(url) && !hostedMediaUrl(url))) throw new ApiError(400,'Use a photo uploaded through MoiMashinani');

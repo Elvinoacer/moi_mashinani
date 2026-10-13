@@ -26,12 +26,12 @@ async function compressPhoto(file: File): Promise<File> {
   } finally {bitmap.close();}
 }
 
-function sendBatch(body:FormData,onProgress:(percentage:number)=>void,onProcessing:()=>void,signal?:AbortSignal):Promise<string[]> {
+function sendBatch(body:FormData,endpoint:string,onProgress:(percentage:number)=>void,onProcessing:()=>void,signal?:AbortSignal):Promise<string[]> {
   return new Promise((resolve,reject)=>{
     const xhr=new XMLHttpRequest();
     const abort=()=>xhr.abort();
     const finish=()=>signal?.removeEventListener('abort',abort);
-    xhr.open('POST','/api/uploads');xhr.timeout=90000;
+    xhr.open('POST',endpoint);xhr.timeout=90000;
     xhr.upload.onprogress=event=>{if(event.lengthComputable)onProgress(Math.round(event.loaded/event.total*100));};
     xhr.upload.onload=onProcessing;
     xhr.onload=()=>{
@@ -48,7 +48,7 @@ function sendBatch(body:FormData,onProgress:(percentage:number)=>void,onProcessi
   });
 }
 
-export async function uploadBusinessPhotos(files: File[], businessId?: string, options:PhotoUploadOptions={}): Promise<string[]> {
+export async function uploadBusinessPhotos(files: File[], businessId?: string, options:PhotoUploadOptions={},enrollment=false): Promise<string[]> {
   if (!files.length || files.length > 8) throw new Error('Choose one to eight photos at a time.');
   let items:PhotoUploadItem[]=files.map(file=>({name:file.name,stage:'pending',progress:0}));
   const emit=()=>options.onChange?.(items.map(item=>({...item})));
@@ -64,7 +64,7 @@ export async function uploadBusinessPhotos(files: File[], businessId?: string, o
       const body = new FormData();batch.forEach(file => body.append('files',file));
       if (businessId) body.append('businessId',businessId);
       update(indices,{stage:'uploading',progress:0});
-      const urls=await sendBatch(body,progress=>update(indices,{progress}),()=>update(indices,{stage:'processing',progress:100}),options.signal);
+      const urls=await sendBatch(body,enrollment ? '/api/enrollment/media' : '/api/uploads',progress=>update(indices,{progress}),()=>update(indices,{stage:'processing',progress:100}),options.signal);
       photos.push(...urls);
       if(urls.length!==batch.length)throw new Error('The server returned an incomplete upload. Please retry.');
       update(indices,{stage:'done',progress:100});
@@ -74,7 +74,7 @@ export async function uploadBusinessPhotos(files: File[], businessId?: string, o
     const reason=options.signal?.aborted?'Upload cancelled. No photos were added to your listing.':error instanceof Error?error.message:'Photo upload failed. Please retry.';
     update(files.map((_,i)=>i),{stage:'failed',reason});
     // Unreferenced assets are also retried by scheduled cleanup if deletion is unavailable.
-    await Promise.allSettled(photos.map(url => fetch(`/api/uploads?url=${encodeURIComponent(url)}`,{method:'DELETE',signal:AbortSignal.timeout(5000)})));
+    await Promise.allSettled(photos.map(url => fetch(`${enrollment ? '/api/enrollment/media' : '/api/uploads'}?url=${encodeURIComponent(url)}`,{method:'DELETE',signal:AbortSignal.timeout(5000)})));
     throw new Error(reason);
   }
 }

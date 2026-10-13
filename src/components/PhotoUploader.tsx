@@ -5,8 +5,8 @@ import {Camera,CheckCircle2,LoaderCircle,Upload,TriangleAlert} from 'lucide-reac
 import {uploadBusinessPhotos,type PhotoUploadItem} from '@/lib/photo-upload';
 
 const stageLabels={pending:'Pending',preparing:'Preparing image',uploading:'Uploading',processing:'Processing on server',done:'Uploaded',failed:'Failed'};
-type Props={label:string;businessId?:string;multiple?:boolean;maxFiles?:number;disabled?:boolean;disabledReason?:string;camera?:boolean;readyMessage?:string;saveMessage?:string;onUploaded:(urls:string[])=>Promise<unknown>|void;onBusyChange?:(busy:boolean)=>void};
-export function PhotoUploader({label,businessId,multiple=false,maxFiles=1,disabled=false,disabledReason,camera=false,readyMessage='Done. Your photo has been saved.',saveMessage='Saving to your listing…',onUploaded,onBusyChange}:Props) {
+type Props={label:string;businessId?:string;enrollment?:boolean;multiple?:boolean;maxFiles?:number;disabled?:boolean;disabledReason?:string;camera?:boolean;readyMessage?:string;saveMessage?:string;onUploaded:(urls:string[])=>Promise<unknown>|void;onBusyChange?:(busy:boolean)=>void};
+export function PhotoUploader({label,businessId,enrollment=false,multiple=false,maxFiles=1,disabled=false,disabledReason,camera=false,readyMessage='Done. Your photo has been saved.',saveMessage='Saving to your listing…',onUploaded,onBusyChange}:Props) {
   const id=useId();const selection=useRef<File[]>([]);const uploaded=useRef<string[]>([]);const controller=useRef<AbortController|null>(null);
   const [items,setItems]=useState<PhotoUploadItem[]>([]);const [phase,setPhase]=useState<'idle'|'uploading'|'saving'|'done'|'failed'>('idle');const [error,setError]=useState('');const [pendingSave,setPendingSave]=useState(false);
   useEffect(()=>()=>controller.current?.abort(),[]);
@@ -17,7 +17,7 @@ export function PhotoUploader({label,businessId,multiple=false,maxFiles=1,disabl
     if(!retrySave && files.length>maxFiles){setPhase('failed');setItems([]);setError(`Choose at most ${maxFiles} ${maxFiles===1?'photo':'photos'}. Remove an existing photo to make more room.`);return;}
     controller.current=new AbortController();onBusyChange?.(true);
     try {
-      if(!retrySave){uploaded.current=[];setPhase('uploading');uploaded.current=await uploadBusinessPhotos(files,businessId,{onChange:setItems,signal:controller.current.signal});}
+      if(!retrySave){uploaded.current=[];setPhase('uploading');uploaded.current=await uploadBusinessPhotos(files,businessId,{onChange:setItems,signal:controller.current.signal},enrollment);}
       setPhase('saving');await onUploaded(uploaded.current);uploaded.current=[];setPendingSave(false);setPhase('done');
     } catch(cause){setPendingSave(uploaded.current.length>0);setPhase('failed');setError(cause instanceof Error?cause.message:'The upload failed. Please retry.');}
     finally{controller.current=null;onBusyChange?.(false);}

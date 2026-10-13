@@ -3,6 +3,8 @@ import { prisma } from './prisma';
 import { reminderStage } from './catalog-plan';
 import { sendProPlanEmail } from './mail';
 import { removeUnusedMedia } from './media-storage';
+import { deletePhotosFromR2 } from './r2';
+import { ENROLLMENT_MEDIA_WINDOW_MS } from './enrollment-media';
 
 export async function runPlanMaintenance(now = new Date(), send = sendProPlanEmail, options: {batchSize?:number;budgetMs?:number;signal?:AbortSignal} = {}) {
   const started = Date.now();
@@ -59,6 +61,16 @@ export async function runPlanMaintenance(now = new Date(), send = sendProPlanEma
   for (const asset of unused) {
     if (Date.now() - started > budgetMs || options.signal?.aborted) break;
     try {if (await removeUnusedMedia(asset.id,options.signal)) result.cleaned++;} catch {result.cleanupFailed++;}
+  }
+  // Remove uploads abandoned before the owner submits, after the 24-hour claim window.
+  const expiredStaged=await prisma.enrollmentMedia.findMany({where:{createdAt:{lt:new Date(now.getTime()-ENROLLMENT_MEDIA_WINDOW_MS)}},select:{id:true,url:true},take:batchSize});
+  for(const media of expiredStaged) {
+    if(Date.now()-started>budgetMs || options.signal?.aborted) break;
+    try {
+      await deletePhotosFromR2([media.url],options.signal);
+      await prisma.enrollmentMedia.deleteMany({where:{id:media.id,createdAt:{lt:new Date(now.getTime()-ENROLLMENT_MEDIA_WINDOW_MS)}}});
+      result.cleaned++;
+    } catch {result.cleanupFailed++;}
   }
   return result;
 }

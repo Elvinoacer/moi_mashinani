@@ -29,35 +29,40 @@ async function main() {
     await admin.getByLabel('Email address').fill(context.admin.email);await admin.getByLabel('Password',{exact:true}).fill(context.admin.password);
     await admin.getByRole('button',{name:'Sign in',exact:true}).click();
     await expect(admin.getByRole('heading',{name:'Enroll a business',exact:true})).toBeVisible({timeout:90000});
-    await admin.getByLabel('Owner name *',{exact:true}).fill('Browser Owner');await admin.getByLabel('Owner email *',{exact:true}).fill(ownerEmail);
+    await admin.getByLabel('Owner’s name *',{exact:true}).fill('Browser Owner');
+    await admin.getByLabel('Owner’s email *',{exact:true}).fill(ownerEmail);
+    await admin.getByLabel('Business name *',{exact:true}).fill(shopName);
+    await admin.getByLabel('Business phone *',{exact:true}).fill('0712345678');
     await admin.getByRole('combobox',{name:'Category',exact:true}).selectOption('phone-laptop-repair');
-    await admin.getByLabel('Business name *',{exact:true}).fill(shopName);await admin.getByLabel('Description *',{exact:true}).fill('We repair phones and sell accessories for the campus community.');
-    await admin.getByLabel('Phone number *',{exact:true}).fill('0712345678');await admin.getByLabel('Nearby landmark *',{exact:true}).fill('Across the campus gate');
-    await admin.getByLabel('Product or service name',{exact:true}).fill('Screen diagnosis');await admin.getByLabel('Price from (KES)',{exact:true}).fill('150');
-    const photo = await sharp({create:{width:300,height:200,channels:3,background:'#335e41'}}).png().toBuffer();
-    await admin.getByLabel('Business and product photos',{exact:true}).setInputFiles({name:'shop.png',mimeType:'image/png',buffer:photo});
-    await expect(admin.getByRole('img',{name:'Business photo 1',exact:true})).toBeVisible({timeout:45000});
-    await admin.getByLabel('Product photo',{exact:true}).selectOption({label:'Photo 1 (cover)'});
-    for (const width of [320, 360, 390, 430, 768]) {
-    await admin.setViewportSize({width,height:844});
-    const clippedInputs = await admin.locator('input[type="time"]').evaluateAll((inputs) =>
-    inputs.filter(input => {const rect = input.getBoundingClientRect(); return rect.left < -1 || rect.right > window.innerWidth + 1;})
-    .map(input => input.getAttribute('aria-label')));
-    assert.deepEqual(clippedInputs,[],`Opening hours time inputs clipped at ${width}px`);
+    await admin.getByRole('button',{name:'Continue'}).click();
+    await admin.getByLabel('Nearby landmark (or use location)').fill('Across the campus gate');
+    for(const width of [320,360,390,430,768]){
+      await admin.setViewportSize({width,height:844});
+      const clipped=await admin.locator('input[type="time"]').evaluateAll(inputs=>inputs.filter(input=>{const rect=input.getBoundingClientRect();return rect.left < -1 || rect.right > innerWidth+1;}).map(input=>input.getAttribute('aria-label')));
+      assert.deepEqual(clipped,[],`Opening hour controls clipped at ${width}px`);
     }
-    await expect(admin.getByLabel('Sunday opening time',{exact:true})).toBeDisabled();
     await admin.getByLabel('Sunday closed',{exact:true}).uncheck();
-    await expect(admin.getByLabel('Sunday opening time',{exact:true})).toBeEnabled();
+    await expect(admin.getByLabel('Sunday opening time',{exact:true})).toBeVisible();
     await admin.getByLabel('Sunday closed',{exact:true}).check();
+    await admin.getByRole('button',{name:'Continue'}).click();
+    await admin.getByRole('button',{name:/Screen replacement/}).click();
+    await admin.getByLabel('Product 1 name').fill('Screen diagnosis');
+    await admin.getByLabel('Product 1 price').fill('150');
+    const photo=await sharp({create:{width:300,height:200,channels:3,background:'#335e41'}}).png().toBuffer();
+    await admin.getByLabel('Upload Screen diagnosis photo',{exact:true}).setInputFiles({name:'product.png',mimeType:'image/png',buffer:photo});
+    await expect(admin.getByRole('img',{name:'Screen diagnosis photo'})).toBeVisible({timeout:45000});
+    await admin.getByRole('button',{name:'Continue'}).click();
+    await admin.getByLabel('Business photos',{exact:true}).setInputFiles({name:'shop.png',mimeType:'image/png',buffer:photo});
+    await expect(admin.getByRole('img',{name:'Business photo 1',exact:true})).toBeVisible({timeout:45000});
     await admin.setViewportSize({width:390,height:844});
     await admin.screenshot({path:'/tmp/moimashinani-browser/mobile-enrollment.png',fullPage:true});
-    assert.ok(await admin.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth),'Mobile enrollment has no horizontal overflow');
+    assert.ok(await admin.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'Mobile wizard has no horizontal overflow');
     await admin.getByLabel('I personally verified the premises').check();
     await admin.getByLabel('Owner authorized public listing').check();
-    const enrollmentResponse = admin.waitForResponse(response=>response.url().endsWith('/api/admin/enroll') && response.request().method()==='POST');
+    const enrollmentResponse=admin.waitForResponse(response=>response.url().endsWith('/api/admin/enroll')&&response.request().method()==='POST');
     await admin.getByRole('button',{name:'Enroll business & email owner',exact:true}).click();
-    const enrollment = await (await enrollmentResponse).json();assert.ok(enrollment.invitation.sent);
-    await expect(admin.getByRole('heading',{name:`${shopName} has been enrolled`})).toBeVisible();
+    const enrollment=await (await enrollmentResponse).json();assert.ok(enrollment.invitation.sent);
+    await expect(admin.getByRole('heading',{name:`${shopName} is on its way.`})).toBeVisible();
     const business = enrollment.business;
     await admin.screenshot({path:'/tmp/moimashinani-browser/enrollment-success.png',fullPage:true});
     console.log('PASS browser admin login, field enrollment, gallery/product photo and emailed invitation');

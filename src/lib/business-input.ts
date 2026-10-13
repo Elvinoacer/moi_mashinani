@@ -26,7 +26,7 @@ export function businessInput(body: Record<string, unknown>, partial = false): P
   const result: Partial<Business> = {};
   for (const [key, max] of Object.entries({ name: 120, tagline: 200, description: 6000, landmark: 300, address: 500, walkTime: 80, studentDiscount: 500 })) {
     if (body[key] !== undefined || !partial && ['name','description','landmark'].includes(key)) {
-      const required = !partial && ['name','landmark'].includes(key) || key === 'name';
+      const required = key === 'name';
       Object.assign(result, { [key]: textField(body[key], key, max, required) });
     }
   }

@@ -72,6 +72,17 @@ model Business {
   @@index([proEndsAt])
 }
 
+// Temporary, cookie-scoped photos for unverified registrations. No account is assigned until enrollment.
+model EnrollmentMedia {
+  id String @id @default(uuid())
+  sessionHash String
+  url String @unique
+  bytes Int
+  createdAt DateTime @default(now())
+  @@index([sessionHash, createdAt])
+  @@index([createdAt])
+}
+
 model BusinessAudit {
   id String @id @default(uuid())
   businessId String

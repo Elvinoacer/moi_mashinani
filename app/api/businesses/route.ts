@@ -8,6 +8,7 @@ import { publicBusiness } from '@/lib/business-input';
 import { enrollBusiness } from '@/lib/enrollment';
 import { rateLimit } from '@/lib/rate-limit';
 import { normalizeEmail } from '@/lib/auth';
+import { ENROLLMENT_MEDIA_COOKIE } from '@/lib/enrollment-media';
 
 export async function GET(req: NextRequest) {
   try {
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
     await rateLimit(req,'public-enrollment',30,3600);
     const body = await jsonBody(req);
     await rateLimit(req,'public-enrollment-email',3,3600,normalizeEmail(body.ownerEmail));
-    const result = await enrollBusiness(body);
+    const result = await enrollBusiness(body,false,undefined,req.cookies.get(ENROLLMENT_MEDIA_COOKIE)?.value);
     const response = NextResponse.json({...result,slug:result.business?.slug},{status:201});
     return withNotificationDelivery(response);
   } catch(error) { return apiError(error); }

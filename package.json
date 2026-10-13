@@ -14,6 +14,7 @@
     "admin:create": "tsx scripts/create-admin.ts",
     "test:metrics": "tsx scripts/test-metrics.ts",
     "test:engine": "tsx scripts/test-engine.ts",
+    "test:onboarding:integrity": "tsx scripts/test-onboarding-integrity.ts",
     "test:categories": "tsx --test scripts/test-categories.ts",
     "test:seo": "tsx --test scripts/test-seo.ts",
     "test:catalog": "tsx --test scripts/test-catalog-plan.ts",

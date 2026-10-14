@@ -29,13 +29,17 @@
     "test:payments": "tsx --test scripts/test-payments.ts",
     "test:db": "tsx scripts/test-prisma-db.ts",
     "test:harness": "tsx scripts/test-harness.ts",
-    "test:workflows": "tsx scripts/test-workflows.ts",
-    "test:payment-routes": "tsx scripts/test-payment-routes.ts",
+    "test:workflows": "node --import ./scripts/test-next-scope.mjs --import tsx scripts/test-workflows.ts",
+    "test:payment-routes": "node --import ./scripts/test-next-scope.mjs --import tsx scripts/test-payment-routes.ts",
     "test:browser": "tsx scripts/test-browser.ts",
     "test:notifications": "tsx --test scripts/test-notifications.ts",
     "test:notifications:workflows": "tsx scripts/test-notification-workflows.ts",
     "test:notifications:browser": "tsx scripts/test-notification-browser.ts",
-    "test:admin:deletion": "tsx scripts/test-admin-deletion.ts"
+    "test:admin:deletion": "tsx scripts/test-admin-deletion.ts",
+    "test:value": "tsx scripts/test-value-loops.ts",
+    "test:sms": "tsx --test scripts/test-sms.ts",
+    "test:value:browser": "tsx scripts/test-value-browser.ts",
+    "test:value:unit": "tsx --test scripts/test-campus-value.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

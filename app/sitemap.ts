@@ -1,9 +1,9 @@
-import type { MetadataRoute } from 'next';
-import { Store } from '@/lib/store';
-import { CATEGORIES, SEED_BUSINESSES } from '@/lib/constants';
-import { CATEGORY_GROUPS } from '@/lib/categories';
-import { SITE_URL } from '@/lib/seo';
-import type { Business } from '@/lib/types';
+import type { MetadataRoute } from "next";
+import { Store } from "@/lib/store";
+import { CATEGORIES, SEED_BUSINESSES } from "@/lib/constants";
+import { CATEGORY_GROUPS } from "@/lib/categories";
+import { SITE_URL } from "@/lib/seo";
+import type { Business } from "@/lib/types";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -11,13 +11,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Load all businesses safely (merging database and verified seed directory listings)
   const businessMap = new Map<string, Business>();
   for (const b of SEED_BUSINESSES) {
-    if (b.status === 'ACTIVE') businessMap.set(b.slug, b);
+    if (b.status === "ACTIVE") businessMap.set(b.slug, b);
   }
 
   try {
     const list = await Store.getBusinesses();
     for (const b of list) {
-      if (b.status === 'ACTIVE') businessMap.set(b.slug, b);
+      if (b.status === "ACTIVE") businessMap.set(b.slug, b);
     }
   } catch {
     // Database unreachable during static builds: seed businesses retained
@@ -28,34 +28,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Core static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
+      url: `${SITE_URL}/requests`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
       url: SITE_URL,
       lastModified: now,
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 1.0,
       images: [`${SITE_URL}/brand/og-image.png`],
     },
     {
       url: `${SITE_URL}/categories`,
       lastModified: now,
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/deals`,
       lastModified: now,
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/search`,
       lastModified: now,
-      changeFrequency: 'daily',
+      changeFrequency: "daily",
       priority: 0.85,
     },
     {
       url: `${SITE_URL}/onboard`,
       lastModified: now,
-      changeFrequency: 'monthly',
+      changeFrequency: "monthly",
       priority: 0.8,
     },
   ];
@@ -64,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const groupPages: MetadataRoute.Sitemap = CATEGORY_GROUPS.map((group) => ({
     url: `${SITE_URL}/c/${group.slug}`,
     lastModified: now,
-    changeFrequency: 'weekly',
+    changeFrequency: "weekly",
     priority: 0.88,
   }));
 
@@ -72,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
     url: `${SITE_URL}/c/${cat.slug}`,
     lastModified: now,
-    changeFrequency: 'weekly',
+    changeFrequency: "weekly",
     priority: 0.85,
   }));
 
@@ -87,20 +93,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!isNaN(parsed.getTime())) bizDate = parsed;
     }
 
-    const rawPhotos = Array.from(new Set([biz.coverPhoto, ...(biz.photos || [])].filter(Boolean)));
+    const rawPhotos = Array.from(
+      new Set([biz.coverPhoto, ...(biz.photos || [])].filter(Boolean)),
+    );
     const photoUrls = rawPhotos
-      .map((p) => (p.startsWith('http') ? p : `${SITE_URL}${p}`))
+      .map((p) => (p.startsWith("http") ? p : `${SITE_URL}${p}`))
       .slice(0, 6);
 
     return {
       url: `${SITE_URL}/b/${biz.slug}`,
       lastModified: bizDate,
-      changeFrequency: 'weekly',
-      priority: biz.activeTier === 'FEATURED' ? 0.9 : biz.activeTier === 'RECOMMENDED' ? 0.85 : 0.8,
+      changeFrequency: "weekly",
+      priority:
+        biz.activeTier === "FEATURED"
+          ? 0.9
+          : biz.activeTier === "RECOMMENDED"
+            ? 0.85
+            : 0.8,
       ...(photoUrls.length > 0 ? { images: photoUrls } : {}),
     };
   });
 
   return [...staticPages, ...groupPages, ...categoryPages, ...businessPages];
 }
-

@@ -1,15 +1,17 @@
-'use client';
+"use client";
+import { CATEGORIES } from "@/lib/constants";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { BusinessCard } from '@/components/BusinessCard';
-import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
-import { Business, Category } from '@/lib/types';
-import { CategoryIcon, Store } from '@/components/icons';
-import { useNow } from '@/lib/useNow';
+import { DemandModal } from "@/components/DemandModal";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
+import { BusinessCard } from "@/components/BusinessCard";
+import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
+import { Business, Category } from "@/lib/types";
+import { CategoryIcon, Store } from "@/components/icons";
+import { useNow } from "@/lib/useNow";
 
 interface CategoryPageClientProps {
   categorySlug: string;
@@ -27,30 +29,42 @@ export function CategoryPageClient({
   popularSearches = [],
 }: CategoryPageClientProps) {
   const now = useNow();
-  const [businesses, setBusinesses] = useState<Business[]>(initialBusinesses ?? []);
+  const [businesses, setBusinesses] = useState<Business[]>(
+    initialBusinesses ?? [],
+  );
   const [loading, setLoading] = useState(initialBusinesses === undefined);
-  const [error, setError] = useState('');
+  const [demandOpen, setDemandOpen] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (initialBusinesses !== undefined) return;
 
     const controller = new AbortController();
-    fetch(`/api/businesses?category=${encodeURIComponent(categorySlug)}`, { signal: controller.signal })
+    fetch(`/api/businesses?category=${encodeURIComponent(categorySlug)}`, {
+      signal: controller.signal,
+    })
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Could not load businesses. Please reload.');
+        if (!response.ok)
+          throw new Error(
+            data.error || "Could not load businesses. Please reload.",
+          );
         return data;
       })
       .then((data) => {
         if (!controller.signal.aborted) {
           setBusinesses(data.results || []);
-          setError('');
+          setError("");
           setLoading(false);
         }
       })
       .catch((cause) => {
         if (!controller.signal.aborted) {
-          setError(cause instanceof Error ? cause.message : 'Connection error. Please reload.');
+          setError(
+            cause instanceof Error
+              ? cause.message
+              : "Connection error. Please reload.",
+          );
           setLoading(false);
         }
       });
@@ -66,16 +80,26 @@ export function CategoryPageClient({
         <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-5 md:p-8 flex items-start gap-4">
           <div
             className="w-14 h-14 md:w-16 md:h-16 rounded-xl border border-[#dfe5d8] flex items-center justify-center shrink-0"
-            style={{ backgroundColor: `${categoryObj.color}15`, color: categoryObj.color }}
+            style={{
+              backgroundColor: `${categoryObj.color}15`,
+              color: categoryObj.color,
+            }}
           >
             <CategoryIcon slug={categoryObj.slug} className="w-8 h-8" />
           </div>
 
           <div>
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase">
-              <Link href="/" className="hover:underline">Home</Link>
+            <nav
+              aria-label="Breadcrumb"
+              className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase"
+            >
+              <Link href="/" className="hover:underline">
+                Home
+              </Link>
               <span>/</span>
-              <Link href="/categories" className="hover:underline">Categories</Link>
+              <Link href="/categories" className="hover:underline">
+                Categories
+              </Link>
               <span>/</span>
               <span className="text-[#243b32]">{categoryObj.name}</span>
             </nav>
@@ -83,7 +107,8 @@ export function CategoryPageClient({
               {categoryObj.name} around Moi University
             </h1>
             <p className="text-sm text-[#667064] mt-1 max-w-2xl font-body">
-              {categoryObj.description} Direct WhatsApp and phone contact for students and staff in Kesses.
+              {categoryObj.description} Direct WhatsApp and phone contact for
+              students and staff in Kesses.
             </p>
           </div>
         </section>
@@ -92,7 +117,9 @@ export function CategoryPageClient({
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display font-bold text-lg md:text-xl text-[#243b32] uppercase">
-              {loading ? 'Finding shops...' : `${businesses.length} verified listings in Kesses`}
+              {loading
+                ? "Finding shops..."
+                : `${businesses.length} verified listings in Kesses`}
             </h2>
             <Link
               href={`/search?category=${categorySlug}`}
@@ -103,20 +130,30 @@ export function CategoryPageClient({
           </div>
 
           {error ? (
-            <p role="alert" className="rounded-xl bg-white p-5 text-sm text-[#a7302d]">{error}</p>
+            <p
+              role="alert"
+              className="rounded-xl bg-white p-5 text-sm text-[#a7302d]"
+            >
+              {error}
+            </p>
           ) : loading ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse" />
+                <div
+                  key={i}
+                  className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"
+                />
               ))}
             </div>
           ) : businesses.length > 0 ? (
             (() => {
               const featuredInCat = businesses.filter(
-                (b) => b.activeTier === 'FEATURED' && (!b.tierEndsAt || new Date(b.tierEndsAt).getTime() > now)
+                (b) =>
+                  b.activeTier === "FEATURED" &&
+                  (!b.tierEndsAt || new Date(b.tierEndsAt).getTime() > now),
               );
               const otherBusinesses = businesses.filter(
-                (b) => !featuredInCat.some((f) => f.id === b.id)
+                (b) => !featuredInCat.some((f) => f.id === b.id),
               );
 
               return (
@@ -143,7 +180,8 @@ export function CategoryPageClient({
                     <div className="space-y-3">
                       {featuredInCat.length > 0 && (
                         <h3 className="text-xs font-bold uppercase tracking-wider text-[#667064]">
-                          All {categoryObj.name} in Kesses ({otherBusinesses.length})
+                          All {categoryObj.name} in Kesses (
+                          {otherBusinesses.length})
                         </h3>
                       )}
                       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -163,7 +201,7 @@ export function CategoryPageClient({
                 No businesses listed in this category yet!
               </h3>
               <p className="text-sm text-[#667064] font-body">
-                Be the first to list your business here for free.
+                Ask for what you need while we add providers in this category.
               </p>
               <Link
                 href="/onboard"
@@ -175,6 +213,32 @@ export function CategoryPageClient({
           )}
         </section>
 
+        <section className="ui-card space-y-3">
+          <h2 className="text-lg font-bold">
+            Can’t find what you need in {categoryObj.name}?
+          </h2>
+          <p className="text-sm">
+            Post your item, budget and preferred time. Verified sellers can
+            reply.
+          </p>
+          <button
+            className="ui-button ui-button-primary"
+            onClick={() => setDemandOpen(true)}
+          >
+            Post a request
+          </button>
+        </section>
+        {demandOpen && (
+          <DemandModal
+            initialCategory={
+              CATEGORIES.some((c) => c.slug === categorySlug)
+                ? categorySlug
+                : ""
+            }
+            initialQuery={`Looking for ${categoryObj.name.toLowerCase()}: `}
+            onClose={() => setDemandOpen(false)}
+          />
+        )}
         {/* SEO CAMPUS GUIDE & LOCAL KEYWORD ENRICHMENT */}
         <section className="bg-white border border-[#dfe5d8] rounded-2xl p-6 md:p-8 space-y-6">
           <div className="space-y-2">
@@ -182,7 +246,52 @@ export function CategoryPageClient({
               Campus Neighborhood Guide: {categoryObj.name} in Kesses
             </h2>
             <p className="text-sm text-[#4a584e] leading-relaxed">
-              Looking for {categoryObj.name.toLowerCase()} around Moi University Main Campus? MoiMashinani connects students, lecturers and residents directly with local providers across all campus zones. Whether you live in <Link href={`/search?category=${categorySlug}&zone=soweto`} className="font-bold underline text-[#335e41] hover:text-[#183e35]">Soweto</Link>, <Link href={`/search?category=${categorySlug}&zone=cheboiywo`} className="font-bold underline text-[#335e41] hover:text-[#183e35]">Cheboiywo</Link>, <Link href={`/search?category=${categorySlug}&zone=stage`} className="font-bold underline text-[#335e41] hover:text-[#183e35]">Stage</Link>, <Link href={`/search?category=${categorySlug}&zone=talai`} className="font-bold underline text-[#335e41] hover:text-[#183e35]">Talai</Link>, or right next to <Link href={`/search?category=${categorySlug}&zone=main-gate`} className="font-bold underline text-[#335e41] hover:text-[#183e35]">Main Gate</Link> and <Link href={`/search?category=${categorySlug}&zone=kesses-centre`} className="font-bold underline text-[#335e41] hover:text-[#183e35]">Kesses Centre</Link>, find service hours, transparent pricing, and instant contact.
+              Looking for {categoryObj.name.toLowerCase()} around Moi University
+              Main Campus? MoiMashinani connects students, lecturers and
+              residents directly with local providers across all campus zones.
+              Whether you live in{" "}
+              <Link
+                href={`/search?category=${categorySlug}&zone=soweto`}
+                className="font-bold underline text-[#335e41] hover:text-[#183e35]"
+              >
+                Soweto
+              </Link>
+              ,{" "}
+              <Link
+                href={`/search?category=${categorySlug}&zone=cheboiywo`}
+                className="font-bold underline text-[#335e41] hover:text-[#183e35]"
+              >
+                Cheboiywo
+              </Link>
+              ,{" "}
+              <Link
+                href={`/search?category=${categorySlug}&zone=stage`}
+                className="font-bold underline text-[#335e41] hover:text-[#183e35]"
+              >
+                Stage
+              </Link>
+              ,{" "}
+              <Link
+                href={`/search?category=${categorySlug}&zone=talai`}
+                className="font-bold underline text-[#335e41] hover:text-[#183e35]"
+              >
+                Talai
+              </Link>
+              , or right next to{" "}
+              <Link
+                href={`/search?category=${categorySlug}&zone=main-gate`}
+                className="font-bold underline text-[#335e41] hover:text-[#183e35]"
+              >
+                Main Gate
+              </Link>{" "}
+              and{" "}
+              <Link
+                href={`/search?category=${categorySlug}&zone=kesses-centre`}
+                className="font-bold underline text-[#335e41] hover:text-[#183e35]"
+              >
+                Kesses Centre
+              </Link>
+              , find service hours, transparent pricing, and instant contact.
             </p>
           </div>
 

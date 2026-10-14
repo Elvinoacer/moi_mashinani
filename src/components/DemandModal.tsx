@@ -1,137 +1,164 @@
-'use client';
-
-import React, { useState } from 'react';
-import { ZONES } from '@/lib/constants';
-import { CheckCircle2 } from '@/components/icons';
-import { ModalFrame } from '@/components/ModalFrame';
-
-interface DemandModalProps {
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { ZONES, CATEGORIES } from "@/lib/constants";
+import { ModalFrame } from "./ModalFrame";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
+export function DemandModal({
+  initialQuery = "",
+  initialCategory = "",
+  initialZone = "all",
+  onClose,
+  onPosted,
+}: {
   initialQuery?: string;
+  initialCategory?: string;
+  initialZone?: string;
   onClose: () => void;
-}
-
-export function DemandModal({ initialQuery = '', onClose }: DemandModalProps) {
+  onPosted?: () => void;
+}) {
   const [query, setQuery] = useState(initialQuery);
-  const [zone, setZone] = useState('kesses-centre');
-  const [phone, setPhone] = useState('');
+  const [zone, setZone] = useState(initialZone);
+  const [category, setCategory] = useState(initialCategory);
+  const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    if (loading) return;
-    setError('');
-    setLoading(true);
-
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError("");
     try {
-      const response = await fetch('/api/demand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/demand", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          query: query.trim(),
+          query,
           zone,
-          contactPhone: phone.trim() || undefined,
+          category,
+          contactPhone: phone || undefined,
+          contactConsent: consent,
         }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Could not submit your request. Please try again.');
+      if (!response.ok) throw new Error(data.error || "Could not post.");
+      try {
+        const receipts = JSON.parse(
+          localStorage.getItem("mm-request-receipts") || "{}",
+        );
+        receipts[data.id] = data.manageToken;
+        localStorage.setItem("mm-request-receipts", JSON.stringify(receipts));
+      } catch {
+        /* Posting works with storage disabled. */
+      }
       setSubmitted(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Connection error. Please try again.');
+      onPosted?.();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Connection error.");
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
-  };
-
+  }
   return (
-    <ModalFrame title={'Tell us what you need'} onClose={onClose}>
-        {submitted ? (
-          <div className="p-6 text-center space-y-3">
-            <CheckCircle2 className="w-12 h-12 text-[#335e41] mx-auto" />
-            <h3 className="font-display font-bold text-xl text-[#243b32]">Got It!</h3>
-            <p className="text-sm text-[#667064]">
-              Your request has been saved. Our team can use it to find providers around campus.
-            </p>
-            <button
-              onClick={onClose}
-              className="mt-4 bg-[#243b32] text-white px-6 py-2 rounded-full font-bold text-sm signboard-border press-action"
+    <ModalFrame title="Post a comrade request" onClose={onClose}>
+      {submitted ? (
+        <div className="space-y-4 p-6">
+          <h3 className="text-xl font-bold">Your request is on the board</h3>
+          <p>
+            Matching verified sellers are notified. The request expires after
+            seven days. You can close it sooner from this browser.
+          </p>
+          <Link
+            href="/requests"
+            className="ui-button ui-button-primary"
+            onClick={onClose}
+          >
+            View requests
+          </Link>
+          <Button variant="secondary" onClick={onClose}>
+            Done
+          </Button>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="space-y-4 p-5">
+          <p className="text-sm">
+            No login needed. Describe the item, budget and when you need it.
+            Keep phone numbers and private details out of the public request.
+          </p>
+          <label className="block text-sm font-semibold">
+            What do you need?
+            <Input
+              required
+              maxLength={500}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="HP blue-pin charger under KES 1,200 today"
+            />
+          </label>
+          <label className="block text-sm font-semibold">
+            Category
+            <select
+              className="ui-input"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             >
-              Done
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
-            {error && <p role="alert" className="rounded bg-[#fce7e1] p-3 text-sm text-[#a7302d]">{error}</p>}
-            <p className="text-xs text-[#667064]">
-              If you couldn&apos;t find a specific fundi, service, or product near campus, tell us. Our ambassadors onboard new shops every week.
-            </p>
-
-            <div>
-              <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
-                What do you need?
-              </label>
+              <option value="">Match by request text</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm font-semibold">
+            Campus zone
+            <select
+              className="ui-input"
+              value={zone}
+              onChange={(e) => setZone(e.target.value)}
+            >
+              {ZONES.map((z) => (
+                <option key={z.slug} value={z.slug}>
+                  {z.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm font-semibold">
+            Your WhatsApp (optional)
+            <Input
+              type="tel"
+              maxLength={20}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="0712 345 678"
+            />
+          </label>
+          {phone && (
+            <label className="flex gap-2 text-sm">
               <input
-                type="text"
+                type="checkbox"
                 required
-                maxLength={200}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="e.g. Electrician, Dentist, PS5 Lounge, Watch repair..."
-                className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
-                Preferred Campus Zone
-              </label>
-              <select
-                value={zone}
-                onChange={(e) => setZone(e.target.value)}
-                className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
-              >
-                {ZONES.filter((z) => z.slug !== 'all').map((z) => (
-                  <option key={z.slug} value={z.slug}>
-                    {z.name} ({z.landmarkHint})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-[#243b32] uppercase mb-1">
-                Your WhatsApp Number (Optional)
-              </label>
-              <input
-                type="tel"
-                maxLength={20}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="07XX XXX XXX (We'll notify you when listed)"
-                className="w-full bg-[#e9eedf] signboard-border rounded px-3 py-2 text-sm text-[#243b32] focus:outline-none"
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-3 pt-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-bold text-[#667064]"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-[#183e35] hover:bg-[#335e41] text-white font-display font-bold text-sm uppercase px-5 py-2.5 rounded-full signboard-border signboard-shadow press-action"
-              >
-                {loading ? 'Submitting...' : 'Send Request'}
-              </button>
-            </div>
-          </form>
-        )}
+              Allow active, verified sellers to access my WhatsApp number to
+              answer this request. It stays hidden on the public board.
+            </label>
+          )}
+          {error && (
+            <p role="alert" className="text-red-800">
+              {error}
+            </p>
+          )}
+          <Button type="submit" disabled={busy}>
+            {busy ? "Posting…" : "Post request"}
+          </Button>
+        </form>
+      )}
     </ModalFrame>
   );
 }

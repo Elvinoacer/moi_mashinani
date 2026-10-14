@@ -1,16 +1,18 @@
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { Store } from '@/lib/store';
-import { CATEGORIES, SEED_BUSINESSES } from '@/lib/constants';
-import { categoryMatches } from '@/lib/categories';
+import { publicBusiness } from "@/lib/business-input";
+import { connection } from "next/server";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { Store } from "@/lib/store";
+import { CATEGORIES, SEED_BUSINESSES } from "@/lib/constants";
+import { categoryMatches } from "@/lib/categories";
 import {
   getBusinessSeoData,
   generateBreadcrumbSchema,
   generateLocalBusinessSchema,
   safeJsonLd,
-} from '@/lib/seo';
-import type { Business } from '@/lib/types';
-import { BusinessProfileClient } from './BusinessProfileClient';
+} from "@/lib/seo";
+import type { Business } from "@/lib/types";
+import { BusinessProfileClient } from "./BusinessProfileClient";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -19,7 +21,7 @@ interface PageProps {
 async function fetchBusiness(slug: string): Promise<Business | undefined> {
   try {
     const business = await Store.getBusinessBySlug(slug);
-    if (business) return business;
+    if (business) return business.status === "ACTIVE" ? business : undefined;
   } catch {
     // Database fallback
   }
@@ -27,7 +29,11 @@ async function fetchBusiness(slug: string): Promise<Business | undefined> {
 }
 
 async function fetchSimilarBusinesses(business: Business): Promise<Business[]> {
-  if (business.activeTier === 'FEATURED' && (!business.tierEndsAt || new Date(business.tierEndsAt).getTime() > Date.now())) {
+  if (
+    business.activeTier === "FEATURED" &&
+    (!business.tierEndsAt ||
+      new Date(business.tierEndsAt).getTime() > Date.now())
+  ) {
     return [];
   }
   const category = business.primaryCategory;
@@ -44,9 +50,9 @@ async function fetchSimilarBusinesses(business: Business): Promise<Business[]> {
 
   const primaryMatches = all.filter(
     (b) =>
-      b.status === 'ACTIVE' &&
+      b.status === "ACTIVE" &&
       b.id !== currentId &&
-      (b.primaryCategory === category || b.extraCategories.includes(category))
+      (b.primaryCategory === category || b.extraCategories.includes(category)),
   );
 
   if (primaryMatches.length >= 3) {
@@ -57,29 +63,33 @@ async function fetchSimilarBusinesses(business: Business): Promise<Business[]> {
   const groupMatches = groupSlug
     ? all.filter(
         (b) =>
-          b.status === 'ACTIVE' &&
+          b.status === "ACTIVE" &&
           b.id !== currentId &&
           !primaryMatches.some((pm) => pm.id === b.id) &&
-          categoryMatches(b, groupSlug)
+          categoryMatches(b, groupSlug),
       )
     : [];
 
   return [...primaryMatches, ...groupMatches].slice(0, 3);
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  await connection();
   const { slug } = await params;
   const business = await fetchBusiness(slug);
 
   if (!business) {
     return {
-      title: 'Business Not Found | MoiMashinani',
-      description: 'Campus business profile not found on MoiMashinani.',
+      title: "Business Not Found | MoiMashinani",
+      description: "Campus business profile not found on MoiMashinani.",
       robots: { index: false, follow: true },
     };
   }
 
-  const { title, description, keywords, coverImage } = getBusinessSeoData(business);
+  const { title, description, keywords, coverImage } =
+    getBusinessSeoData(business);
 
   return {
     title,
@@ -92,8 +102,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url: `/b/${business.slug}`,
-      siteName: 'MoiMashinani',
-      type: 'profile',
+      siteName: "MoiMashinani",
+      type: "profile",
       images: [
         {
           url: coverImage,
@@ -104,7 +114,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title,
       description,
       images: [coverImage],
@@ -113,6 +123,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function BusinessProfilePage({ params }: PageProps) {
+  await connection();
   const { slug } = await params;
   const business = await fetchBusiness(slug);
 
@@ -121,10 +132,12 @@ export default async function BusinessProfilePage({ params }: PageProps) {
   }
 
   const similarBusinesses = await fetchSimilarBusinesses(business);
-  const categoryName = CATEGORIES.find((c) => c.slug === business.primaryCategory)?.name || business.primaryCategory.replace(/-/g, ' ');
+  const categoryName =
+    CATEGORIES.find((c) => c.slug === business.primaryCategory)?.name ||
+    business.primaryCategory.replace(/-/g, " ");
 
   const breadcrumbsSchema = generateBreadcrumbSchema([
-    { name: 'Home', url: '/' },
+    { name: "Home", url: "/" },
     { name: categoryName, url: `/c/${business.primaryCategory}` },
     { name: business.name, url: `/b/${business.slug}` },
   ]);
@@ -143,10 +156,9 @@ export default async function BusinessProfilePage({ params }: PageProps) {
       />
       <BusinessProfileClient
         slug={slug}
-        initialBusiness={business}
-        initialSimilar={similarBusinesses}
+        initialBusiness={publicBusiness(business)}
+        initialSimilar={similarBusinesses.map(publicBusiness)}
       />
     </>
   );
 }
-

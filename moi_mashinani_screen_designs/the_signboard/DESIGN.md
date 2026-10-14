@@ -204,3 +204,7 @@ The shape system adopts a sturdy, slightly softened geometry (`0.25rem` radius) 
 
 ### Checkboxes & Filters
 - Compact squares with `1.5px solid #0B2545`. Checked state filled with Bougainvillea `#C2185B` and a solid white checkmark graphic. Zero blur on focus outlines.
+
+## Current implementation tokens
+
+The production application has since adopted Manrope and a forest/paper palette. Those current tokens, rather than the earlier reference palette above, are the source of truth for subsequent screens: `--primary` (#183e35), `--midnight` (#243b32), `--paper` (#ffffff), `--chalk` (#f7f8f2), `--line` (#dfe5d8), `--jua` (#d9f279), `--radius-card` and `--elevation-card` in `app/globals.css`. Tailwind maps these through the `campus-*` theme values. Button, Badge, Card and Input primitives use the same tokens. Featured advertising retains its yellow accent, WhatsApp retains its green action and outdoor fieldwork uses white with #0f172a text and 52px primary actions. The historical prototype above remains a reference, not a second live theme.

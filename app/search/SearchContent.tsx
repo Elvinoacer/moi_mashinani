@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { BusinessCard } from '@/components/BusinessCard';
-import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
-import { DemandModal } from '@/components/DemandModal';
-import { CATEGORIES, ZONES } from '@/lib/constants';
-import { CategorySelect } from '@/components/CategorySelect';
-import { Business, Tier } from '@/lib/types';
-import { Search, AlertCircle, Info, X } from '@/components/icons';
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
+import { BusinessCard } from "@/components/BusinessCard";
+import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
+import { DemandModal } from "@/components/DemandModal";
+import { CATEGORIES, ZONES } from "@/lib/constants";
+import { CategorySelect } from "@/components/CategorySelect";
+import { Business, Tier } from "@/lib/types";
+import { Search, AlertCircle, Info, X } from "@/components/icons";
 
 interface SearchResultItem extends Business {
   effectiveTier?: Tier;
@@ -22,17 +22,23 @@ export function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const queryParam = searchParams.get('q') || '';
-  const zoneParam = searchParams.get('zone') || 'all';
-  const categoryParam = searchParams.get('category') || '';
-  const availableNowParam = searchParams.get('availableNow') === 'true';
-  const verifiedParam = searchParams.get('verified') === 'true';
-  const discountParam = searchParams.get('discount') === 'true';
-  const sortParam = searchParams.get('sort') || 'best_match';
+  const queryParam = searchParams.get("q") || "";
+  const zoneParam = searchParams.get("zone") || "all";
+  const categoryParam = searchParams.get("category") || "";
+  const availableNowParam = searchParams.get("availableNow") === "true";
+  const verifiedParam = searchParams.get("verified") === "true";
+  const deliveryParam = searchParams.get("delivery") === "true";
+  const maxPriceParam = searchParams.get("maxPrice") || "";
+  const discountParam = searchParams.get("discount") === "true";
+  const sortParam = searchParams.get("sort") || "best_match";
 
-  const [searchDraft, setSearchDraft] = useState<{ query: string; text: string } | null>(null);
-  const searchInput = searchDraft?.query === queryParam ? searchDraft.text : queryParam;
-  const [error, setError] = useState('');
+  const [searchDraft, setSearchDraft] = useState<{
+    query: string;
+    text: string;
+  } | null>(null);
+  const searchInput =
+    searchDraft?.query === queryParam ? searchDraft.text : queryParam;
+  const [error, setError] = useState("");
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [demandModalOpen, setDemandModalOpen] = useState(false);
@@ -44,19 +50,26 @@ export function SearchContent() {
     fetch(`/api/businesses?${params.toString()}`, { signal: controller.signal })
       .then(async (res) => {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Could not load search results. Please try again.');
+        if (!res.ok)
+          throw new Error(
+            data.error || "Could not load search results. Please try again.",
+          );
         return data;
       })
       .then((data) => {
         if (!controller.signal.aborted) {
           setResults(data.results || []);
-          setError('');
+          setError("");
           setLoading(false);
         }
       })
       .catch((err) => {
         if (!controller.signal.aborted) {
-          setError(err instanceof Error ? err.message : 'Connection error. Please try again.');
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Connection error. Please try again.",
+          );
           setLoading(false);
         }
       });
@@ -66,7 +79,7 @@ export function SearchContent() {
   const updateFilters = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([k, v]) => {
-      if (v === null || v === '' || v === 'all') params.delete(k);
+      if (v === null || v === "" || v === "all") params.delete(k);
       else params.set(k, v);
     });
     router.replace(`/search?${params.toString()}`, { scroll: false });
@@ -82,11 +95,18 @@ export function SearchContent() {
 
   const clearAllFilters = () => {
     setSearchDraft(null);
-    router.replace('/search', { scroll: false });
+    router.replace("/search", { scroll: false });
   };
 
   const hasActiveFilters = Boolean(
-    queryParam || zoneParam !== 'all' || categoryParam || availableNowParam || verifiedParam || discountParam
+    queryParam ||
+    zoneParam !== "all" ||
+    categoryParam ||
+    availableNowParam ||
+    verifiedParam ||
+    discountParam ||
+    deliveryParam ||
+    maxPriceParam,
   );
 
   return (
@@ -95,20 +115,31 @@ export function SearchContent() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20 md:pb-12">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase">
-          <Link href="/" className="hover:underline">Home</Link>
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase"
+        >
+          <Link href="/" className="hover:underline">
+            Home
+          </Link>
           <span>/</span>
           <span className="text-[#243b32]">Search Directory</span>
         </nav>
 
         {/* SEARCH BAR & QUICK FILTERS HERO */}
         <section className="bg-white signboard-border signboard-shadow-sm rounded-2xl p-4 sm:p-6 space-y-4">
-          <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="relative flex items-center"
+          >
             <Search className="w-5 h-5 text-[#758071] absolute left-4" />
             <input
               type="text"
               value={searchInput}
-              onChange={(e) => setSearchDraft({ query: queryParam, text: e.target.value })}
+              onChange={(e) =>
+                setSearchDraft({ query: queryParam, text: e.target.value })
+              }
+              aria-label="Search products or services"
               placeholder="Search phone repair, chapo, salon, cyber, kibanda..."
               className="w-full pl-12 pr-24 py-3 bg-[#f7f8f2] border border-[#dfe5d8] rounded-xl text-[#243b32] text-sm md:text-base font-body focus:outline-none focus:ring-2 focus:ring-[#183e35]"
             />
@@ -116,8 +147,8 @@ export function SearchContent() {
               <button
                 type="button"
                 onClick={() => {
-                  setSearchDraft({ query: queryParam, text: '' });
-                  updateFilters({ q: '' });
+                  setSearchDraft({ query: queryParam, text: "" });
+                  updateFilters({ q: "" });
                 }}
                 className="absolute right-20 text-xs text-[#758071] hover:text-[#243b32]"
               >
@@ -155,14 +186,40 @@ export function SearchContent() {
               />
             </div>
 
+            <label className="text-xs font-bold">
+              Budget cap · KES
+              <input
+                className="ui-input w-28"
+                type="number"
+                min="0"
+                value={maxPriceParam}
+                aria-label="Maximum price"
+                onChange={(e) =>
+                  updateFilters({ maxPrice: e.target.value || null })
+                }
+              />
+            </label>
+            <button
+              className="ui-button ui-button-secondary"
+              aria-pressed={deliveryParam}
+              onClick={() =>
+                updateFilters({ delivery: deliveryParam ? null : "true" })
+              }
+            >
+              Hostel delivery
+            </button>
             {/* Toggles */}
             <button
               type="button"
-              onClick={() => updateFilters({ availableNow: availableNowParam ? null : 'true' })}
+              onClick={() =>
+                updateFilters({
+                  availableNow: availableNowParam ? null : "true",
+                })
+              }
               className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 availableNowParam
-                  ? 'bg-[#183e35] text-white border-[#183e35]'
-                  : 'bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]'
+                  ? "bg-[#183e35] text-white border-[#183e35]"
+                  : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
               }`}
             >
               🟢 Open Now
@@ -170,11 +227,13 @@ export function SearchContent() {
 
             <button
               type="button"
-              onClick={() => updateFilters({ verified: verifiedParam ? null : 'true' })}
+              onClick={() =>
+                updateFilters({ verified: verifiedParam ? null : "true" })
+              }
               className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 verifiedParam
-                  ? 'bg-[#183e35] text-white border-[#183e35]'
-                  : 'bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]'
+                  ? "bg-[#183e35] text-white border-[#183e35]"
+                  : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
               }`}
             >
               🛡️ Team Verified (L2)
@@ -182,11 +241,13 @@ export function SearchContent() {
 
             <button
               type="button"
-              onClick={() => updateFilters({ discount: discountParam ? null : 'true' })}
+              onClick={() =>
+                updateFilters({ discount: discountParam ? null : "true" })
+              }
               className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 discountParam
-                  ? 'bg-[#183e35] text-white border-[#183e35]'
-                  : 'bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]'
+                  ? "bg-[#183e35] text-white border-[#183e35]"
+                  : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
               }`}
             >
               🏷️ Student Deals
@@ -209,11 +270,14 @@ export function SearchContent() {
           <div>
             <h1 className="font-display font-black text-xl md:text-2xl text-[#243b32] uppercase tracking-tight">
               {loading ? (
-                'Searching campus directory...'
+                "Searching campus directory..."
               ) : (
                 <>
-                  {results.length} {results.length === 1 ? 'business found' : 'businesses found'}
-                  {activeZoneObj && activeZoneObj.slug !== 'all' && ` around ${activeZoneObj.name}`}
+                  {results.length}{" "}
+                  {results.length === 1 ? "business found" : "businesses found"}
+                  {activeZoneObj &&
+                    activeZoneObj.slug !== "all" &&
+                    ` around ${activeZoneObj.name}`}
                   {activeCategoryObj && ` in ${activeCategoryObj.name}`}
                   {queryParam && ` for "${queryParam}"`}
                 </>
@@ -229,6 +293,9 @@ export function SearchContent() {
               className="bg-white border border-[#dfe5d8] rounded-lg px-2.5 py-1 font-bold text-[#243b32] focus:outline-none"
             >
               <option value="best_match">Recommended & Best Match</option>
+              <option value="price">
+                Lowest listed price (paid spots first)
+              </option>
               <option value="nearest">Nearest to Gate</option>
               <option value="alphabetical">Name (A-Z)</option>
             </select>
@@ -249,7 +316,9 @@ export function SearchContent() {
         {error && (
           <div className="bg-white signboard-border rounded-xl p-6 text-center space-y-3">
             <AlertCircle className="w-8 h-8 text-[#a7302d] mx-auto" />
-            <h3 className="font-display font-bold text-base text-[#243b32]">{error}</h3>
+            <h3 className="font-display font-bold text-base text-[#243b32]">
+              {error}
+            </h3>
             <button
               onClick={() => updateFilters({})}
               className="text-xs bg-[#243b32] text-white px-4 py-2 rounded-full uppercase font-bold"
@@ -263,7 +332,10 @@ export function SearchContent() {
         {loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse" />
+              <div
+                key={i}
+                className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"
+              />
             ))}
           </div>
         )}
@@ -272,7 +344,12 @@ export function SearchContent() {
         {!loading && !error && results.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {results.map((biz) => (
-              <BusinessCard key={biz.id} business={biz} effectiveTier={biz.effectiveTier} />
+              <BusinessCard
+                key={biz.id}
+                business={biz}
+                query={queryParam}
+                effectiveTier={biz.effectiveTier}
+              />
             ))}
           </div>
         )}
@@ -289,7 +366,9 @@ export function SearchContent() {
                 No matching shops found
               </h2>
               <p className="text-sm text-[#667064] font-body">
-                We couldn&apos;t find any businesses matching your search. Can&apos;t find what you need around campus? Tell us and we will find a fundi or shop to list!
+                We couldn&apos;t find any businesses matching your search.
+                Can&apos;t find what you need around campus? Tell us and we will
+                find a fundi or shop to list!
               </p>
             </div>
 
@@ -340,19 +419,28 @@ export function SearchContent() {
             </div>
             <div className="p-4 md:p-6 text-sm text-[#243b32] space-y-3 leading-relaxed">
               <p>
-                <strong>1. Relevance First:</strong> A business only appears if it genuinely offers what you searched for (phone technician, braids, cyber, etc.). Paying cannot make an irrelevant shop show up.
+                <strong>1. Relevance First:</strong> A business only appears if
+                it genuinely offers what you searched for (phone technician,
+                braids, cyber, etc.). Paying cannot make an irrelevant shop show
+                up.
               </p>
               <p>
-                <strong>2. Featured Tier:</strong> Guaranteed top placement in the top block of relevant results with a bright Jua Sun Yellow border.
+                <strong>2. Featured Tier:</strong> Guaranteed top placement in
+                the top block of relevant results with a bright Jua Sun Yellow
+                border.
               </p>
               <p>
-                <strong>3. Recommended Tier:</strong> Placed above all free listings with a Deep Teal sticker.
+                <strong>3. Recommended Tier:</strong> Placed above all free
+                listings with a Deep Teal sticker.
               </p>
               <p>
-                <strong>4. Fair Rotation:</strong> Paying businesses with equal match scores rotate evenly per session so every local operator gets fair exposure.
+                <strong>4. Fair Rotation:</strong> Paying businesses with equal
+                match scores rotate evenly per session so every local operator
+                gets fair exposure.
               </p>
               <p>
-                <strong>5. Capped per page:</strong> At least 4 out of 10 slots are always reserved for organic local shops.
+                <strong>5. Capped per page:</strong> At least 4 out of 10 slots
+                are always reserved for organic local shops.
               </p>
               <button
                 onClick={() => setRankingModalOpen(false)}

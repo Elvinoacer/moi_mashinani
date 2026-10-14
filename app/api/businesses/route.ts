@@ -1,116 +1,174 @@
-import { withNotificationDelivery } from '@/lib/notification-response';
-import { NextRequest, NextResponse } from 'next/server';
-import { Store } from '@/lib/store';
-import { rankBusinesses } from '@/lib/rank';
-import { requireAdmin } from '@/lib/auth';
-import { apiError, assertSameOrigin, jsonBody } from '@/lib/api';
-import { publicBusiness } from '@/lib/business-input';
-import { enrollBusiness } from '@/lib/enrollment';
-import { rateLimit } from '@/lib/rate-limit';
-import { normalizeEmail } from '@/lib/auth';
-import { ENROLLMENT_MEDIA_COOKIE } from '@/lib/enrollment-media';
+import { withNotificationDelivery } from "@/lib/notification-response";
+import { NextRequest, NextResponse } from "next/server";
+import { Store } from "@/lib/store";
+import { comparisonPrice } from "@/lib/catalog-plan";
+import { rankBusinesses } from "@/lib/rank";
+import { requireAdmin } from "@/lib/auth";
+import { apiError, assertSameOrigin, jsonBody } from "@/lib/api";
+import { publicBusiness } from "@/lib/business-input";
+import { enrollBusiness } from "@/lib/enrollment";
+import { rateLimit } from "@/lib/rate-limit";
+import { normalizeEmail } from "@/lib/auth";
+import { ENROLLMENT_MEDIA_COOKIE } from "@/lib/enrollment-media";
 
 export async function GET(req: NextRequest) {
   try {
-  const { searchParams } = new URL(req.url);
-  const q = searchParams.get('q') || '';
-  const zone = searchParams.get('zone') || 'all';
-  const category = searchParams.get('category') || undefined;
-  const availableNowOnly = searchParams.get('availableNow') === 'true';
-  const verifiedOnly = searchParams.get('verified') === 'true';
-  const hasDiscountsOnly = searchParams.get('discount') === 'true';
-  const sort = searchParams.get('sort') || 'best_match';
-  const sessionId = searchParams.get('sessionId') || 'session_client';
+    const { searchParams } = new URL(req.url);
+    const q = searchParams.get("q") || "";
+    const zone = searchParams.get("zone") || "all";
+    const category = searchParams.get("category") || undefined;
+    const availableNowOnly = searchParams.get("availableNow") === "true";
+    const verifiedOnly = searchParams.get("verified") === "true";
+    const hasDiscountsOnly = searchParams.get("discount") === "true";
+    const sort = searchParams.get("sort") || "best_match";
+    const sessionId = searchParams.get("sessionId") || "session_client";
 
-  let businesses = await Store.getBusinesses();
+    let businesses = await Store.getBusinesses();
 
-  // If filtering for admin or special requests
-  const statusFilter = searchParams.get('status');
-  if (statusFilter && statusFilter !== 'ACTIVE') {
-    await requireAdmin(req);
-    if (statusFilter !== 'all') {
-      businesses = businesses.filter((b) => b.status === statusFilter);
+    // If filtering for admin or special requests
+    const statusFilter = searchParams.get("status");
+    if (statusFilter && statusFilter !== "ACTIVE") {
+      await requireAdmin(req);
+      if (statusFilter !== "all") {
+        businesses = businesses.filter((b) => b.status === statusFilter);
+      }
+      return NextResponse.json({
+        results: businesses,
+        total: businesses.length,
+      });
     }
-    return NextResponse.json({ results: businesses, total: businesses.length });
-  }
 
-  businesses = businesses.filter(b => b.status === 'ACTIVE');
+    businesses = businesses.filter((b) => b.status === "ACTIVE");
 
-  // Pre-filters
-  if (availableNowOnly) {
-    const now = Date.now();
-    businesses = businesses.filter(
-      (b) => !b.isTemporarilyClosed && b.availableNowUntil && new Date(b.availableNowUntil).getTime() > now
+    // Pre-filters
+    if (availableNowOnly) {
+      const now = Date.now();
+      businesses = businesses.filter(
+        (b) =>
+          !b.isTemporarilyClosed &&
+          b.availableNowUntil &&
+          new Date(b.availableNowUntil).getTime() > now,
+      );
+    }
+
+    if (searchParams.get("delivery") === "true")
+      businesses = businesses.filter((b) =>
+        b.serviceModes.includes("delivery"),
+      );
+    if (verifiedOnly) {
+      businesses = businesses.filter((b) => b.verificationLevel === "L2");
+    }
+
+    if (hasDiscountsOnly) {
+      businesses = businesses.filter((b) => Boolean(b.studentDiscount));
+    }
+
+    // Hidden saved products must not influence public search after Pro expires.
+    businesses = businesses.map(publicBusiness);
+
+    const priceCap = searchParams.get("maxPrice");
+    if (priceCap && /^\d+(?:\.\d{1,2})?$/.test(priceCap))
+      businesses = businesses.filter(
+        (b) => comparisonPrice(b, q) <= Number(priceCap),
+      );
+    // Run official ranking engine
+    const ranked = rankBusinesses(
+      businesses,
+      q,
+      zone,
+      category,
+      undefined,
+      sessionId,
     );
+
+    // If explicit sort selected, preserve paid tier guarantees (top-block Featured and Recommended priority)
+    let finalCandidates = ranked;
+    if (
+      sort === "nearest" ||
+      sort === "newest" ||
+      sort === "alphabetical" ||
+      sort === "price"
+    ) {
+      const topBlock = ranked.filter(
+        (c) => c.effectiveTier === "FEATURED" && c.relevance >= 0.5,
+      );
+      const topBlockIds = new Set(topBlock.map((c) => c.business.id));
+      const promoted = ranked.filter(
+        (c) => c.effectiveTier !== "NONE" && !topBlockIds.has(c.business.id),
+      );
+      const organic = ranked.filter((c) => c.effectiveTier === "NONE");
+
+      const sortFn =
+        sort === "price"
+          ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
+              comparisonPrice(a.business, q) - comparisonPrice(b.business, q)
+          : sort === "nearest"
+            ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
+                b.proximity - a.proximity
+            : sort === "newest"
+              ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
+                  new Date(b.business.createdAt).getTime() -
+                  new Date(a.business.createdAt).getTime()
+              : (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
+                  a.business.name.localeCompare(b.business.name);
+
+      finalCandidates = [
+        ...[...topBlock].sort(sortFn),
+        ...[...promoted].sort(sortFn),
+        ...[...organic].sort(sortFn),
+      ];
+    }
+
+    const results = finalCandidates.map((c) => ({
+      ...publicBusiness(c.business),
+      effectiveTier: c.effectiveTier,
+      relevanceScore: c.relevance,
+      proximityScore: c.proximity,
+      totalRankScore: c.totalScore,
+    }));
+
+    // Track impressions for top-returned listings asynchronously
+    if (results.length > 0) {
+      const topIds = results.slice(0, 10).map((r) => r.id);
+      void Store.recordImpressions(topIds).catch(() => {});
+    }
+
+    return NextResponse.json({
+      results,
+      total: results.length,
+      query: q,
+      zone,
+      category,
+    });
+  } catch (error) {
+    return apiError(error);
   }
-
-  if (verifiedOnly) {
-    businesses = businesses.filter((b) => b.verificationLevel === 'L2');
-  }
-
-  if (hasDiscountsOnly) {
-    businesses = businesses.filter((b) => Boolean(b.studentDiscount));
-  }
-
-  // Hidden saved products must not influence public search after Pro expires.
-  businesses = businesses.map(publicBusiness);
-
-  // Run official ranking engine
-  const ranked = rankBusinesses(businesses, q, zone, category, undefined, sessionId);
-
-  // If explicit sort selected, preserve paid tier guarantees (top-block Featured and Recommended priority)
-  let finalCandidates = ranked;
-  if (sort === 'nearest' || sort === 'newest' || sort === 'alphabetical') {
-    const topBlock = ranked.filter((c) => c.effectiveTier === 'FEATURED' && c.relevance >= 0.5);
-    const topBlockIds = new Set(topBlock.map((c) => c.business.id));
-    const promoted = ranked.filter((c) => c.effectiveTier !== 'NONE' && !topBlockIds.has(c.business.id));
-    const organic = ranked.filter((c) => c.effectiveTier === 'NONE');
-
-    const sortFn = sort === 'nearest'
-      ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) => b.proximity - a.proximity
-      : sort === 'newest'
-      ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) => new Date(b.business.createdAt).getTime() - new Date(a.business.createdAt).getTime()
-      : (a: (typeof ranked)[0], b: (typeof ranked)[0]) => a.business.name.localeCompare(b.business.name);
-
-    finalCandidates = [
-      ...[...topBlock].sort(sortFn),
-      ...[...promoted].sort(sortFn),
-      ...[...organic].sort(sortFn),
-    ];
-  }
-
-  const results = finalCandidates.map((c) => ({
-    ...publicBusiness(c.business),
-    effectiveTier: c.effectiveTier,
-    relevanceScore: c.relevance,
-    proximityScore: c.proximity,
-    totalRankScore: c.totalScore,
-  }));
-
-  // Track impressions for top-returned listings asynchronously
-  if (results.length > 0) {
-    const topIds = results.slice(0, 10).map((r) => r.id);
-    void Store.recordImpressions(topIds).catch(() => {});
-  }
-
-  return NextResponse.json({
-    results,
-    total: results.length,
-    query: q,
-    zone,
-    category,
-  });
-  } catch(error) { return apiError(error); }
 }
 
 export async function POST(req: NextRequest) {
   try {
     assertSameOrigin(req);
-    await rateLimit(req,'public-enrollment',30,3600);
+    await rateLimit(req, "public-enrollment", 30, 3600);
     const body = await jsonBody(req);
-    await rateLimit(req,'public-enrollment-email',3,3600,normalizeEmail(body.ownerEmail));
-    const result = await enrollBusiness(body,false,undefined,req.cookies.get(ENROLLMENT_MEDIA_COOKIE)?.value);
-    const response = NextResponse.json({...result,slug:result.business?.slug},{status:201});
+    await rateLimit(
+      req,
+      "public-enrollment-email",
+      3,
+      3600,
+      normalizeEmail(body.ownerEmail),
+    );
+    const result = await enrollBusiness(
+      body,
+      false,
+      undefined,
+      req.cookies.get(ENROLLMENT_MEDIA_COOKIE)?.value,
+    );
+    const response = NextResponse.json(
+      { ...result, slug: result.business?.slug },
+      { status: 201 },
+    );
     return withNotificationDelivery(response);
-  } catch(error) { return apiError(error); }
+  } catch (error) {
+    return apiError(error);
+  }
 }

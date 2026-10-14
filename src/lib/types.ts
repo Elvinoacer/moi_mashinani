@@ -1,8 +1,8 @@
-export type Tier = 'FEATURED' | 'RECOMMENDED' | 'NONE';
+export type Tier = "FEATURED" | "RECOMMENDED" | "NONE";
 
-export type ListingStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'REJECTED';
+export type ListingStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "REJECTED";
 
-export type VerificationLevel = 'L0' | 'L1' | 'L2';
+export type VerificationLevel = "L0" | "L1" | "L2";
 
 export interface ServiceItem {
   id: string;
@@ -12,6 +12,7 @@ export interface ServiceItem {
   unit?: string;
   note?: string;
   photo?: string;
+  inStock?: boolean;
 }
 
 export interface BusinessHours {
@@ -44,7 +45,7 @@ export interface Business {
   primaryCategory: string;
   extraCategories: string[];
   tags: string[];
-  serviceModes: ('at_shop' | 'comes_to_you' | 'delivery' | 'online')[];
+  serviceModes: ("at_shop" | "comes_to_you" | "delivery" | "online")[];
   phone: string;
   whatsapp: string;
   campus: string;
@@ -65,6 +66,11 @@ export interface Business {
   tierStartsAt?: string;
   proStartsAt?: string;
   proEndsAt?: string;
+  requestAlertsEnabled?: boolean;
+  liveStatus?: string;
+  sellerType?: "SHOPFRONT" | "COMRADE";
+  verificationVisitRequested?: boolean;
+  dealBlastEndsAt?: string;
   availableNowUntil?: string; // ISO date string
   isTemporarilyClosed?: boolean;
   temporarilyClosedUntil?: string;
@@ -113,11 +119,17 @@ export interface ProblemReport {
   id: string;
   businessId: string;
   businessName: string;
-  reason: 'wrong_number' | 'not_responding' | 'closed_down' | 'scam' | 'inappropriate' | 'other';
+  reason:
+    | "wrong_number"
+    | "not_responding"
+    | "closed_down"
+    | "scam"
+    | "inappropriate"
+    | "other";
   details?: string;
   sessionId: string;
   createdAt: string;
-  status: 'OPEN' | 'RESOLVED' | 'DISMISSED';
+  status: "OPEN" | "RESOLVED" | "DISMISSED";
 }
 
 export interface PaymentRecord {
@@ -125,13 +137,15 @@ export interface PaymentRecord {
   apiRef: string;
   businessId: string;
   businessName: string;
-  planId: 'RECOMMENDED' | 'FEATURED' | 'PRO';
+  planId: "RECOMMENDED" | "FEATURED" | "PRO" | "DEAL_BLAST";
   weeks: number;
   amountKes: number;
   phone: string;
-  state: 'CREATED' | 'PENDING' | 'PROCESSING' | 'COMPLETE' | 'FAILED' | 'EXPIRED';
+  state:
+    "CREATED" | "PENDING" | "PROCESSING" | "COMPLETE" | "FAILED" | "EXPIRED";
+  submittedReceipt?: string;
   receiptNumber?: string;
-  method: 'STK_PUSH' | 'MANUAL_MPESA' | 'INTASEND_CHECKOUT';
+  method: "STK_PUSH" | "MANUAL_MPESA" | "INTASEND_CHECKOUT";
   provider?: string;
   currency?: string;
   checkoutId?: string;
@@ -149,6 +163,9 @@ export interface PaymentRecord {
 }
 
 export interface ServiceRequest {
+  category?: string;
+  contactConsent?: boolean;
+  closedAt?: string;
   id: string;
   query: string;
   zone: string;
@@ -165,6 +182,6 @@ export interface BookingIntent {
   studentName: string;
   note?: string;
   contactPhone?: string;
-  status: 'NEW' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+  status: "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
   createdAt: string;
 }

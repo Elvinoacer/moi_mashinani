@@ -1,37 +1,46 @@
-import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
-import { CATEGORIES, SEED_BUSINESSES } from '@/lib/constants';
-import { CATEGORY_GROUPS, categoryMatches } from '@/lib/categories';
-import { Store } from '@/lib/store';
+import { publicBusiness } from "@/lib/business-input";
+import { connection } from "next/server";
+import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
+import { CATEGORIES, SEED_BUSINESSES } from "@/lib/constants";
+import { CATEGORY_GROUPS, categoryMatches } from "@/lib/categories";
+import { Store } from "@/lib/store";
 import {
   CATEGORY_ALIASES,
   getCategorySeoData,
   generateBreadcrumbSchema,
   generateCategoryItemListSchema,
   safeJsonLd,
-} from '@/lib/seo';
-import type { Business, Category } from '@/lib/types';
-import { CategoryPageClient } from './CategoryPageClient';
+} from "@/lib/seo";
+import type { Business, Category } from "@/lib/types";
+import { CategoryPageClient } from "./CategoryPageClient";
 
-import { rankBusinesses } from '@/lib/rank';
+import { rankBusinesses } from "@/lib/rank";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
-async function fetchCategoryBusinesses(categorySlug: string): Promise<Business[]> {
+async function fetchCategoryBusinesses(
+  categorySlug: string,
+): Promise<Business[]> {
   let list: Business[] = [];
   try {
     list = await Store.getBusinesses();
   } catch {
     list = SEED_BUSINESSES;
   }
-  const matching = list.filter((b) => b.status === 'ACTIVE' && categoryMatches(b, categorySlug));
-  const ranked = rankBusinesses(matching, '', 'all', categorySlug);
+  const matching = list.filter(
+    (b) => b.status === "ACTIVE" && categoryMatches(b, categorySlug),
+  );
+  const ranked = rankBusinesses(matching, "", "all", categorySlug);
   return ranked.map((c) => c.business);
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  await connection();
   const { category: rawCategorySlug } = await params;
   const categorySlug = CATEGORY_ALIASES[rawCategorySlug] || rawCategorySlug;
 
@@ -40,8 +49,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   if (!leafCategory && !groupCategory) {
     return {
-      title: 'Category Not Found | MoiMashinani',
-      description: 'Campus category not found on MoiMashinani.',
+      title: "Category Not Found | MoiMashinani",
+      description: "Campus category not found on MoiMashinani.",
       robots: { index: false, follow: true },
     };
   }
@@ -59,11 +68,11 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       title: seo.title,
       description: seo.description,
       url: `/c/${categorySlug}`,
-      siteName: 'MoiMashinani',
-      type: 'website',
+      siteName: "MoiMashinani",
+      type: "website",
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: seo.title,
       description: seo.description,
     },
@@ -71,6 +80,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
+  await connection();
   const { category: rawCategorySlug } = await params;
 
   // Handle aliases (e.g. hostels-rentals -> hostels-rooms) with 301 redirect
@@ -92,7 +102,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     name: groupCategory!.name,
     icon: groupCategory!.icon,
     description: `All ${groupCategory!.name.toLowerCase()} around Moi University Main Campus (Kesses).`,
-    color: '#183e35',
+    color: "#183e35",
     group: groupCategory!.slug,
   };
 
@@ -101,27 +111,37 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   // If group, related are the leaf categories inside that group
   // If leaf, related are peer categories in the same group
   const relatedCategories = leafCategory
-    ? CATEGORIES.filter((c) => c.group === categoryObj.group && c.slug !== categorySlug).slice(0, 6)
+    ? CATEGORIES.filter(
+        (c) => c.group === categoryObj.group && c.slug !== categorySlug,
+      ).slice(0, 6)
     : CATEGORIES.filter((c) => c.group === groupCategory!.slug).slice(0, 8);
 
   const seo = getCategorySeoData(categorySlug);
 
   const breadcrumbItems = [
-    { name: 'Home', url: '/' },
-    { name: 'Categories', url: '/categories' },
+    { name: "Home", url: "/" },
+    { name: "Categories", url: "/categories" },
   ];
 
-  if (leafCategory && seo.groupName && seo.groupName !== 'Campus Services') {
-    const parentGroup = CATEGORY_GROUPS.find((g) => g.slug === leafCategory.group);
+  if (leafCategory && seo.groupName && seo.groupName !== "Campus Services") {
+    const parentGroup = CATEGORY_GROUPS.find(
+      (g) => g.slug === leafCategory.group,
+    );
     if (parentGroup) {
-      breadcrumbItems.push({ name: parentGroup.name, url: `/c/${parentGroup.slug}` });
+      breadcrumbItems.push({
+        name: parentGroup.name,
+        url: `/c/${parentGroup.slug}`,
+      });
     }
   }
 
   breadcrumbItems.push({ name: categoryObj.name, url: `/c/${categorySlug}` });
 
   const breadcrumbsSchema = generateBreadcrumbSchema(breadcrumbItems);
-  const itemListSchema = generateCategoryItemListSchema(categorySlug, businesses);
+  const itemListSchema = generateCategoryItemListSchema(
+    categorySlug,
+    businesses,
+  );
 
   return (
     <>
@@ -136,11 +156,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <CategoryPageClient
         categorySlug={categorySlug}
         categoryObj={categoryObj}
-        initialBusinesses={businesses}
+        initialBusinesses={businesses.map(publicBusiness)}
         relatedCategories={relatedCategories}
         popularSearches={seo.synonyms.slice(0, 8)}
       />
     </>
   );
 }
-

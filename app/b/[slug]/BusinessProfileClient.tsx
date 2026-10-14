@@ -1,19 +1,21 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { BookingModal } from '@/components/BookingModal';
-import { ReportModal } from '@/components/ReportModal';
-import { ClaimModal } from '@/components/ClaimModal';
-import { BusinessCard } from '@/components/BusinessCard';
-import { Business } from '@/lib/types';
-import { CATEGORIES } from '@/lib/constants';
-import { useNow } from '@/lib/useNow';
-import { trackBusinessEvent } from '@/lib/track-business-event';
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { TrustShield } from "@/components/TrustShield";
+import { TrustShare } from "@/components/TrustShare";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
+import { BookingModal } from "@/components/BookingModal";
+import { ReportModal } from "@/components/ReportModal";
+import { ClaimModal } from "@/components/ClaimModal";
+import { BusinessCard } from "@/components/BusinessCard";
+import { Business } from "@/lib/types";
+import { CATEGORIES } from "@/lib/constants";
+import { useNow } from "@/lib/useNow";
+import { trackBusinessEvent } from "@/lib/track-business-event";
 import {
   Store,
   Share2,
@@ -25,7 +27,7 @@ import {
   WhatsAppIcon,
   Tag,
   ExternalLink,
-} from '@/components/icons';
+} from "@/components/icons";
 
 interface BusinessProfileClientProps {
   slug: string;
@@ -39,8 +41,11 @@ export function BusinessProfileClient({
   initialSimilar = [],
 }: BusinessProfileClientProps) {
   const now = useNow();
-  const [business, setBusiness] = useState<Business | null>(initialBusiness ?? null);
-  const [similarBusinesses, setSimilarBusinesses] = useState<Business[]>(initialSimilar);
+  const [business, setBusiness] = useState<Business | null>(
+    initialBusiness ?? null,
+  );
+  const [similarBusinesses, setSimilarBusinesses] =
+    useState<Business[]>(initialSimilar);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [loading, setLoading] = useState(initialBusiness === undefined);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -48,11 +53,11 @@ export function BusinessProfileClient({
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [shareToast, setShareToast] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (initialBusiness && initialBusiness.status === 'ACTIVE') {
-      trackBusinessEvent(initialBusiness.id, 'view');
+    if (initialBusiness && initialBusiness.status === "ACTIVE") {
+      trackBusinessEvent(initialBusiness.id, "view");
     }
   }, [initialBusiness]);
 
@@ -63,33 +68,41 @@ export function BusinessProfileClient({
     const controller = new AbortController();
     async function load() {
       try {
-        const response = await fetch(`/api/businesses/${encodeURIComponent(slug)}`, {
-          signal: controller.signal,
-          cache: 'no-store',
-        });
+        const response = await fetch(
+          `/api/businesses/${encodeURIComponent(slug)}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          },
+        );
         const data = await response.json();
         if (!response.ok) {
           throw new Error(
             response.status === 404
-              ? 'This business is not available.'
-              : data.error || 'Could not load the business. Please try again.'
+              ? "This business is not available."
+              : data.error || "Could not load the business. Please try again.",
           );
         }
         if (controller.signal.aborted) return;
         setBusiness(data);
-        if (data.status === 'ACTIVE') trackBusinessEvent(data.id, 'view');
+        if (data.status === "ACTIVE") trackBusinessEvent(data.id, "view");
 
-        const isFeatured = data.activeTier === 'FEATURED' && (!data.tierEndsAt || new Date(data.tierEndsAt).getTime() > Date.now());
+        const isFeatured =
+          data.activeTier === "FEATURED" &&
+          (!data.tierEndsAt ||
+            new Date(data.tierEndsAt).getTime() > Date.now());
         if (!isFeatured) {
           const similar = await fetch(
             `/api/businesses?category=${encodeURIComponent(data.primaryCategory)}`,
-            { signal: controller.signal }
+            { signal: controller.signal },
           );
           if (similar.ok) {
             const related = await similar.json();
             if (!controller.signal.aborted) {
               setSimilarBusinesses(
-                (related.results || []).filter((item: Business) => item.id !== data.id).slice(0, 3)
+                (related.results || [])
+                  .filter((item: Business) => item.id !== data.id)
+                  .slice(0, 3),
               );
             }
           }
@@ -98,7 +111,11 @@ export function BusinessProfileClient({
         }
       } catch (failure) {
         if (!controller.signal.aborted) {
-          setError(failure instanceof Error ? failure.message : 'Connection error. Please reload.');
+          setError(
+            failure instanceof Error
+              ? failure.message
+              : "Connection error. Please reload.",
+          );
         }
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -131,7 +148,7 @@ export function BusinessProfileClient({
             Business Not Found
           </h1>
           <p className="text-sm text-[#667064]">
-            {error || 'This shop may have changed its address or been removed.'}
+            {error || "This shop may have changed its address or been removed."}
           </p>
           <Link
             href="/search"
@@ -144,25 +161,32 @@ export function BusinessProfileClient({
     );
   }
 
-  const galleryPhotos = Array.from(new Set([business.coverPhoto, ...business.photos].filter(Boolean)));
-  const promotionActive = Boolean(business.tierEndsAt && new Date(business.tierEndsAt).getTime() > now);
-  const isFeatured = business.activeTier === 'FEATURED' && promotionActive;
-  const isRecommended = business.activeTier === 'RECOMMENDED' && promotionActive;
+  const galleryPhotos = Array.from(
+    new Set([business.coverPhoto, ...business.photos].filter(Boolean)),
+  );
+  const promotionActive = Boolean(
+    business.tierEndsAt && new Date(business.tierEndsAt).getTime() > now,
+  );
+  const isFeatured = business.activeTier === "FEATURED" && promotionActive;
+  const isRecommended =
+    business.activeTier === "RECOMMENDED" && promotionActive;
   const isAvailableNow = Boolean(
-    !business.isTemporarilyClosed && business.availableNowUntil && new Date(business.availableNowUntil).getTime() > now
+    !business.isTemporarilyClosed &&
+    business.availableNowUntil &&
+    new Date(business.availableNowUntil).getTime() > now,
   );
 
-  const handleCall = () => trackBusinessEvent(business.id, 'call');
-  const handleWhatsApp = () => trackBusinessEvent(business.id, 'whatsapp');
+  const handleCall = () => trackBusinessEvent(business.id, "call");
+  const handleWhatsApp = () => trackBusinessEvent(business.id, "whatsapp");
 
   const handleDirections = () => {
-    trackBusinessEvent(business.id, 'directions');
+    trackBusinessEvent(business.id, "directions");
     const mapsUrl = business.mapPin
       ? `https://www.google.com/maps/dir/?api=1&destination=${business.mapPin.lat},${business.mapPin.lng}&travelmode=walking`
       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          `${business.name} ${business.landmark} Moi University Kesses`
+          `${business.name} ${business.landmark} Moi University Kesses`,
         )}`;
-    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+    window.open(mapsUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleShare = async () => {
@@ -184,10 +208,15 @@ export function BusinessProfileClient({
     setTimeout(() => setShareToast(false), 2000);
   };
 
-  const recipient = (business.whatsapp || business.phone || '').replace(/\D/g, '');
-  const whatsappPhone = recipient.startsWith('0') ? '254' + recipient.slice(1) : recipient;
+  const recipient = (business.whatsapp || business.phone || "").replace(
+    /\D/g,
+    "",
+  );
+  const whatsappPhone = recipient.startsWith("0")
+    ? "254" + recipient.slice(1)
+    : recipient;
   const whatsappMessage = encodeURIComponent(
-    `Habari ${business.name}, nimeona profile yako kwa MoiMashinani campus directory. Naomba kuuliza kuhusu huduma zenu.`
+    `Habari ${business.name}, nimeona profile yako kwa MoiMashinani campus directory. Naomba kuuliza kuhusu huduma zenu.`,
   );
   const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMessage}`;
 
@@ -197,14 +226,25 @@ export function BusinessProfileClient({
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-24 md:pb-12">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase">
-          <Link href="/" className="hover:underline">Home</Link>
-          <span>/</span>
-          <Link href={`/c/${business.primaryCategory}`} className="hover:underline">
-            {CATEGORIES.find((c) => c.slug === business.primaryCategory)?.name || business.primaryCategory.replace(/-/g, ' ')}
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase"
+        >
+          <Link href="/" className="hover:underline">
+            Home
           </Link>
           <span>/</span>
-          <span className="text-[#243b32] truncate max-w-[200px]">{business.name}</span>
+          <Link
+            href={`/c/${business.primaryCategory}`}
+            className="hover:underline"
+          >
+            {CATEGORIES.find((c) => c.slug === business.primaryCategory)
+              ?.name || business.primaryCategory.replace(/-/g, " ")}
+          </Link>
+          <span>/</span>
+          <span className="text-[#243b32] truncate max-w-[200px]">
+            {business.name}
+          </span>
         </nav>
 
         {/* PHOTO GALLERY */}
@@ -244,7 +284,9 @@ export function BusinessProfileClient({
                   type="button"
                   onClick={() => setActivePhotoIdx(i)}
                   className={`w-16 h-16 rounded overflow-hidden signboard-border shrink-0 press-action ${
-                    activePhotoIdx === i ? 'ring-2 ring-[#183e35]' : 'opacity-70'
+                    activePhotoIdx === i
+                      ? "ring-2 ring-[#183e35]"
+                      : "opacity-70"
                   }`}
                 >
                   <Image
@@ -278,10 +320,12 @@ export function BusinessProfileClient({
               </span>
             )}
 
-            {business.verificationLevel === 'L2' && (
+            {business.verificationLevel === "L2" && (
               <span className="bg-white text-[#243b32] font-display font-bold text-xs px-2 py-0.5 rounded signboard-border flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#335e41]" />
-                Verified by Team
+                {business.sellerType === "COMRADE"
+                  ? "Comrade verified"
+                  : "Shopfront verified"}
               </span>
             )}
 
@@ -318,7 +362,9 @@ export function BusinessProfileClient({
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-bold text-[#667064] pt-2 border-t border-[#dfe5d8]">
             <span className="flex items-center gap-1 text-[#243b32]">
               <MapPin className="w-4 h-4 text-[#183e35]" />
-              <span className="uppercase">{business.zone.replace(/-/g, ' ')}</span>
+              <span className="uppercase">
+                {business.zone.replace(/-/g, " ")}
+              </span>
             </span>
             {business.walkTime && (
               <span className="flex items-center gap-1">
@@ -382,12 +428,12 @@ export function BusinessProfileClient({
 
               {/* Service Modes */}
               <div className="flex flex-wrap gap-2 pt-2">
-                {business.serviceModes.includes('at_shop') && (
+                {business.serviceModes.includes("at_shop") && (
                   <span className="bg-[#e9eedf] text-[#243b32] text-xs font-bold px-2.5 py-1 rounded-full border border-[#dfe5d8]">
                     ✓ Visit Shop
                   </span>
                 )}
-                {business.serviceModes.includes('comes_to_you') && (
+                {business.serviceModes.includes("comes_to_you") && (
                   <span className="bg-[#e9eedf] text-[#243b32] text-xs font-bold px-2.5 py-1 rounded-full border border-[#dfe5d8]">
                     ✓ Hostel Delivery / Call-out
                   </span>
@@ -402,33 +448,47 @@ export function BusinessProfileClient({
                   <h2 className="font-display font-black text-base text-[#243b32] uppercase tracking-tight">
                     Services & Pricing
                   </h2>
-                  <span className="text-xs text-[#667064]">Estimated rates</span>
+                  <span className="text-xs text-[#667064]">
+                    Estimated rates
+                  </span>
                 </div>
 
                 <div className="divide-y divide-[#dfe5d8]">
                   {business.services.map((service, idx) => (
-                    <div key={service.id || idx} className="py-3 flex items-center justify-between gap-4">
+                    <div
+                      key={service.id || idx}
+                      className="py-3 flex items-center justify-between gap-4"
+                    >
                       <div>
                         <span className="font-display font-bold text-sm text-[#243b32] block">
                           {service.name}
+                          {service.inStock === false ? " · Out of stock" : ""}
                         </span>
                         {service.unit && (
-                          <span className="text-xs text-[#667064]">{service.unit}</span>
+                          <span className="text-xs text-[#667064]">
+                            {service.unit}
+                          </span>
                         )}
                       </div>
 
                       <div className="flex items-center gap-3">
                         <span className="font-display font-black text-sm text-[#183e35]">
-                          {service.priceFrom !== undefined ? `KES ${service.priceFrom.toLocaleString()}` : 'Price on inquiry'}
+                          {service.priceFrom !== undefined
+                            ? `KES ${service.priceFrom.toLocaleString()}`
+                            : "Price on inquiry"}
                         </span>
                         <button
+                          disabled={
+                            service.inStock === false ||
+                            business.isTemporarilyClosed
+                          }
                           onClick={() => {
                             setBookingService(service.name);
                             setBookingModalOpen(true);
                           }}
                           className="bg-[#243b32] text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-[#183e35] transition uppercase tracking-tight"
                         >
-                          Book
+                          WhatsApp
                         </button>
                       </div>
                     </div>
@@ -450,15 +510,24 @@ export function BusinessProfileClient({
               <div className="text-xs space-y-1.5 font-body">
                 {business.hours && Object.keys(business.hours).length > 0 ? (
                   Object.entries(business.hours).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between py-1 border-b border-[#dfe5d8]/50 last:border-0">
-                      <span className="font-bold text-[#243b32] capitalize">{day}</span>
+                    <div
+                      key={day}
+                      className="flex justify-between py-1 border-b border-[#dfe5d8]/50 last:border-0"
+                    >
+                      <span className="font-bold text-[#243b32] capitalize">
+                        {day}
+                      </span>
                       <span className="text-[#667064]">
-                        {hours.open && hours.close ? `${hours.open} – ${hours.close}` : 'Closed'}
+                        {hours.open && hours.close
+                          ? `${hours.open} – ${hours.close}`
+                          : "Closed"}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-[#667064]">Contact shop directly for exact daily hours.</p>
+                  <p className="text-[#667064]">
+                    Contact shop directly for exact daily hours.
+                  </p>
                 )}
               </div>
             </div>
@@ -489,7 +558,7 @@ export function BusinessProfileClient({
                 onClick={() => setBookingModalOpen(true)}
                 className="w-full bg-[#243b32] text-white py-3 rounded-xl font-display font-black text-xs uppercase tracking-tight hover:bg-[#183e35] transition"
               >
-                Request Custom Booking
+                Order / inquire via WhatsApp
               </button>
 
               <div className="flex items-center justify-between text-xs pt-2">
@@ -514,25 +583,37 @@ export function BusinessProfileClient({
         </div>
 
         {/* SIMILAR BUSINESSES IN THIS CATEGORY - Suppressed on Featured profiles */}
-        {business.activeTier === 'FEATURED' && (!business.tierEndsAt || new Date(business.tierEndsAt).getTime() > now) ? (
+        {business.activeTier === "FEATURED" &&
+        (!business.tierEndsAt ||
+          new Date(business.tierEndsAt).getTime() > now) ? (
           <div className="pt-6 border-t border-[#dfe5d8]">
             <div className="rounded-2xl border-2 border-[#ffc53d] bg-[#fffdf5] p-5 shadow-[0_4px_16px_rgba(255,197,61,0.15)] flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffc53d] text-[#243b32] font-black text-xl shadow-sm">★</span>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffc53d] text-[#243b32] font-black text-xl shadow-sm">
+                  ★
+                </span>
                 <div>
-                  <p className="font-display font-black text-sm text-[#243b32] uppercase tracking-wide">Featured Campus Partner</p>
-                  <p className="text-xs text-[#667064]">This business is an official top-rated priority provider on MoiMashinani with direct customer contact.</p>
+                  <p className="font-display font-black text-sm text-[#243b32] uppercase tracking-wide">
+                    Featured Campus Partner
+                  </p>
+                  <p className="text-xs text-[#667064]">
+                    This business is an official top-rated priority provider on
+                    MoiMashinani with direct customer contact.
+                  </p>
                 </div>
               </div>
-              <Link href={`/c/${business.primaryCategory}`} className="inline-flex items-center gap-1 rounded-full border border-[#dfe5d8] bg-white px-4 py-2 text-xs font-bold text-[#335e41] hover:bg-[#edf2e5] transition">
-                Explore {business.primaryCategory.replace(/-/g, ' ')} category →
+              <Link
+                href={`/c/${business.primaryCategory}`}
+                className="inline-flex items-center gap-1 rounded-full border border-[#dfe5d8] bg-white px-4 py-2 text-xs font-bold text-[#335e41] hover:bg-[#edf2e5] transition"
+              >
+                Explore {business.primaryCategory.replace(/-/g, " ")} category →
               </Link>
             </div>
           </div>
         ) : similarBusinesses.length > 0 ? (
           <div className="pt-6 border-t border-[#dfe5d8] space-y-4">
             <h2 className="font-display font-black text-xl text-[#243b32] uppercase tracking-tight">
-              More {business.primaryCategory.replace(/-/g, ' ')} nearby
+              More {business.primaryCategory.replace(/-/g, " ")} nearby
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {similarBusinesses.map((item) => (
@@ -543,8 +624,40 @@ export function BusinessProfileClient({
         ) : null}
       </main>
 
+      <div className="mx-auto mb-24 w-full max-w-5xl px-4">
+        <TrustShield slug={slug} />
+        <div className="mt-4">
+          <TrustShare business={business} />
+        </div>
+        {isAvailableNow && business.liveStatus && (
+          <p className="mt-3 rounded-xl bg-[#edf2e5] p-4 font-bold">
+            ● {business.liveStatus}
+          </p>
+        )}
+      </div>
       <Footer />
       <BottomNav />
+      <nav
+        aria-label="Contact seller"
+        className="fixed inset-x-0 bottom-0 z-40 flex gap-3 border-t bg-white p-3 pb-[calc(.75rem+env(safe-area-inset-bottom))] md:hidden"
+      >
+        <a
+          className="ui-button ui-button-secondary flex-1"
+          href={`tel:${business.phone}`}
+          onClick={handleCall}
+        >
+          Call
+        </a>
+        <a
+          className="ui-button ui-button-whatsapp flex-[2]"
+          href={whatsappUrl}
+          onClick={handleWhatsApp}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp now
+        </a>
+      </nav>
 
       {/* MODALS */}
       {bookingModalOpen && (

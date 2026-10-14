@@ -1,32 +1,48 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { BottomNav } from '@/components/BottomNav';
-import { Business } from '@/lib/types';
-import { BusinessCard } from '@/components/BusinessCard';
-import { JoinNeighborhoodCard } from '@/components/JoinNeighborhoodCard';
-import { CheckCircle2, Tag, ShieldCheck } from '@/components/icons';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { BottomNav } from "@/components/BottomNav";
+import { Business } from "@/lib/types";
+import { BusinessCard } from "@/components/BusinessCard";
+import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
+import { CheckCircle2, Tag, ShieldCheck } from "@/components/icons";
 
 interface DealsPageClientProps {
   initialDeals?: Business[];
+  initialBudget?: Array<{
+    id: string;
+    name: string;
+    price: number;
+    businessName: string;
+    slug: string;
+    zone: string;
+  }>;
 }
 
-export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
-  const [dealBusinesses, setDealBusinesses] = useState<Business[]>(initialDeals ?? []);
+export function DealsPageClient({
+  initialDeals,
+  initialBudget = [],
+}: DealsPageClientProps) {
+  const [dealBusinesses, setDealBusinesses] = useState<Business[]>(
+    initialDeals ?? [],
+  );
   const [dealLoading, setDealLoading] = useState(initialDeals === undefined);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (initialDeals !== undefined) return;
 
     const controller = new AbortController();
-    fetch('/api/businesses?discount=true', { signal: controller.signal })
+    fetch("/api/businesses?discount=true", { signal: controller.signal })
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Could not load student deals. Please reload.');
+        if (!response.ok)
+          throw new Error(
+            data.error || "Could not load student deals. Please reload.",
+          );
         return data;
       })
       .then((data) => {
@@ -37,7 +53,11 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
       })
       .catch((cause) => {
         if (!controller.signal.aborted) {
-          setError(cause instanceof Error ? cause.message : 'Connection error. Please reload.');
+          setError(
+            cause instanceof Error
+              ? cause.message
+              : "Connection error. Please reload.",
+          );
           setDealLoading(false);
         }
       });
@@ -49,10 +69,58 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pb-20 md:pb-12">
+        {dealBusinesses.length < 6 && (
+          <section className="space-y-3">
+            <h2 className="text-2xl font-bold">
+              Budget comrade picks under KES 300
+            </h2>
+            <p className="text-sm">
+              Everyday listed prices. Confirm the current price and availability
+              with the seller.
+            </p>
+            {initialBudget.length ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {initialBudget.map((item) => (
+                  <Link
+                    className="ui-card"
+                    href={`/b/${item.slug}`}
+                    key={item.id}
+                  >
+                    <h3 className="font-bold">{item.name}</h3>
+                    <p className="my-2 text-lg font-bold">
+                      KES {item.price.toLocaleString("en-KE")}
+                    </p>
+                    <p className="text-sm">
+                      {item.businessName} · {item.zone.replaceAll("-", " ")}
+                    </p>
+                    <span className="mt-3 inline-block text-sm underline">
+                      View prices →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="ui-card">
+                <p>Help us find your next budget pick.</p>
+                <Link
+                  className="ui-button ui-button-primary mt-3"
+                  href="/requests"
+                >
+                  Post your budget request
+                </Link>
+              </div>
+            )}
+          </section>
+        )}
         {/* Header Banner */}
         <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase mb-3">
-            <Link href="/" className="hover:underline">Home</Link>
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase mb-3"
+          >
+            <Link href="/" className="hover:underline">
+              Home
+            </Link>
             <span>/</span>
             <span className="text-[#243b32]">Student Deals</span>
           </nav>
@@ -65,7 +133,8 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
             Campus Deals & Trust Guide
           </h1>
           <p className="text-sm md:text-base text-[#667064] mt-2 max-w-2xl leading-relaxed font-body">
-            Moi University student discounts, safety tips for hiring campus fundis, and how our L0 to L2 verification levels protect your money.
+            Moi University student discounts, safety tips for hiring campus
+            fundis, and what our listing and verification levels mean.
           </p>
         </section>
 
@@ -76,15 +145,25 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
               <Tag className="w-6 h-6 text-[#526936]" />
               <span>Active Student Discounts</span>
             </h2>
-            <span className="text-xs text-[#667064]">Show Student ID to claim</span>
+            <span className="text-xs text-[#667064]">
+              Show Student ID to claim
+            </span>
           </div>
 
           {error ? (
-            <p role="alert" className="rounded-xl bg-white p-5 text-sm text-[#a7302d]">{error}</p>
+            <p
+              role="alert"
+              className="rounded-xl bg-white p-5 text-sm text-[#a7302d]"
+            >
+              {error}
+            </p>
           ) : dealLoading ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="h-[460px] animate-pulse rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf]" />
+                <div
+                  key={item}
+                  className="h-[460px] animate-pulse rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf]"
+                />
               ))}
             </div>
           ) : dealBusinesses.length ? (
@@ -96,9 +175,17 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
           ) : (
             <div className="rounded-[22px] border border-[#dce6d1] bg-white px-6 py-10 text-center">
               <Tag className="mx-auto mb-3 h-9 w-9 text-[#6f8949]" />
-              <h3 className="text-lg font-bold text-[#183e35]">Fresh student deals are on their way.</h3>
-              <p className="mt-2 text-sm text-[#667064]">Explore nearby businesses while owners prepare their next offers.</p>
-              <Link href="/search" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#183e35] px-5 text-sm font-semibold text-white">
+              <h3 className="text-lg font-bold text-[#183e35]">
+                Fresh student deals are on their way.
+              </h3>
+              <p className="mt-2 text-sm text-[#667064]">
+                Explore nearby businesses while owners prepare their next
+                offers.
+              </p>
+              <Link
+                href="/search"
+                className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#183e35] px-5 text-sm font-semibold text-white"
+              >
                 Explore local businesses →
               </Link>
             </div>
@@ -112,10 +199,11 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
           <div>
             <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight flex items-center gap-2">
               <ShieldCheck className="w-6 h-6 text-[#335e41]" />
-              <span>How MoiMashinani Protects Students</span>
+              <span>Understand campus verification</span>
             </h2>
             <p className="text-xs md:text-sm text-[#667064] mt-1 font-body">
-              Every merchant on this directory is verified through a 3-tier safety standard:
+              Listings have different evidence levels. A badge describes checks,
+              and does not guarantee a transaction:
             </p>
           </div>
 
@@ -129,20 +217,22 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
                 Basic Community Entry
               </h3>
               <p className="text-xs text-[#667064] leading-relaxed">
-                Initial entry. Unconfirmed phone or address. Students should exercise standard caution before making large advance payments.
+                Initial entry. Unconfirmed phone or address. Students should
+                exercise standard caution before making large advance payments.
               </p>
             </div>
 
             <div className="p-4 bg-[#e9eedf] rounded-xl border border-[#dfe5d8] space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#335e41]">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#335e41]" />
-                Level 1: Phone Confirmed
+                Level 1: Recheck Needed
               </div>
               <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Owner OTP Verified
+                Details Awaiting Field Check
               </h3>
               <p className="text-xs text-[#667064] leading-relaxed">
-                The owner verified their Kenyan Safaricom line via SMS OTP code. The owner has answered student calls directly.
+                Owner details are on file, or key details changed after a visit.
+                Current identity and location still need a field check.
               </p>
             </div>
 
@@ -152,10 +242,12 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
                 Level 2: Team Verified
               </div>
               <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Physical Shopfront Checked
+                Shop or Comrade Seller Checked
               </h3>
               <p className="text-xs text-[#243b32] leading-relaxed">
-                Physically scouted by student ambassadors. Real photos of tools/shelves, verified landmark, and confirmed prices.
+                A field reviewer checked the shopfront or student seller
+                identity and campus location. See the profile for the check date
+                and open reports.
               </p>
             </div>
           </div>
@@ -169,19 +261,27 @@ export function DealsPageClient({ initialDeals }: DealsPageClientProps) {
 
           <div className="space-y-3 text-sm text-[#243b32] font-body">
             <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>1. Inspect before full payment:</strong> Always test replaced screens, laptop keyboards, or tailored clothes before leaving the kiosk.
+              <strong>1. Inspect before full payment:</strong> Always test
+              replaced screens, laptop keyboards, or tailored clothes before
+              leaving the kiosk.
             </div>
             <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>2. Pay via M-Pesa Buy Goods / Till:</strong> Official till numbers provide clear transactional audit trails.
+              <strong>2. Pay via M-Pesa Buy Goods / Till:</strong> Official till
+              numbers provide clear transactional audit trails.
             </div>
             <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>3. Never send deposit to unverified phone numbers:</strong> For hostels or room deposits, visit in person first.
+              <strong>
+                3. Never send deposit to unverified phone numbers:
+              </strong>{" "}
+              For hostels or room deposits, visit in person first.
             </div>
             <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>4. Report ghost or inactive numbers:</strong> Click the three dots on any profile to report outdated contacts.
+              <strong>4. Report ghost or inactive numbers:</strong> Click the
+              three dots on any profile to report outdated contacts.
             </div>
             <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>5. Agree on diagnosis costs upfront:</strong> Confirm whether opening a phone or laptop incurs a diagnostic fee.
+              <strong>5. Agree on diagnosis costs upfront:</strong> Confirm
+              whether opening a phone or laptop incurs a diagnostic fee.
             </div>
           </div>
         </section>

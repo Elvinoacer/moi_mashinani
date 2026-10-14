@@ -2,7 +2,7 @@
 
 | Feature                    | Free                                 | Pro                                  |
 | -------------------------- | ------------------------------------ | ------------------------------------ |
-| Price                      | KES 0                                | KES 500 per calendar month           |
+| Price                      | KES 0                                | KES 250 per calendar month           |
 | Public products/services   | 5                                    | Unlimited                            |
 | Total hosted image storage | 25 MB per business                   | Unlimited                            |
 | Shop gallery               | 8 photos                             | 8 photos                             |
@@ -14,7 +14,7 @@ A product and a service each occupy one catalogue slot. Images are rotated, resi
 
 ## Billing and expiry
 
-`/pro/<business-slug>` compares plans, starts an IntaSend hosted checkout and checks payment status. Price and duration are calculated on the server. Verified payment activates the separate `proStartsAt`/`proEndsAt` entitlement atomically; duplicate callbacks cannot grant duplicate months. Early renewal adds a calendar month after the existing end. Late renewal starts a new month at payment verification. Month-end dates are clamped to the last day of the next month.
+`/pro/<business-slug>` redirects to Boost & upgrade in `/dashboard/<business-slug>?tab=billing`, which compares packages, starts an IntaSend hosted checkout and checks payment status. Price and duration are calculated on the server. Verified payment activates the separate `proStartsAt`/`proEndsAt` entitlement atomically; duplicate callbacks cannot grant duplicate months. Early renewal adds a calendar month after the existing end. Late renewal starts a new month at payment verification. Month-end dates are clamped to the last day of the next month.
 
 Pro never auto-renews. It has no mandate or automatic charge. Owners must open the checkout page and make a fresh one-time payment. Pro does not grant Recommended or Featured promotion.
 

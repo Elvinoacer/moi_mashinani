@@ -1,16 +1,21 @@
+# Current onboarding
+
+The current two-step flow, hostel-seller evidence and field roles are documented in [Campus value workflows](value-creation.md). The remaining sections describe the underlying ownership/media contracts.
+
 # Business enrollment and accounts
-## Guided enrollment (admin and business owners)
+## Guided enrollment
 
-Both `/admin/enroll` and `/onboard` now use the same four-step, mobile-first form: **Essentials → Where & when → What you offer → Photos & finish**. The essentials screen prioritizes owner name/email, shop name/category and phone. Optional owner phone and separate WhatsApp are tucked away. The location step requires either a nearby landmark **or** complete latitude/longitude (browser geolocation is supported). Opening hours are entered once for Monday–Friday, with independent Saturday/Sunday hours, common presets and an advanced per-day editor. Contact/service modes remain adjustable.
+`/onboard`, `/admin/enroll` and the appointed ambassador field tool share two steps: **Essentials & prices → Preview & trust**. The first step collects the business name, category, WhatsApp, campus zone, owner name and recovery email, with an optional separate private owner phone. Owners select three to five core items and enter prices. Category templates suggest names, not prices or unverified claims. Prices can be edited later in the merchant dashboard.
 
-Selecting a category unlocks the curated template catalogue for every one of the 65 category slugs. One tap selects an item; it can be removed with the same tap, and each free listing can select **at most five** items. Merchants can search, edit product names, leave prices blank, supply price units, or add custom products. Category-based tagline and description suggestions incorporate the actual shop name and area, rotate between variations, and are fully editable. This is generated **suggested copy**, not evidence that the business actually stocks an item or has any license. Only explicitly selected items are saved. Always verify product availability and pharmacy-specific regulatory restrictions before publishing.
+The second step previews the actual items and prices, collects a landmark or safe hostel meeting point, offers hours presets and delivery, and lets the seller upload public shop/product photos or request a free field visit. Comrade sellers upload a private student ID plus a public product/workspace photo, or request an in-person identity check. A trust badge is awarded from evidence, independently of paid plans.
 
-## Photos before email verification
+## Media and drafts
 
-Both flows allow gallery and individual product photo uploads **before** the owner accepts an email invitation. Anonymous uploads use `/api/enrollment/media` and an unpredictable, HttpOnly, SameSite cookie. Uploads are resized, re-encoded, stripped of metadata, rate-limited, capped at 16 individual images/25 MB per session and expire after 24 hours. A short-lived `EnrollmentMedia` ledger records the session, URL and byte count without associating the uploader with an email address. Only that browser's cookie may reference or remove its staged media. Submitting a listing atomically validates and transfers those URLs to its `BusinessMedia` ownership ledger; photos never become owned by an account just because its email was entered in an unverified form. The plan maintenance task deletes abandoned staged images after 24 hours. Uploads require properly configured R2 storage; no external photo URLs are accepted during enrollment. The cover is the first gallery image, and up to five catalogue items can each have their own photograph.
+Public gallery uploads before invitation acceptance use `/api/enrollment/media` and an unpredictable HttpOnly, SameSite cookie. Photos are resized, re-encoded, stripped of metadata and staged for 24 hours, with file-count and 25 MB limits. Enrollment transfers the cookie-bound images to the business ownership ledger in the same transaction; entering an email never grants access to another browser’s uploads. R2 is required for public gallery storage. Product photos can be added from the owner dashboard.
 
-Drafts save the step, form and staged image URLs in session storage; an active upload session cookie is required to attach those photos when restoring. If the cookie expires, reupload the images. Registration is still submitted online and owners still accept the email invitation before they can manage the listing. Avoid using the feature for restricted prescription product sales; listing a pharmacy does not imply PPB verification.
+Private student IDs use `/api/enrollment/proof`, separate PostgreSQL storage and authenticated, uncached retrieval. They never become public gallery URLs. Owners and admins can review them; appointed field workers can review a business’s ID while an authorized visit is pending. Abandoned staged proof is removed after the 24-hour window by plan maintenance. Attached evidence remains private and is removed when replaced or when the listing is deleted.
 
+Drafts stay in the current tab for 24 hours. An active staging cookie is required to attach restored images. Listing submission is online; owners accept the email invitation once to set a password, then may sign in with their private owner phone. Email links remain recovery.
 
 ## Operator flow
 

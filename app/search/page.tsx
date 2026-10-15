@@ -8,11 +8,15 @@ import {
 import { SearchContent } from './SearchContent';
 
 export const metadata: Metadata = {
-  title: 'Search Campus Businesses, Services & Fundis | Moi University (Kesses)',
+  title: 'Find Businesses Near Moi University, Kesses',
   description:
-    'Search and filter verified businesses, food spots, hostels, phone repairs, kinyozi salons, and fundis around Moi University Main Campus (Kesses). Filter by campus zone and open-now status.',
+    'Search for businesses around Moi University Main Campus in Kesses. Find shops, food, hostels, phone repairs, salons and nearby services; filter by campus area.',
   keywords: [
     'search Moi University businesses',
+    'businesses near Moi University',
+    'businesses around Moi University',
+    'shops near Moi University',
+    'Moi University business directory',
     'find fundi Kesses',
     'campus services search',
     'Moi University directory search',
@@ -25,11 +29,11 @@ export const metadata: Metadata = {
     canonical: '/search',
   },
   openGraph: {
-    title: 'Search Campus Businesses & Services | Moi University (Kesses)',
+    title: 'Find Local Businesses Near Moi University, Kesses',
     description:
-      'Search and filter verified businesses, food spots, hostels, and fundis around Moi University Main Campus (Kesses).',
+      'Discover businesses, shops, food, hostels and student services around Moi University Main Campus, Kesses.',
     url: '/search',
-    siteName: 'MoiMashinani',
+    siteName: 'Moi Mashinani',
     type: 'website',
   },
   twitter: {

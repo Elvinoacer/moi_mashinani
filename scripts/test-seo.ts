@@ -33,6 +33,17 @@ test('SEO: Core campus keywords and site configuration', () => {
   assert.ok(SITE_ALTERNATE_NAMES.includes('Moishanani'));
   assert.ok(CORE_CAMPUS_KEYWORDS.length >= 35, 'Rich array of campus keywords defined');
   assert.ok(CORE_CAMPUS_KEYWORDS.includes('Moi University'), 'Includes Moi University');
+  for (const phrase of [
+    'Moi University businesses',
+    'businesses around Moi University',
+    'businesses near Moi University',
+    'Moi University business directory',
+    'shops near Moi University',
+    'services near Moi University',
+    'local businesses Kesses',
+  ]) {
+    assert.ok(CORE_CAMPUS_KEYWORDS.includes(phrase), `Includes discovery intent: ${phrase}`);
+  }
   assert.ok(CORE_CAMPUS_KEYWORDS.includes('Kesses'), 'Includes Kesses');
   assert.ok(CORE_CAMPUS_KEYWORDS.includes('Soweto Moi University'), 'Includes Soweto');
   assert.ok(CORE_CAMPUS_KEYWORDS.includes('Cheboiywo'), 'Includes Cheboiywo');
@@ -49,6 +60,9 @@ test('SEO: Category SEO helper handles leaf categories and category groups', () 
   assert.ok(foodSeo.title.includes('Food & Cafes'), 'Title has category name');
   assert.ok(foodSeo.title.includes('Moi University'), 'Title has Moi University');
   assert.ok(foodSeo.title.includes('Kesses'), 'Title has Kesses');
+  assert.ok(foodSeo.title.includes('Near Moi University'), 'Uses natural near-campus phrase');
+  assert.ok(foodSeo.description.includes('Moi University'), 'Describes campus context');
+  assert.ok(foodSeo.keywords.includes('businesses around Moi University'), 'Category includes business discovery intent');
   assert.ok(foodSeo.description.includes('Soweto'), 'Description mentions student neighborhoods');
   assert.ok(foodSeo.keywords.length >= 10, 'Category has rich keyword expansion');
   assert.ok(foodSeo.synonyms.includes('hostel delivery'), 'Synonyms include hostel delivery');
@@ -223,6 +237,8 @@ test('SEO: generateMetadata resolves correct metadata on dynamic and static rout
   const { metadata: homeMetadata } = await import('../app/page');
   assert.ok(typeof homeMetadata.title === 'object' && (homeMetadata.title as { absolute?: string })?.absolute?.startsWith('Moi Mashinani'), 'Brand appears at start of homepage title');
   assert.equal(homeMetadata.alternates?.canonical, '/');
+  assert.ok((homeMetadata.title as { absolute?: string })?.absolute?.includes('Businesses Around Moi University'), 'Homepage targets Moi University business discovery');
+  assert.ok((homeMetadata.description || '').includes('businesses around Moi University'), 'Homepage description naturally contains campus business search terms');
   const { metadata: aboutMetadata } = await import('../app/about/page');
   assert.equal(aboutMetadata.alternates?.canonical, '/about');
   assert.ok((aboutMetadata.description || '').includes('Moi Mashinani'));
@@ -232,12 +248,15 @@ test('SEO: generateMetadata resolves correct metadata on dynamic and static rout
   // Static pages metadata
   const { metadata: categoriesMetadata } = await import('../app/categories/page');
   assert.ok(categoriesMetadata.title, 'Categories page has title');
+  assert.ok(typeof categoriesMetadata.title === 'string' && categoriesMetadata.title.includes('Businesses Around Moi University'), 'Category page clearly serves local business searches');
 
   const { metadata: dealsMetadata } = await import('../app/deals/page');
   assert.ok(dealsMetadata.title, 'Deals page has title');
 
   const { metadata: searchMetadata } = await import('../app/search/page');
   assert.ok(searchMetadata.title, 'Search page has title');
+  assert.ok(typeof searchMetadata.title === 'string' && searchMetadata.title.includes('Businesses Near Moi University'), 'Search title matches nearby-business intent');
+  assert.ok((searchMetadata.description || '').includes('businesses around Moi University'), 'Search description matches campus discovery');
 
   const { metadata: onboardMetadata } = await import('../app/onboard/page');
   assert.ok(onboardMetadata.title, 'Onboard page has title');

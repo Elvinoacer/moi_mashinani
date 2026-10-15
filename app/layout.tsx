@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Moi Mashinani",
   },
   description:
-    "Moi Mashinani connects Moi University students in Kesses with nearby food, hostels, phone repairs, printing, salons, shops and local services. Compare listings and contact sellers directly.",
+    "Discover businesses and services around Moi University Main Campus in Kesses on Moi Mashinani. Find shops, food, hostels, repairs, printing and more.",
   keywords: CORE_CAMPUS_KEYWORDS,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,

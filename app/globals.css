@@ -759,3 +759,39 @@
   .request-board-grid > *, .directory-form-enter { animation: none; }
   .request-listing, .directory-market-types button, .request-expand svg { transition: none; }
 }
+
+
+/* Consistent deal cards and clear mobile controls */
+.directory-deal-card {
+  display: flex; flex-direction: column; min-width: 0;
+  padding: 14px 16px; border-radius: 16px;
+  border: 1px solid #dce6d9; background: #fff;
+  box-shadow: 0 3px 12px #243b320b;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+.directory-deal-card:hover { border-color: #baccb9; box-shadow: 0 8px 23px #243b3215; }
+.directory-deal-time { color: #436850; }
+.directory-deal-sponsored { width: fit-content; padding: 3px 7px; border-radius: 6px; background: #fff3c9; color: #7d570b; }
+.directory-deal-price { line-height: 1.35; color: #1d5b40; }
+.directory-deal-detail { line-height: 1.5; color: #647467; }
+.directory-deal-card :is(a.ui-button,button.ui-button) { min-height: 44px; margin-top: auto; font-size: 12px; }
+.directory-deal-budgets button { min-height: 44px; border-radius: 100px; font-size: 12px; }
+.directory-deal-budgets button[aria-pressed="true"] { background: #183e35; color: white; border-color: #183e35; }
+.directory-search-form { position: relative; }
+.directory-budget-apply {
+  min-height: 44px; padding: .55rem .9rem; border-radius: 9px;
+  background: #183e35; color: white; font-size: .8rem; font-weight: 800;
+}
+.directory-budget-apply:hover { background: #2f5a43; }
+.directory-budget-apply:focus-visible { outline: 3px solid #51804d; outline-offset: 3px; }
+#services-and-prices:target { border-color: #7da270; box-shadow: 0 0 0 3px #83aa6b29; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .directory-deal-card { transition: none; }
+}
+@media (max-width: 639px) {
+  .directory-query-input { flex-basis: calc(100% - 100px); }
+}

@@ -3,12 +3,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Activity,
+  ArrowRight,
+  ArrowUpRight,
+  ChevronDown,
+  Compass,
+  Search,
+  SlidersHorizontal,
   Bike,
   Droplets,
-  Flame,
   GraduationCap,
   House,
-  MapPin,
   Megaphone,
   Moon,
   Wifi,
@@ -18,6 +22,7 @@ import { useRouter } from "next/navigation";
 import type { Business } from "@/lib/types";
 import { ZONES } from "@/lib/constants";
 import { useCampusZone, useClientReady } from "@/lib/useCampusZone";
+import { CampusZonePicker } from "./CampusZonePicker";
 import { useNow } from "@/lib/useNow";
 import {
   campusContext,
@@ -36,16 +41,14 @@ import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 const QUICK_INTENTS = [
   { value: "open", label: "Open right now", icon: Activity },
-  { value: "deals", label: "Today’s deals", icon: Flame },
   { value: "delivery", label: "Hostel delivery", icon: Bike },
+  { value: "hostels", label: "Verified rooms", icon: House },
   { value: "backup", label: "Blackout mode", icon: Zap },
   { value: "wifi", label: "Live Wi-Fi", icon: Wifi },
   { value: "water", label: "Water available", icon: Droplets },
   { value: "late", label: "Open past 9 PM", icon: Moon },
   { value: "free-delivery", label: "Free zone delivery", icon: Bike },
-  { value: "hostels", label: "Verified vacant kejas", icon: House },
   { value: "comrade", label: "Comrade Market", icon: GraduationCap },
-  { value: "requests", label: "Post a request", icon: Megaphone },
 ];
 
 export function CampusHome({
@@ -58,6 +61,7 @@ export function CampusHome({
   const [zone, setZone] = useCampusZone();
   const [query, setQuery] = useState("");
   const [intent, setIntent] = useState("all");
+  const [moreFilters, setMoreFilters] = useState(false);
   const [post, setPost] = useState(false);
   const router = useRouter();
   const now = useNow();
@@ -136,98 +140,118 @@ export function CampusHome({
   }
   return (
     <>
-      <div className="campus-zone-bar">
-        <label className="flex flex-col gap-2 text-sm font-bold sm:flex-row sm:items-center">
-          <span className="inline-flex items-center gap-2">
-            <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
-            Your campus zone
-          </span>
-          <select
-            disabled={!ready}
-            aria-label="Your campus zone"
-            className="ui-input w-full sm:max-w-xs"
-            value={zone}
-            onChange={(e) => setZone(e.target.value)}
-          >
-            {ZONES.map((z) => (
-              <option key={z.slug} value={z.slug}>
-                {z.slug === "all" ? "All campus" : z.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <section className="space-y-4 pt-3">
-        <Badge>Moi University · Kesses</Badge>
-        <h1 className="text-3xl font-extrabold sm:text-5xl">
-          Find it. Compare prices.
-          <br />
-          WhatsApp the seller.
-        </h1>
-        <p className="text-sm sm:text-base">
-          Meals, gas, repairs, rooms and hostel hustles near you.
-        </p>
-        <form
-          className="flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            router.push(`/search?q=${encodeURIComponent(query)}&zone=${zone}`);
-          }}
-        >
-          <label className="min-w-0 flex-1">
-            <span className="sr-only">Search products, prices or services</span>
-            <Input
-              id="landing-query"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Gas refill, braids, printing, charger…"
-            />
-          </label>
-          <Button type="submit">Search</Button>
-        </form>
-        <form
-          className="ui-card flex flex-wrap gap-3"
-          aria-label="Ask Mashinani"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPost(true);
-          }}
-        >
-          <label className="w-full min-w-0 sm:w-auto sm:flex-1">
-            <span className="block font-bold">
-              Can’t find what you need? Ask Mashinani
-            </span>
-            <Input
-              disabled={!ready}
-              aria-label="Your instant request"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Need a charger under KES 1,200 in Stage"
-            />
-          </label>
-          <Button
-            disabled={!ready}
-            className="w-full self-end sm:w-auto"
-            type="submit"
-          >
-            Broadcast a request
-          </Button>
-          <p className="w-full text-xs">
-            Reach matching verified sellers in your zone. No account needed.
+
+      <section className="campus-home-hero" aria-labelledby="campus-home-heading">
+        <div className="campus-home-hero-main">
+          <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Made for Moi University · Kesses</span>
+          <h1 id="campus-home-heading">
+            Find it nearby.<br /><span>Get it sorted.</span>
+          </h1>
+          <p className="campus-home-intro">
+            Food, hostels, repairs, printing and more. Compare local prices and
+            contact the seller directly — all in one place.
           </p>
-        </form>
-        <div className="campus-pills" aria-label="Quick intents">
-          {QUICK_INTENTS.map(({ value, label, icon: Icon }) => (
-            <Button
-              key={value}
-              variant={intent === value ? "primary" : "secondary"}
-              aria-pressed={intent === value}
-              onClick={() => choose(value)}
-            >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {label}
-            </Button>
+          <form
+            role="search"
+            className="campus-home-search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!query.trim()) return;
+              const params = new URLSearchParams({ q: query.trim() });
+              if (zone !== "all") params.set("zone", zone);
+              router.push("/search?" + params.toString());
+            }}
+          >
+            <label htmlFor="landing-query" className="campus-home-search-label">What are you looking for?</label>
+            <div className="campus-home-search-row">
+              <div className="campus-home-search-field">
+                <Search size={21} aria-hidden="true" />
+                <Input
+                  id="landing-query"
+                  name="q"
+                  type="search"
+                  enterKeyHint="search"
+                  required
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="e.g. Gas refill, braids, printing…"
+                />
+              </div>
+              <button type="submit" className="campus-home-search-submit">
+                Search <ArrowRight size={19} aria-hidden="true" />
+              </button>
+            </div>
+          </form>
+          <div className="campus-home-popular">
+            <span>Popular:</span>
+            {["Food", "Hostels", "Printing", "Phone repairs"].map((term) => (
+              <Link
+                key={term}
+                href={"/search?q=" + encodeURIComponent(term) + (zone === "all" ? "" : "&zone=" + encodeURIComponent(zone))}
+              >
+                {term} <ArrowUpRight size={13} aria-hidden="true" />
+              </Link>
+            ))}
+          </div>
+        </div>
+        <aside className="campus-home-hero-aside" aria-label="Search location">
+          <CampusZonePicker value={zone} onChange={setZone} disabled={!ready} />
+          <div className="campus-home-location-tip">
+            <Compass size={19} aria-hidden="true" />
+            <p>Choose a campus area to see nearby sellers, services and prices.</p>
+            <Link href={"/search" + (zone === "all" ? "" : "?zone=" + encodeURIComponent(zone))}>
+              Explore all businesses <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
+        </aside>
+      </section>
+
+      <section className="campus-home-request" aria-labelledby="campus-request-heading">
+        <div className="campus-home-request-icon" aria-hidden="true"><Megaphone size={23} /></div>
+        <div className="campus-home-request-copy">
+          <h2 id="campus-request-heading">Can’t find it? Ask Mashinani.</h2>
+          <p>Post what you need and let matching sellers know. No account required.</p>
+        </div>
+        <button type="button" className="campus-home-request-action" disabled={!ready} onClick={() => setPost(true)}>
+          Post a request <ArrowRight size={17} aria-hidden="true" />
+        </button>
+      </section>
+
+      <section className="campus-home-discovery" aria-label="Explore campus listings">
+        <div className="campus-home-filter-heading">
+          <div>
+            <h2>Discover around you</h2>
+            <p>Make your search more specific with optional filters.</p>
+          </div>
+          {intent !== "all" && (
+            <button type="button" className="campus-home-filter-reset" onClick={() => setIntent("all")}>
+              Clear filters
+            </button>
+          )}
+        </div>
+        <div className="campus-home-filter-row" role="group" aria-label="Quick seller filters">
+          {QUICK_INTENTS.slice(0, 3).map(({ value, label, icon: Icon }) => (
+            <button key={value} type="button" aria-pressed={intent === value}
+              className="campus-home-filter-chip" onClick={() => choose(value)}>
+              <Icon size={17} aria-hidden="true" /> {label}
+            </button>
           ))}
+          <button type="button" className="campus-home-more-filters" aria-expanded={moreFilters}
+            aria-controls="campus-extra-filters" onClick={() => setMoreFilters((expanded) => !expanded)}>
+            <SlidersHorizontal size={17} aria-hidden="true" /> More filters
+            <ChevronDown size={16} aria-hidden="true" className={moreFilters ? "rotate-180" : ""} />
+          </button>
+        </div>
+        <div id="campus-extra-filters" className={"campus-home-filter-expand" + (moreFilters ? " is-open" : "")}
+          aria-hidden={!moreFilters} inert={!moreFilters}>
+          <div className="campus-home-filter-expand-inner" role="group" aria-label="More seller filters">
+            {QUICK_INTENTS.slice(3).map(({ value, label, icon: Icon }) => (
+              <button key={value} type="button" aria-pressed={intent === value}
+                className="campus-home-filter-chip" onClick={() => choose(value)}>
+                <Icon size={17} aria-hidden="true" /> {label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
       <section className="ui-card space-y-3">

@@ -460,7 +460,8 @@ export function BusinessProfileClient({
                   {business.services.map((service, idx) => (
                     <div
                       key={service.id || idx}
-                      className="py-3 flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-2 sm:gap-4"
+                      id={`service-${service.id}`}
+                      className="scroll-mt-24 py-3 flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-2 sm:gap-4"
                     >
                       <div>
                         <span className="font-display font-bold text-sm text-[#243b32] block">

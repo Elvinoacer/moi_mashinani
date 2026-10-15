@@ -379,6 +379,7 @@ export function BusinessProfileClient({
         </div>
 
         {/* PRIMARY ACTION BUTTONS */}
+        {business.services.length > 0 && <a href="#services-and-prices" className="inline-flex min-h-11 items-center text-sm font-bold text-[#205443] underline underline-offset-4">Jump to item prices ↓</a>}
         <div className="grid grid-cols-2 gap-3">
           <a
             href={`tel:${business.phone}`}
@@ -445,9 +446,9 @@ export function BusinessProfileClient({
 
             {/* Services & Price Menu */}
             {business.services && business.services.length > 0 && (
-              <div className="bg-white signboard-border signboard-shadow-sm rounded-xl p-5 space-y-4">
+              <div id="services-and-prices" className="bg-white signboard-border signboard-shadow-sm rounded-xl p-4 sm:p-5 space-y-4 scroll-mt-20">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-display font-black text-base text-[#243b32] uppercase tracking-tight">
+                  <h2 className="font-display font-black text-base text-[#243b32] tracking-tight">
                     Services & Pricing
                   </h2>
                   <span className="text-xs text-[#667064]">
@@ -459,7 +460,7 @@ export function BusinessProfileClient({
                   {business.services.map((service, idx) => (
                     <div
                       key={service.id || idx}
-                      className="py-3 flex items-center justify-between gap-4"
+                      className="py-3 flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-2 sm:gap-4"
                     >
                       <div>
                         <span className="font-display font-bold text-sm text-[#243b32] block">
@@ -473,7 +474,7 @@ export function BusinessProfileClient({
                         )}
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <span className="font-display font-black text-sm text-[#183e35]">
                           {service.priceFrom !== undefined
                             ? `KES ${service.priceFrom.toLocaleString()}`
@@ -488,9 +489,9 @@ export function BusinessProfileClient({
                             setBookingService(service.name);
                             setBookingModalOpen(true);
                           }}
-                          className="bg-[#243b32] text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-[#183e35] transition uppercase tracking-tight"
+                          className="min-h-11 rounded-lg bg-[#243b32] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
                         >
-                          WhatsApp
+                          Ask about this
                         </button>
                       </div>
                     </div>

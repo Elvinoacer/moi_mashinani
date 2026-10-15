@@ -1,4 +1,6 @@
 "use client";
+import { availabilityLabel, confirmedOpen } from "@/lib/campus-value";
+import { CampusUtilityDetails } from "./CampusUtilityDetails";
 import { useState } from "react";
 import Link from "next/link";
 import { BadgeCheck, MessageCircle, Store } from "lucide-react";
@@ -32,12 +34,6 @@ export function BusinessCard({
     (business.tierEndsAt && Date.parse(business.tierEndsAt) <= now
       ? "NONE"
       : business.activeTier);
-  const live =
-    !business.isTemporarilyClosed &&
-    Boolean(
-      business.availableNowUntil &&
-      Date.parse(business.availableNowUntil) > now,
-    );
   const category =
     CATEGORIES.find((c) => c.slug === business.primaryCategory)?.name ||
     "Local business";
@@ -76,11 +72,7 @@ export function BusinessCard({
           </div>
         )}
         <span className={styles.status}>
-          {business.isTemporarilyClosed
-            ? "Temporarily closed"
-            : live
-              ? "● Open now"
-              : "Ask availability"}
+          {availabilityLabel(business, now)}
         </span>
         {business.verificationLevel === "L2" && (
           <span
@@ -119,7 +111,8 @@ export function BusinessCard({
               ? `${query && compared.length ? compared.find((s) => s.priceFrom === min)?.name + " · " : "From "}KES ${min.toLocaleString("en-KE")}`
               : "View prices & services"}
         </p>
-        {live && business.liveStatus && (
+        <CampusUtilityDetails business={business} />
+        {confirmedOpen(business, now) && business.liveStatus && (
           <p className={styles.liveNote}>{business.liveStatus}</p>
         )}
         {url &&

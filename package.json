@@ -18,7 +18,7 @@
     "test:templates": "tsx scripts/test-enrollment-templates.ts",
     "test:onboarding:uploads": "tsx scripts/test-enrollment-photo-upload.ts",
     "test:categories": "tsx --test scripts/test-categories.ts",
-    "test:seo": "tsx --test scripts/test-seo.ts",
+    "test:seo": "node --import ./scripts/test-next-scope.mjs --import tsx --test scripts/test-seo.ts",
     "test:catalog": "tsx --test scripts/test-catalog-plan.ts",
     "test:catalog:db": "tsx scripts/test-catalog-db.ts",
     "test:catalog:browser": "tsx scripts/test-catalog-browser.ts",
@@ -39,7 +39,10 @@
     "test:value": "tsx scripts/test-value-loops.ts",
     "test:sms": "tsx --test scripts/test-sms.ts",
     "test:value:browser": "tsx scripts/test-value-browser.ts",
-    "test:value:unit": "tsx --test scripts/test-campus-value.ts"
+    "test:value:unit": "tsx --test scripts/test-campus-value.ts",
+    "test:habit": "tsx scripts/test-habit-strategy.ts",
+    "test:habit:unit": "tsx --test scripts/test-habit-strategy-unit.ts",
+    "test:habit:browser": "tsx scripts/test-habit-strategy-browser.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -53,6 +56,7 @@
     "lucide-react": "^1.52.0",
     "next": "16.3.8",
     "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sharp": "^0.35.5"
@@ -62,6 +66,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^18.0.6",

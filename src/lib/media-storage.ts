@@ -39,7 +39,7 @@ export async function reserveMedia(accountId: string, businessId: string | undef
     if (businessId) {
       await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${businessId} FOR UPDATE`;
       const business = await tx.business.findUniqueOrThrow({where:{id:businessId}});
-      unlimited = hasPro({proEndsAt:business.proEndsAt?.toISOString()});
+      unlimited = business.verificationLevel === "L2" || hasPro({proEndsAt:business.proEndsAt?.toISOString()});
       references = mediaReferences(business);
     } else await tx.$queryRaw`SELECT "id" FROM "Account" WHERE "id" = ${accountId} FOR UPDATE`;
     const assets = await tx.businessMedia.findMany({where: businessId ? {businessId} : {accountId,businessId:null},select:{url:true,bytes:true}});
@@ -67,7 +67,7 @@ export async function attachMedia(tx: Prisma.TransactionClient, businessId: stri
   }
   const business = await tx.business.findUniqueOrThrow({where:{id:businessId}});
   const assets = await tx.businessMedia.findMany({where:{businessId},select:{url:true,bytes:true}});
-  if (!hasPro({proEndsAt:business.proEndsAt?.toISOString()}) && storageUsage(assets, next).usedBytes > FREE_STORAGE_BYTES) {
+  if (business.verificationLevel !== "L2" && !hasPro({proEndsAt:business.proEndsAt?.toISOString()}) && storageUsage(assets, next).usedBytes > FREE_STORAGE_BYTES) {
     throw new ApiError(409, 'These photos exceed the Free plan’s 25 MB allocation.');
   }
 }

@@ -66,6 +66,12 @@ export interface Business {
   tierStartsAt?: string;
   proStartsAt?: string;
   proEndsAt?: string;
+  responseCount?: number;
+  responseAverageSeconds?: number;
+  availabilityConfirmedAt?: string;
+  utilities?: CampusUtilities;
+  listingExpiresAt?: string;
+  comradeListingKind?: "DECLUTTER" | "HUSTLE";
   requestAlertsEnabled?: boolean;
   liveStatus?: string;
   sellerType?: "SHOPFRONT" | "COMRADE";
@@ -184,4 +190,33 @@ export interface BookingIntent {
   contactPhone?: string;
   status: "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
   createdAt: string;
+}
+
+export interface CampusUtilities {
+  hasGenerator?: boolean;
+  hasWifi?: boolean;
+  hasWater?: boolean;
+  lateNightBoda?: boolean;
+  freeDelivery?: boolean;
+  noBrokerFee?: boolean;
+  vacantRooms?: number;
+  rentKes?: number;
+  security?: string;
+  waterStatus?: string;
+}
+export interface FlashDeal {
+  id: string;
+  businessId: string;
+  title: string;
+  priceKes: number;
+  endsAt: string;
+  dropZone?: string;
+  dropAt?: string;
+  deliveryFeeKes?: number;
+  joins: number;
+  businessName: string;
+  slug: string;
+  zone: string;
+  whatsapp: string;
+  sponsored: boolean;
 }

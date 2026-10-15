@@ -1,3 +1,5 @@
+> Updated daily campus features: see the [habit-strategy guide](habit-strategy.md) for SMS-code sign-in, unlimited free catalogues, timed deals, delivery drops, student listings and merchant quick actions. It supersedes the older account/plan descriptions below.
+
 # MoiMashinani: complete platform user guide
 
 Updated: 9 October 2026.
@@ -643,7 +645,7 @@ Temporary closure is a separate flag on a listing, not one of these approval sta
 
 L0 is the initial unverified listing level. L2 is the admin's field-verified level and the level used by the **Verified** search filter. L1 is an intermediate listing level that can appear on existing records or after L2 is removed.
 
-The current account-verification mechanism is email. Do not interpret older L1/OTP wording in the trust page as an available SMS-verification action. A verification badge does not guarantee service quality or a payment outcome.
+Accounts can be verified using an SMS code or the existing email invitation. SMS possession establishes account access; L2 remains an independent field/identity check. A verification badge does not guarantee service quality or a payment outcome.
 
 ### 5.4 Who can do what?
 
@@ -753,11 +755,11 @@ The guide documents current screens. The following are not available as user act
 - Owner editing of service modes, tags, extra categories, served areas, price level, walk-time text or profile slug through the current Details form.
 - A separate ambassador account/application portal.
 - Customer GPS radar/range/map-mode controls: a radar component exists in the repository but is not mounted on the current homepage.
-- SMS OTP account verification. Current account setup uses email.
+- Phone-code sign-in is now available when SMS transport is configured; see the habit-strategy guide.
 - Automatic promotion renewal, refund controls, receipt PDF downloads or manually granting paid tiers.
 - Offline enrollment and draft autosave.
 
-Some explanatory UI wording is older than the current implementation, including SMS OTP/trust wording and the ranking modal's fixed organic-results promise. Use the behaviours documented here: email establishes account access, L2 is field verification, and result composition depends on the eligible businesses available.
+Some explanatory UI wording is older than the current implementation, including SMS OTP/trust wording and the ranking modal's fixed organic-results promise. Use the behaviours documented here: phone or email verification establishes account access, L2 is field verification, and result composition depends on the eligible businesses available.
 
 For permanent closure, use temporary closure to stop discovery/booking immediately and contact the admin about the listing's longer-term status.
 

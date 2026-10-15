@@ -1,0 +1,12 @@
+ALTER TABLE "Business" ADD COLUMN "utilities" JSONB NOT NULL DEFAULT '{}', ADD COLUMN "availabilityConfirmedAt" TIMESTAMP(3), ADD COLUMN "listingExpiresAt" TIMESTAMP(3), ADD COLUMN "comradeListingKind" TEXT;
+ALTER TABLE "Account" ADD COLUMN "phone" TEXT, ADD COLUMN "phoneVerifiedAt" TIMESTAMP(3);
+CREATE UNIQUE INDEX "Account_phone_key" ON "Account"("phone");
+CREATE TABLE "PhoneChallenge" ("id" TEXT NOT NULL, "phone" TEXT NOT NULL, "name" TEXT NOT NULL, "codeHash" TEXT NOT NULL, "attempts" INTEGER NOT NULL DEFAULT 0, "expiresAt" TIMESTAMP(3) NOT NULL, "usedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "PhoneChallenge_pkey" PRIMARY KEY ("id"));
+CREATE INDEX "PhoneChallenge_expiresAt_idx" ON "PhoneChallenge"("expiresAt");
+CREATE TABLE "MerchantAction" ("id" TEXT NOT NULL, "tokenHash" TEXT NOT NULL, "businessId" TEXT NOT NULL, "ownerId" TEXT NOT NULL, "kind" TEXT NOT NULL, "resourceId" TEXT, "expiresAt" TIMESTAMP(3) NOT NULL, "usedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "MerchantAction_pkey" PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX "MerchantAction_tokenHash_key" ON "MerchantAction"("tokenHash");
+CREATE INDEX "MerchantAction_expiresAt_idx" ON "MerchantAction"("expiresAt");
+CREATE TABLE "FlashDeal" ("id" TEXT NOT NULL, "businessId" TEXT NOT NULL, "title" TEXT NOT NULL, "priceKes" INTEGER NOT NULL, "endsAt" TIMESTAMP(3) NOT NULL, "dropZone" TEXT, "dropAt" TIMESTAMP(3), "deliveryFeeKes" INTEGER, "closedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "FlashDeal_pkey" PRIMARY KEY ("id"), CONSTRAINT "FlashDeal_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE CASCADE ON UPDATE CASCADE);
+CREATE INDEX "FlashDeal_endsAt_idx" ON "FlashDeal"("endsAt");
+CREATE TABLE "DropJoin" ("id" TEXT NOT NULL, "dealId" TEXT NOT NULL, "sessionHash" TEXT NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "DropJoin_pkey" PRIMARY KEY ("id"), CONSTRAINT "DropJoin_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "FlashDeal"("id") ON DELETE CASCADE ON UPDATE CASCADE);
+CREATE UNIQUE INDEX "DropJoin_dealId_sessionHash_key" ON "DropJoin"("dealId", "sessionHash");

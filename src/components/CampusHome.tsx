@@ -6,6 +6,12 @@ import type { Business } from "@/lib/types";
 import { ZONES } from "@/lib/constants";
 import { useCampusZone, useClientReady } from "@/lib/useCampusZone";
 import { useNow } from "@/lib/useNow";
+import {
+  campusContext,
+  survivalMatch,
+  availabilityLabel,
+} from "@/lib/campus-value";
+import { FlashDeals } from "./FlashDeals";
 import { rankBusinesses } from "@/lib/rank";
 import { BusinessCard } from "./BusinessCard";
 import { CategoryBrowser } from "./CategoryBrowser";
@@ -63,16 +69,33 @@ export function CampusHome({
       b.availableNowUntil &&
       Date.parse(b.availableNowUntil) > now,
   );
+  const context = campusContext(now);
   const filtered = nearby.filter((b) =>
-    intent === "open"
-      ? live.some((l) => l.id === b.id)
-      : intent === "delivery"
-        ? b.serviceModes.includes("delivery")
-        : intent === "hostels"
-          ? b.primaryCategory === "hostels-rooms"
-          : true,
+    intent === "delivery"
+      ? b.serviceModes.includes("delivery")
+      : survivalMatch(b, intent, now),
   );
-  const ranked = rankBusinesses(filtered, "", zone).slice(0, 8);
+  const ranked = rankBusinesses(
+    filtered,
+    "",
+    zone,
+    undefined,
+    undefined,
+    "campus",
+    new Date(now),
+  ).slice(0, 8);
+  const contextPicks =
+    now > 0
+      ? rankBusinesses(
+          nearby,
+          context.query,
+          zone,
+          undefined,
+          undefined,
+          "pulse",
+          new Date(now),
+        ).slice(0, 3)
+      : [];
   function choose(value: string) {
     if (value === "deals") {
       router.push("/deals");
@@ -132,12 +155,49 @@ export function CampusHome({
           </label>
           <Button type="submit">Search</Button>
         </form>
+        <form
+          className="ui-card flex flex-wrap gap-3"
+          aria-label="Ask Mashinani"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPost(true);
+          }}
+        >
+          <label className="w-full min-w-0 sm:w-auto sm:flex-1">
+            <span className="block font-bold">
+              Can’t find what you need? Ask Mashinani
+            </span>
+            <Input
+              disabled={!ready}
+              aria-label="Your instant request"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Need a charger under KES 1,200 in Stage"
+            />
+          </label>
+          <Button
+            disabled={!ready}
+            className="w-full self-end sm:w-auto"
+            type="submit"
+          >
+            Broadcast a request
+          </Button>
+          <p className="w-full text-xs">
+            Reach matching verified sellers in your zone. No account needed.
+          </p>
+        </form>
         <div className="campus-pills" aria-label="Quick intents">
           {[
             ["open", "🟢 Open right now"],
             ["deals", "🔥 Today’s deals"],
             ["delivery", "🛵 Hostel delivery"],
-            ["hostels", "🏠 Rooms & vacancies"],
+            ["backup", "⚡ Blackout mode"],
+            ["wifi", "📶 Live Wi-Fi"],
+            ["water", "💧 Water available"],
+            ["late", "🌙 Open past 9 PM"],
+            ["free-delivery", "🛵 Free zone delivery"],
+            ["hostels", "🏠 Verified vacant kejas"],
+            ["comrade", "🎓 Comrade Market"],
             ["requests", "📢 Post a request"],
           ].map(([value, label]) => (
             <Button
@@ -151,6 +211,31 @@ export function CampusHome({
           ))}
         </div>
       </section>
+      <section className="ui-card space-y-3">
+        <h2 className="text-2xl font-bold">
+          {now ? context.title : "Your campus pulse"}
+        </h2>
+        <p>
+          {now
+            ? context.description
+            : "Fresh deals, instant requests and student hustles around Moi."}
+        </p>
+        <div className="flex flex-wrap gap-3">
+          {contextPicks.map(({ business }) => (
+            <Link
+              className="ui-button ui-button-secondary"
+              key={business.id}
+              href={`/b/${business.slug}`}
+            >
+              {business.name} · {availabilityLabel(business, now)}
+            </Link>
+          ))}
+          <Link href="/market" className="underline">
+            Explore student hustles & declutter →
+          </Link>
+        </div>
+      </section>
+      <FlashDeals compact />
       {live.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-xl font-bold">Live on campus now</h2>
@@ -162,7 +247,7 @@ export function CampusHome({
               <Link href={`/b/${b.slug}`} key={b.id} className="ui-card">
                 <p className="truncate font-bold">{b.name}</p>
                 <p className="my-2 text-sm">
-                  {b.liveStatus || "Open for customers now"}
+                  {b.liveStatus || availabilityLabel(b, now)}
                 </p>
                 <Badge>
                   {ZONES.find((z) => z.slug === b.zone)?.name || b.zone}
@@ -180,12 +265,24 @@ export function CampusHome({
               : intent === "delivery"
                 ? "Delivering to hostels"
                 : intent === "hostels"
-                  ? "Rooms & vacancies"
-                  : "Nearby prices & sellers"}
+                  ? "Verified vacant kejas · no broker fee"
+                  : intent === "backup"
+                    ? "Live backup power in your zone"
+                    : intent === "wifi"
+                      ? "Live Wi-Fi in your zone"
+                      : intent === "water"
+                        ? "Water available in your zone"
+                        : intent === "late"
+                          ? "Shops open past 9 PM & night bodas"
+                          : intent === "free-delivery"
+                            ? "Free delivery to your zone"
+                            : intent === "comrade"
+                              ? "Verified comrade sellers"
+                              : "Nearby prices & sellers"}
           </h2>
           <Link
             className="text-sm underline"
-            href={`/search?zone=${zone}${intent === "open" ? "&availableNow=true" : intent === "delivery" ? "&delivery=true" : intent === "hostels" ? "&category=hostels-rooms" : ""}`}
+            href={`/search?zone=${zone}&survival=${intent}${intent === "open" ? "&availableNow=true" : intent === "delivery" ? "&delivery=true" : intent === "hostels" ? "&category=hostels-rooms" : ""}`}
           >
             See all
           </Link>
@@ -222,7 +319,7 @@ export function CampusHome({
       <Card>
         <h2 className="text-xl font-bold">Have a shop or a hostel hustle?</h2>
         <p className="my-3 text-sm">
-          List five items with prices for free. Request a free verification
+          List unlimited items with prices for free. Request a free verification
           visit and let students find you.
         </p>
         <Link className="ui-button ui-button-primary" href="/onboard">
@@ -233,7 +330,11 @@ export function CampusHome({
         </Link>
       </Card>
       {post && (
-        <DemandModal initialZone={zone} onClose={() => setPost(false)} />
+        <DemandModal
+          initialQuery={query}
+          initialZone={zone}
+          onClose={() => setPost(false)}
+        />
       )}
     </>
   );

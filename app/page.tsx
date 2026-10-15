@@ -1,3 +1,4 @@
+import { survivalMatch } from "@/lib/campus-value";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Store } from "@/lib/store";
@@ -14,8 +15,9 @@ export const metadata: Metadata = {
 };
 export default async function HomePage() {
   await connection();
+  const now = new Date().getTime();
   const businesses = (await Store.getBusinesses())
-    .filter((b) => b.status === "ACTIVE" && !b.isTemporarilyClosed)
+    .filter((b) => survivalMatch(b, "all", now))
     .map(publicBusiness);
   return (
     <div className="interior-page">

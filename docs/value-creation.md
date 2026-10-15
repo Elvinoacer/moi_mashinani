@@ -12,7 +12,7 @@ Implementation of `moi_mashinani_ux_ui_value_creation_audit.md`. The app remains
 
 ## Shop and hostel supply
 
-Two-step onboarding collects essentials and three to five priced core items, then shows a preview and trust options. Every business keeps five free public products. Templates propose real item names, never fabricated prices. Drafts stay in the current tab for 24 hours.
+Two-step onboarding collects essentials and priced core items (student sellers can start with one), then shows a preview and trust options. Every business keeps unlimited free public products and stock updates. Templates propose real item names, never fabricated prices. Drafts stay in the current tab for 24 hours.
 
 Shopfront sellers use public shop/signboard photos. Comrade sellers use a public product/workspace photo and a private student-ID photo, or request an in-person check. Both types can request a free ambassador visit. Uploaded student IDs are re-encoded and stored separately in PostgreSQL, served through authenticated, uncached routes. They are never R2 public gallery files or public business fields. Owners can replace private evidence from the dashboard. Field workers can review it while an authorized visit is outstanding. Admins can review it from the verification modal.
 
@@ -42,7 +42,7 @@ The field tool has high contrast, 16px text and 52px primary controls. Progress 
 | -------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | Deal blast           | KES 30       | 24 hours at the top of Deals; pushes to opted-in campus accounts                                                         |
 | Recommended top spot | KES 100      | Seven days above free listings in matching category/zone results                                                         |
-| Pro                  | KES 250      | One calendar month of unlimited items/storage, stock controls, a quality ranking bonus and optional matching-request SMS |
+| Pro                  | KES 250      | One calendar month of featured relevant zone placement and daily active-deal broadcasts |
 
 Existing Featured purchases and bundle pricing continue to reconcile correctly. Historical KES 500 Pro checkouts can still complete at their original stored quote; new quotes use KES 250. Renewal preserves paid time and duplicate callbacks cannot add time twice.
 
@@ -50,7 +50,7 @@ Existing Featured purchases and bundle pricing continue to reconcile correctly. 
 
 The fallback reopens the saved provider checkout and allows a 10-character M-Pesa receipt to be saved for operator review. A receipt alone never settles a payment or activates a plan. The existing client settlement endpoint remains disabled. No unspecified manual paybill is presented.
 
-Matching requests generate durable inbox/email/push notifications for eligible sellers. Optional Pro SMS uses Africa's Talking, requires owner opt-in and `AT_USERNAME`, `AT_API_KEY`, plus an approved `AT_SENDER_ID` where required. Delivery rechecks the owner, consent, verification and Pro term; expired/disabled targets stop. Provider acceptance is logged and retryable, without promising handset delivery. Contracts: [SMS endpoint](https://africastalkingltd.gitbooks.io/mobile-communication-apis/content/downloads.html), [acceptance versus delivery](https://help.africastalking.com/en/articles/742491-why-did-my-messages-fail).
+Matching requests generate durable inbox/email/push notifications for eligible sellers. Optional free merchant SMS uses Africa's Talking, requires owner opt-in and `AT_USERNAME`, `AT_API_KEY`, plus an approved `AT_SENDER_ID` where required. Delivery rechecks the owner, consent, verification and listing state; disabled targets stop. Provider acceptance is logged and retryable, without promising handset delivery. Contracts: [SMS endpoint](https://africastalkingltd.gitbooks.io/mobile-communication-apis/content/downloads.html), [acceptance versus delivery](https://help.africastalking.com/en/articles/742491-why-did-my-messages-fail).
 
 ## Deployment
 
@@ -60,7 +60,7 @@ No production deployment, actual M-Pesa charge, real SMS or external customer Wh
 
 ## Verification
 
-- `npm run test:value`: 23 passing database/API checks for phone login, permissions, request consent/redaction/expiry/closure, notifications, WhatsApp response links, live expiry, lead events, Pro stock enforcement, replay-safe micro-packages, private ID access and field progress.
+- `npm run test:value`: 23 passing database/API checks for phone login, permissions, request consent/redaction/expiry/closure, notifications, WhatsApp response links, live expiry, lead events, free stock accuracy, replay-safe micro-packages, private ID access and field progress.
 - `npm run test:value:browser`: 10 passing mobile/desktop journeys for discovery, stored zones, anonymous requests, immediate WhatsApp handoff with a deliberately delayed booking log, two-step hostel preview, dashboard actions, mocked provider polling, field touch targets and empty-state recovery. No uncaught browser errors.
 - `npm run test:value:unit`: two passing matched-price and WhatsApp-message checks.
 - `npm run test:sms`: provider contract, acceptance validation and fail-closed configuration, using injected fetch mocks.
@@ -79,3 +79,5 @@ Six email contract checks and the anonymous enrollment photo upload/CSRF checks 
 The workflow harness creates and removes its own local database, captures email and object storage, and disables actual payments/SMS. Browser provider responses are mocked. It uses no external checkout charge and no production data mutation.
 
 After building, `TEST_SERVER_MODE=production npm run test:harness` runs the compiled app against the disposable database. Its configured HTTPS invitation origin satisfies production URL validation; the loopback test transport remains HTTP, requests use the configured test origin and captured links are opened by token in the test browser. No invitation is sent externally.
+
+The [habit-strategy guide](habit-strategy.md) supersedes the original catalogue entitlements and documents the new daily deals, drops, Comrade Market, SMS-code sign-in and no-login merchant actions.

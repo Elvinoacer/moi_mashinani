@@ -20,7 +20,7 @@ export async function runPlanMaintenance(
   const thirtyAgo = new Date(now.getTime() - 30 * 864e5);
   const candidates = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT b."id" FROM "Business" b JOIN "Account" a ON a."id" = b."ownerId"
-    WHERE b."proEndsAt" <= ${seven} AND b."proEndsAt" >= ${thirtyAgo} AND a."emailVerifiedAt" IS NOT NULL
+    WHERE b."proEndsAt" <= ${seven} AND b."proEndsAt" >= ${thirtyAgo} AND (a."emailVerifiedAt" IS NOT NULL OR a."phoneVerifiedAt" IS NOT NULL)
     AND NOT EXISTS (SELECT 1 FROM "PlanNotice" n WHERE n."businessId" = b."id" AND n."endsAt" = b."proEndsAt"
       AND n."daysBefore" = CASE WHEN b."proEndsAt" <= ${now} THEN 0 WHEN b."proEndsAt" <= ${one} THEN 1 WHEN b."proEndsAt" <= ${three} THEN 3 ELSE 7 END
       AND n."sentAt" IS NOT NULL)
@@ -42,7 +42,10 @@ export async function runPlanMaintenance(
       where: { id: candidate.id },
       include: { owner: true },
     });
-    if (!business?.proEndsAt || !business.owner?.emailVerifiedAt) {
+    if (
+      !business?.proEndsAt ||
+      (!business.owner?.emailVerifiedAt && !business.owner?.phoneVerifiedAt)
+    ) {
       result.skipped++;
       continue;
     }
@@ -107,17 +110,19 @@ export async function runPlanMaintenance(
             path: `/pro/${business.slug}`,
             button: "Review & renew Pro",
           },
-          ["PUSH"],
+          business.owner?.emailVerifiedAt ? ["PUSH"] : ["PUSH", "SMS"],
+          business.id,
         ),
       );
-      await send(
-        business.owner.email,
-        business.name,
-        business.slug,
-        business.proEndsAt,
-        stage,
-        `pro/${business.id}/${business.proEndsAt.toISOString()}/${stage}`,
-      );
+      if (business.owner.emailVerifiedAt)
+        await send(
+          business.owner.email,
+          business.name,
+          business.slug,
+          business.proEndsAt,
+          stage,
+          `pro/${business.id}/${business.proEndsAt.toISOString()}/${stage}`,
+        );
       await prisma.planNotice.updateMany({
         where: { id: notice.id, claimedAt },
         data: { sentAt: new Date(), claimedAt: null, error: null },

@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { FlashDeals } from "@/components/FlashDeals";
+import { ZONES } from "@/lib/constants";
+import { useCampusZone } from "@/lib/useCampusZone";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
@@ -30,6 +33,7 @@ export function DealsPageClient({
     initialDeals ?? [],
   );
   const [dealLoading, setDealLoading] = useState(initialDeals === undefined);
+  const [zone, setZone] = useCampusZone();
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -69,6 +73,22 @@ export function DealsPageClient({
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pb-20 md:pb-12">
+        <label className="block font-bold">
+          Your delivery zone
+          <select
+            aria-label="Your delivery zone"
+            className="ui-input"
+            value={zone}
+            onChange={(e) => setZone(e.target.value)}
+          >
+            {ZONES.map((z) => (
+              <option key={z.slug} value={z.slug}>
+                {z.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <FlashDeals />
         {dealBusinesses.length < 6 && (
           <section className="space-y-3">
             <h2 className="text-2xl font-bold">
@@ -127,10 +147,10 @@ export function DealsPageClient({
 
           <div className="inline-flex items-center gap-1.5 bg-[#e9eedf] text-[#526936] text-xs font-display font-bold px-3 py-1 rounded-full border border-[#dfe5d8] mb-3">
             <CheckCircle2 className="w-4 h-4" />
-            <span>STUDENT PERKS & SAFETY HUB</span>
+            <span>DAILY COMRADE DEALS & DROPS</span>
           </div>
           <h1 className="font-display font-black text-3xl md:text-5xl text-[#243b32] uppercase tracking-tight">
-            Campus Deals & Trust Guide
+            Today’s Campus Deals
           </h1>
           <p className="text-sm md:text-base text-[#667064] mt-2 max-w-2xl leading-relaxed font-body">
             Moi University student discounts, safety tips for hiring campus

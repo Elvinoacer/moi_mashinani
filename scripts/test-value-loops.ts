@@ -151,7 +151,7 @@ async function main() {
       },
     });
     check(
-      notification?.path === "/requests",
+      notification?.path.startsWith("/merchant/action/"),
       "matching active verified seller gets a durable request notification",
     );
     await req(
@@ -298,18 +298,16 @@ async function main() {
       "PATCH",
       { ...business.services[0], inStock: false },
       cookie,
-      409,
     );
     await req(
       `/api/businesses/${business.slug}`,
       "PATCH",
       { services: [{ ...business.services[0], inStock: false }] },
       cookie,
-      409,
     );
     check(
       true,
-      "Pro stock entitlement applies to both product endpoint and bulk profile updates",
+      "Free stock accuracy applies to product and bulk profile updates",
     );
     const payment = await Store.createPayment({
       apiRef: `audit-pro-${tag}`,

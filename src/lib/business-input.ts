@@ -202,6 +202,54 @@ export function businessInput(
       return service;
     });
   }
+  if (body.utilities !== undefined) {
+    if (
+      !body.utilities ||
+      typeof body.utilities !== "object" ||
+      Array.isArray(body.utilities)
+    )
+      throw new ApiError(400, "Invalid campus utilities");
+    const raw = body.utilities as Record<string, unknown>;
+    const utilities: NonNullable<Business["utilities"]> = {};
+    for (const key of [
+      "hasGenerator",
+      "hasWifi",
+      "hasWater",
+      "lateNightBoda",
+      "freeDelivery",
+      "noBrokerFee",
+    ] as const) {
+      if (raw[key] !== undefined) {
+        if (typeof raw[key] !== "boolean")
+          throw new ApiError(400, "Invalid utility flag");
+        utilities[key] = raw[key];
+      }
+    }
+    for (const key of ["vacantRooms", "rentKes"] as const) {
+      if (raw[key] !== undefined) {
+        if (
+          !Number.isInteger(raw[key]) ||
+          Number(raw[key]) < 0 ||
+          Number(raw[key]) > 10000000
+        )
+          throw new ApiError(
+            400,
+            "Use a non-negative whole number for rooms and rent",
+          );
+        utilities[key] = Number(raw[key]);
+      }
+    }
+    for (const key of ["security", "waterStatus"] as const)
+      if (raw[key] !== undefined)
+        utilities[key] = textField(raw[key], key, 200);
+    result.utilities = utilities;
+  }
+  if (body.comradeListingKind !== undefined) {
+    if (!["HUSTLE", "DECLUTTER"].includes(String(body.comradeListingKind)))
+      throw new ApiError(400, "Choose hustle or declutter");
+    result.comradeListingKind =
+      body.comradeListingKind as Business["comradeListingKind"];
+  }
   if (body.requestAlertsEnabled !== undefined) {
     if (typeof body.requestAlertsEnabled !== "boolean")
       throw new ApiError(400, "Invalid SMS consent");

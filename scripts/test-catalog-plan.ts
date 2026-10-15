@@ -102,12 +102,12 @@ test("external cron rejects missing/wrong tokens and uses small resumable batche
     else process.env.CRON_SECRET = oldSecret;
   }
 });
-test("expiry is immediate, extra items are retained for owners, Free cannot add a sixth item", () => {
+test("visibility expiry never hides catalogues or gates supply", () => {
   const now = Date.parse("2027-03-20T09:00:00Z");
   const expired = { proEndsAt: new Date(now).toISOString() };
   assert.equal(hasPro(expired, now), false);
-  assert.equal(visibleProducts({ ...expired, services: items }, now).length, 5);
-  assert.ok(productLimitError({}, items.slice(0, 5), items, now));
+  assert.equal(visibleProducts({ ...expired, services: items }, now).length, 6);
+  assert.equal(productLimitError({}, items.slice(0, 5), items, now), undefined);
   assert.equal(
     productLimitError(
       expired,
@@ -121,13 +121,14 @@ test("expiry is immediate, extra items are retained for owners, Free cannot add 
     productLimitError(expired, items, items.slice(1), now),
     undefined,
   );
-  assert.ok(
+  assert.equal(
     productLimitError(
       expired,
       items,
       [...items.slice(0, 5), { id: "new", name: "New" }],
       now,
     ),
+    undefined,
   );
   assert.equal(
     productLimitError(

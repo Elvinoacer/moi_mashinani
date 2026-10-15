@@ -1,7 +1,8 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { PhoneSignIn } from "./PhoneSignIn";
 import { ZONES } from "@/lib/constants";
 import { CategorySelect } from "./CategorySelect";
 import { PhotoUploader } from "./PhotoUploader";
@@ -42,6 +43,11 @@ export function BusinessEnrollmentForm({
   mode?: "admin" | "public" | "field";
   onEnrolled?: () => void;
 }) {
+  const [phoneOwner, setPhoneOwner] = useState<{
+    name: string;
+    phone: string;
+  } | null>(null);
+  const [authAttempt, setAuthAttempt] = useState(0);
   const [step, setStep] = useState(1);
   const [details, setDetails] = useState(blank);
   const [sellerType, setSellerType] = useState<"SHOPFRONT" | "COMRADE">(
@@ -63,6 +69,25 @@ export function BusinessEnrollmentForm({
     business: Business;
     invitation: { sent: boolean; error?: string };
   } | null>(null);
+  useEffect(() => {
+    if (mode !== "public") return;
+    const controller = new AbortController();
+    fetch("/api/auth/me", { signal: controller.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.user?.phone) {
+          setPhoneOwner(data.user);
+          setDetails((d) => ({
+            ...d,
+            ownerName: data.user.name,
+            ownerPhone: data.user.phone,
+            phone: d.phone || data.user.phone,
+          }));
+        }
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [mode, authAttempt]);
   const draftKey = "mm-enrollment-v3-" + mode;
   function field(key: keyof Details, label: string, type = "text") {
     return (
@@ -78,7 +103,6 @@ export function BusinessEnrollmentForm({
     );
   }
   function add(name = "") {
-    if (items.length >= 5) return;
     setItems((current) => [
       ...current,
       { id: crypto.randomUUID(), name, price: "" },
@@ -89,7 +113,9 @@ export function BusinessEnrollmentForm({
       !details.name.trim() ||
       !details.primaryCategory ||
       !details.ownerName.trim() ||
-      !/^\S+@\S+\.\S+$/.test(details.ownerEmail)
+      (!phoneOwner &&
+        mode === "public" &&
+        !/^\S+@\S+\.\S+$/.test(details.ownerEmail))
     )
       throw new Error(
         "Add the business name, category, owner name and a recovery email.",
@@ -101,7 +127,7 @@ export function BusinessEnrollmentForm({
     )
       throw new Error("Enter a Kenyan mobile number: 07…, 01… or +254…");
     if (
-      items.length < 3 ||
+      items.length < (sellerType === "COMRADE" ? 1 : 3) ||
       items.some(
         (i) =>
           !i.name.trim() ||
@@ -110,7 +136,9 @@ export function BusinessEnrollmentForm({
           Number(i.price) < 0,
       )
     )
-      throw new Error("Add three to five items with names and valid prices.");
+      throw new Error(
+        "Add core items with names and valid prices. Student sellers can start with one.",
+      );
   }
   function preview() {
     setError("");
@@ -295,8 +323,11 @@ export function BusinessEnrollmentForm({
           {result.business.status === "ACTIVE"
             ? "Your inspected listing is live."
             : "Your preview is saved for review."}{" "}
-          Accept the owner invitation at {details.ownerEmail} to set your
-          password. You can then sign in using your owner phone.
+          {phoneOwner
+            ? "Your phone account can manage this listing now."
+            : details.ownerEmail
+              ? `Accept the owner invitation at ${details.ownerEmail}, or verify your owner phone by SMS.`
+              : "The owner can verify their phone by SMS to manage this listing."}
         </p>
         {result.business.verificationVisitRequested && (
           <p>A free verification visit is in the field queue.</p>
@@ -307,16 +338,29 @@ export function BusinessEnrollmentForm({
               "Invitation delivery unavailable. Your listing is saved; request the email again."}
           </p>
         )}
-        <Button
-          disabled={busy}
-          variant="secondary"
-          onClick={() => void resend()}
-        >
-          Resend owner invitation
-        </Button>
+        {details.ownerEmail && !phoneOwner && (
+          <Button
+            disabled={busy}
+            variant="secondary"
+            onClick={() => void resend()}
+          >
+            Resend owner invitation
+          </Button>
+        )}
         <Link href="/login" className="ui-button ui-button-primary">
           Go to my account
         </Link>
+        {(phoneOwner ||
+          mode !== "public" ||
+          result.business.status === "ACTIVE") && (
+          <a
+            className="ui-button ui-button-secondary"
+            href={`/api/businesses/${result.business.slug}/signboard`}
+            download
+          >
+            Download QR signboard
+          </a>
+        )}
         {result.business.status === "ACTIVE" && (
           <Link className="block underline" href={`/b/${result.business.slug}`}>
             View public page
@@ -327,339 +371,361 @@ export function BusinessEnrollmentForm({
       </Card>
     );
   return (
-    <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5">
-      <Card>
-        <h2 className="text-2xl font-bold">
-          {mode === "public"
-            ? "Your shop or hustle, on campus"
-            : "Quick field enrollment"}
-        </h2>
-        <p className="mt-2 text-sm">
-          Two steps: essentials & prices, then preview & trust. Five price slots
-          are always free.
-        </p>
-        <div className="mt-4 flex gap-3">
-          <Button
-            type="button"
-            variant={step === 1 ? "primary" : "secondary"}
-            onClick={() => setStep(1)}
-            aria-current={step === 1 ? "step" : undefined}
-          >
-            1 · Essentials & prices
-          </Button>
-          <Button
-            type="button"
-            variant={step === 2 ? "primary" : "secondary"}
-            onClick={preview}
-            aria-current={step === 2 ? "step" : undefined}
-          >
-            2 · Preview & trust
-          </Button>
-        </div>
-      </Card>
-      {step === 1 ? (
-        <Card className="space-y-5">
-          <fieldset>
-            <legend className="mb-2 font-bold">How do you operate?</legend>
-            <div className="flex flex-wrap gap-2">
-              {(["SHOPFRONT", "COMRADE"] as const).map((type) => (
-                <Button
-                  type="button"
-                  key={type}
-                  variant={sellerType === type ? "primary" : "secondary"}
-                  aria-pressed={sellerType === type}
-                  onClick={() => setSellerType(type)}
+    <>
+      {mode === "public" && !phoneOwner && (
+        <Card className="mx-auto max-w-3xl">
+          <PhoneSignIn onSignedIn={() => setAuthAttempt((n) => n + 1)} />
+        </Card>
+      )}
+      <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5">
+        <Card>
+          <h2 className="text-2xl font-bold">
+            {mode === "public"
+              ? "Your shop or hustle, on campus"
+              : "Quick field enrollment"}
+          </h2>
+          <p className="mt-2 text-sm">
+            Two steps: essentials & prices, then preview & trust. Unlimited
+            price slots are always free.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Button
+              type="button"
+              variant={step === 1 ? "primary" : "secondary"}
+              onClick={() => setStep(1)}
+              aria-current={step === 1 ? "step" : undefined}
+            >
+              1 · Essentials & prices
+            </Button>
+            <Button
+              type="button"
+              variant={step === 2 ? "primary" : "secondary"}
+              onClick={preview}
+              aria-current={step === 2 ? "step" : undefined}
+            >
+              2 · Preview & trust
+            </Button>
+          </div>
+        </Card>
+        {step === 1 ? (
+          <Card className="space-y-5">
+            <fieldset>
+              <legend className="mb-2 font-bold">How do you operate?</legend>
+              <div className="flex flex-wrap gap-2">
+                {(["SHOPFRONT", "COMRADE"] as const).map((type) => (
+                  <Button
+                    type="button"
+                    key={type}
+                    variant={sellerType === type ? "primary" : "secondary"}
+                    aria-pressed={sellerType === type}
+                    onClick={() => setSellerType(type)}
+                  >
+                    {type === "SHOPFRONT"
+                      ? "I have a shop / stall"
+                      : "Hostel / mobile hustle"}
+                  </Button>
+                ))}
+              </div>
+            </fieldset>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {field("name", "Business name")}
+              {field("phone", "Business WhatsApp", "tel")}
+              <label className="block text-sm font-semibold">
+                Business category
+                <CategorySelect
+                  value={details.primaryCategory}
+                  onChange={(value) => {
+                    setDetails((d) => ({ ...d, primaryCategory: value }));
+                    setItems([]);
+                  }}
+                  className="ui-input"
+                />
+              </label>
+              <label className="block text-sm font-semibold">
+                Campus zone
+                <select
+                  className="ui-input"
+                  value={details.zone}
+                  onChange={(e) =>
+                    setDetails((d) => ({ ...d, zone: e.target.value }))
+                  }
                 >
-                  {type === "SHOPFRONT"
-                    ? "I have a shop / stall"
-                    : "Hostel / mobile hustle"}
+                  {ZONES.filter((z) => z.slug !== "all").map((z) => (
+                    <option key={z.slug} value={z.slug}>
+                      {z.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {field("ownerName", "Owner name")}
+              {!phoneOwner &&
+                field(
+                  "ownerEmail",
+                  mode === "public"
+                    ? "Recovery email (or sign in by phone above)"
+                    : "Owner email (optional for SMS setup)",
+                  "email",
+                )}
+            </div>
+            <p className="text-xs">
+              Your email is used once to accept ownership and set a password,
+              and for account recovery. Then sign in using your owner phone and
+              password.
+            </p>
+            <details>
+              <summary className="cursor-pointer font-semibold">
+                Separate private owner phone
+              </summary>
+              {field("ownerPhone", "Private owner phone (if different)", "tel")}
+            </details>
+            <h3 className="text-lg font-bold">Add 3–5 core prices</h3>
+            <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto">
+              {templateSuggestions(details.primaryCategory, "").map((item) => (
+                <Button
+                  key={item.name}
+                  type="button"
+                  variant="secondary"
+                  disabled={items.some((i) => i.name === item.name)}
+                  onClick={() => add(item.name)}
+                >
+                  + {item.name}
                 </Button>
               ))}
             </div>
-          </fieldset>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {field("name", "Business name")}
-            {field("phone", "Business WhatsApp", "tel")}
-            <label className="block text-sm font-semibold">
-              Business category
-              <CategorySelect
-                value={details.primaryCategory}
-                onChange={(value) => {
-                  setDetails((d) => ({ ...d, primaryCategory: value }));
-                  setItems([]);
-                }}
-                className="ui-input"
-              />
-            </label>
-            <label className="block text-sm font-semibold">
-              Campus zone
-              <select
-                className="ui-input"
-                value={details.zone}
-                onChange={(e) =>
-                  setDetails((d) => ({ ...d, zone: e.target.value }))
-                }
+            {items.map((item, index) => (
+              <div
+                className="grid gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_150px_auto]"
+                key={item.id}
               >
-                {ZONES.filter((z) => z.slug !== "all").map((z) => (
-                  <option key={z.slug} value={z.slug}>
-                    {z.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {field("ownerName", "Owner name")}
-            {field("ownerEmail", "Recovery email", "email")}
-          </div>
-          <p className="text-xs">
-            Your email is used once to accept ownership and set a password, and
-            for account recovery. Then sign in using your owner phone and
-            password.
-          </p>
-          <details>
-            <summary className="cursor-pointer font-semibold">
-              Separate private owner phone
-            </summary>
-            {field("ownerPhone", "Private owner phone (if different)", "tel")}
-          </details>
-          <h3 className="text-lg font-bold">Add 3–5 core prices</h3>
-          <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto">
-            {templateSuggestions(details.primaryCategory, "").map((item) => (
-              <Button
-                key={item.name}
-                type="button"
-                variant="secondary"
-                disabled={
-                  items.length >= 5 || items.some((i) => i.name === item.name)
-                }
-                onClick={() => add(item.name)}
-              >
-                + {item.name}
-              </Button>
+                <label className="text-sm">
+                  Item {index + 1}
+                  <Input
+                    aria-label={`Product ${index + 1} name`}
+                    value={item.name}
+                    maxLength={150}
+                    onChange={(e) =>
+                      setItems((current) =>
+                        current.map((i) =>
+                          i.id === item.id ? { ...i, name: e.target.value } : i,
+                        ),
+                      )
+                    }
+                  />
+                </label>
+                <label className="text-sm">
+                  Price · KES
+                  <Input
+                    aria-label={`Product ${index + 1} price`}
+                    type="number"
+                    min="0"
+                    max="10000000"
+                    step="0.01"
+                    value={item.price}
+                    onChange={(e) =>
+                      setItems((current) =>
+                        current.map((i) =>
+                          i.id === item.id
+                            ? { ...i, price: e.target.value }
+                            : i,
+                        ),
+                      )
+                    }
+                  />
+                </label>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  aria-label={`Remove item ${index + 1}`}
+                  onClick={() =>
+                    setItems((current) =>
+                      current.filter((i) => i.id !== item.id),
+                    )
+                  }
+                >
+                  Remove
+                </Button>
+              </div>
             ))}
-          </div>
-          {items.map((item, index) => (
-            <div
-              className="grid gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_150px_auto]"
-              key={item.id}
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={false}
+              onClick={() => add()}
             >
-              <label className="text-sm">
-                Item {index + 1}
-                <Input
-                  aria-label={`Product ${index + 1} name`}
-                  value={item.name}
-                  maxLength={150}
-                  onChange={(e) =>
-                    setItems((current) =>
-                      current.map((i) =>
-                        i.id === item.id ? { ...i, name: e.target.value } : i,
-                      ),
-                    )
-                  }
-                />
-              </label>
-              <label className="text-sm">
-                Price · KES
-                <Input
-                  aria-label={`Product ${index + 1} price`}
-                  type="number"
-                  min="0"
-                  max="10000000"
-                  step="0.01"
-                  value={item.price}
-                  onChange={(e) =>
-                    setItems((current) =>
-                      current.map((i) =>
-                        i.id === item.id ? { ...i, price: e.target.value } : i,
-                      ),
-                    )
-                  }
-                />
-              </label>
-              <Button
-                variant="secondary"
-                type="button"
-                aria-label={`Remove item ${index + 1}`}
-                onClick={() =>
-                  setItems((current) => current.filter((i) => i.id !== item.id))
-                }
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={items.length >= 5}
-            onClick={() => add()}
-          >
-            Add custom item
-          </Button>
-        </Card>
-      ) : (
-        <>
-          <Card className="space-y-3">
-            <h3 className="text-xl font-bold">Instant listing preview</h3>
-            <p className="font-bold">
-              {details.name} ·{" "}
-              {ZONES.find((z) => z.slug === details.zone)?.name}
-            </p>
-            <ul className="space-y-2">
-              {items.map((i) => (
-                <li key={i.id} className="flex justify-between gap-3">
-                  <span>{i.name}</span>
-                  <strong>KES {Number(i.price).toLocaleString("en-KE")}</strong>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs">
-              This is your preview. Public listing and a trust badge need
-              review.
-            </p>
+              Add custom item
+            </Button>
           </Card>
-          <Card className="space-y-4">
-            <h3 className="text-xl font-bold">Trust upgrade</h3>
-            {field(
-              "landmark",
-              sellerType === "COMRADE"
-                ? "Hostel / safe meeting point"
-                : "Nearby landmark",
-            )}
-            <label className="block text-sm font-semibold">
-              Hours
-              <select
-                className="ui-input"
-                value={hours}
-                onChange={(e) => setHours(e.target.value)}
-              >
-                {[
-                  ["standard", "Mon–Sat 8 AM–6 PM"],
-                  ["everyday", "Every day"],
-                  ["late", "Late hours"],
-                  ["appointment", "By appointment"],
-                ].map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
+        ) : (
+          <>
+            <Card className="space-y-3">
+              <h3 className="text-xl font-bold">Instant listing preview</h3>
+              <p className="font-bold">
+                {details.name} ·{" "}
+                {ZONES.find((z) => z.slug === details.zone)?.name}
+              </p>
+              <ul className="space-y-2">
+                {items.map((i) => (
+                  <li key={i.id} className="flex justify-between gap-3">
+                    <span>{i.name}</span>
+                    <strong>
+                      KES {Number(i.price).toLocaleString("en-KE")}
+                    </strong>
+                  </li>
                 ))}
-              </select>
-            </label>
-            <label className="flex gap-2">
-              <input
-                type="checkbox"
-                checked={delivery}
-                onChange={(e) => setDelivery(e.target.checked)}
-              />
-              I deliver to hostels
-            </label>
-            <PhotoUploader
-              enrollment
-              multiple
-              camera
-              maxFiles={8 - photos.length}
-              disabled={uploading || photos.length >= 8}
-              label={
+              </ul>
+              <p className="text-xs">
+                This is your preview. Public listing and a trust badge need
+                review.
+              </p>
+            </Card>
+            <Card className="space-y-4">
+              <h3 className="text-xl font-bold">Trust upgrade</h3>
+              {field(
+                "landmark",
                 sellerType === "COMRADE"
-                  ? "Product / workspace photos (public)"
-                  : "Shop / signboard photos (public)"
-              }
-              onBusyChange={setUploading}
-              onUploaded={(urls) => setPhotos((p) => [...p, ...urls])}
-            />
-            <div className="grid grid-cols-3 gap-2">
-              {photos.map((url, index) => (
-                <Image
-                  key={url}
-                  src={url}
-                  alt={`Listing photo ${index + 1}`}
-                  width={180}
-                  height={120}
-                  unoptimized
-                  className="rounded-lg"
-                />
-              ))}
-            </div>
-            {sellerType === "COMRADE" && (
-              <label className="block space-y-2 text-sm font-semibold">
-                Student ID (private; only you and reviewers can see it)
-                <Input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  disabled={uploading}
-                  onChange={(e) => void uploadProof(e.target.files?.[0])}
-                />
-                {proofId && (
-                  <span className="block text-green-800">
-                    Student ID uploaded privately.
-                  </span>
-                )}
+                  ? "Hostel / safe meeting point"
+                  : "Nearby landmark",
+              )}
+              <label className="block text-sm font-semibold">
+                Hours
+                <select
+                  className="ui-input"
+                  value={hours}
+                  onChange={(e) => setHours(e.target.value)}
+                >
+                  {[
+                    ["standard", "Mon–Sat 8 AM–6 PM"],
+                    ["everyday", "Every day"],
+                    ["late", "Late hours"],
+                    ["appointment", "By appointment"],
+                  ].map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
               </label>
-            )}
-            <label className="flex gap-3 rounded-xl bg-[#edf2e5] p-4">
-              <input
-                type="checkbox"
-                checked={visit}
-                onChange={(e) => setVisit(e.target.checked)}
+              <label className="flex gap-2">
+                <input
+                  type="checkbox"
+                  checked={delivery}
+                  onChange={(e) => setDelivery(e.target.checked)}
+                />
+                I deliver to hostels
+              </label>
+              <PhotoUploader
+                enrollment
+                multiple
+                camera
+                maxFiles={8 - photos.length}
+                disabled={uploading || photos.length >= 8}
+                label={
+                  sellerType === "COMRADE"
+                    ? "Product / workspace photos (public)"
+                    : "Shop / signboard photos (public)"
+                }
+                onBusyChange={setUploading}
+                onUploaded={(urls) => setPhotos((p) => [...p, ...urls])}
               />
-              <span>
-                <strong>Request a free ambassador visit</strong>
-                <span className="block text-sm">
-                  No suitable photo or ID ready? A reviewer can check your shop
-                  or hostel hustle in person. The badge is awarded after
-                  verification.
+              <div className="grid grid-cols-3 gap-2">
+                {photos.map((url, index) => (
+                  <Image
+                    key={url}
+                    src={url}
+                    alt={`Listing photo ${index + 1}`}
+                    width={180}
+                    height={120}
+                    unoptimized
+                    className="rounded-lg"
+                  />
+                ))}
+              </div>
+              {sellerType === "COMRADE" && (
+                <label className="block space-y-2 text-sm font-semibold">
+                  Student ID (private; only you and reviewers can see it)
+                  <Input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    disabled={uploading}
+                    onChange={(e) => void uploadProof(e.target.files?.[0])}
+                  />
+                  {proofId && (
+                    <span className="block text-green-800">
+                      Student ID uploaded privately.
+                    </span>
+                  )}
+                </label>
+              )}
+              <label className="flex gap-3 rounded-xl bg-[#edf2e5] p-4">
+                <input
+                  type="checkbox"
+                  checked={visit}
+                  onChange={(e) => setVisit(e.target.checked)}
+                />
+                <span>
+                  <strong>Request a free ambassador visit</strong>
+                  <span className="block text-sm">
+                    No suitable photo or ID ready? A reviewer can check your
+                    shop or hostel hustle in person. The badge is awarded after
+                    verification.
+                  </span>
                 </span>
-              </span>
-            </label>
-            {mode !== "public" && (
-              <>
-                <label className="flex gap-2">
-                  <input
-                    type="checkbox"
-                    checked={fieldVisit}
-                    onChange={(e) => setFieldVisit(e.target.checked)}
-                  />
-                  I visited this location and checked the shop or student
-                  identity.
-                </label>
-                <label className="flex gap-2">
-                  <input
-                    type="checkbox"
-                    checked={consent}
-                    onChange={(e) => setConsent(e.target.checked)}
-                  />
-                  The owner agreed to publish this listing and its prices.
-                </label>
-              </>
-            )}
-          </Card>
-        </>
-      )}
-      {error && (
-        <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
-          {error}
-        </p>
-      )}
-      {notice && <p role="status">{notice}</p>}
-      <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-3 border-t bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        {step === 2 && (
-          <Button type="button" variant="secondary" onClick={() => setStep(1)}>
-            Back
-          </Button>
+              </label>
+              {mode !== "public" && (
+                <>
+                  <label className="flex gap-2">
+                    <input
+                      type="checkbox"
+                      checked={fieldVisit}
+                      onChange={(e) => setFieldVisit(e.target.checked)}
+                    />
+                    I visited this location and checked the shop or student
+                    identity.
+                  </label>
+                  <label className="flex gap-2">
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(e) => setConsent(e.target.checked)}
+                    />
+                    The owner agreed to publish this listing and its prices.
+                  </label>
+                </>
+              )}
+            </Card>
+          </>
         )}
-        <Button type="button" variant="secondary" onClick={saveDraft}>
-          Save draft
-        </Button>
-        <Button type="button" variant="secondary" onClick={restore}>
-          Restore
-        </Button>
-        <Button type="submit" disabled={busy || uploading}>
-          {busy
-            ? "Saving…"
-            : step === 1
-              ? "Preview listing"
-              : "Save listing & request verification"}
-        </Button>
-      </div>
-    </form>
+        {error && (
+          <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
+            {error}
+          </p>
+        )}
+        {notice && <p role="status">{notice}</p>}
+        <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-3 border-t bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          {step === 2 && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setStep(1)}
+            >
+              Back
+            </Button>
+          )}
+          <Button type="button" variant="secondary" onClick={saveDraft}>
+            Save draft
+          </Button>
+          <Button type="button" variant="secondary" onClick={restore}>
+            Restore
+          </Button>
+          <Button type="submit" disabled={busy || uploading}>
+            {busy
+              ? "Saving…"
+              : step === 1
+                ? "Preview listing"
+                : "Save listing & request verification"}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }

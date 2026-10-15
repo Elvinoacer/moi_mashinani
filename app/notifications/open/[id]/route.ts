@@ -6,6 +6,7 @@ export async function GET(req:NextRequest,ctx:{params:Promise<{id:string}>}) {
   const {id} = await ctx.params;
   const user = await getCurrentUser(req);
   let path: string;
+  // Token possession is still required at the action page; never disclose a capability from a public notification ID.
   if (!user) path = `/login?next=${encodeURIComponent(notificationLink(id))}`;
   else {
     const notification = await prisma.notification.findFirst({where:{id,accountId:user.id}});

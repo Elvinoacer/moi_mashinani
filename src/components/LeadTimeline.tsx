@@ -50,17 +50,17 @@ export function LeadTimeline({ slug }: { slug: string }) {
       {events.length ? (
         events.map((e) => (
           <p className="border-b py-2 text-sm" key={e.id}>
-            A visitor
+            {e.type === "merchant_reply" || e.type === "open_confirmed" ? "You" : "A visitor"}
             {e.zone && e.zone !== "all"
               ? ` in ${ZONES.find((z) => z.slug === e.zone)?.name || e.zone}`
               : ""}{" "}
-            {e.type === "view"
+            {e.type === "merchant_reply" ? "replied using a quick action" : e.type === "open_confirmed" ? "confirmed your shop is open" : e.type === "view"
               ? "opened your profile"
               : e.type === "call"
                 ? "tapped Call"
                 : e.type === "whatsapp"
                   ? "tapped WhatsApp"
-                  : "opened directions"}{" "}
+                  : e.type === "booking" ? "sent a booking request" : "opened directions"}{" "}
             ·{" "}
             {new Date(e.createdAt).toLocaleString("en-KE", {
               timeZone: "Africa/Nairobi",

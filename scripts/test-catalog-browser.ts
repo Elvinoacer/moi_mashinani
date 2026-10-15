@@ -40,16 +40,13 @@ async function main() {
     await expect(
       page.getByText("Free catalogue", { exact: true }),
     ).toBeVisible();
-    await expect(page.getByText("5 / 5 public", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("5 · Unlimited, free", { exact: true }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Prices", exact: true }).click();
     await expect(
       page.getByRole("button", { name: "Add item", exact: true }),
-    ).toBeDisabled();
-    await expect(
-      page.getByRole("link", {
-        name: "Need more products? Pro is KES 250/month →",
-      }),
-    ).toBeVisible();
+    ).toBeEnabled();
     assert.equal(
       paymentPosts,
       0,
@@ -65,11 +62,11 @@ async function main() {
       path: "/tmp/moimashinani-catalog-free.png",
       fullPage: true,
     });
-    console.log("PASS Free usage panel, five-product limit and upgrade action");
+    console.log("PASS Free usage panel and unlimited catalogue creation");
 
     await page.goto(`${base}/dashboard/${context.proSlug}`);
     await expect(
-      page.getByText("Pro catalogue", { exact: true }),
+      page.getByText("Pro visibility", { exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: /Pro ends in \d days/ }),
@@ -142,7 +139,7 @@ async function main() {
       page.getByText("36 · Unlimited", { exact: true }),
     ).toBeVisible();
     console.log(
-      "PASS Pro catalogue above the former 30-item cap and client compression of a 4 MB source image",
+      "PASS Pro visibility above the former 30-item cap and client compression of a 4 MB source image",
     );
 
     await page.goto(`${base}/dashboard/${context.expiredSlug}`);
@@ -154,18 +151,16 @@ async function main() {
     ).toBeVisible();
     await page.getByRole("button", { name: "Prices", exact: true }).click();
     await expect(
-      page.getByText("Saved · hidden on Free", { exact: true }),
-    ).toBeVisible();
-    await page
-      .getByRole("button", { name: "Show on Free", exact: true })
-      .click();
-    await expect(
-      page.getByText("Changes saved.", { exact: true }),
-    ).toBeVisible();
+      page.getByRole("button", { name: "Add item", exact: true }),
+    ).toBeEnabled();
     const publicBusiness = await (
       await fetch(`${base}/api/businesses/${context.expiredSlug}`)
     ).json();
-    assert.equal(publicBusiness.services.length, 5);
+    assert.equal(
+      publicBusiness.services.length,
+      6,
+      "All expired-plan catalogue items stay public",
+    );
     assert.equal(
       paymentPosts,
       0,
@@ -176,7 +171,7 @@ async function main() {
       fullPage: true,
     });
     console.log(
-      "PASS expired plan retains hidden products, lets owners choose five public items and never auto-renews",
+      "PASS expired visibility plan keeps catalogue creation free and never auto-renews",
     );
 
     await page.goto(`${base}/pro/${context.proSlug}`);

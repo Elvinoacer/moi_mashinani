@@ -43,6 +43,11 @@ model Business {
   media                  BusinessMedia[]
   planNotices            PlanNotice[]
   requestAlertsEnabled   Boolean @default(false)
+  utilities              Json @default("{}")
+  availabilityConfirmedAt DateTime?
+  listingExpiresAt       DateTime?
+  comradeListingKind     String?
+  deals                  FlashDeal[]
   liveStatus             String?
   sellerType             String @default("SHOPFRONT")
   verificationVisitRequested Boolean @default(false)
@@ -179,6 +184,8 @@ model Account {
   email           String @unique
   name            String
   role            String @default("BUSINESS")
+  phone           String? @unique
+  phoneVerifiedAt DateTime?
   passwordHash    String?
   emailVerifiedAt DateTime?
   createdAt       DateTime @default(now())
@@ -350,4 +357,51 @@ model BusinessEvent {
   zone String?
   createdAt DateTime @default(now())
   @@index([businessId, createdAt])
+}
+
+model PhoneChallenge {
+  id String @id @default(uuid())
+  phone String
+  name String
+  codeHash String
+  attempts Int @default(0)
+  expiresAt DateTime
+  usedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+model MerchantAction {
+  id String @id @default(uuid())
+  tokenHash String @unique
+  businessId String
+  ownerId String
+  kind String
+  resourceId String?
+  expiresAt DateTime
+  usedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+model FlashDeal {
+  id String @id @default(uuid())
+  businessId String
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  title String
+  priceKes Int
+  endsAt DateTime
+  dropZone String?
+  dropAt DateTime?
+  deliveryFeeKes Int?
+  closedAt DateTime?
+  createdAt DateTime @default(now())
+  joins DropJoin[]
+  @@index([endsAt])
+}
+model DropJoin {
+  id String @id @default(uuid())
+  dealId String
+  deal FlashDeal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  sessionHash String
+  createdAt DateTime @default(now())
+  @@unique([dealId, sessionHash])
 }

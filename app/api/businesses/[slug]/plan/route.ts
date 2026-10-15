@@ -6,7 +6,6 @@ import { ApiError, apiError } from "@/lib/api";
 import { getStorageUsage } from "@/lib/media-storage";
 import {
   FREE_STORAGE_BYTES,
-  FREE_PRODUCT_LIMIT,
   hasPro,
 } from "@/lib/catalog-plan";
 
@@ -27,8 +26,8 @@ export async function GET(
         ...usage,
         plan: pro ? "PRO" : "FREE",
         productCount: business.services.length,
-        productLimit: pro ? null : FREE_PRODUCT_LIMIT,
-        storageLimit: pro ? null : FREE_STORAGE_BYTES,
+        productLimit: null,
+        storageLimit: pro || business.verificationLevel === "L2" ? null : FREE_STORAGE_BYTES,
         proEndsAt: business.proEndsAt ?? null,
       },
       { headers: { "Cache-Control": "private, no-store" } },

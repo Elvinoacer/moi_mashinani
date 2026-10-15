@@ -1,3 +1,4 @@
+import { survivalMatch } from "./campus-value";
 import { hasPro } from "./catalog-plan";
 import { CATEGORIES, categoryMatches, categorySearchText } from "./categories";
 import { Business, Tier } from "./types";
@@ -275,6 +276,7 @@ export function computeProximity(
 }
 
 export function computeQuality(business: Business, now = Date.now()): number {
+  void now;
   const completeness = (business.profileStrength || 70) / 100;
   const verifiedBonus =
     business.verificationLevel === "L2"
@@ -284,11 +286,12 @@ export function computeQuality(business: Business, now = Date.now()): number {
         : 0;
   return Math.min(
     1.0,
-    0.6 * completeness + verifiedBonus + (hasPro(business, now) ? 0.05 : 0),
+    0.6 * completeness + verifiedBonus + ((business.responseCount || 0) >= 3 && business.responseAverageSeconds !== undefined ? 0.1 * Math.max(0, 1 - business.responseAverageSeconds / 1800) : 0),
   );
 }
 
 export function getEffectiveTier(business: Business, now = new Date()): Tier {
+  if (hasPro(business, now.getTime())) return "FEATURED";
   if (business.activeTier === "NONE") return "NONE";
   if (!business.tierEndsAt) return business.activeTier;
   const endsAt = new Date(business.tierEndsAt);
@@ -313,7 +316,7 @@ export function rankBusinesses(
   // Filter active and eligible
   const activeListings = businesses.filter(
     (b) =>
-      b.status === "ACTIVE" &&
+      survivalMatch(b, "all", now.getTime()) &&
       !b.isTemporarilyClosed &&
       (!targetCategory || categoryMatches(b, targetCategory)),
   );

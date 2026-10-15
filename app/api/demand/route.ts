@@ -1,3 +1,6 @@
+import { survivalMatch } from "@/lib/campus-value";
+import { whatsappUrl } from "@/lib/whatsapp";
+import { computeRelevance } from "@/lib/rank";
 import { randomBytes } from "node:crypto";
 import { withNotificationDelivery } from "@/lib/notification-response";
 import { NextRequest, NextResponse } from "next/server";
@@ -65,8 +68,29 @@ export async function POST(req: NextRequest) {
     );
     const { contactPhone, ...safe } = created;
     void contactPhone;
+    const handoffs = (await Store.getBusinesses())
+      .filter(
+        (b) =>
+          survivalMatch(b, "all", Date.now()) &&
+          b.verificationLevel === "L2" &&
+          (zone === "all" || b.zone === zone || b.servesZones.includes(zone)) &&
+          (category
+            ? b.primaryCategory === category ||
+              b.extraCategories.includes(category)
+            : computeRelevance(b, created.query) >= 0.25),
+      )
+      .slice(0, 5)
+      .map((b) => ({
+        name: b.name,
+        businessId: b.id,
+        url: whatsappUrl(
+          b.whatsapp || b.phone,
+          `I posted this request on Moi Mashinani: ${created.query}. Zone: ${zone}. Can you help with the price and availability?`,
+        ),
+      }))
+      .filter((b) => b.url);
     return withNotificationDelivery(
-      NextResponse.json({ ...safe, manageToken }, { status: 201 }),
+      NextResponse.json({ ...safe, manageToken, handoffs }, { status: 201 }),
     );
   } catch (error) {
     return apiError(error);

@@ -120,7 +120,7 @@ async function main() {
         props,
       )
     ).status,
-    409,
+    200,
   );
   assert.equal(
     (
@@ -131,7 +131,7 @@ async function main() {
         props,
       )
     ).status,
-    409,
+    200,
   );
   assert.equal(
     (await patchBusiness(request("PATCH", { proEndsAt: "2099-01-01" }), props))
@@ -147,7 +147,7 @@ async function main() {
     ).status,
     403,
   );
-  // Two simultaneous attempts to fill the final free slot cannot both succeed.
+  // Simultaneous free additions both persist under the catalogue lock.
   await deleteProduct(request("DELETE", { id: "product-4" }), props);
   const attempts = await Promise.all(
     ["racing-a", "racing-b"].map((id) =>
@@ -156,11 +156,11 @@ async function main() {
   );
   assert.deepEqual(
     attempts.map((response) => response.status).sort(),
-    [200, 409],
+    [200, 200],
   );
-  assert.equal((await Store.getBusinessById(business.id))!.services.length, 5);
+  assert.equal((await Store.getBusinessById(business.id))!.services.length, 7);
   console.log(
-    "PASS Free product cap, forged plan rejection, ownership and concurrent writes",
+    "PASS Unlimited free products, forged plan rejection, ownership and concurrent writes",
   );
 
   const oldFetch = globalThis.fetch;
@@ -300,8 +300,8 @@ async function main() {
     data: { proEndsAt: new Date(Date.now() - 1000) },
   });
   const expired = (await Store.getBusinessById(business.id))!;
-  assert.equal(expired.services.length, 6);
-  assert.equal(publicBusiness(expired).services.length, 5);
+  assert.equal(expired.services.length, 8);
+  assert.equal(publicBusiness(expired).services.length, 8);
   assert.equal(
     (
       await addProduct(
@@ -309,14 +309,14 @@ async function main() {
         props,
       )
     ).status,
-    409,
+    200,
   );
   assert.equal(
     (
       await editProduct(
         request("PATCH", {
           ...expired.services[5],
-          name: "Edited hidden item",
+          name: "Edited item",
           publishFirst: true,
         }),
         props,
@@ -326,10 +326,10 @@ async function main() {
   );
   assert.equal(
     (await Store.getBusinessById(business.id))!.services[0].name,
-    "Edited hidden item",
+    "Edited item",
   );
   console.log(
-    "PASS instant expiry, retained hidden items, edits and choosing the public five",
+    "PASS visibility expiry keeps all products public and allows additions and edits",
   );
 
   // Count reservations before R2 writes and serialize against the same business.
@@ -722,7 +722,15 @@ async function main() {
   });
   await prisma.business.update({
     where: { id: business.id },
-    data: { proEndsAt: new Date(Date.now() - 864e5) },
+    data: {
+      proEndsAt: new Date(Date.now() - 864e5),
+      services: JSON.parse(
+        JSON.stringify([
+          ...products,
+          { id: "expiry-extra", name: "All items stay public", priceFrom: 80 },
+        ]),
+      ),
+    },
   });
   const admin = await prisma.account.create({
     data: {

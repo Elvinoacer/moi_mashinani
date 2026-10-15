@@ -33,3 +33,5 @@ Primary documentation used:
 - https://developers.intasend.com/guides/authentication/
 - https://developers.intasend.com/guides/testing/
 - https://developers.intasend.com/openapi.json
+
+Phone-verified accounts can start checkout without a recovery email. The server omits the email prefill when it is absent; it does not send an internal phone-account address to the payment provider. IntaSend documents email and phone as optional checkout prefills in its [Checkout API guide](https://developers.intasend.com/guides/collections/checkout/). Server pricing and verified settlement remain required.

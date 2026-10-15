@@ -1,5 +1,5 @@
+import { merchantActionPreview } from "./merchant-actions";
 import { sendRequestSms } from "./sms";
-import { hasPro } from "./catalog-plan";
 import { prisma } from "./prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { applicationUrl, sendNotificationEmail } from "./mail";
@@ -39,12 +39,11 @@ export async function queueNotice(
     if (
       business?.requestAlertsEnabled &&
       business.ownerPhone &&
-      business.ownerId === accountId &&
-      hasPro({ proEndsAt: business.proEndsAt?.toISOString() })
+      business.ownerId === accountId
     )
       targets.push({ channel: "SMS", target: business.ownerPhone });
   }
-  if (channels.includes("EMAIL"))
+  if (channels.includes("EMAIL") && account.emailVerifiedAt)
     targets.push({ channel: "EMAIL", target: account.email });
   if (channels.includes("PUSH")) {
     const devices = await tx.pushDevice.findMany({
@@ -159,7 +158,26 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
     if (!claimed.count) continue;
     try {
       const n = delivery.notification;
-      const url = `${applicationUrl()}${notificationLink(n.id)}`;
+      let actionBusinessId: string | undefined;
+      if (n.path.startsWith("/merchant/action/")) {
+        try {
+          actionBusinessId = (
+            await merchantActionPreview(n.path.split("/").pop()!)
+          ).business.id;
+        } catch {
+          await prisma.notificationDelivery.updateMany({
+            where: { id: delivery.id, claimedAt },
+            data: {
+              stoppedAt: new Date(),
+              claimedAt: null,
+              error: "Merchant action expired, used or no longer authorized",
+            },
+          });
+          result.skipped++;
+          continue;
+        }
+      }
+      const url = `${applicationUrl()}${n.path.startsWith("/merchant/action/") ? n.path : notificationLink(n.id)}`;
       if (delivery.channel === "EMAIL") {
         await sendNotificationEmail(
           delivery.target,
@@ -173,13 +191,13 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
       } else if (delivery.channel === "SMS") {
         const business = await prisma.business.findFirst({
           where: {
+            ...(actionBusinessId ? { id: actionBusinessId } : {}),
             ownerId: n.accountId,
             ownerPhone: delivery.target,
             requestAlertsEnabled: true,
             status: "ACTIVE",
             isClaimed: true,
             verificationLevel: "L2",
-            proEndsAt: { gt: new Date() },
           },
         });
         if (!business) {
@@ -188,7 +206,7 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
             data: {
               stoppedAt: new Date(),
               claimedAt: null,
-              error: "SMS alerts disabled or Pro expired",
+              error: "SMS alerts disabled or listing unavailable",
             },
           });
           result.skipped++;

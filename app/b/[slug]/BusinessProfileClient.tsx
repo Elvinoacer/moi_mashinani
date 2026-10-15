@@ -3,6 +3,8 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { availabilityLabel } from "@/lib/campus-value";
+import { CampusUtilityDetails } from "@/components/CampusUtilityDetails";
 import { TrustShield } from "@/components/TrustShield";
 import { TrustShare } from "@/components/TrustShare";
 import { Navbar } from "@/components/Navbar";
@@ -332,7 +334,7 @@ export function BusinessProfileClient({
             {isAvailableNow && (
               <span className="bg-[#d9f279]/30 text-[#243b32] font-display font-bold text-xs px-2 py-0.5 rounded border border-[#d9f279] flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-[#335e41]" />
-                Open Right Now
+                {availabilityLabel(business, now)}
               </span>
             )}
           </div>
@@ -625,6 +627,7 @@ export function BusinessProfileClient({
       </main>
 
       <div className="mx-auto mb-24 w-full max-w-5xl px-4">
+        <CampusUtilityDetails business={business} />
         <TrustShield slug={slug} />
         <div className="mt-4">
           <TrustShare business={business} />

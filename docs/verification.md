@@ -23,3 +23,27 @@ Corrections include unauthorized business/admin access, client-controlled paymen
 The original email workflow was verified with a local capture fixture. The Resend migration has separate mocked API contract tests (`npm run test:mail`); live Resend delivery has not been exercised. IntaSend tests use mocked provider transport with actual route handlers and PostgreSQL transactions. No external emails or payment charges were made. These checks establish application behavior, but cannot establish delivery through a real Resend account or IntaSend account.
 
 To operate the deployment, configure Resend and IntaSend environment variables, bootstrap the main administrator with `npm run admin:create`, and register the HTTPS collection webhook. Then complete an IntaSend sandbox checkout and confirm its delivered webhook, stored receipt and promotion dates on that deployment before enabling live collections. See [account setup](onboarding.md) and [payment setup](payments.md).
+
+## Campus habit strategy — 15 October 2026
+
+The value-creation strategy is implemented across the homepage, free catalogues, merchant dashboard, deals/delivery drops, student market, SMS-code sign-in and no-login merchant actions. See [implementation and deployment instructions](habit-strategy.md).
+
+Verified using disposable local PostgreSQL databases and Chromium, with synthetic records and captured/mocked external transport:
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Production build, TypeScript and lint | Passed | Next.js production compilation, static generation, TypeScript and ESLint. |
+| New strategy API workflows | 33 passed | Free catalogue/stock, request escalation, action preview/replay/concurrency, availability and utility expiry, drop joins, booking acceptance, closure, phone codes, private student IDs, publication/renewal, phone-only field enrollment and cron deduplication. |
+| New strategy browser journeys | 7 passed | Mobile request, deal budget/drop handoff, merchant publishing, QR download, no-login open confirmation, SMS-code UI and private-ID student posting. |
+| Habit logic | 7 passed | Kenya-time hours, overnight opening, campus context, utilities, kejas, student expiry, temporary closure and honest legacy availability labels. |
+| Existing value-loop workflows | 23 passed | Owner access, request privacy/closure, field verification, payments, leads and evidence. |
+| Catalogue PostgreSQL regressions | Passed | Unlimited free products, concurrent edits, payment replay, photo ownership/compression/quota, shared media and durable cleanup/reminders. |
+| Catalogue unit checks | 5 passed | Month renewal, expiry and public supply, reminders and cron authentication. |
+| Provider contracts | 30 passed | 15 payments, 3 SMS, 6 mail and 6 notification checks; no live charges or messages. |
+| Search/discovery engine | Passed | Existing relevance, promotion expiry, seeded location data and availability checks against the test database. |
+| SEO | 8 passed | Metadata, sitemap, category groups, schemas and request-scoped Next.js metadata generation. |
+| Schema consistency | No drift | All ten migrations applied in a disposable database; Prisma diff returned an empty migration. |
+
+Mobile screenshots are in `/tmp/mm-habit-browser`. A separate layout check confirmed that the homepage request input uses 316 px of a 390 px viewport after stacking the input and button on small screens. The QR signboard was also rendered and visually inspected.
+
+These checks do not establish real SMS/FCM delivery, production cron scheduling or live payment activation. The configured remote database was not migrated and the application was not deployed as part of this work.

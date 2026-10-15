@@ -570,6 +570,7 @@ function CampusRadarDiscoveryInner({
 
   return (
     <section className="bg-white border-2 border-[#001C3B] shadow-[4px_4px_0px_#001C3B] rounded-2xl p-4 sm:p-6 md:p-8 space-y-6 relative overflow-hidden">
+      <nav className="flex flex-wrap gap-2" aria-label="Campus survival filters">{[["backup", "⚡ Backup power"], ["late", "🌙 Open past 9 PM"], ["free-delivery", "🛵 Free zone delivery"], ["hostels", "🏠 Verified vacant kejas"]].map(([value, label]) => <Link key={value} className="ui-button ui-button-secondary" href={`/search?survival=${value}`}>{label}</Link>)}</nav>
       {/* HEADER BANNER */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b-2 border-[#001C3B]">
         <div>

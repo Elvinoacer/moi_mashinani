@@ -1,3 +1,4 @@
+import { publicListing } from "@/lib/campus-value";
 import type { MetadataRoute } from "next";
 import { Store } from "@/lib/store";
 import { CATEGORIES, SEED_BUSINESSES } from "@/lib/constants";
@@ -11,13 +12,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Load all businesses safely (merging database and verified seed directory listings)
   const businessMap = new Map<string, Business>();
   for (const b of SEED_BUSINESSES) {
-    if (b.status === "ACTIVE") businessMap.set(b.slug, b);
+    if (publicListing(b, now.getTime())) businessMap.set(b.slug, b);
   }
 
   try {
     const list = await Store.getBusinesses();
     for (const b of list) {
-      if (b.status === "ACTIVE") businessMap.set(b.slug, b);
+      if (publicListing(b, now.getTime())) businessMap.set(b.slug, b);
+      else businessMap.delete(b.slug);
     }
   } catch {
     // Database unreachable during static builds: seed businesses retained
@@ -27,6 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 1. Core static pages
   const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: `${SITE_URL}/market`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
     {
       url: `${SITE_URL}/requests`,
       lastModified: now,

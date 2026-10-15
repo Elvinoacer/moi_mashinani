@@ -11,6 +11,7 @@ import Image from "next/image";
 
 import { Suspense, use, useEffect, useState } from "react";
 import Link from "next/link";
+import { MerchantDailyTools } from "@/components/MerchantDailyTools";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -410,12 +411,6 @@ function BusinessDashboard({ slug }: { slug: string }) {
   async function saveService(event: React.FormEvent) {
     event.preventDefault();
     if (!business || !serviceName.trim()) return;
-    if (!serviceId && !hasPro(business, now) && business.services.length >= 5) {
-      setError(
-        "Free includes 5 products or services. Upgrade or renew Pro to add more.",
-      );
-      return;
-    }
     const price = servicePrice === "" ? undefined : Number(servicePrice);
     if (price !== undefined && (!Number.isFinite(price) || price < 0)) {
       setError("Enter a valid non-negative price.");
@@ -498,9 +493,9 @@ function BusinessDashboard({ slug }: { slug: string }) {
       business.tierEndsAt && new Date(business.tierEndsAt).getTime() > now,
     );
   const pro = hasPro(business, now);
-  const canAddProduct = pro || business.services.length < 5;
+  const canAddProduct = true;
   const storageFull =
-    !pro &&
+    !pro && business.verificationLevel !== "L2" &&
     Boolean(storageUsage && storageUsage.usedBytes >= FREE_STORAGE_BYTES);
   const switcherBusinesses = ownedBusinesses.some(
     (item) => item.id === business.id,
@@ -653,7 +648,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
             <label className="flex gap-3 text-sm">
               <input
                 type="checkbox"
-                disabled={!!busy || !pro || !storageUsage?.smsReady}
+                disabled={!!busy || !storageUsage?.smsReady}
                 checked={Boolean(business.requestAlertsEnabled)}
                 onChange={(e) =>
                   void runAction("sms", () =>
@@ -661,7 +656,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
                   )
                 }
               />
-              Send matching requests by SMS to my private owner phone (Pro, with
+              Send matching requests by SMS to my private owner phone (with
               my consent).
             </label>
             {!storageUsage?.smsReady && (
@@ -769,6 +764,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
           </nav>
         </>
       )}
+      {["overview", "services"].includes(activeTab) && <MerchantDailyTools business={business} />}
       {activeTab === "billing" && <BoostCheckout business={business} />}
       {["overview", "bookings"].includes(activeTab) && (
         <>
@@ -1077,31 +1073,16 @@ function BusinessDashboard({ slug }: { slug: string }) {
             Services, products and prices
           </h2>
           <p className="text-sm text-[#667064]">
-            {pro
-              ? "Unlimited catalogue items on Pro."
-              : "Free displays your first five items. Edit or remove saved items, or use Show on Free to move an item into the public five."}
+            Unlimited catalogue items and stock updates are free.
           </p>
-          {!canAddProduct && (
-            <Link
-              href={`/dashboard/${business.slug}?tab=billing`}
-              className="inline-block text-sm font-bold text-[#335e41]"
-            >
-              Need more products? Pro is KES 250/month →
-            </Link>
-          )}
           <div className="divide-y divide-[#dfe5d8]">
-            {(business.services as EditableService[]).map((service, index) => (
+            {(business.services as EditableService[]).map((service) => (
               <div
                 key={service.id}
                 className="flex flex-wrap items-center justify-between gap-3 py-3"
               >
                 <div>
                   <strong className="text-sm">{service.name}</strong>
-                  {!pro && index >= 5 && (
-                    <span className="ml-2 rounded-full bg-[#fff8df] px-2 py-1 text-[10px] font-bold">
-                      Saved · hidden on Free
-                    </span>
-                  )}
                   <p className="text-xs text-[#667064]">
                     {service.priceFrom !== undefined
                       ? `KSh ${service.priceFrom.toLocaleString()}`
@@ -1110,24 +1091,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {!pro && index >= 5 && (
-                    <button
-                      type="button"
-                      disabled={Boolean(busy)}
-                      onClick={() =>
-                        void runAction("publish-product", () =>
-                          mutateProduct("PATCH", {
-                            ...service,
-                            publishFirst: true,
-                          }),
-                        )
-                      }
-                      className="text-xs font-bold text-[#335e41]"
-                    >
-                      Show on Free
-                    </button>
-                  )}
-                  {pro && (
+                  {(
                     <button
                       type="button"
                       className="text-sm font-bold text-[#335e41]"

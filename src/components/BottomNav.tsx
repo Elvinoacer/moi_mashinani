@@ -9,7 +9,7 @@ const items = [
   { href: "/search", label: "Explore", icon: Compass },
   { href: "/requests", label: "Requests", icon: MessageCircle, primary: true },
   { href: "/deals", label: "Deals", icon: Percent },
-  { href: "/dashboard", label: "Merchant", icon: Store },
+  { href: "/market", label: "Market", icon: Store },
 ];
 
 export function BottomNav() {

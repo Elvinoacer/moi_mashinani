@@ -10,7 +10,7 @@ import {
   textField,
 } from "@/lib/api";
 import { businessInput } from "@/lib/business-input";
-import { hasPro, productLimitError } from "@/lib/catalog-plan";
+import { productLimitError } from "@/lib/catalog-plan";
 import {
   attachMedia,
   cleanRemovedMedia,
@@ -53,12 +53,6 @@ async function mutate(
         const before = Array.isArray(business.services)
           ? (business.services as unknown as ServiceItem[])
           : [];
-        if (
-          item?.inStock !== undefined &&
-          !hasPro({ proEndsAt: business.proEndsAt?.toISOString() }) &&
-          item.inStock !== before.find((p) => p.id === id)?.inStock
-        )
-          throw new ApiError(409, "Stock controls are included in Pro.");
         if (method === "PATCH" && item && item.inStock === undefined)
           item.inStock = before.find((p) => p.id === id)?.inStock;
         const existing = before.some((product) => product.id === id);

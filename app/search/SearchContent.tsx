@@ -106,7 +106,7 @@ export function SearchContent() {
     verifiedParam ||
     discountParam ||
     deliveryParam ||
-    maxPriceParam,
+    maxPriceParam || searchParams.get("survival"),
   );
 
   return (
@@ -126,6 +126,7 @@ export function SearchContent() {
           <span className="text-[#243b32]">Search Directory</span>
         </nav>
 
+        <div className="flex flex-wrap gap-2" aria-label="Campus survival filters">{[["backup", "⚡ Blackout / backup power"], ["late", "🌙 Open past 9 PM"], ["free-delivery", "🛵 Free zone delivery"], ["hostels", "🏠 Verified vacant kejas"]].map(([value, label]) => <button key={value} type="button" className="ui-button ui-button-secondary" aria-pressed={searchParams.get("survival") === value} onClick={() => updateFilters({ survival: searchParams.get("survival") === value ? null : value })}>{label}</button>)}</div>
         {/* SEARCH BAR & QUICK FILTERS HERO */}
         <section className="bg-white signboard-border signboard-shadow-sm rounded-2xl p-4 sm:p-6 space-y-4">
           <form

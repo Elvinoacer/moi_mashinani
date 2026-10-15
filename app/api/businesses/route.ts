@@ -2,8 +2,9 @@ import { withNotificationDelivery } from "@/lib/notification-response";
 import { NextRequest, NextResponse } from "next/server";
 import { Store } from "@/lib/store";
 import { comparisonPrice } from "@/lib/catalog-plan";
+import { survivalMatch } from "@/lib/campus-value";
 import { rankBusinesses } from "@/lib/rank";
-import { requireAdmin } from "@/lib/auth";
+import { getCurrentUser, requireAdmin } from "@/lib/auth";
 import { apiError, assertSameOrigin, jsonBody } from "@/lib/api";
 import { publicBusiness } from "@/lib/business-input";
 import { enrollBusiness } from "@/lib/enrollment";
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    businesses = businesses.filter((b) => b.status === "ACTIVE");
+    businesses = businesses.filter((b) => survivalMatch(b, searchParams.get("survival") || "all", Date.now()));
 
     // Pre-filters
     if (availableNowOnly) {
@@ -150,17 +151,18 @@ export async function POST(req: NextRequest) {
     assertSameOrigin(req);
     await rateLimit(req, "public-enrollment", 30, 3600);
     const body = await jsonBody(req);
+    const user = await getCurrentUser(req);
     await rateLimit(
       req,
       "public-enrollment-email",
       3,
       3600,
-      normalizeEmail(body.ownerEmail),
+      user?.id || normalizeEmail(body.ownerEmail),
     );
     const result = await enrollBusiness(
       body,
       false,
-      undefined,
+      user?.id,
       req.cookies.get(ENROLLMENT_MEDIA_COOKIE)?.value,
     );
     const response = NextResponse.json(

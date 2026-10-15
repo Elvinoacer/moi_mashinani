@@ -33,6 +33,7 @@ export function TrustShare({ business }: { business: Business }) {
         Choose WhatsApp in your phone’s share menu, then select Status or a
         chat.
       </p>
+      <a href={`/api/businesses/${business.slug}/signboard`} download className="ui-button ui-button-secondary">Download branded QR signboard</a>
       {message && (
         <p role="status" className="text-sm">
           {message}

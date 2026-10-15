@@ -1,6 +1,7 @@
 import type { Business, ServiceItem } from "./types";
 
-export const FREE_PRODUCT_LIMIT = 5;
+// Catalog creation and stock accuracy are free on every plan.
+export const FREE_PRODUCT_LIMIT = Infinity;
 export const FREE_STORAGE_BYTES = 25 * 1024 * 1024;
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 export const MAX_STORED_IMAGE_BYTES = 1024 * 1024;
@@ -38,24 +39,18 @@ export function productLimitError(
 ): string | undefined {
   if (new Set(after.map((item) => item.id)).size !== after.length)
     return "Each product must have a unique ID.";
-  if (hasPro(business, now) || after.length <= FREE_PRODUCT_LIMIT) return;
-  // An expired owner may edit or remove existing saved products, but cannot add new ones above Free.
-  const oldIds = new Set(before.map((item) => item.id));
-  if (
-    after.length <= before.length &&
-    after.every((item) => oldIds.has(item.id))
-  )
-    return;
-  return "Free includes 5 products or services. Renew Pro for KES 250/month to add more.";
+  void business;
+  void before;
+  void now;
+  return;
 }
 
 export function visibleProducts(
   business: Pick<Business, "proEndsAt" | "services">,
   now = Date.now(),
 ): ServiceItem[] {
-  return hasPro(business, now)
-    ? business.services
-    : business.services.slice(0, FREE_PRODUCT_LIMIT);
+  void now;
+  return business.services;
 }
 
 export function reminderStage(

@@ -1,4 +1,4 @@
-import { hasPro } from "./catalog-plan";
+import { createMerchantAction } from "./merchant-actions";
 import { smsConfigured } from "./sms";
 import { computeRelevance } from "./rank";
 import { queueNotice, queueAdmins, listingNotice } from "./notifications";
@@ -114,6 +114,10 @@ export function mapPrismaBusiness(b: PrismaBusiness): Business {
     proStartsAt: b.proStartsAt?.toISOString(),
     proEndsAt: b.proEndsAt?.toISOString(),
     requestAlertsEnabled: b.requestAlertsEnabled,
+    utilities: b.utilities as Business["utilities"],
+    availabilityConfirmedAt: b.availabilityConfirmedAt?.toISOString(),
+    listingExpiresAt: b.listingExpiresAt?.toISOString(),
+    comradeListingKind: b.comradeListingKind as Business["comradeListingKind"],
     liveStatus: b.liveStatus || undefined,
     sellerType: b.sellerType as Business["sellerType"],
     verificationVisitRequested: b.verificationVisitRequested,
@@ -237,8 +241,17 @@ export const Store = {
       orderBy: { createdAt: "desc" },
       include: { owner: { select: { emailVerifiedAt: true } } },
     });
+    const responseStats = await prisma.$queryRaw<
+      Array<{ businessId: string; count: number; seconds: number }>
+    >`
+      SELECT "businessId", COUNT(*)::int AS count, AVG(EXTRACT(EPOCH FROM ("usedAt" - "createdAt")))::float AS seconds
+      FROM "MerchantAction" WHERE "usedAt" IS NOT NULL AND "kind" IN ('REQUEST', 'BOOKING') AND "createdAt" > NOW() - INTERVAL '30 days'
+      GROUP BY "businessId"`;
+    const stats = new Map(responseStats.map((row) => [row.businessId, row]));
     return records.map((record) => ({
       ...mapPrismaBusiness(record),
+      responseCount: stats.get(record.id)?.count || 0,
+      responseAverageSeconds: stats.get(record.id)?.seconds,
       emailVerifiedAt: record.owner?.emailVerifiedAt?.toISOString(),
     }));
   },
@@ -454,6 +467,12 @@ export const Store = {
           ? new Date(payload.tierStartsAt)
           : null,
         tierEndsAt: payload.tierEndsAt ? new Date(payload.tierEndsAt) : null,
+        utilities: JSON.parse(JSON.stringify(payload.utilities || {})),
+        listingExpiresAt: payload.listingExpiresAt
+          ? new Date(payload.listingExpiresAt)
+          : null,
+        comradeListingKind: payload.comradeListingKind || null,
+        requestAlertsEnabled: Boolean(payload.requestAlertsEnabled),
         liveStatus: payload.liveStatus || null,
         sellerType: payload.sellerType || "SHOPFRONT",
         verificationVisitRequested: Boolean(payload.verificationVisitRequested),
@@ -528,17 +547,6 @@ export const Store = {
 
         const mappedExisting = mapPrismaBusiness(existing);
         const merged = { ...mappedExisting, ...updates };
-        if (
-          updates.services &&
-          !hasPro(mappedExisting) &&
-          updates.services.some(
-            (item) =>
-              item.inStock !==
-              mappedExisting.services.find((old) => old.id === item.id)
-                ?.inStock,
-          )
-        )
-          throw new ApiError(409, "Stock controls are included in Pro.");
         const limitError =
           updates.services !== undefined
             ? productLimitError(
@@ -628,6 +636,20 @@ export const Store = {
             : null;
         if (updates.requestAlertsEnabled !== undefined)
           prismaUpdateData.requestAlertsEnabled = updates.requestAlertsEnabled;
+        if (updates.utilities !== undefined)
+          prismaUpdateData.utilities = JSON.parse(
+            JSON.stringify(updates.utilities),
+          );
+        if (updates.availabilityConfirmedAt !== undefined)
+          prismaUpdateData.availabilityConfirmedAt = new Date(
+            updates.availabilityConfirmedAt,
+          );
+        if (updates.listingExpiresAt !== undefined)
+          prismaUpdateData.listingExpiresAt = updates.listingExpiresAt
+            ? new Date(updates.listingExpiresAt)
+            : null;
+        if (updates.comradeListingKind !== undefined)
+          prismaUpdateData.comradeListingKind = updates.comradeListingKind;
         if (updates.liveStatus !== undefined)
           prismaUpdateData.liveStatus = updates.liveStatus || null;
         if (updates.verificationVisitRequested !== undefined)
@@ -853,6 +875,7 @@ export const Store = {
         await tx.business.update({
           where: { id: businessId },
           data: {
+            availabilityConfirmedAt: on ? new Date() : null,
             availableNowUntil: on
               ? new Date(Date.now() + durationHours * 3600e3)
               : null,
@@ -1273,6 +1296,10 @@ export const Store = {
             computeRelevance(mapPrismaBusiness(business), created.query) < 0.25
           )
             continue;
+          const actionPath =
+            created.contactPhone && created.contactConsent
+              ? await createMerchantAction(tx, business, "REQUEST", id)
+              : undefined;
           await queueNotice(
             tx,
             business.ownerId,
@@ -1281,15 +1308,13 @@ export const Store = {
               kind: "SERVICE_REQUEST",
               title: "A student needs what you offer",
               body: `${created.query} · ${created.zone}`,
-              path: "/requests",
+              path: actionPath || "/requests",
               button: "Respond to request",
             },
             [
               "EMAIL",
               "PUSH",
-              ...(business.requestAlertsEnabled &&
-              hasPro({ proEndsAt: business.proEndsAt?.toISOString() }) &&
-              smsConfigured()
+              ...(business.requestAlertsEnabled && smsConfigured()
                 ? ["SMS" as const]
                 : []),
             ],
@@ -1333,13 +1358,26 @@ export const Store = {
           await Store.recordEvent(payload.businessId, "booking", tx);
         }
 
-        await queueNotice(tx, business.ownerId, `booking/${id}`, {
-          kind: "BOOKING",
-          title: `New customer request for ${business.name}`,
-          body: `A customer has requested ${booking.serviceName} for ${booking.day} at ${booking.time}. Open your dashboard to review their contact details and respond.`,
-          path: `/dashboard/${business.slug}?tab=bookings`,
-          button: "View customer request",
-        });
+        const actionPath = await createMerchantAction(
+          tx,
+          business,
+          "BOOKING",
+          id,
+        );
+        await queueNotice(
+          tx,
+          business.ownerId,
+          `booking/${id}`,
+          {
+            kind: "BOOKING",
+            title: `New customer request for ${business.name}`,
+            body: `A customer has requested ${booking.serviceName} for ${booking.day} at ${booking.time}. Open your dashboard to review their contact details and respond.`,
+            path: actionPath || `/dashboard/${business.slug}?tab=bookings`,
+            button: "Accept & reply on WhatsApp",
+          },
+          ["EMAIL", "PUSH", ...(smsConfigured() ? ["SMS" as const] : [])],
+          business.id,
+        );
         await queueAdmins(tx, `booking/${id}`, {
           kind: "BOOKING",
           title: "New booking or customer inquiry",

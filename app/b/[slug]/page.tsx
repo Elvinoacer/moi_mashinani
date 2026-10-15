@@ -1,6 +1,7 @@
 import { publicBusiness } from "@/lib/business-input";
 import { connection } from "next/server";
 import type { Metadata } from "next";
+import { publicListing } from "@/lib/campus-value";
 import { notFound } from "next/navigation";
 import { Store } from "@/lib/store";
 import { CATEGORIES, SEED_BUSINESSES } from "@/lib/constants";
@@ -21,7 +22,12 @@ interface PageProps {
 async function fetchBusiness(slug: string): Promise<Business | undefined> {
   try {
     const business = await Store.getBusinessBySlug(slug);
-    if (business) return business.status === "ACTIVE" ? business : undefined;
+    if (business)
+      return publicListing(business, Date.now()) &&
+        (business.sellerType !== "COMRADE" ||
+          business.verificationLevel === "L2")
+        ? business
+        : undefined;
   } catch {
     // Database fallback
   }

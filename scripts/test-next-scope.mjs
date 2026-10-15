@@ -6,5 +6,5 @@ const { workAsyncStorage } =
   await import("next/dist/server/app-render/work-async-storage.external.js");
 const { workUnitAsyncStorage } =
   await import("next/dist/server/app-render/work-unit-async-storage.external.js");
-workAsyncStorage.enterWith({ afterContext: { after() {} } });
-workUnitAsyncStorage.enterWith({ type: "request" });
+workAsyncStorage.enterWith({ route: "/__test_request", afterContext: { after() {} } });
+workUnitAsyncStorage.enterWith({ type: "request", phase: "render" });

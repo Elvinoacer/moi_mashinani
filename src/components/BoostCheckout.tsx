@@ -25,7 +25,7 @@ const packages = [
     name: "Moi Mashinani Pro",
     price: 250,
     description:
-      "A calendar month of unlimited items and image storage, stock controls and a search quality boost.",
+      "A calendar month of featured zone visibility and daily deal broadcasts. Catalogues, stock updates and verification stay free.",
   },
 ] as const;
 export function BoostCheckout({ business }: { business: Business }) {

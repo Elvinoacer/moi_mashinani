@@ -8,7 +8,7 @@ export type NoticeContent = {
 
 export function safeNotificationPath(path: string) {
   if (
-    !/^\/(admin|dashboard|pro|requests|b|ambassador)(\/|$|\?)/.test(path) ||
+    !/^\/(admin|dashboard|pro|requests|b|ambassador|merchant|deals)(\/|$|\?)/.test(path) ||
     path.includes("\\") ||
     /[\u0000-\u001f]/.test(path)
   )

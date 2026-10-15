@@ -105,7 +105,7 @@ export async function createIntaSendCheckout(payment: PaymentRecord, email: stri
   const data = await request(config, '/checkout/', {
     amount: payment.amountKes,
     currency: 'KES',
-    email,
+    ...(email ? { email } : {}),
     phone_number: payment.phone,
     api_ref: payment.apiRef,
     unique_api_ref: true,

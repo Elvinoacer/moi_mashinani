@@ -1,4 +1,5 @@
 "use client";
+import { trackBusinessEvent } from "@/lib/track-business-event";
 import { useState } from "react";
 import Link from "next/link";
 import { ZONES, CATEGORIES } from "@/lib/constants";
@@ -23,6 +24,9 @@ export function DemandModal({
   const [category, setCategory] = useState(initialCategory);
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
+  const [handoffs, setHandoffs] = useState<
+    Array<{ name: string; businessId: string; url: string }>
+  >([]);
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -54,6 +58,7 @@ export function DemandModal({
       } catch {
         /* Posting works with storage disabled. */
       }
+      setHandoffs(data.handoffs || []);
       setSubmitted(true);
       onPosted?.();
     } catch (cause) {
@@ -71,6 +76,40 @@ export function DemandModal({
             Matching verified sellers are notified. The request expires after
             seven days. You can close it sooner from this browser.
           </p>
+          {handoffs.length ? (
+            <div className="space-y-3">
+              <p className="font-bold">
+                Want a faster reply? Ping a matching verified seller:
+              </p>
+              {handoffs.map((seller) => (
+                <a
+                  key={seller.businessId}
+                  href={seller.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ui-button ui-button-primary"
+                  onClick={() =>
+                    trackBusinessEvent(seller.businessId, "whatsapp")
+                  }
+                >
+                  WhatsApp {seller.name}
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p>
+              No matching seller contact yet. Share your request in your campus
+              WhatsApp group.
+            </p>
+          )}
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(`Can anyone help? ${query}. Zone: ${zone}. Find verified sellers and post requests on Moi Mashinani: ${typeof window === "undefined" ? "" : window.location.origin}/requests`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ui-button ui-button-secondary"
+          >
+            Share request on WhatsApp
+          </a>
           <Link
             href="/requests"
             className="ui-button ui-button-primary"
@@ -102,6 +141,7 @@ export function DemandModal({
             Category
             <select
               className="ui-input"
+              aria-label="Category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
@@ -117,6 +157,7 @@ export function DemandModal({
             Campus zone
             <select
               className="ui-input"
+              aria-label="Campus zone"
               value={zone}
               onChange={(e) => setZone(e.target.value)}
             >

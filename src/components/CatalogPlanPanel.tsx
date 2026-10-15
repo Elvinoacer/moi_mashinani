@@ -66,7 +66,7 @@ export function CatalogPlanPanel({
         timeStyle: "short",
       })
     : "";
-  const hidden = !pro ? Math.max(0, business.services.length - 5) : 0;
+  const unlimitedStorage = pro || business.verificationLevel === "L2";
   return (
     <section
       aria-label="Catalogue plan and storage"
@@ -75,13 +75,13 @@ export function CatalogPlanPanel({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <span className="rounded-full bg-[#edf2e5] px-3 py-1 text-xs font-bold text-[#335e41]">
-            {pro ? "Pro catalogue" : "Free catalogue"}
+            {pro ? "Pro visibility" : "Free catalogue"}
           </span>
           <h2 className="mt-3 text-lg font-bold text-[#243b32]">
             {expiresSoon
               ? `Pro ends in ${days} ${days === 1 ? "day" : "days"}`
               : pro
-                ? "Room for your whole catalogue"
+                ? "Your visibility plan is active"
                 : business.proEndsAt
                   ? "Your Pro plan has ended"
                   : "Your catalogue at a glance"}
@@ -100,22 +100,16 @@ export function CatalogPlanPanel({
           <p className="text-xs text-[#667064]">Products & services</p>
           <p className="mt-1 text-xl font-bold">
             {business.services.length}
-            {pro ? " · Unlimited" : " / 5 public"}
+            {" · Unlimited, free"}
           </p>
-          {hidden > 0 && (
-            <p className="mt-1 text-xs text-[#667064]">
-              {hidden} saved {hidden === 1 ? "item is" : "items are"} hidden
-              until renewal. You can choose which five appear.
-            </p>
-          )}
         </div>
         <div>
           <p className="text-xs text-[#667064]">Image storage</p>
           <p className="mt-1 text-xl font-bold">
             {usage ? formatStorage(usage.usedBytes) : "Loading…"}{" "}
-            {pro ? "· Unlimited" : "/ 25 MB"}
+            {unlimitedStorage ? "· Unlimited" : "/ 25 MB"}
           </p>
-          {usage && !pro && (
+          {usage && !unlimitedStorage && (
             <progress
               className="mt-2 h-2 w-full accent-[#335e41]"
               aria-label="Image storage used"
@@ -136,7 +130,7 @@ export function CatalogPlanPanel({
           {error}
         </p>
       )}
-      {usage && !pro && usage.usedBytes >= FREE_STORAGE_BYTES && (
+      {usage && !unlimitedStorage && usage.usedBytes >= FREE_STORAGE_BYTES && (
         <p className="rounded-lg bg-[#fff8df] p-3 text-sm">
           Your storage allocation is full. Existing photos remain saved. Remove
           photos or renew Pro before uploading more.
@@ -148,8 +142,8 @@ export function CatalogPlanPanel({
           : business.proEndsAt
             ? `Ended ${date} (EAT). `
             : ""}
-        Manual renewal through checkout. We never charge automatically. Email
-        reminders arrive 7, 3 and 1 day before expiry. Images can be up to 5 MB
+        Manual renewal through checkout. We never charge automatically. Renewal
+        reminders appear in your account and, if verified, your email. Images can be up to 5 MB
         before compression; each stored image uses at most 1 MB. Both plans
         include an eight-photo shop gallery.
       </p>

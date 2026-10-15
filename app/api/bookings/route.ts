@@ -1,3 +1,4 @@
+import { publicListing } from "@/lib/campus-value";
 import { withNotificationDelivery } from "@/lib/notification-response";
 import { queueNotice, queueAdmins } from "@/lib/notifications";
 import { NextRequest, NextResponse } from "next/server";
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
     const business = await Store.getBusinessById(
       textField(body.businessId, "Business ID", 100, true),
     );
-    if (!business || business.status !== "ACTIVE")
+    if (!business || !publicListing(business, Date.now()))
       throw new ApiError(404, "Business is unavailable");
     if (business.isTemporarilyClosed)
       throw new ApiError(409, "This business is temporarily closed");

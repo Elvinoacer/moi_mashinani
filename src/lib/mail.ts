@@ -114,7 +114,7 @@ export async function sendProPlanEmail(
   const subject = expired
     ? `${businessName}: your MoiMashinani Pro plan has ended`
     : `${businessName}: Pro ends in ${stage} ${stage === 1 ? "day" : "days"}`;
-  const text = `Hello,\n\n${expired ? "Your Pro plan has ended" : "Your Pro plan is ending soon"} for ${businessName}.\nEnd date: ${date} (East Africa Time).\n\nPro is KES ${PRO_PRICE_KES} for one calendar month. Renewal is manual: open the link below and complete a new checkout. We will never charge you automatically. Renewing early adds a month after your current end date.\n${link}\n\n${expired ? "Your listing is now on Free" : "After expiry, your listing returns to Free"}: 5 public products/services and 25 MB of image storage. Extra products and existing photos stay saved; additional uploads may be paused until you reduce usage or renew. No content is automatically deleted.\n\nMoiMashinani`;
+  const text = `Hello,\n\n${expired ? "Your Pro plan has ended" : "Your Pro plan is ending soon"} for ${businessName}.\nEnd date: ${date} (East Africa Time).\n\nPro is KES ${PRO_PRICE_KES} for one calendar month. Renewal is manual: open the link below and complete a new checkout. We will never charge you automatically. Renewing early adds a month after your current end date.\n${link}\n\n${expired ? "Your listing is now on Free" : "After expiry, your listing returns to Free"}: unlimited public products/services and free stock updates. Verified businesses keep unlimited image storage. Pro visibility and daily broadcasts end at expiry; no catalogue content is hidden or deleted.\n\nMoiMashinani`;
   const response = await fetcher("https://api.resend.com/emails", {
     method: "POST",
     headers: {

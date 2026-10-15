@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PhoneSignIn } from "@/components/PhoneSignIn";
 import { PasswordField } from "@/components/PasswordField";
 
 function LoginForm() {
@@ -86,76 +87,96 @@ function LoginForm() {
             : "Use your private owner phone (07… / 01…) or email and password. Browse and contact sellers without signing in."}
         </p>
       </div>
-      <form onSubmit={submit} className="space-y-4">
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-bold text-[#243b32]">
-            {requestLink ? "Recovery email address" : "Owner phone or email"}
-          </span>
-          <input
-            required
-            type={requestLink ? "email" : "text"}
-            maxLength={254}
-            autoComplete="username"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            disabled={busy}
-            className={inputClass}
-          />
-        </label>
-        {!requestLink && (
-          <PasswordField
-            label="Password"
-            required
-            autoComplete="current-password"
-            maxLength={128}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            disabled={busy}
-            className={inputClass}
-          />
-        )}
-        {error && (
-          <p
-            role="alert"
-            className="rounded-xl bg-[#fce7e1] p-3 text-sm text-[#8f2424]"
-          >
-            {error}
-          </p>
-        )}
-        {message && (
-          <p
-            role="status"
-            className="rounded-xl bg-[#edf2e5] p-3 text-sm text-[#335e41]"
-          >
-            {message}
-          </p>
-        )}
-        <button
-          disabled={busy}
-          type="submit"
-          className="w-full rounded-xl bg-[#243b32] py-3 text-sm font-bold text-white disabled:opacity-50"
-        >
-          {busy
-            ? "Please wait…"
-            : requestLink
-              ? "Email account link"
-              : "Sign in"}
-        </button>
-      </form>
-      <button
-        type="button"
-        onClick={() => {
-          setRequestLink((value) => !value);
-          setError("");
-          setMessage("");
+      <PhoneSignIn
+        onSignedIn={() => {
+          const next = params.get("next");
+          router.replace(
+            next &&
+              next.startsWith("/") &&
+              !next.startsWith("//") &&
+              !next.includes("\\") &&
+              !/[\u0000-\u001f]/.test(next)
+              ? next
+              : "/dashboard",
+          );
+          router.refresh();
         }}
-        disabled={busy}
-        className="text-sm font-semibold text-[#335e41] underline"
-      >
-        {requestLink
-          ? "Back to sign in"
-          : "Verify your email or reset your password"}
-      </button>
+      />
+      <details>
+        <summary className="cursor-pointer font-bold">
+          Use phone/email and password
+        </summary>
+        <form onSubmit={submit} className="space-y-4">
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-bold text-[#243b32]">
+              {requestLink ? "Recovery email address" : "Owner phone or email"}
+            </span>
+            <input
+              required
+              type={requestLink ? "email" : "text"}
+              maxLength={254}
+              autoComplete="username"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              disabled={busy}
+              className={inputClass}
+            />
+          </label>
+          {!requestLink && (
+            <PasswordField
+              label="Password"
+              required
+              autoComplete="current-password"
+              maxLength={128}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={busy}
+              className={inputClass}
+            />
+          )}
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl bg-[#fce7e1] p-3 text-sm text-[#8f2424]"
+            >
+              {error}
+            </p>
+          )}
+          {message && (
+            <p
+              role="status"
+              className="rounded-xl bg-[#edf2e5] p-3 text-sm text-[#335e41]"
+            >
+              {message}
+            </p>
+          )}
+          <button
+            disabled={busy}
+            type="submit"
+            className="w-full rounded-xl bg-[#243b32] py-3 text-sm font-bold text-white disabled:opacity-50"
+          >
+            {busy
+              ? "Please wait…"
+              : requestLink
+                ? "Email account link"
+                : "Sign in"}
+          </button>
+        </form>
+        <button
+          type="button"
+          onClick={() => {
+            setRequestLink((value) => !value);
+            setError("");
+            setMessage("");
+          }}
+          disabled={busy}
+          className="text-sm font-semibold text-[#335e41] underline"
+        >
+          {requestLink
+            ? "Back to sign in"
+            : "Verify your email or reset your password"}
+        </button>
+      </details>
       <p className="text-xs text-[#667064]">
         New business?{" "}
         <Link

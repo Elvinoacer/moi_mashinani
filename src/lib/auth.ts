@@ -16,6 +16,7 @@ export const SESSION_SECONDS = 7 * 24 * 3600;
 export type AuthUser = {
   id: string;
   email: string;
+  phone?: string;
   name: string;
   role: "ADMIN" | "BUSINESS" | "AMBASSADOR";
 };
@@ -28,7 +29,10 @@ export function normalizeEmail(value: unknown): string {
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
   )
     throw new ApiError(400, "A valid owner email is required");
-  return value.trim().toLowerCase();
+  const email = value.trim().toLowerCase();
+  if (email.endsWith("@phone.moimashinani.invalid"))
+    throw new ApiError(400, "Use phone sign-in or a personal email address.");
+  return email;
 }
 export function validatePassword(value: unknown): asserts value is string {
   if (typeof value !== "string" || value.length < 12 || value.length > 128)
@@ -56,12 +60,16 @@ export async function verifyPassword(
 export function publicUser(account: {
   id: string;
   email: string;
+  phone?: string | null;
   name: string;
   role: string;
 }): AuthUser {
   return {
     id: account.id,
-    email: account.email,
+    email: account.email.endsWith("@phone.moimashinani.invalid")
+      ? ""
+      : account.email,
+    phone: account.phone || undefined,
     name: account.name,
     role: account.role as AuthUser["role"],
   };
@@ -78,7 +86,7 @@ export async function getCurrentUser(
   if (
     !session ||
     session.expiresAt <= new Date() ||
-    !session.account.emailVerifiedAt
+    (!session.account.emailVerifiedAt && !session.account.phoneVerifiedAt)
   )
     return null;
   return publicUser(session.account);

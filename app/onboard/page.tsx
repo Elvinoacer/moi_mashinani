@@ -58,7 +58,7 @@ export default function BusinessOnboardPage() {
             List your business — free
           </h1>
           <p className="text-sm text-[#667064]">
-            Create your profile in four quick steps: ready-made catalogues, opening hours and photos included. Verify your email to manage your listing.
+            Create your profile in four quick steps: ready-made catalogues, opening hours and photos included. Sign in by phone to manage your listing, or use an email invitation.
           </p>
         </div>
         <BusinessEnrollmentForm mode="public" />

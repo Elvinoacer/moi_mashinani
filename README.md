@@ -1,6 +1,8 @@
 # MoiMashinani
 
-Campus business discovery, field enrollment, merchant accounts and IntaSend promotion checkout.
+Live campus deals, delivery drops, instant requests, verified student hustles and business storefronts with WhatsApp handoff.
+
+Read the [campus habit implementation and rollout guide](docs/habit-strategy.md) for the completed value-creation strategy, phone sign-in and daily merchant workflows.
 
 Read the [complete platform user guide](docs/platform-user-guide.md) for all student/customer, admin and business actions, daily workflows, payments and troubleshooting.
 
@@ -13,7 +15,7 @@ npm run admin:create
 npm run dev
 ```
 
-The administrator visits businesses, records their details/products/photos in `/admin/enroll`, and sends an email invitation. Owners verify the email, set a password, and manage their own business in the merchant dashboard. Customers discover businesses, contact them, request bookings and report issues. The admin manages approvals, reports and owner invitations.
+The administrator visits businesses, records their details/products/photos in `/admin/enroll`, and provides phone-based setup or an email invitation. Owners verify an SMS code or accept their email invitation, then manage their business in the merchant dashboard. Customers discover businesses, contact them, request bookings and report issues. The admin manages approvals, reports and owner invitations.
 
 Read [Business enrollment and account setup](docs/onboarding.md) for environment configuration, existing database baselining and administrator creation. Read [IntaSend payments](docs/payments.md) for checkout and webhook setup.
 
@@ -33,4 +35,4 @@ The [isolated workflow harness](docs/onboarding.md#testing) runs PostgreSQL, HTT
 
 See the [verification record](docs/verification.md) for tested workflows and the remaining external-service setup.
 
-See [catalogue plans](docs/catalog-plans.md) for Free/Pro product limits, storage accounting, manual monthly renewal and expiry reminders.
+See [catalogue plans](docs/catalog-plans.md) for free unlimited catalogues, visibility plans, storage accounting and manual monthly renewal.

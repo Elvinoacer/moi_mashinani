@@ -89,8 +89,7 @@ export function AccountGate({
           Sign in to your account
         </h1>
         <p className="text-sm text-[#667064]">
-          Business owners can use the verification link in their email to set up
-          their account.
+          Business owners can sign in with an SMS code or their phone/email and password.
         </p>
         <Link
           href={`/login?next=${encodeURIComponent(loginNext)}`}

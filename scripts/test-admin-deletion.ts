@@ -20,7 +20,7 @@ try {
   const admin = await prisma.account.findUniqueOrThrow({where:{email:context.admin.email}});
   const owner = await prisma.account.create({data:{email:`delete-${tag}@test.invalid`,name:'Deletion Owner',role:'BUSINESS',emailVerifiedAt:new Date(),passwordHash:admin.passwordHash}});
   const template = await prisma.business.findFirstOrThrow();
-  const business = await prisma.business.create({data:{...template,id:`delete-${tag}`,slug:`delete-${tag}`,name:`Delete Test ${tag}`,ownerId:owner.id,ownerEmail:owner.email,photos:[],coverPhoto:'',services:[],claimCode:null,mapPin:undefined,hours:template.hours as Prisma.InputJsonValue,metrics:template.metrics as Prisma.InputJsonValue}});
+  const business = await prisma.business.create({data:{...template,id:`delete-${tag}`,slug:`delete-${tag}`,name:`Delete Test ${tag}`,ownerId:owner.id,ownerEmail:owner.email,photos:[],coverPhoto:'',services:[],claimCode:null,mapPin:undefined,utilities:template.utilities as Prisma.InputJsonValue,hours:template.hours as Prisma.InputJsonValue,metrics:template.metrics as Prisma.InputJsonValue}});
   const login = async (email:string) => {
     const response = await fetch(`${base}/api/auth/login`,{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({email,password:context.admin.password})});
     assert.equal(response.status,200);

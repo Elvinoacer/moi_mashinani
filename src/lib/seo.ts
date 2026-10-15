@@ -43,6 +43,21 @@ export const CORE_CAMPUS_KEYWORDS = [
   'Eldoret campus businesses',
   'Uasin Gishu local business directory',
   'Moi University student directory',
+  'Moi University businesses',
+  'businesses around Moi University',
+  'businesses near Moi University',
+  'businesses at Moi University Main Campus',
+  'Moi University business directory',
+  'shops near Moi University',
+  'shops around Moi University',
+  'shops in Kesses',
+  'local businesses Kesses',
+  'services near Moi University',
+  'student services around Moi University',
+  'Moi University campus marketplace',
+  'Moi University market',
+  'businesses in Kesses Eldoret',
+  'where to shop near Moi University',
   'campus market Moi',
   'student services Kesses',
   'hostels near Moi University',
@@ -435,10 +450,10 @@ export function getCategorySeoData(categorySlug: string) {
     synonyms = [categoryName.toLowerCase(), 'services', 'shops'];
   }
 
-  const title = `${categoryName} in Moi University (Kesses) | Campus Directory`;
+  const title = `${categoryName} Near Moi University, Kesses`;
   const description = isGroup
-    ? `Explore all verified ${categoryName.toLowerCase()} around Moi University Main Campus (Kesses). Find shops, fundis, and student services across Soweto, Cheboiywo, Stage, Kesses Centre & Main Gate with WhatsApp & direct phone contacts.`
-    : `Find top ${categoryName.toLowerCase()} around Moi University Main Campus (Kesses). Discover verified shops and services across Soweto, Cheboiywo, Stage, Kesses Centre & Main Gate with direct WhatsApp & phone contacts.`;
+    ? `Browse ${categoryName.toLowerCase()} and local businesses around Moi University Main Campus, Kesses. Explore options in Soweto, Cheboiywo, Stage and Kesses Centre, then contact sellers directly.`
+    : `Looking for ${categoryName.toLowerCase()} near Moi University? Explore local Kesses listings around Soweto, Cheboiywo, Stage and Main Gate, with published details and direct seller contacts.`;
 
   const keywords = Array.from(
     new Set([
@@ -455,6 +470,8 @@ export function getCategorySeoData(categorySlug: string) {
       'Kesses Centre',
       'Main Gate',
       'Moi University directory',
+      'businesses around Moi University',
+      'services near Moi University',
     ])
   );
 
@@ -543,7 +560,7 @@ export function generateWebsiteSchema() {
     alternateName: SITE_ALTERNATE_NAMES,
     url: `${SITE_URL}/`,
     inLanguage: 'en-KE',
-    description: 'Moi Mashinani connects Moi University students with campus shops, hostels, food sellers, services and local businesses around Kesses.',
+    description: 'Moi Mashinani helps students find businesses around Moi University Main Campus in Kesses, including shops, hostels, food, repairs and local services.',
     publisher: { '@id': `${SITE_URL}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',

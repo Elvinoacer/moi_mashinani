@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, Suspense } from 'react';
 import Link from 'next/link';
+import { Bike, BookOpen, Bus, House, Landmark, Moon, Star } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Business } from '@/lib/types';
 import { CategorySelect } from '@/components/CategorySelect';
@@ -40,6 +41,13 @@ import {
   WhatsAppIcon,
   Crosshair,
 } from '@/components/icons';
+
+const SURVIVAL_FILTERS = [
+  { value: "backup", label: "Backup power", icon: Zap },
+  { value: "late", label: "Open past 9 PM", icon: Moon },
+  { value: "free-delivery", label: "Free zone delivery", icon: Bike },
+  { value: "hostels", label: "Verified vacant kejas", icon: House },
+];
 
 interface CampusRadarDiscoveryProps {
   businesses: Business[];
@@ -162,8 +170,8 @@ function SpotlightCard({
               {business.zone.replace('-', ' ')}
             </span>
             {business.activeTier === 'FEATURED' && (
-              <span className="text-[10px] font-black uppercase bg-[#FFC53D] text-[#001C3B] px-2 py-0.5 rounded border border-[#001C3B]">
-                ★ Featured
+              <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase bg-[#FFC53D] text-[#001C3B] px-2 py-0.5 rounded border border-[#001C3B]">
+                <Star size={12} aria-hidden="true" /> Featured
               </span>
             )}
             {business.isOpen && (
@@ -570,7 +578,7 @@ function CampusRadarDiscoveryInner({
 
   return (
     <section className="bg-white border-2 border-[#001C3B] shadow-[4px_4px_0px_#001C3B] rounded-2xl p-4 sm:p-6 md:p-8 space-y-6 relative overflow-hidden">
-      <nav className="flex flex-wrap gap-2" aria-label="Campus survival filters">{[["backup", "⚡ Backup power"], ["late", "🌙 Open past 9 PM"], ["free-delivery", "🛵 Free zone delivery"], ["hostels", "🏠 Verified vacant kejas"]].map(([value, label]) => <Link key={value} className="ui-button ui-button-secondary" href={`/search?survival=${value}`}>{label}</Link>)}</nav>
+      <nav className="flex flex-wrap gap-2" aria-label="Campus survival filters">{SURVIVAL_FILTERS.map(({ value, label, icon: Icon }) => <Link key={value} className="ui-button ui-button-secondary" href={`/search?survival=${value}`}><Icon className="h-4 w-4 shrink-0" aria-hidden="true" />{label}</Link>)}</nav>
       {/* HEADER BANNER */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b-2 border-[#001C3B]">
         <div>
@@ -1239,11 +1247,11 @@ function CampusRadarDiscoveryInner({
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FFC53D] border border-[#001C3B]" />
-                <span>★ Featured Shop</span>
+                <Star size={12} className="shrink-0" aria-hidden="true" /><span>Featured Shop</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#25D366] border border-[#001C3B]" />
-                <span>⚡ Open Right Now</span>
+                <Zap size={12} className="shrink-0" aria-hidden="true" /><span>Open Right Now</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#0B6E70] border border-[#001C3B]" />
@@ -1550,7 +1558,7 @@ function CampusRadarDiscoveryInner({
                     fontWeight="bold"
                     textAnchor="middle"
                   >
-                    Gate ↔ Stage 5 min
+                    Gate – Stage 5 min
                   </text>
 
                   {/* Gate to Soweto walk path */}
@@ -1570,7 +1578,7 @@ function CampusRadarDiscoveryInner({
                     fontWeight="bold"
                     textAnchor="middle"
                   >
-                    Gate ↔ Soweto 7 min
+                    Gate – Soweto 7 min
                   </text>
 
                   {/* LANDMARKS WITH ICONS */}
@@ -1587,16 +1595,7 @@ function CampusRadarDiscoveryInner({
                       stroke="#FFC53D"
                       strokeWidth="3"
                     />
-                    <text
-                      x="300"
-                      y="235"
-                      fill="#FFC53D"
-                      fontSize="11"
-                      fontWeight="bold"
-                      textAnchor="middle"
-                    >
-                      🏛️
-                    </text>
+                    <Landmark x={292} y={222} width={16} height={16} color="#FFC53D" aria-hidden="true" />
                     <rect x="235" y="248" width="130" height="18" rx="4" fill="#001C3B" />
                     <text
                       x="300"
@@ -1622,15 +1621,16 @@ function CampusRadarDiscoveryInner({
                       stroke="#001C3B"
                       strokeWidth="1.5"
                     />
+                    <BookOpen x={157} y={179} width={14} height={14} color="#FFFFFF" aria-hidden="true" />
                     <text
-                      x="185"
+                      x="192"
                       y="192"
                       fill="#FFFFFF"
                       fontSize="9"
                       fontWeight="bold"
                       textAnchor="middle"
                     >
-                      📚 Library
+                      Library
                     </text>
                   </g>
 
@@ -1650,15 +1650,7 @@ function CampusRadarDiscoveryInner({
                       stroke="#FFFFFF"
                       strokeWidth="2"
                     />
-                    <text
-                      x="510"
-                      y="360"
-                      fill="#FFFFFF"
-                      fontSize="10"
-                      textAnchor="middle"
-                    >
-                      🚌
-                    </text>
+                    <Bus x={502} y={347} width={16} height={16} color="#FFFFFF" aria-hidden="true" />
                   </g>
 
                   {/* PLOTTED BUSINESS PINS ON CAMPUS MAP */}

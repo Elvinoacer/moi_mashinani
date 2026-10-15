@@ -1,6 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import {
+  Activity,
+  Bike,
+  Droplets,
+  Flame,
+  GraduationCap,
+  House,
+  MapPin,
+  Megaphone,
+  Moon,
+  Wifi,
+  Zap,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { Business } from "@/lib/types";
 import { ZONES } from "@/lib/constants";
@@ -21,6 +34,20 @@ import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
+const QUICK_INTENTS = [
+  { value: "open", label: "Open right now", icon: Activity },
+  { value: "deals", label: "Today’s deals", icon: Flame },
+  { value: "delivery", label: "Hostel delivery", icon: Bike },
+  { value: "backup", label: "Blackout mode", icon: Zap },
+  { value: "wifi", label: "Live Wi-Fi", icon: Wifi },
+  { value: "water", label: "Water available", icon: Droplets },
+  { value: "late", label: "Open past 9 PM", icon: Moon },
+  { value: "free-delivery", label: "Free zone delivery", icon: Bike },
+  { value: "hostels", label: "Verified vacant kejas", icon: House },
+  { value: "comrade", label: "Comrade Market", icon: GraduationCap },
+  { value: "requests", label: "Post a request", icon: Megaphone },
+];
+
 export function CampusHome({
   businesses: initial,
 }: {
@@ -110,12 +137,15 @@ export function CampusHome({
   return (
     <>
       <div className="campus-zone-bar">
-        <label className="flex items-center gap-2 text-sm font-bold">
-          📍 Your campus zone
+        <label className="flex flex-col gap-2 text-sm font-bold sm:flex-row sm:items-center">
+          <span className="inline-flex items-center gap-2">
+            <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
+            Your campus zone
+          </span>
           <select
             disabled={!ready}
             aria-label="Your campus zone"
-            className="ui-input max-w-xs"
+            className="ui-input w-full sm:max-w-xs"
             value={zone}
             onChange={(e) => setZone(e.target.value)}
           >
@@ -187,25 +217,14 @@ export function CampusHome({
           </p>
         </form>
         <div className="campus-pills" aria-label="Quick intents">
-          {[
-            ["open", "🟢 Open right now"],
-            ["deals", "🔥 Today’s deals"],
-            ["delivery", "🛵 Hostel delivery"],
-            ["backup", "⚡ Blackout mode"],
-            ["wifi", "📶 Live Wi-Fi"],
-            ["water", "💧 Water available"],
-            ["late", "🌙 Open past 9 PM"],
-            ["free-delivery", "🛵 Free zone delivery"],
-            ["hostels", "🏠 Verified vacant kejas"],
-            ["comrade", "🎓 Comrade Market"],
-            ["requests", "📢 Post a request"],
-          ].map(([value, label]) => (
+          {QUICK_INTENTS.map(({ value, label, icon: Icon }) => (
             <Button
               key={value}
               variant={intent === value ? "primary" : "secondary"}
               aria-pressed={intent === value}
               onClick={() => choose(value)}
             >
+              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
               {label}
             </Button>
           ))}

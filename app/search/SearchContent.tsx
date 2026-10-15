@@ -3,6 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  Activity,
+  Bike,
+  House,
+  MapPin,
+  Moon,
+  ShieldCheck,
+  Tag,
+  Zap,
+} from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
@@ -13,6 +23,13 @@ import { CATEGORIES, ZONES } from "@/lib/constants";
 import { CategorySelect } from "@/components/CategorySelect";
 import { Business, Tier } from "@/lib/types";
 import { Search, AlertCircle, Info, X } from "@/components/icons";
+
+const SURVIVAL_FILTERS = [
+  { value: "backup", label: "Blackout / backup power", icon: Zap },
+  { value: "late", label: "Open past 9 PM", icon: Moon },
+  { value: "free-delivery", label: "Free zone delivery", icon: Bike },
+  { value: "hostels", label: "Verified vacant kejas", icon: House },
+];
 
 interface SearchResultItem extends Business {
   effectiveTier?: Tier;
@@ -106,7 +123,8 @@ export function SearchContent() {
     verifiedParam ||
     discountParam ||
     deliveryParam ||
-    maxPriceParam || searchParams.get("survival"),
+    maxPriceParam ||
+    searchParams.get("survival"),
   );
 
   return (
@@ -126,7 +144,28 @@ export function SearchContent() {
           <span className="text-[#243b32]">Search Directory</span>
         </nav>
 
-        <div className="flex flex-wrap gap-2" aria-label="Campus survival filters">{[["backup", "⚡ Blackout / backup power"], ["late", "🌙 Open past 9 PM"], ["free-delivery", "🛵 Free zone delivery"], ["hostels", "🏠 Verified vacant kejas"]].map(([value, label]) => <button key={value} type="button" className="ui-button ui-button-secondary" aria-pressed={searchParams.get("survival") === value} onClick={() => updateFilters({ survival: searchParams.get("survival") === value ? null : value })}>{label}</button>)}</div>
+        <div
+          className="flex flex-wrap gap-2"
+          aria-label="Campus survival filters"
+        >
+          {SURVIVAL_FILTERS.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              className="ui-button ui-button-secondary"
+              aria-pressed={searchParams.get("survival") === value}
+              onClick={() =>
+                updateFilters({
+                  survival:
+                    searchParams.get("survival") === value ? null : value,
+                })
+              }
+            >
+              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {label}
+            </button>
+          ))}
+        </div>
         {/* SEARCH BAR & QUICK FILTERS HERO */}
         <section className="bg-white signboard-border signboard-shadow-sm rounded-2xl p-4 sm:p-6 space-y-4">
           <form
@@ -167,17 +206,21 @@ export function SearchContent() {
           {/* CHIPS ROW (ZONES & TOGGLES) */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#dfe5d8]">
             {/* Zones Dropdown */}
-            <select
-              value={zoneParam}
-              onChange={(e) => updateFilters({ zone: e.target.value })}
-              className="bg-[#f7f8f2] border border-[#dfe5d8] rounded-lg px-3 py-1.5 text-xs font-bold text-[#243b32] focus:outline-none"
-            >
-              {ZONES.map((z) => (
-                <option key={z.slug} value={z.slug}>
-                  📍 {z.name}
-                </option>
-              ))}
-            </select>
+            <label className="inline-flex items-center gap-1.5 rounded-lg border border-[#dfe5d8] bg-[#f7f8f2] px-3 text-[#243b32]">
+              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <select
+                aria-label="Campus zone"
+                value={zoneParam}
+                onChange={(e) => updateFilters({ zone: e.target.value })}
+                className="min-w-0 bg-transparent py-1.5 text-xs font-bold focus:outline-none"
+              >
+                {ZONES.map((z) => (
+                  <option key={z.slug} value={z.slug}>
+                    {z.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             {/* Category Select */}
             <div className="w-48">
@@ -217,13 +260,14 @@ export function SearchContent() {
                   availableNow: availableNowParam ? null : "true",
                 })
               }
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 availableNowParam
                   ? "bg-[#183e35] text-white border-[#183e35]"
                   : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
               }`}
             >
-              🟢 Open Now
+              <Activity className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />{" "}
+              Open Now
             </button>
 
             <button
@@ -231,13 +275,17 @@ export function SearchContent() {
               onClick={() =>
                 updateFilters({ verified: verifiedParam ? null : "true" })
               }
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 verifiedParam
                   ? "bg-[#183e35] text-white border-[#183e35]"
                   : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
               }`}
             >
-              🛡️ Team Verified (L2)
+              <ShieldCheck
+                className="h-3.5 w-3.5 shrink-0"
+                aria-hidden="true"
+              />{" "}
+              Team Verified (L2)
             </button>
 
             <button
@@ -245,13 +293,14 @@ export function SearchContent() {
               onClick={() =>
                 updateFilters({ discount: discountParam ? null : "true" })
               }
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 discountParam
                   ? "bg-[#183e35] text-white border-[#183e35]"
                   : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
               }`}
             >
-              🏷️ Student Deals
+              <Tag className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />{" "}
+              Student Deals
             </button>
 
             {hasActiveFilters && (

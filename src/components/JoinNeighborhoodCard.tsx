@@ -43,7 +43,7 @@ export function JoinNeighborhoodCard() {
             <span className="text-left"><strong className="block text-[12px] text-[#183e35]">Your shop, discovered.</strong><small className="text-[10px] text-[#667064]">Good things happen locally.</small></span>
           </div>
         </div>
-        <div className="absolute bottom-6 right-6 rotate-[7deg] rounded-[11px] bg-[#d9f279] px-4 py-2 text-[11px] font-extrabold text-[#183e35] shadow-lg sm:bottom-10 sm:right-10">HELLO, NEIGHBOR ↗</div>
+        <div className="absolute bottom-6 right-6 inline-flex items-center gap-1 rotate-[7deg] rounded-[11px] bg-[#d9f279] px-4 py-2 text-[11px] font-extrabold text-[#183e35] shadow-lg sm:bottom-10 sm:right-10">HELLO, NEIGHBOR <ArrowUpRight size={14} aria-hidden="true" /></div>
       </div>
     </section>
   );

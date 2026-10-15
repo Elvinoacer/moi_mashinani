@@ -1,3 +1,4 @@
+import { Bike, Droplets, Handshake, Moon, Wifi, Zap } from "lucide-react";
 import type { Business } from "@/lib/types";
 export function CampusUtilityDetails({ business }: { business: Business }) {
   const u = business.utilities;
@@ -9,19 +10,24 @@ export function CampusUtilityDetails({ business }: { business: Business }) {
     >
       <div className="flex flex-wrap gap-2">
         {[
-          [u.hasGenerator, "⚡ Backup power"],
-          [u.hasWifi, "📶 Wi-Fi"],
-          [u.hasWater, "💧 Water"],
-          [u.lateNightBoda, "🌙 Night boda"],
-          [u.freeDelivery, "🛵 Free delivery"],
-          [u.noBrokerFee, "Caretaker direct · no broker fee"],
+          { enabled: u.hasGenerator, label: "Backup power", icon: Zap },
+          { enabled: u.hasWifi, label: "Wi-Fi", icon: Wifi },
+          { enabled: u.hasWater, label: "Water", icon: Droplets },
+          { enabled: u.lateNightBoda, label: "Night boda", icon: Moon },
+          { enabled: u.freeDelivery, label: "Free delivery", icon: Bike },
+          {
+            enabled: u.noBrokerFee,
+            label: "Caretaker direct · no broker fee",
+            icon: Handshake,
+          },
         ]
-          .filter(([enabled]) => enabled)
-          .map(([, label]) => (
+          .filter(({ enabled }) => enabled)
+          .map(({ label, icon: Icon }) => (
             <span
-              key={String(label)}
-              className="rounded-lg bg-[#edf2e5] px-2 py-1 text-xs"
+              key={label}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#edf2e5] px-2 py-1 text-xs"
             >
+              <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               {label}
             </span>
           ))}

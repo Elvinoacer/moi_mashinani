@@ -592,7 +592,7 @@ export function BusinessProfileClient({
             <div className="rounded-2xl border-2 border-[#ffc53d] bg-[#fffdf5] p-5 shadow-[0_4px_16px_rgba(255,197,61,0.15)] flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ffc53d] text-[#243b32] font-black text-xl shadow-sm">
-                  ★
+                  <Star className="h-6 w-6" aria-hidden="true" />
                 </span>
                 <div>
                   <p className="font-display font-black text-sm text-[#243b32] uppercase tracking-wide">

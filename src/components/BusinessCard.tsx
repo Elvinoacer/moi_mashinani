@@ -3,7 +3,7 @@ import { availabilityLabel, confirmedOpen } from "@/lib/campus-value";
 import { CampusUtilityDetails } from "./CampusUtilityDetails";
 import { useState } from "react";
 import Link from "next/link";
-import { BadgeCheck, MessageCircle, Store } from "lucide-react";
+import { BadgeCheck, Flame, MessageCircle, Star, Store } from "lucide-react";
 import { CATEGORIES, ZONES } from "@/lib/constants";
 import { comparisonItems } from "@/lib/catalog-plan";
 import { useNow } from "@/lib/useNow";
@@ -91,7 +91,8 @@ export function BusinessCard({
         )}
         {tier !== "NONE" && (
           <span className={styles.promoted}>
-            {tier === "FEATURED" ? "★ Featured" : "Recommended"} · Ad
+            {tier === "FEATURED" && <Star size={12} aria-hidden="true" />}
+            {tier === "FEATURED" ? "Featured" : "Recommended"} · Ad
           </span>
         )}
       </Link>
@@ -105,11 +106,20 @@ export function BusinessCard({
           {category} • {zone}
         </p>
         <p className={styles.price}>
-          {business.studentDiscount
-            ? `🔥 ${business.studentDiscount}`
-            : min !== undefined
-              ? `${query && compared.length ? compared.find((s) => s.priceFrom === min)?.name + " · " : "From "}KES ${min.toLocaleString("en-KE")}`
-              : "View prices & services"}
+          {business.studentDiscount ? (
+            <>
+              <Flame
+                size={16}
+                className="mr-1 inline-block align-text-bottom"
+                aria-hidden="true"
+              />
+              {business.studentDiscount}
+            </>
+          ) : min !== undefined ? (
+            `${query && compared.length ? compared.find((s) => s.priceFrom === min)?.name + " · " : "From "}KES ${min.toLocaleString("en-KE")}`
+          ) : (
+            "View prices & services"
+          )}
         </p>
         <CampusUtilityDetails business={business} />
         {confirmedOpen(business, now) && business.liveStatus && (

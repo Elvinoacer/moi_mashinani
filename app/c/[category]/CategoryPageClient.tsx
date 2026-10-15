@@ -10,6 +10,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { BusinessCard } from "@/components/BusinessCard";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
 import { Business, Category } from "@/lib/types";
+import { Search, Star } from "lucide-react";
 import { CategoryIcon, Store } from "@/components/icons";
 import { useNow } from "@/lib/useNow";
 
@@ -161,8 +162,12 @@ export function CategoryPageClient({
                   {featuredInCat.length > 0 && (
                     <div className="space-y-3 rounded-2xl border-2 border-[#ffc53d] bg-[#fffdf5] p-5 shadow-[0_6px_20px_rgba(255,197,61,0.15)]">
                       <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-[#ffc53d] px-2.5 py-1 text-xs font-black uppercase tracking-wider text-[#243b32]">
-                          ★ Featured Spotlight
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#ffc53d] px-2.5 py-1 text-xs font-black uppercase tracking-wider text-[#243b32]">
+                          <Star
+                            className="h-3.5 w-3.5 shrink-0"
+                            aria-hidden="true"
+                          />{" "}
+                          Featured Spotlight
                         </span>
                         <span className="text-xs font-bold text-[#667064]">
                           Top recommended in {categoryObj.name}
@@ -305,9 +310,13 @@ export function CategoryPageClient({
                   <Link
                     key={term}
                     href={`/search?q=${encodeURIComponent(term)}`}
-                    className="inline-block bg-[#f7f8f2] hover:bg-[#e9eedf] text-[#243b32] text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#dfe5d8] transition"
+                    className="inline-flex items-center gap-1.5 bg-[#f7f8f2] hover:bg-[#e9eedf] text-[#243b32] text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#dfe5d8] transition"
                   >
-                    🔍 {term}
+                    <Search
+                      className="h-3.5 w-3.5 shrink-0"
+                      aria-hidden="true"
+                    />{" "}
+                    {term}
                   </Link>
                 ))}
               </div>

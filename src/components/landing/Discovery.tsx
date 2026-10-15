@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Form from 'next/form';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, BadgeCheck, ChevronDown, MapPin, Search, Store } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BadgeCheck, ChevronDown, GraduationCap, MapPin, Search, Star, Store } from 'lucide-react';
 import type { Business, ServiceItem } from '@/lib/types';
 import styles from './discovery.module.css';
 import { BookingModal } from '@/components/BookingModal';
@@ -144,7 +144,7 @@ function DiscoveryCard({ business }: { business: LandingBusiness }) {
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
           {business.activeTier === 'FEATURED' && (!business.tierEndsAt || new Date(business.tierEndsAt).getTime() > now) && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#ffc53d] px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider text-[#243b32] shadow-sm">
-              ★ Featured
+              <Star size={12} aria-hidden="true" /> Featured
             </span>
           )}
           <span className={styles.categoryPill}>{business.categoryName}</span>
@@ -244,7 +244,7 @@ export function FeaturedSpotlight({ businesses }: { businesses: LandingBusiness[
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#fff4cc] px-3 py-1 text-xs font-black uppercase tracking-wider text-[#9a6700] border border-[#ffe082]">
-            <span className="text-[#e69500]">★</span> Campus Featured Spotlight
+            <Star size={14} className="text-[#e69500]" aria-hidden="true" /> Campus Featured Spotlight
           </div>
           <h2 id="featured-spotlight-heading" className="mt-2 font-display text-2xl md:text-3xl font-black text-[#243b32] tracking-tight">
             Featured around campus
@@ -286,7 +286,7 @@ export function FeaturedSpotlight({ businesses }: { businesses: LandingBusiness[
                   )}
                   <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10 pointer-events-none">
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#ffc53d] px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-[#243b32] shadow-sm">
-                      ★ Featured
+                      <Star size={12} aria-hidden="true" /> Featured
                     </span>
                     <span className="rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-[#243b32]">
                       {biz.categoryName}
@@ -307,8 +307,8 @@ export function FeaturedSpotlight({ businesses }: { businesses: LandingBusiness[
                     {biz.tagline || firstService?.name || biz.categoryName}
                   </p>
                   {biz.studentDiscount && (
-                    <div className="rounded-lg bg-[#eff4da] px-2.5 py-1 text-[11px] font-bold text-[#526936]">
-                      🎓 {biz.studentDiscount}
+                    <div className="flex items-center gap-1.5 rounded-lg bg-[#eff4da] px-2.5 py-1 text-[11px] font-bold text-[#526936]">
+                      <GraduationCap size={14} className="shrink-0" aria-hidden="true" /> {biz.studentDiscount}
                     </div>
                   )}
                 </div>

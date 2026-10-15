@@ -34,7 +34,7 @@ export function Footer() {
           <div>
             <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">For the neighborhood</h2>
             <nav aria-label="Platform links" className="flex flex-col items-start gap-3">
-              <Link href="/onboard" className="font-semibold text-[12px] text-[#335e41] hover:text-[#183e35]">List your business for free ↗</Link>
+              <Link href="/onboard" className="inline-flex items-center gap-1 font-semibold text-[12px] text-[#335e41] hover:text-[#183e35]">List your business for free <ArrowUpRight size={13} aria-hidden="true" /></Link>
               <Link href="/deals" className="text-[12px] text-[#667064] hover:text-[#183e35]">Student deals</Link>
               <Link href="/dashboard" className="text-[12px] text-[#667064] hover:text-[#183e35]">Manage your business</Link>
               <Link href="/ambassador" className="text-[12px] text-[#667064] hover:text-[#183e35]">Ambassadors</Link>

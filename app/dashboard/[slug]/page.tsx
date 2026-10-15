@@ -6,6 +6,7 @@ import { TrustShare } from "@/components/TrustShare";
 import { LeadTimeline } from "@/components/LeadTimeline";
 import { RequestBoard } from "@/components/RequestBoard";
 import { CategorySelect } from "@/components/CategorySelect";
+import { DashboardWorkspaceNav, type WorkspaceTab } from "@/components/DashboardWorkspaceNav";
 
 import Image from "next/image";
 
@@ -68,18 +69,28 @@ const tabs = [
   "billing",
   "share",
 ] as const;
-type Tab = (typeof tabs)[number];
+type Tab = WorkspaceTab;
+const sectionCopy: Record<Tab, { title: string; subtitle: string }> = {
+  overview: { title: "Today at your business", subtitle: "See what needs attention and how customers are finding you." },
+  bookings: { title: "Booking requests", subtitle: "Find customers quickly, respond and update each request." },
+  services: { title: "Your catalogue", subtitle: "Manage products, pricing and availability in one place." },
+  details: { title: "Business information", subtitle: "Keep your contact details, location and trust information accurate." },
+  photos: { title: "Business gallery", subtitle: "Help customers recognize your business and what you offer." },
+  hours: { title: "Opening hours", subtitle: "Set a reliable weekly schedule for your customers." },
+  billing: { title: "Plans and payments", subtitle: "Manage visibility, promotions and your transaction history." },
+  share: { title: "Share your business", subtitle: "Make it easy for customers to reach your public profile." },
+};
 type Booking = BookingIntent & {
   status: "NEW" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
   contactPhone?: string;
 };
 type EditableService = ServiceItem & { photo?: string };
 const inputClass =
-  "mt-1 w-full rounded border border-[#dfe5d8] bg-[#e9eedf] px-3 py-2 text-sm text-[#243b32]";
+  "mt-1 block min-h-11 w-full min-w-0 rounded-xl border border-[#becfc1] bg-white px-3.5 py-2.5 text-sm text-[#243b32] shadow-sm placeholder:text-[#869387] focus-visible:border-[#477353] focus-visible:ring-2 focus-visible:ring-[#d4e6c1]";
 const buttonClass =
   "rounded-full bg-[#335e41] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50";
 const panelClass =
-  "space-y-4 rounded-xl bg-white p-5 signboard-border signboard-shadow md:p-6";
+  "min-w-0 space-y-4 rounded-2xl border border-[#e0e8dd] bg-white p-4 shadow-[0_8px_26px_rgba(31,61,42,0.045)] sm:p-5 xl:p-6";
 
 async function readResponse<T>(response: Response): Promise<T> {
   const data = await response.json();
@@ -107,24 +118,10 @@ function BusinessDashboard({ slug }: { slug: string }) {
   const [busy, setBusy] = useState("");
   const [liveStatus, setLiveStatus] = useState("");
   const requestedTab = searchParams.get("tab");
-  const [tabSelection, setTabSelection] = useState<{
-    query: string | null;
-    tab: Tab;
-  }>({
-    query: requestedTab,
-    tab: tabs.includes(requestedTab as Tab)
-      ? (requestedTab as Tab)
-      : "services",
-  });
-  const activeTab =
-    tabSelection.query === requestedTab
-      ? tabSelection.tab
-      : tabs.includes(requestedTab as Tab)
-        ? (requestedTab as Tab)
-        : "services";
-  function setActiveTab(tab: Tab) {
-    setTabSelection({ query: requestedTab, tab });
-  }
+  // The URL is the single source of truth, including browser Back/Forward.
+  const activeTab: Tab = tabs.includes(requestedTab as Tab)
+    ? (requestedTab as Tab)
+    : "overview";
   const [draft, setDraft] = useState({
     name: "",
     tagline: "",
@@ -147,6 +144,12 @@ function BusinessDashboard({ slug }: { slug: string }) {
   const [servicePhoto, setServicePhoto] = useState("");
   const [storageRefresh, setStorageRefresh] = useState(0);
   const [storageUsage, setStorageUsage] = useState<CatalogUsage | null>(null);
+  const [catalogQuery, setCatalogQuery] = useState("");
+  const [serviceSort, setServiceSort] = useState<"listed" | "name" | "stock">("listed");
+  const [showServiceForm, setShowServiceForm] = useState(false);
+  const [confirmDeleteServiceId, setConfirmDeleteServiceId] = useState<string | null>(null);
+  const [bookingQuery, setBookingQuery] = useState("");
+  const [bookingFilter, setBookingFilter] = useState<"OPEN" | "ALL" | Booking["status"]>("OPEN");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -384,6 +387,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
     setServicePrice("");
     setServiceNote("");
     setServicePhoto("");
+    setShowServiceForm(false);
   }
   async function mutateProduct(
     method: "POST" | "PATCH" | "DELETE",
@@ -435,6 +439,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
       setServicePrice("");
       setServiceNote("");
       setServicePhoto("");
+      setShowServiceForm(false);
       return updated;
     });
   }
@@ -503,17 +508,30 @@ function BusinessDashboard({ slug }: { slug: string }) {
     ? ownedBusinesses
     : [business, ...ownedBusinesses];
 
+  const pendingBookings = bookings.filter((item) => (item.status || "NEW") === "NEW").length;
+  const openBookings = bookings.filter((item) => ["NEW", "CONFIRMED"].includes(item.status || "NEW")).length;
+  const visibleBookings = bookings.filter((item) => {
+    const matchesStatus = bookingFilter === "ALL" || (bookingFilter === "OPEN" ? ["NEW", "CONFIRMED"].includes(item.status || "NEW") : (item.status || "NEW") === bookingFilter);
+    const needle = bookingQuery.trim().toLowerCase();
+    return matchesStatus && (!needle || [item.studentName, item.serviceName, item.note || "", item.contactPhone || ""].join(" ").toLowerCase().includes(needle));
+  });
+  const visibleServices = (business.services as EditableService[])
+    .filter((service) => [service.name, service.note || ""].join(" ").toLowerCase().includes(catalogQuery.trim().toLowerCase()))
+    .sort((a, b) => serviceSort === "name" ? a.name.localeCompare(b.name) : serviceSort === "stock" ? Number(a.inStock === false) - Number(b.inStock === false) : 0);
+
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 space-y-5 px-4 py-6 md:px-8">
+    <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-5 px-3 py-5 sm:px-6 lg:px-9 lg:py-8">
       <div
-        className={`${panelClass} flex flex-wrap items-center justify-between gap-4`}
+        className="relative flex flex-wrap items-center justify-between gap-5 overflow-hidden rounded-[26px] border border-[#dce7d2] bg-[linear-gradient(115deg,#f0f6e8_0%,#ffffff_75%)] px-5 py-6 shadow-[0_9px_30px_rgba(31,61,42,0.06)] sm:px-7"
       >
-        <div>
-          <h1 className="font-display text-2xl font-bold text-[#243b32]">
+        <div className="min-w-0 flex-1">
+          <Link href="/dashboard" className="mb-3 inline-flex items-center text-xs font-semibold text-[#56755b] hover:underline">← All my businesses</Link>
+          <p className="mb-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#637d5b]">Merchant workspace</p>
+          <h1 className="font-display break-words text-2xl font-extrabold text-[#183e35] sm:text-[30px]">
             {business.name}
           </h1>
           <p className="mt-1 text-xs text-[#667064]">
-            {business.status} listing · {business.landmark}
+            <span className="font-bold text-[#335e41]">{business.status === "ACTIVE" ? "Published" : business.status.toLowerCase()}</span> · {business.landmark || "Campus business"}
           </p>
           {switcherBusinesses.length > 1 && (
             <label className="mt-2 block text-xs font-bold text-[#243b32]">
@@ -539,13 +557,13 @@ function BusinessDashboard({ slug }: { slug: string }) {
           <Link
             href={`/b/${business.slug}`}
             target="_blank"
-            className="inline-flex items-center gap-2 rounded-full border border-[#dfe5d8] px-4 py-2 text-sm font-bold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#cbd9c7] bg-white px-4 py-2 text-sm font-bold text-[#294a36] transition-colors hover:bg-[#f3f7ed]"
           >
             <Eye className="h-4 w-4" /> View profile
           </Link>
           <Link
             href={`/dashboard/${business.slug}?tab=billing`}
-            className="inline-flex items-center gap-2 rounded-full bg-[#d9f279] px-4 py-2 text-sm font-bold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#244b37] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#35684a]"
           >
             <Rocket className="h-4 w-4" /> Promote
           </Link>
@@ -604,41 +622,37 @@ function BusinessDashboard({ slug }: { slug: string }) {
           {notice}
         </p>
       )}
-      <nav aria-label="Business management" className="flex flex-wrap gap-2">
-        {[
-          ["services", "My shop & prices"],
-          ["overview", "Customer leads"],
-          ["billing", "Boost & upgrade"],
-        ].map(([tab, label]) => (
-          <button
-            key={tab}
-            className={`ui-button ${(["overview", "bookings"].includes(activeTab) ? "overview" : activeTab === "billing" ? "billing" : "services") === tab ? "ui-button-primary" : "ui-button-secondary"}`}
-            onClick={() => {
-              setActiveTab(tab as Tab);
-              setNotice("");
-            }}
-            aria-current={
-              (["overview", "bookings"].includes(activeTab)
-                ? "overview"
-                : activeTab === "billing"
-                  ? "billing"
-                  : "services") === tab
-                ? "page"
-                : undefined
-            }
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
-      {!["overview", "bookings", "billing"].includes(activeTab) && (
-        <>
-          <CatalogPlanPanel
-            business={business}
-            refreshKey={storageRefresh}
-            onUsage={setStorageUsage}
-          />
-          <section className={panelClass}>
+      <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[245px_minmax(0,1fr)] lg:gap-7">
+        <DashboardWorkspaceNav slug={business.slug} activeTab={activeTab} pendingBookings={pendingBookings} onNavigate={() => { setError(""); setNotice(""); }} />
+        <div className="min-w-0 space-y-5">
+          <header className="flex flex-wrap items-end justify-between gap-3 px-1">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#7c887e]">Business management</p>
+              <h2 className="mt-1 text-2xl font-extrabold text-[#183e35] sm:text-[28px]">{sectionCopy[activeTab].title}</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#65746a]">{sectionCopy[activeTab].subtitle}</p>
+            </div>
+          </header>
+          {activeTab === "overview" && (
+            <section aria-label="Quick actions" className="grid gap-3 sm:grid-cols-3">
+              <Link href={"/dashboard/" + business.slug + "?tab=bookings"} scroll={false} className="rounded-2xl border border-[#d9e7cb] bg-[#eaf3db] p-4 transition-colors hover:bg-[#deedca]">
+                <p className="text-xs font-semibold text-[#43624a]">Requests to handle</p>
+                <p className="mt-1 text-3xl font-extrabold text-[#204834]">{openBookings}</p>
+                <p className="mt-2 text-xs font-bold text-[#315d41]">View bookings →</p>
+              </Link>
+              <Link href={"/dashboard/" + business.slug + "?tab=services"} scroll={false} className="rounded-2xl border border-[#e0e8dd] bg-white p-4 transition-colors hover:bg-[#f5f8f1]">
+                <p className="text-xs font-semibold text-[#65746a]">Catalogue items</p>
+                <p className="mt-1 text-3xl font-extrabold text-[#204834]">{business.services.length}</p>
+                <p className="mt-2 text-xs font-bold text-[#315d41]">Edit prices & stock →</p>
+              </Link>
+              <div className="rounded-2xl border border-[#e0e8dd] bg-white p-4">
+                <p className="text-xs font-semibold text-[#65746a]">Customer visibility</p>
+                <p className="mt-2 text-base font-extrabold text-[#204834]">{business.isTemporarilyClosed ? "Temporarily closed" : isAvailable ? "Live now" : business.status === "ACTIVE" ? "Published" : "Not published"}</p>
+                <p className="mt-2 text-xs text-[#65746a]">Change availability below</p>
+              </div>
+            </section>
+          )}
+          {activeTab === "details" && (
+            <section className={panelClass}>
             <h2 className="text-xl font-bold">Trust & request alerts</h2>
             <VerificationEvidence
               slug={slug}
@@ -662,7 +676,9 @@ function BusinessDashboard({ slug }: { slug: string }) {
               Customer requests and booking updates also appear in your inbox and email. No SMS charges.
             </p>
           </section>
-          <section className={panelClass}>
+          )}
+          {activeTab === "overview" && (
+            <section className={panelClass}>
             <h2 className="text-xl font-bold">Live campus status</h2>
             <label className="block text-sm font-semibold">
               What’s happening now? (40 characters)
@@ -744,30 +760,9 @@ function BusinessDashboard({ slug }: { slug: string }) {
               Updates expire automatically. Closing the shop pauses inquiries.
             </p>
           </section>
-          <nav aria-label="Shop settings" className="campus-pills">
-            {(["services", "details", "photos", "hours", "share"] as const).map(
-              (tab) => (
-                <button
-                  key={tab}
-                  className={`ui-button ${activeTab === tab ? "ui-button-primary" : "ui-button-secondary"}`}
-                  onClick={() => setActiveTab(tab)}
-                  aria-current={activeTab === tab ? "page" : undefined}
-                >
-                  {tab === "services" ? "Prices" : tab}
-                </button>
-              ),
-            )}
-          </nav>
-        </>
-      )}
-      {["overview", "services"].includes(activeTab) && <MerchantDailyTools business={business} />}
+          )}
+      {activeTab === "overview" && <MerchantDailyTools business={business} />}
       {activeTab === "billing" && <BoostCheckout business={business} />}
-      {["overview", "bookings"].includes(activeTab) && (
-        <>
-          <LeadTimeline slug={slug} />
-          <RequestBoard compact />
-        </>
-      )}
       {activeTab === "overview" && (
         <div className="space-y-5">
           <div className={panelClass}>
@@ -969,20 +964,35 @@ function BusinessDashboard({ slug }: { slug: string }) {
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
           </div>
-          <p className="text-sm text-[#667064]">
-            Contact the customer to agree on the appointment before confirming a
-            request.
-          </p>
+          <p className="text-sm leading-relaxed text-[#667064]">Contact the customer to agree on the appointment before confirming a request. Status changes are saved immediately.</p>
+          <div className="grid gap-3 rounded-xl border border-[#e4eadf] bg-[#f8faf5] p-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-end">
+            <label className="block text-xs font-bold text-[#334d3b]">
+              Search bookings
+              <input type="search" value={bookingQuery} onChange={(event) => setBookingQuery(event.target.value)} placeholder="Customer, service or phone" className={inputClass} />
+            </label>
+            <label className="block text-xs font-bold text-[#334d3b]">
+              Show requests
+              <select value={bookingFilter} onChange={(event) => setBookingFilter(event.target.value as typeof bookingFilter)} className={inputClass}>
+                <option value="OPEN">Open (new & confirmed)</option>
+                <option value="NEW">New only</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="ALL">All requests</option>
+              </select>
+            </label>
+          </div>
+          <p aria-live="polite" className="text-xs text-[#647267]">Showing {visibleBookings.length} of {bookings.length} requests. {pendingBookings} new.</p>
           {bookingError ? (
             <p role="alert" className="text-sm text-[#a7302d]">
               {bookingError}
             </p>
-          ) : !bookings.length ? (
-            <p className="text-sm text-[#667064]">No booking requests yet.</p>
+          ) : !visibleBookings.length ? (
+            <p className="rounded-xl border border-dashed border-[#d8e2d5] bg-[#f8faf5] p-5 text-sm text-[#667064]">{bookings.length ? "No requests match these filters. Try another status or search." : "No booking requests yet. New customer requests will appear here."}</p>
           ) : (
             <div className="divide-y divide-[#dfe5d8]">
-              {bookings.map((booking) => (
-                <article key={booking.id} className="space-y-2 py-4">
+              {visibleBookings.map((booking) => (
+                <article key={booking.id} className="space-y-2 py-3.5">
                   <div className="flex flex-wrap justify-between gap-2">
                     <div>
                       <h3 className="font-bold">{booking.serviceName}</h3>
@@ -1063,88 +1073,39 @@ function BusinessDashboard({ slug }: { slug: string }) {
         </section>
       )}
 
+      {activeTab === "overview" && (
+        <div className="space-y-5">
+          <LeadTimeline slug={slug} />
+          <RequestBoard compact />
+        </div>
+      )}
       {activeTab === "services" && (
         <section className={panelClass}>
-          <h2 className="font-display text-xl font-bold">
-            Services, products and prices
-          </h2>
-          <p className="text-sm text-[#667064]">
-            Unlimited catalogue items and stock updates are free.
-          </p>
-          <div className="divide-y divide-[#dfe5d8]">
-            {(business.services as EditableService[]).map((service) => (
-              <div
-                key={service.id}
-                className="flex flex-wrap items-center justify-between gap-3 py-3"
-              >
-                <div>
-                  <strong className="text-sm">{service.name}</strong>
-                  <p className="text-xs text-[#667064]">
-                    {service.priceFrom !== undefined
-                      ? `KSh ${service.priceFrom.toLocaleString()}`
-                      : "Contact for price"}
-                    {service.note ? ` · ${service.note}` : ""}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {(
-                    <button
-                      type="button"
-                      className="text-sm font-bold text-[#335e41]"
-                      disabled={!!busy}
-                      onClick={() =>
-                        void runAction("stock", () =>
-                          mutateProduct("PATCH", {
-                            ...service,
-                            inStock: service.inStock === false,
-                          }),
-                        )
-                      }
-                    >
-                      {service.inStock === false
-                        ? "Mark in stock"
-                        : "Mark sold out"}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    disabled={Boolean(busy)}
-                    onClick={() => {
-                      discardDraftPhoto(servicePhoto);
-                      setServiceId(service.id);
-                      setServiceName(service.name);
-                      setServicePrice(
-                        service.priceFrom === undefined
-                          ? ""
-                          : String(service.priceFrom),
-                      );
-                      setServiceNote(service.note || "");
-                      setServicePhoto(service.photo || "");
-                    }}
-                    className="text-sm font-bold text-[#335e41]"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Remove ${service.name}`}
-                    disabled={Boolean(busy)}
-                    onClick={() =>
-                      void runAction("remove-service", () =>
-                        mutateProduct("DELETE", { id: service.id }),
-                      )
-                    }
-                    className="p-2 text-[#a7302d]"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-xl font-bold">Products and services</h2>
+              <p className="mt-1 text-sm text-[#65746a]">Make it easy for customers to see what you offer.</p>
+            </div>
+            <button type="button" disabled={Boolean(busy)} onClick={() => { resetService(); setShowServiceForm(true); }} className="inline-flex min-h-11 items-center rounded-xl bg-[#24543b] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#34734e]">+ Add an item</button>
           </div>
+          <div className="grid gap-3 rounded-xl border border-[#e4eadf] bg-[#f8faf5] p-3 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-end">
+            <label className="block text-xs font-bold text-[#334d3b]">Search catalogue
+              <input type="search" value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Find an item by name" className={inputClass} />
+            </label>
+            <label className="block text-xs font-bold text-[#334d3b]">Sort items
+              <select value={serviceSort} onChange={(event) => setServiceSort(event.target.value as typeof serviceSort)} className={inputClass}>
+                <option value="listed">Listing order</option>
+                <option value="name">Name A to Z</option>
+                <option value="stock">Available first</option>
+              </select>
+            </label>
+          </div>
+          <p aria-live="polite" className="text-xs text-[#65746a]">Showing {visibleServices.length} of {business.services.length} items</p>
+          {(showServiceForm || serviceId) && (
           <form
             onSubmit={saveService}
-            className="space-y-3 border-t border-[#dfe5d8] pt-4"
+            id="catalog-editor"
+            className="scroll-mt-28 space-y-3 rounded-2xl border border-[#d7e5ce] bg-[#f3f8ed] p-4 sm:p-5"
           >
             <fieldset
               disabled={
@@ -1154,7 +1115,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
               className="space-y-3 disabled:opacity-50"
             >
               <h3 className="font-bold">
-                {serviceId ? "Edit item" : "Add a service or product"}
+                {serviceId ? "Edit catalogue item" : "Add a product or service"}
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="text-xs font-bold">
@@ -1242,21 +1203,84 @@ function BusinessDashboard({ slug }: { slug: string }) {
                       ? "Save item"
                       : "Add item"}
                 </button>
-                {serviceId && (
+                {(serviceId || showServiceForm) && (
                   <button
                     type="button"
                     onClick={resetService}
-                    className="text-sm font-bold"
+                    className="min-h-11 rounded-xl border border-[#cadbc9] bg-white px-4 py-2 text-sm font-bold text-[#335e41]"
                   >
-                    Cancel edit
+                    Cancel
                   </button>
                 )}
               </div>
             </fieldset>
           </form>
+          )}
+          {!visibleServices.length && (
+            <div className="rounded-xl border border-dashed border-[#d8e2d5] bg-[#f8faf5] p-5 text-sm text-[#65746a]">
+              {business.services.length ? "No catalogue items match that search." : "Your catalogue is empty. Add your first product or service to get started."}
+            </div>
+          )}
+          {!!visibleServices.length && (
+            <div className="divide-y divide-[#e6ede4] overflow-hidden rounded-xl border border-[#e2e9df]">
+              {visibleServices.map((service) => (
+                <article key={service.id} className="space-y-3 bg-white px-3 py-3.5 sm:px-4">
+                  <div className="flex min-w-0 flex-wrap items-center gap-3">
+                    {service.photo ? (
+                      <Image unoptimized src={service.photo} width={56} height={56} alt="" className="h-12 w-12 shrink-0 rounded-lg border border-[#e0e8dd] object-cover" />
+                    ) : (
+                      <div aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#eff4e8] text-lg text-[#6a7d66]">◈</div>
+                    )}
+                    <div className="min-w-0 flex-[1_1_150px]">
+                      <h3 className="break-words text-sm font-bold text-[#234032]">{service.name}</h3>
+                      <p className="mt-0.5 text-xs font-semibold text-[#526657]">{service.priceFrom !== undefined ? "KSh " + service.priceFrom.toLocaleString("en-KE") : "Price on request"}</p>
+                      {service.note && <p className="mt-0.5 line-clamp-2 text-xs text-[#708074]">{service.note}</p>}
+                    </div>
+                    <span className={"shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold " + (service.inStock === false ? "bg-[#fff0e5] text-[#925530]" : "bg-[#e9f4e7] text-[#387048]")}>
+                      {service.inStock === false ? "Sold out" : "Available"}
+                    </span>
+                    <div className="flex w-full flex-wrap gap-2 sm:ml-auto sm:w-auto">
+                      <button type="button" disabled={Boolean(busy)} onClick={() => void runAction("stock", () => mutateProduct("PATCH", { ...service, inStock: service.inStock === false }), "Availability updated.")} className="min-h-10 rounded-lg border border-[#d7e2d2] bg-[#f7faf3] px-3 py-2 text-xs font-bold text-[#345e43] transition-colors hover:bg-[#eaf3de] disabled:opacity-50">
+                        {service.inStock === false ? "Mark available" : "Mark sold out"}
+                      </button>
+                      <button type="button" disabled={Boolean(busy)} onClick={() => {
+                        discardDraftPhoto(servicePhoto);
+                        setServiceId(service.id);
+                        setServiceName(service.name);
+                        setServicePrice(service.priceFrom === undefined ? "" : String(service.priceFrom));
+                        setServiceNote(service.note || "");
+                        setServicePhoto(service.photo || "");
+                        setShowServiceForm(true);
+                        window.requestAnimationFrame(() => document.getElementById("catalog-editor")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }));
+                      }} className="min-h-10 rounded-lg border border-[#cadbc9] bg-white px-3 py-2 text-xs font-bold text-[#335e41] transition-colors hover:bg-[#f3f8ee] disabled:opacity-50">Edit</button>
+                      <button type="button" aria-label={"Remove " + service.name} disabled={Boolean(busy)} onClick={() => setConfirmDeleteServiceId(service.id)} className="flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-[#f0d4cd] text-[#a7302d] transition-colors hover:bg-[#fceeea] disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </div>
+                  {confirmDeleteServiceId === service.id && (
+                    <div role="group" aria-label={"Remove " + service.name} className="rounded-xl border border-[#efc5bd] bg-[#fff4f0] p-3 text-sm">
+                      <p className="font-bold text-[#913a30]">Remove “{service.name}” from your catalogue?</p>
+                      <p className="mt-1 text-xs text-[#7e554e]">This will remove the item from your public profile.</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button type="button" disabled={Boolean(busy)} onClick={() => void runAction("remove-service", async () => { await mutateProduct("DELETE", { id: service.id }); setConfirmDeleteServiceId(null); }, "Item removed.")} className="min-h-10 rounded-lg bg-[#993f35] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Remove item</button>
+                        <button type="button" onClick={() => setConfirmDeleteServiceId(null)} className="min-h-10 rounded-lg border border-[#d7bab3] bg-white px-3 py-2 text-xs font-bold text-[#633e37]">Keep item</button>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+
         </section>
       )}
 
+          {activeTab === "services" && (
+            <CatalogPlanPanel
+            business={business}
+            refreshKey={storageRefresh}
+            onUsage={setStorageUsage}
+          />
+          )}
       {activeTab === "details" && (
         <form
           onSubmit={(event) => {
@@ -1733,6 +1757,8 @@ function BusinessDashboard({ slug }: { slug: string }) {
           </Link>
         </section>
       )}
+        </div>
+      </div>
     </main>
   );
 }

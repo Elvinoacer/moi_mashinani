@@ -52,13 +52,22 @@ export default function BusinessOnboardPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbsSchema) }}
       />
       <Navbar />
-      <main className="flex-1 max-w-6xl w-full mx-auto px-3 py-4 sm:px-6 sm:py-7 md:px-8 space-y-4 sm:space-y-5">
-        <div className="page-hero !rounded-2xl !p-4 sm:!p-6 space-y-2">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-[#243b32]">
-            List your business — free
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 px-3 pb-12 pt-4 sm:gap-4 sm:px-6 sm:pt-7">
+        <div className="rounded-2xl border border-[#dce7d8] bg-[#eef4e9] px-4 py-4 sm:px-6 sm:py-5">
+          <p className="text-[11px] font-extrabold uppercase tracking-[.1em] text-[#426b50]">Get discovered on campus</p>
+          <h1 className="mt-1.5 font-display text-[clamp(1.55rem,5vw,2rem)] font-extrabold leading-tight tracking-tight text-[#183e35]">
+            List your business for free
           </h1>
-          <p className="text-sm text-[#667064]">
-            Two simple steps: add your business and core prices, then review photos and trust details. Sign in with email and password to manage your listing, or accept an email invitation after submitting.
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#4e6557]">
+            Add your business and prices, then review and submit. No account needed to start.
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-[#587060]">
+            You&apos;ll get an email invitation to set up your account after submitting.
+            <span className="mx-1.5" aria-hidden="true">·</span>
+            Already manage a listing?{" "}
+            <a href="/login?next=%2Fdashboard" className="font-bold text-[#174e3c] underline decoration-[#759987] underline-offset-4 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]">
+              Sign in
+            </a>
           </p>
         </div>
         <BusinessEnrollmentForm mode="public" />

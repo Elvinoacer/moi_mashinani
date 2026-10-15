@@ -143,13 +143,14 @@ export function CampusHome({
 
       <section className="campus-home-hero" aria-labelledby="campus-home-heading">
         <div className="campus-home-hero-main">
-          <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Made for Moi University · Kesses</span>
+          <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Moi Mashinani · Made for Moi University, Kesses</span>
           <h1 id="campus-home-heading">
             Find it nearby.<br /><span>Get it sorted.</span>
           </h1>
           <p className="campus-home-intro">
-            Food, hostels, repairs, printing and more. Compare local prices and
-            contact the seller directly — all in one place.
+            Moi Mashinani connects students with food, hostels, repairs, printing and
+            other local businesses around Moi University. Compare prices and
+            contact sellers directly — all in one place.
           </p>
           <form
             role="search"

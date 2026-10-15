@@ -70,6 +70,17 @@ export function BusinessEnrollmentForm({
     business: Business;
     invitation: { sent: boolean; error?: string };
   } | null>(null);
+  // Bring the completed journey into view, including for keyboard and screen-reader users.
+  useEffect(() => {
+    if (!result) return;
+    const completion = document.getElementById("listing-submit-result");
+    if (!completion) return;
+    completion.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+    completion.focus({ preventScroll: true });
+  }, [result]);
   useEffect(() => {
     if (mode !== "public") return;
     const controller = new AbortController();
@@ -327,7 +338,7 @@ export function BusinessEnrollmentForm({
   }
   if (result)
     return (
-      <Card className="mx-auto max-w-2xl space-y-4 !p-5 sm:!p-7">
+      <Card id="listing-submit-result" tabIndex={-1} aria-label="Listing submission result" className="mx-auto max-w-2xl scroll-mt-6 space-y-4 !p-5 sm:!p-7 focus:outline-none">
         <span className="inline-flex rounded-full bg-[#edf2e5] px-3 py-1 text-xs font-bold text-[#265740]">
           Listing submitted
         </span>

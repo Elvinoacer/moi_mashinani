@@ -31,44 +31,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${SITE_URL}/market`,
-      lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/requests`,
-      lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: SITE_URL,
-      lastModified: now,
+      url: `${SITE_URL}/`,
       changeFrequency: "daily",
       priority: 1.0,
       images: [`${SITE_URL}/brand/og-image.png`],
     },
     {
+      url: `${SITE_URL}/about`,
+      changeFrequency: "monthly",
+      priority: 0.65,
+    },
+    {
       url: `${SITE_URL}/categories`,
-      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/deals`,
-      lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/search`,
-      lastModified: now,
       changeFrequency: "daily",
       priority: 0.85,
     },
     {
       url: `${SITE_URL}/onboard`,
-      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.8,
     },
@@ -77,7 +75,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 2. Category group directory landing pages
   const groupPages: MetadataRoute.Sitemap = CATEGORY_GROUPS.map((group) => ({
     url: `${SITE_URL}/c/${group.slug}`,
-    lastModified: now,
     changeFrequency: "weekly",
     priority: 0.88,
   }));
@@ -85,14 +82,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 3. All leaf category directory pages
   const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
     url: `${SITE_URL}/c/${cat.slug}`,
-    lastModified: now,
     changeFrequency: "weekly",
     priority: 0.85,
   }));
 
   // 4. All individual active campus business profiles with image sitemaps
   const businessPages: MetadataRoute.Sitemap = businesses.map((biz) => {
-    let bizDate = now;
+    let bizDate: Date | undefined;
     if (biz.updatedAt) {
       const parsed = new Date(biz.updatedAt);
       if (!isNaN(parsed.getTime())) bizDate = parsed;
@@ -110,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return {
       url: `${SITE_URL}/b/${biz.slug}`,
-      lastModified: bizDate,
+      ...(bizDate ? { lastModified: bizDate } : {}),
       changeFrequency: "weekly",
       priority:
         biz.activeTier === "FEATURED"

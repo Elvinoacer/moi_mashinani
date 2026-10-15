@@ -10,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-9 border-b border-[#dfe5d8] pb-9 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
             <SiteBrand />
-            <p className="mt-4 max-w-[280px] text-[13px] leading-7 text-[#667064]">A little closer to everything. Find local people, real services, and good things around Moi University.</p>
+            <p className="mt-4 max-w-[280px] text-[13px] leading-7 text-[#667064]"><strong className="font-semibold text-[#183e35]">Moi Mashinani</strong> brings nearby businesses, student services and everyday essentials closer to Moi University. Local people, real connections.</p>
             <p className="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold text-[#335e41]"><MapPin size={14} /> Made for Moi. Rooted in Kesses.</p>
           </div>
           <div>
@@ -34,6 +34,7 @@ export function Footer() {
           <div>
             <h2 className="mb-4 text-[12px] font-bold text-[#183e35]">For the neighborhood</h2>
             <nav aria-label="Platform links" className="flex flex-col items-start gap-3">
+              <Link href="/about" className="text-[12px] text-[#667064] hover:text-[#183e35]">About Moi Mashinani</Link>
               <Link href="/onboard" className="inline-flex items-center gap-1 font-semibold text-[12px] text-[#335e41] hover:text-[#183e35]">List your business for free <ArrowUpRight size={13} aria-hidden="true" /></Link>
               <Link href="/deals" className="text-[12px] text-[#667064] hover:text-[#183e35]">Student deals</Link>
               <Link href="/dashboard" className="text-[12px] text-[#667064] hover:text-[#183e35]">Manage your business</Link>
@@ -43,7 +44,7 @@ export function Footer() {
           </div>
         </div>
         <div className="flex flex-col gap-3 pt-6 text-[11px] text-[#758071] sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} MoiMashinani. Local people. Real connections.</span>
+          <span>© {new Date().getFullYear()} Moi Mashinani. Local people. Real connections.</span>
           <span>Moi University Main Campus · Kesses, Kenya</span>
         </div>
       </div>

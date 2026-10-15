@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { PhoneSignIn } from "./PhoneSignIn";
 import { ZONES } from "@/lib/constants";
-import { CategorySelect } from "./CategorySelect";
+import { EnrollmentCategoryPicker } from "./EnrollmentCategoryPicker";
 import { PhotoUploader } from "./PhotoUploader";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
@@ -49,6 +49,8 @@ export function BusinessEnrollmentForm({
   } | null>(null);
   const [authAttempt, setAuthAttempt] = useState(0);
   const [step, setStep] = useState(1);
+  const stepNavRef = useRef<HTMLElement>(null);
+  const [itemQuery, setItemQuery] = useState("");
   const [details, setDetails] = useState(blank);
   const [sellerType, setSellerType] = useState<"SHOPFRONT" | "COMRADE">(
     "SHOPFRONT",
@@ -140,14 +142,26 @@ export function BusinessEnrollmentForm({
         "Add core items with names and valid prices. Student sellers can start with one.",
       );
   }
+  function scrollToSteps() {
+    stepNavRef.current?.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }
+  function returnToEssentials() {
+    setError("");
+    setStep(1);
+    scrollToSteps();
+  }
   function preview() {
     setError("");
     try {
       essentialsValid();
       setStep(2);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToSteps();
     } catch (cause) {
       setError((cause as Error).message);
+      scrollToSteps();
     }
   }
   async function uploadProof(file?: File) {
@@ -378,69 +392,84 @@ export function BusinessEnrollmentForm({
         </Card>
       )}
       <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5">
-        <Card>
-          <h2 className="text-2xl font-bold">
-            {mode === "public"
-              ? "Your shop or hustle, on campus"
-              : "Quick field enrollment"}
-          </h2>
-          <p className="mt-2 text-sm">
-            Two steps: essentials & prices, then preview & trust. Unlimited
-            price slots are always free.
-          </p>
-          <div className="mt-4 flex gap-3">
-            <Button
-              type="button"
-              variant={step === 1 ? "primary" : "secondary"}
-              onClick={() => setStep(1)}
-              aria-current={step === 1 ? "step" : undefined}
-            >
-              1 · Essentials & prices
-            </Button>
-            <Button
-              type="button"
-              variant={step === 2 ? "primary" : "secondary"}
-              onClick={preview}
-              aria-current={step === 2 ? "step" : undefined}
-            >
-              2 · Preview & trust
-            </Button>
+        <Card className="!p-4 sm:!p-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#526d48]">
+              Business enrollment
+            </p>
+            <span className="text-xs font-semibold text-[#667064]">Step {step} of 2</span>
           </div>
+          <h2 className="mt-2 text-xl font-bold text-[#183e35] sm:text-2xl">
+            {mode === "public" ? "Set up your campus listing" : "Quick field enrollment"}
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed text-[#667064]">
+            Add your details and prices, then review the listing and confirm trust details.
+          </p>
+          <nav ref={stepNavRef} aria-label="Enrollment steps" className="mt-4 scroll-mt-5 border-b border-[#dfe5d8]">
+            <ol className="grid grid-cols-2 gap-2">
+              <li className="min-w-0">
+                <button
+                  type="button"
+                  aria-current={step === 1 ? "step" : undefined}
+                  onClick={returnToEssentials}
+                  className={`flex min-h-14 w-full items-center gap-2 border-b-[3px] px-1 py-2 text-left text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${step === 1 ? "border-[#183e35] text-[#183e35]" : "border-transparent text-[#667064] hover:text-[#183e35]"}`}
+                >
+                  <span aria-hidden="true" className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${step === 1 ? "bg-[#183e35] text-white" : "bg-[#edf2e5] text-[#335e41]"}`}>1</span>
+                  <span>Details &amp; prices</span>
+                </button>
+              </li>
+              <li className="min-w-0">
+                <button
+                  type="button"
+                  aria-current={step === 2 ? "step" : undefined}
+                  onClick={preview}
+                  className={`flex min-h-14 w-full items-center gap-2 border-b-[3px] px-1 py-2 text-left text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${step === 2 ? "border-[#183e35] text-[#183e35]" : "border-transparent text-[#667064] hover:text-[#183e35]"}`}
+                >
+                  <span aria-hidden="true" className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${step === 2 ? "bg-[#183e35] text-white" : "bg-[#edf2e5] text-[#335e41]"}`}>2</span>
+                  <span>Review &amp; verify</span>
+                </button>
+              </li>
+            </ol>
+          </nav>
         </Card>
+        {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
+        {notice && <p role="status" className="rounded-xl bg-[#edf2e5] p-3 text-sm text-[#335e41]">{notice}</p>}
         {step === 1 ? (
-          <Card className="space-y-5">
+          <Card key="details" className="enrollment-step-panel space-y-5 !p-4 sm:!p-6">
             <fieldset>
               <legend className="mb-2 font-bold">How do you operate?</legend>
-              <div className="flex flex-wrap gap-2">
+              <div role="radiogroup" aria-label="Business operating style" className="grid gap-2 sm:grid-cols-2">
                 {(["SHOPFRONT", "COMRADE"] as const).map((type) => (
-                  <Button
-                    type="button"
+                  <label
                     key={type}
-                    variant={sellerType === type ? "primary" : "secondary"}
-                    aria-pressed={sellerType === type}
-                    onClick={() => setSellerType(type)}
+                    className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${sellerType === type ? "border-[#335e41] bg-[#edf2e5] text-[#183e35]" : "border-[#dfe5d8] bg-white text-[#526154]"}`}
                   >
-                    {type === "SHOPFRONT"
-                      ? "I have a shop / stall"
-                      : "Hostel / mobile hustle"}
-                  </Button>
+                    <input
+                      type="radio"
+                      name={`seller-type-${mode}`}
+                      checked={sellerType === type}
+                      onChange={() => setSellerType(type)}
+                      className="size-4 shrink-0"
+                    />
+                    <span>{type === "SHOPFRONT" ? "Shop or stall" : "Hostel / mobile hustle"}</span>
+                  </label>
                 ))}
               </div>
             </fieldset>
             <div className="grid gap-4 sm:grid-cols-2">
               {field("name", "Business name")}
               {field("phone", "Business WhatsApp", "tel")}
-              <label className="block text-sm font-semibold">
-                Business category
-                <CategorySelect
+              <div className="min-w-0 space-y-1.5 text-sm font-semibold">
+                <span>Business category</span>
+                <EnrollmentCategoryPicker
                   value={details.primaryCategory}
                   onChange={(value) => {
                     setDetails((d) => ({ ...d, primaryCategory: value }));
                     setItems([]);
+                    setItemQuery("");
                   }}
-                  className="ui-input"
                 />
-              </label>
+              </div>
               <label className="block text-sm font-semibold">
                 Campus zone
                 <select
@@ -478,19 +507,36 @@ export function BusinessEnrollmentForm({
               </summary>
               {field("ownerPhone", "Private owner phone (if different)", "tel")}
             </details>
-            <h3 className="text-lg font-bold">Add 3–5 core prices</h3>
-            <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto">
-              {templateSuggestions(details.primaryCategory, "").map((item) => (
-                <Button
-                  key={item.name}
-                  type="button"
-                  variant="secondary"
-                  disabled={items.some((i) => i.name === item.name)}
-                  onClick={() => add(item.name)}
-                >
-                  + {item.name}
-                </Button>
-              ))}
+            <div>
+              <h3 className="text-lg font-bold">Add core prices</h3>
+              <p className="mt-1 text-sm text-[#667064]">Choose suggested items or add your own. Set a price for each.</p>
+            </div>
+            <div className="space-y-3">
+              <Input
+                type="search"
+                aria-label="Find suggested products or services"
+                placeholder="Search suggested items…"
+                value={itemQuery}
+                onChange={(event) => setItemQuery(event.target.value)}
+              />
+              <div className="flex flex-wrap gap-2">
+                {templateSuggestions(details.primaryCategory, "")
+                  .filter((item) => item.name.toLowerCase().includes(itemQuery.trim().toLowerCase()))
+                  .slice(0, itemQuery ? 30 : 12)
+                  .map((item) => (
+                    <Button
+                      className="min-h-11 !px-3 text-left"
+                      key={item.name}
+                      type="button"
+                      variant="secondary"
+                      disabled={items.some((i) => i.name === item.name)}
+                      onClick={() => add(item.name)}
+                    >
+                      + {item.name}
+                    </Button>
+                  ))}
+              </div>
+              {!details.primaryCategory && <p className="text-xs text-[#667064]">Choose a business category to see relevant suggestions.</p>}
             </div>
             {items.map((item, index) => (
               <div
@@ -536,6 +582,7 @@ export function BusinessEnrollmentForm({
                   variant="secondary"
                   type="button"
                   aria-label={`Remove item ${index + 1}`}
+                  className="w-full sm:self-end"
                   onClick={() =>
                     setItems((current) =>
                       current.filter((i) => i.id !== item.id),
@@ -556,8 +603,8 @@ export function BusinessEnrollmentForm({
             </Button>
           </Card>
         ) : (
-          <>
-            <Card className="space-y-3">
+          <div key="review" className="enrollment-step-panel space-y-5">
+            <Card className="space-y-3 !p-4 sm:!p-6">
               <h3 className="text-xl font-bold">Instant listing preview</h3>
               <p className="font-bold">
                 {details.name} ·{" "}
@@ -578,8 +625,8 @@ export function BusinessEnrollmentForm({
                 review.
               </p>
             </Card>
-            <Card className="space-y-4">
-              <h3 className="text-xl font-bold">Trust upgrade</h3>
+            <Card className="space-y-4 !p-4 sm:!p-6">
+              <h3 className="text-xl font-bold">Trust &amp; verification</h3>
               {field(
                 "landmark",
                 sellerType === "COMRADE"
@@ -627,7 +674,7 @@ export function BusinessEnrollmentForm({
                 onBusyChange={setUploading}
                 onUploaded={(urls) => setPhotos((p) => [...p, ...urls])}
               />
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {photos.map((url, index) => (
                   <Image
                     key={url}
@@ -693,36 +740,21 @@ export function BusinessEnrollmentForm({
                 </>
               )}
             </Card>
-          </>
+          </div>
         )}
-        {error && (
-          <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
-            {error}
-          </p>
-        )}
-        {notice && <p role="status">{notice}</p>}
-        <div className="sticky bottom-0 z-10 flex flex-wrap items-center gap-3 border-t bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          {step === 2 && (
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setStep(1)}
-            >
-              Back
-            </Button>
-          )}
-          <Button type="button" variant="secondary" onClick={saveDraft}>
-            Save draft
-          </Button>
-          <Button type="button" variant="secondary" onClick={restore}>
-            Restore
-          </Button>
-          <Button type="submit" disabled={busy || uploading}>
+        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-[#dfe5d8] bg-white p-3 sm:p-4 md:sticky md:bottom-3 md:z-20 md:flex md:items-center md:shadow-lg">
+          <Button type="submit" disabled={busy || uploading} className="col-span-2 min-w-0 w-full whitespace-normal text-center md:order-last md:ml-auto md:w-auto">
             {busy
               ? "Saving…"
               : step === 1
-                ? "Preview listing"
+                ? "Review listing"
                 : "Save listing & request verification"}
+          </Button>
+          <Button type="button" variant="secondary" className="w-full md:w-auto" onClick={saveDraft}>
+            Save draft
+          </Button>
+          <Button type="button" variant="secondary" className="w-full md:w-auto" onClick={restore}>
+            Restore
           </Button>
         </div>
       </form>

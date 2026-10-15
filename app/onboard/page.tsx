@@ -52,13 +52,13 @@ export default function BusinessOnboardPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbsSchema) }}
       />
       <Navbar />
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-8 space-y-6">
-        <div className="page-hero rounded-2xl border border-[#dfe5d8] bg-white p-6 space-y-2">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 py-4 sm:px-6 sm:py-7 md:px-8 space-y-4 sm:space-y-5">
+        <div className="page-hero !rounded-2xl !p-4 sm:!p-6 space-y-2">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-[#243b32]">
             List your business — free
           </h1>
           <p className="text-sm text-[#667064]">
-            Create your profile in four quick steps: ready-made catalogues, opening hours and photos included. Sign in by phone to manage your listing, or use an email invitation.
+            Two simple steps: add your business and core prices, then review photos and trust details. Sign in by phone to manage your listing, or use an email invitation.
           </p>
         </div>
         <BusinessEnrollmentForm mode="public" />

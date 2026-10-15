@@ -339,3 +339,19 @@
     animation: none;
   }
 }
+
+/* Enrollment: keep the form stable, with a short transition on step changes. */
+.enrollment-step-panel {
+  animation: enrollment-step-in 180ms ease-out both;
+}
+.enrollment-category-panel {
+  animation: enrollment-step-in 140ms ease-out both;
+}
+@keyframes enrollment-step-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .enrollment-step-panel,
+  .enrollment-category-panel { animation: none; }
+}

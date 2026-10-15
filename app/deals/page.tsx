@@ -47,6 +47,8 @@ export const metadata: Metadata = {
 
 export default async function DealsAndSafetyPage() {
   await connection();
+  // This is deliberately evaluated per request after Next.js opts into dynamic rendering.
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const all = (await Store.getBusinesses())
     .filter((business) => publicListing(business, now) && !business.isTemporarilyClosed)

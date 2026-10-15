@@ -198,6 +198,7 @@ function NavbarInner() {
               Sign in
             </Link>
           )}
+          {pathname !== "/onboard" && (
           <Link
             href={
               user?.role === "ADMIN"
@@ -223,6 +224,7 @@ function NavbarInner() {
               </span>
             )}
           </Link>
+          )}
           <button
             type="button"
             aria-label={mobileOpen ? "Close navigation" : "Open navigation"}

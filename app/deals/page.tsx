@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Store } from "@/lib/store";
 import { connection } from "next/server";
 import { publicBusiness } from "@/lib/business-input";
+import { publicListing } from "@/lib/campus-value";
 import {
   SITE_URL,
   CORE_CAMPUS_KEYWORDS,
@@ -46,10 +47,10 @@ export const metadata: Metadata = {
 
 export default async function DealsAndSafetyPage() {
   await connection();
+  const now = Date.now();
   const all = (await Store.getBusinesses())
-    .filter((b) => b.status === "ACTIVE" && !b.isTemporarilyClosed)
+    .filter((business) => publicListing(business, now) && !business.isTemporarilyClosed)
     .map(publicBusiness);
-  const now = new Date().getTime();
   const deals = all
     .filter((b) => Boolean(b.studentDiscount))
     .sort(

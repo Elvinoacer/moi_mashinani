@@ -25,7 +25,7 @@ export default async function HomePage() {
         Skip to search
       </a>
       <Navbar />
-      <main className="mx-auto max-w-6xl space-y-7 px-4 pb-24 sm:px-6">
+      <main className="mx-auto max-w-6xl space-y-7 px-3 pb-36 sm:px-6 md:pb-16">
         <CampusHome businesses={businesses} />
       </main>
       <Footer />

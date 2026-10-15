@@ -92,8 +92,8 @@ function NavbarInner() {
 
   return (
     <header className="relative z-50 w-full border-b border-[#e3e7dc] bg-[#f7f8f2]">
-      <div className="mx-auto flex min-h-[60px] md:min-h-[82px] max-w-[1328px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
-        <div className="flex min-w-0 items-center gap-4 lg:gap-6">
+      <div className="mx-auto flex min-h-[64px] md:min-h-[82px] max-w-[1328px] items-center justify-between gap-2 px-3 sm:gap-4 sm:px-8 lg:px-10">
+        <div className="flex min-w-0 items-center gap-2 lg:gap-6">
           <SiteBrand />
           <div className="relative hidden xl:block">
             <button
@@ -206,7 +206,7 @@ function NavbarInner() {
                   ? "/ambassador"
                   : "/onboard"
             }
-            className="inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-[#183e35] px-3.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-[9px] bg-[#183e35] px-2.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4"
           >
             <Plus size={16} />
             <span className="hidden sm:inline">
@@ -228,7 +228,7 @@ function NavbarInner() {
             aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((value) => !value)}
-            className="grid h-10 w-10 place-items-center rounded-lg border border-[#dce5d7] bg-white text-[#183e35] lg:hidden"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-[#dce5d7] bg-white text-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41] lg:hidden"
           >
             {mobileOpen ? <X size={19} /> : <Menu size={19} />}
           </button>

@@ -46,6 +46,7 @@ export function BusinessCard({
   );
   const photo = business.coverPhoto || business.photos?.[0];
   const profileUrl = `/b/${business.slug}`;
+  const pricesUrl = business.services.length ? `${profileUrl}#services-and-prices` : profileUrl;
   const contactable = business.status === "ACTIVE" && !business.isTemporarilyClosed;
   const whatsapp = contactable ? whatsappUrl(
     business.whatsapp || business.phone,
@@ -120,7 +121,7 @@ export function BusinessCard({
         </p>
       )}
       <div className={styles.actions}>
-        <Link href={profileUrl} className={styles.details}>
+        <Link href={pricesUrl} className={styles.details}>
           View prices <ArrowUpRight size={16} aria-hidden="true" />
         </Link>
         {whatsapp && (

@@ -1,5 +1,3 @@
-import { smsConfigured, sendRequestSms } from "./sms";
-import { applicationUrl } from "./mail";
 import { prisma } from "./prisma";
 import { Store } from "./store";
 import { businessInput } from "./business-input";
@@ -91,24 +89,16 @@ export async function enrollBusiness(
     fields.landmark = "Location shown on map";
   const limitError = productLimitError({}, [], fields.services || []);
   if (limitError) throw new ApiError(409, limitError);
-  const phoneOwner =
+  const signedInOwner =
     uploaderId && !admin
       ? await prisma.account.findUnique({ where: { id: uploaderId } })
       : null;
   if (
-    phoneOwner &&
-    (phoneOwner.role !== "BUSINESS" || !phoneOwner.phoneVerifiedAt)
+    signedInOwner &&
+    (signedInOwner.role !== "BUSINESS" || !signedInOwner.emailVerifiedAt)
   )
-    throw new ApiError(403, "Verify your owner phone before enrolling.");
-  const smsOwnerPhone =
-    admin && !body.ownerEmail
-      ? phoneField(body.ownerPhone || fields.phone)
-      : undefined;
-  const ownerEmail =
-    phoneOwner?.email ||
-    (smsOwnerPhone
-      ? `${smsOwnerPhone.slice(1)}@phone.moimashinani.invalid`
-      : normalizeEmail(body.ownerEmail));
+    throw new ApiError(403, "Verify your email before enrolling.");
+  const ownerEmail = signedInOwner?.email || normalizeEmail(body.ownerEmail);
   if (sellerType === "COMRADE")
     fields.listingExpiresAt = new Date(Date.now() + 30 * 864e5).toISOString();
   const ownerName = textField(body.ownerName, "Owner name", 120, true);
@@ -137,14 +127,13 @@ export async function enrollBusiness(
         "This business appears to be listed already. Open the existing listing instead of submitting again.",
       );
     const owner =
-      phoneOwner ||
+      signedInOwner ||
       (await tx.account.upsert({
         where: { email: ownerEmail },
         create: {
           email: ownerEmail,
           name: ownerName,
           role: "BUSINESS",
-          phone: smsOwnerPhone,
         },
         update: {},
       }));
@@ -161,11 +150,11 @@ export async function enrollBusiness(
         ownerEmail,
         ownerName,
         ownerPhone:
-          phoneOwner?.phone ||
+          signedInOwner?.phone ||
           (body.ownerPhone ? phoneField(body.ownerPhone) : fields.phone),
         status: admin ? "ACTIVE" : "PENDING",
         verificationLevel: admin ? "L2" : "L0",
-        isClaimed: Boolean(phoneOwner),
+        isClaimed: Boolean(signedInOwner),
         activeTier: "NONE",
       },
       tx,
@@ -206,26 +195,8 @@ export async function enrollBusiness(
     });
     return created;
   });
-  let invitation: { sent: boolean; error?: string };
-  if (phoneOwner) invitation = { sent: true };
-  else if (smsOwnerPhone) {
-    try {
-      if (!smsConfigured())
-        throw new Error(
-          "SMS is not configured. The owner can sign in once SMS is enabled.",
-        );
-      await sendRequestSms(
-        smsOwnerPhone,
-        `${business.name} is on Moi Mashinani: ${applicationUrl()}/b/${business.slug}. Manage your shop with an SMS code at ${applicationUrl()}/login.`,
-      );
-      invitation = { sent: true };
-    } catch {
-      invitation = {
-        sent: false,
-        error:
-          "Listing saved. SMS invitation unavailable; the owner can request a sign-in code when SMS is configured.",
-      };
-    }
-  } else invitation = await inviteAccount(business.ownerId!, business.id);
+  const invitation = signedInOwner
+    ? { sent: true }
+    : await inviteAccount(business.ownerId!, business.id);
   return { business: await Store.getBusinessById(business.id), invitation };
 }

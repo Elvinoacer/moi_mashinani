@@ -134,7 +134,7 @@ export default function AboutMoiMashinaniPage() {
 
         <p className="mt-8 text-sm leading-7 text-[#657268]">
           Looking for <strong>MoiMashinani</strong>, <strong>moimashinani</strong> or <strong>Moishanani</strong>?
-          You are in the right place. The platform's official name is <strong>Moi Mashinani</strong>.
+          You are in the right place. The platform&apos;s official name is <strong>Moi Mashinani</strong>.
         </p>
       </main>
       <Footer />

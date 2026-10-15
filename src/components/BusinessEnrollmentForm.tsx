@@ -382,57 +382,42 @@ export function BusinessEnrollmentForm({
     );
   return (
     <>
-      {mode === "public" && !signedInOwner && (
-        <Card className="mx-auto max-w-3xl space-y-3 !p-4 sm:!p-5">
-          <p className="text-sm font-semibold text-[#183e35]">Already have an account?</p>
-          <p className="text-sm text-[#667064]">Sign in with email and password to manage your listing immediately. Or continue below and accept the email invitation afterwards.</p>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/login?next=%2Fonboard" className="ui-button ui-button-primary">Sign in</Link>
-            <Link href="/register" className="ui-button ui-button-secondary">Create an account</Link>
+      <form onSubmit={submit} className="mx-auto w-full max-w-3xl space-y-4">
+        <section ref={stepNavRef} aria-labelledby="enrollment-stage-heading" className="scroll-mt-6 px-1 py-1 sm:px-0">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="font-bold text-[#335e41]">Step {step} of 2</span>
+            <span className="font-medium text-[#657569]">{step === 1 ? "Business essentials" : "Ready to submit"}</span>
           </div>
-        </Card>
-      )}
-      <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5">
-        <Card className="!p-4 sm:!p-6">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#526d48]">
-              Business enrollment
-            </p>
-            <span className="text-xs font-semibold text-[#667064]">Step {step} of 2</span>
+          <div
+            role="progressbar"
+            aria-label="Listing setup progress"
+            aria-valuemin={0}
+            aria-valuemax={2}
+            aria-valuenow={step}
+            className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#dce6d9]"
+          >
+            <div
+              className="h-full rounded-full bg-[#245947] transition-[width] duration-300 ease-out motion-reduce:transition-none"
+              style={{ width: `${step * 50}%` }}
+            />
           </div>
-          <h2 className="mt-2 text-xl font-bold text-[#183e35] sm:text-2xl">
-            {mode === "public" ? "Set up your campus listing" : "Quick field enrollment"}
+          <ol className="mt-2 flex items-center justify-between gap-3 text-xs text-[#6b786d]" aria-label="Listing setup steps">
+            <li aria-current={step === 1 ? "step" : undefined} className={step === 1 ? "font-bold text-[#183e35]" : ""}>
+              1. Business &amp; prices
+            </li>
+            <li aria-current={step === 2 ? "step" : undefined} className={step === 2 ? "font-bold text-[#183e35]" : ""}>
+              2. Review &amp; submit
+            </li>
+          </ol>
+          <h2 id="enrollment-stage-heading" className="mt-3 text-lg font-extrabold text-[#183e35] sm:text-xl">
+            {step === 1 ? "Tell students what you offer" : "Check everything before submitting"}
           </h2>
-          <p className="mt-1 text-sm leading-relaxed text-[#667064]">
-            Add your details and prices, then review the listing and confirm trust details.
+          <p className="mt-0.5 text-sm leading-relaxed text-[#607267]">
+            {step === 1
+              ? "Start with your business details and a few everyday prices."
+              : "Confirm prices, your location and the details needed for review."}
           </p>
-          <nav ref={stepNavRef} aria-label="Enrollment steps" className="mt-4 scroll-mt-5 border-b border-[#dfe5d8]">
-            <ol className="grid grid-cols-2 gap-2">
-              <li className="min-w-0">
-                <button
-                  type="button"
-                  aria-current={step === 1 ? "step" : undefined}
-                  onClick={returnToEssentials}
-                  className={`flex min-h-14 w-full items-center gap-2 border-b-[3px] px-1 py-2 text-left text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${step === 1 ? "border-[#183e35] text-[#183e35]" : "border-transparent text-[#667064] hover:text-[#183e35]"}`}
-                >
-                  <span aria-hidden="true" className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${step === 1 ? "bg-[#183e35] text-white" : "bg-[#edf2e5] text-[#335e41]"}`}>1</span>
-                  <span>Details &amp; prices</span>
-                </button>
-              </li>
-              <li className="min-w-0">
-                <button
-                  type="button"
-                  aria-current={step === 2 ? "step" : undefined}
-                  onClick={preview}
-                  className={`flex min-h-14 w-full items-center gap-2 border-b-[3px] px-1 py-2 text-left text-xs font-semibold transition-colors sm:px-3 sm:text-sm ${step === 2 ? "border-[#183e35] text-[#183e35]" : "border-transparent text-[#667064] hover:text-[#183e35]"}`}
-                >
-                  <span aria-hidden="true" className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${step === 2 ? "bg-[#183e35] text-white" : "bg-[#edf2e5] text-[#335e41]"}`}>2</span>
-                  <span>Review &amp; verify</span>
-                </button>
-              </li>
-            </ol>
-          </nav>
-        </Card>
+        </section>
         {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
         {notice && <p role="status" className="rounded-xl bg-[#edf2e5] p-3 text-sm text-[#335e41]">{notice}</p>}
         {step === 1 ? (
@@ -739,20 +724,45 @@ export function BusinessEnrollmentForm({
             </Card>
           </div>
         )}
-        <div className="grid grid-cols-2 gap-2 rounded-2xl border border-[#dfe5d8] bg-white p-3 sm:p-4 md:sticky md:bottom-3 md:z-20 md:flex md:items-center md:shadow-lg">
-          <Button type="submit" disabled={busy || uploading} className="col-span-2 min-w-0 w-full whitespace-normal text-center md:order-last md:ml-auto md:w-auto">
+        <div className="flex flex-col gap-3 rounded-2xl border border-[#dfe5d8] bg-white p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4 md:sticky md:bottom-3 md:z-20 md:shadow-lg">
+          <Button
+            type="submit"
+            disabled={busy || uploading}
+            className="min-h-12 w-full whitespace-normal text-center sm:order-2 sm:ml-auto sm:w-auto"
+          >
             {busy
               ? "Saving…"
               : step === 1
-                ? "Review listing"
-                : "Save listing & request verification"}
+                ? "Continue to review"
+                : mode === "public"
+                  ? "Submit listing for review"
+                  : "Save listing & request verification"}
           </Button>
-          <Button type="button" variant="secondary" className="w-full md:w-auto" onClick={saveDraft}>
-            Save draft
-          </Button>
-          <Button type="button" variant="secondary" className="w-full md:w-auto" onClick={restore}>
-            Restore
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 sm:order-1 sm:justify-start">
+            {step === 2 && (
+              <button
+                type="button"
+                onClick={returnToEssentials}
+                className="min-h-11 text-sm font-bold text-[#23543f] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
+              >
+                Back to details
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={saveDraft}
+              className="min-h-11 text-sm font-semibold text-[#466453] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
+            >
+              Save draft
+            </button>
+            <button
+              type="button"
+              onClick={restore}
+              className="min-h-11 text-sm font-semibold text-[#466453] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
+            >
+              Restore draft
+            </button>
+          </div>
         </div>
       </form>
     </>

@@ -2,13 +2,7 @@ import { NotificationCenter } from '@/components/NotificationCenter';
 import { Suspense } from 'react';
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import {
-  SITE_URL,
-  CORE_CAMPUS_KEYWORDS,
-  generateWebsiteSchema,
-  generateOrganizationSchema,
-  safeJsonLd,
-} from "@/lib/seo";
+import { SITE_URL, SITE_NAME, CORE_CAMPUS_KEYWORDS } from "@/lib/seo";
 import "./globals.css";
 
 const manrope = localFont({
@@ -23,35 +17,41 @@ const manrope = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "MoiMashinani — Moi University Campus Business Directory | Kesses",
-    template: "%s | MoiMashinani",
+    default: "Moi Mashinani | Local Businesses & Services Near Moi University",
+    template: "%s | Moi Mashinani",
   },
   description:
-    "Find food, kibandas, hostels, student bedsitters, kinyozi salons, phone repairs, groceries, printing and local fundis around Moi University Main Campus (Kesses). Call or WhatsApp businesses directly.",
+    "Moi Mashinani connects Moi University students in Kesses with nearby food, hostels, phone repairs, printing, salons, shops and local services. Compare listings and contact sellers directly.",
   keywords: CORE_CAMPUS_KEYWORDS,
-  authors: [{ name: "MoiMashinani", url: SITE_URL }],
-  creator: "MoiMashinani",
-  publisher: "MoiMashinani",
-  applicationName: "MoiMashinani",
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  applicationName: SITE_NAME,
   category: "business",
   classification: "Campus Business Directory",
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
-    title: "MoiMashinani — Moi University Campus Business Directory",
+    title: "Moi Mashinani | Moi University Campus Business Directory",
     description:
-      "Find food, kibandas, hostels, student rooms, phone repairs, kinyozi salons and campus fundis in Kesses. Call or WhatsApp businesses directly.",
-    url: "/",
-    siteName: "MoiMashinani",
+      "Find businesses, food, hostels, student rooms, phone repairs, salons and local services around Moi University Main Campus in Kesses.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "en_KE",
     type: "website",
+    images: [
+      {
+        url: "/brand/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Moi Mashinani — campus businesses and student services around Moi University",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MoiMashinani — Moi University Campus Business Directory",
+    title: "Moi Mashinani | Local Businesses Near Moi University",
     description:
-      "Find food, hostels, phone repairs, kinyozi salons and campus fundis in Kesses with direct contact.",
+      "Find food, hostels, phone repairs, printing and campus services in Kesses.",
+    images: ["/brand/og-image.png"],
   },
   robots: {
     index: true,
@@ -78,21 +78,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const websiteSchema = generateWebsiteSchema();
-  const orgSchema = generateOrganizationSchema();
-
   return (
     <html lang="en" className="h-full">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: safeJsonLd(orgSchema) }}
-        />
-      </head>
       <body className={`${manrope.variable} min-h-full flex flex-col bg-[#f7f8f2] text-[#243b32] antialiased`}>
         {children}
         <Suspense fallback={null}><NotificationCenter /></Suspense>

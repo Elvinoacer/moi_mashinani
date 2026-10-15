@@ -14,7 +14,24 @@ export async function POST(req: NextRequest) {
     const name = textField(body.name, "Name", 120, true);
     await rateLimit(req, "email-signup-address", 3, 3600, email);
     const passwordHash = await hashPassword(body.password as string);
-    const existing = await prisma.account.findUnique({ where: { email }, select: { id: true } });
+    const existing = await prisma.account.findUnique({
+      where: { email },
+      select: { id: true, emailVerifiedAt: true, passwordHash: true },
+    });
+    if (existing && !existing.emailVerifiedAt) {
+      // A previously invited owner can finish setup without creating a
+      // duplicate account. Never replace their password before verification.
+      const pending = await prisma.business.findFirst({
+        where: { ownerId: existing.id, isClaimed: false },
+        select: { id: true },
+        orderBy: { createdAt: "desc" },
+      });
+      await inviteAccount(
+        existing.id,
+        pending?.id,
+        pending ? "INVITE" : existing.passwordHash ? "REGISTER" : "INVITE",
+      );
+    }
     if (!existing) {
       // Only a verified email can claim business ownership. Never grant an elevated role here.
       const account = await prisma.account.create({

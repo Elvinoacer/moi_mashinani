@@ -4,10 +4,9 @@ import Link from "next/link";
 import type { Business, ServiceRequest } from "@/lib/types";
 import { ZONES } from "@/lib/constants";
 import { CampusZonePicker } from "./CampusZonePicker";
-import { ArrowRight, Check, ChevronDown, MessageCircle, Search, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, MapPin, MessageCircle, MessageCircleOff, Plus, Search, X } from "lucide-react";
 import { DemandModal } from "./DemandModal";
 import { Button } from "./ui/Button";
-import { Card } from "./ui/Card";
 import { useNow } from "@/lib/useNow";
 import { useCampusZone } from "@/lib/useCampusZone";
 type PublicRequest = Omit<ServiceRequest, "contactPhone"> & {
@@ -140,26 +139,66 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
   ).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const shown = compact ? visible.slice(0, 2) : visible.slice(0, showCount);
   return (
-    <section className="space-y-4" aria-label="Comrade requests">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-xl sm:text-2xl font-bold">Comrade requests</h2>
-          <p className="text-sm text-[#5c6f60]">See what people need around campus. Verified sellers can reply.</p>
-        </div>
-        <Button onClick={() => setPost(true)} className="shrink-0">Post a request <ArrowRight size={15} aria-hidden="true" /></Button>
-      </div>
-      {!compact && (
-        <div className="request-board-toolbar">
-          <label className="request-board-search">
-            <Search size={18} aria-hidden="true" />
-            <span className="sr-only">Find requests by item or service</span>
-            <input type="search" value={keyword} placeholder="Search requests e.g. charger, room…"
-              onChange={(event) => { setKeyword(event.target.value); setShowCount(8); }} />
-          </label>
-          <div className="request-board-zone">
-            <CampusZonePicker value={zone} onChange={(value) => { setZone(value); setShowCount(8); }} />
+    <section className={compact ? "space-y-4" : "requests-board space-y-5"} aria-label="Comrade requests">
+      {compact ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-xl font-bold">Comrade requests</h2>
+            <p className="text-sm text-[#5c6f60]">See what people need around campus. Verified sellers can reply.</p>
           </div>
+          <Button onClick={() => setPost(true)}>Post a request <ArrowRight size={16} aria-hidden="true" /></Button>
         </div>
+      ) : (
+        <>
+          <div className="requests-hero">
+            <div className="requests-hero-copy">
+              <p className="requests-eyebrow"><span className="requests-eyebrow-dot" aria-hidden="true" />MOI UNIVERSITY · COMMUNITY BOARD</p>
+              <h1 className="requests-hero-title">Campus needs.<br /><span>Real connections.</span></h1>
+              <p className="requests-hero-lead">
+                Discover what students around campus are looking for. If you can help, connect directly with them.
+              </p>
+            </div>
+            <div className="requests-post-card">
+              <p className="requests-post-eyebrow"><Plus size={15} aria-hidden="true" /> FOR PEOPLE LOOKING FOR SOMETHING</p>
+              <h2>Need something?</h2>
+              <p>Tell the campus what you are looking for. Posting is free and does not require an account.</p>
+              <button type="button" className="requests-post-button" onClick={() => setPost(true)}>
+                <Plus size={17} aria-hidden="true" /> Post a request <ArrowRight size={17} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+          <div className="requests-filters" role="search" aria-label="Search campus requests">
+            <div className="requests-filters-heading">
+              <h2>Explore requests</h2>
+              <p>Search by need, or narrow the board to a campus area. Results update as you type.</p>
+            </div>
+            <div className="request-board-toolbar">
+              <div className="requests-search-field">
+                <label className="requests-field-label" htmlFor="requests-search-input">What are you looking for?</label>
+                <div className="requests-search-box">
+                  <Search size={20} aria-hidden="true" />
+                  <input
+                    id="requests-search-input"
+                    type="search"
+                    value={keyword}
+                    autoComplete="off"
+                    placeholder="Search e.g. charger, bedsitter, fundi"
+                    onChange={(event) => { setKeyword(event.target.value); setShowCount(8); }}
+                  />
+                  {keyword && (
+                    <button type="button" className="requests-clear-input" aria-label="Clear request search"
+                      onClick={() => { setKeyword(""); setShowCount(8); }}>
+                      <X size={18} aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="request-board-zone">
+                <CampusZonePicker value={zone} onChange={(value) => { setZone(value); setShowCount(8); }} />
+              </div>
+            </div>
+          </div>
+        </>
       )}
       {businesses.length > 1 && (
         <label className="flex flex-wrap items-center gap-2 text-sm font-semibold">
@@ -170,23 +209,51 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
         </label>
       )}
       {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
+      {!compact && (
+        <div className="requests-results-header" id="requests-results">
+          <div>
+            <p className="requests-section-kicker">FROM AROUND CAMPUS</p>
+            <h2>Latest requests</h2>
+            <p className="requests-results-description">Recent requests first · Posts remain visible for seven days</p>
+          </div>
+          <div className="requests-results-tools">
+            <span className="requests-results-count" role="status">
+              {loading ? "Loading…" : visible.length + (visible.length === 1 ? " active request" : " active requests")}
+            </span>
+            {(keyword || zone !== "all") && (
+              <button type="button" className="requests-reset" onClick={() => { setKeyword(""); setZone("all"); setShowCount(8); }}>
+                Clear filters
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       {loading ? (
         <div role="status" className="grid gap-3 sm:grid-cols-2" aria-label="Loading requests">
           {[1, 2, 3, 4].map((item) => <div key={item} className="h-36 rounded-2xl bg-[#e8efe5] animate-pulse" />)}
         </div>
       ) : !visible.length ? (
-        <Card>
-          <h3 className="font-bold">No requests found {keyword ? "for that search" : "in this area"}.</h3>
-          <p className="mt-1 text-sm">Try another term or area, or ask sellers what you need.</p>
-          {keyword && <button type="button" onClick={() => setKeyword("")} className="mt-3 mr-3 text-sm font-bold underline">Clear search</button>}
-          <Link className="mt-3 inline-block text-sm font-bold underline" href="/search">Explore nearby businesses →</Link>
-        </Card>
+        <div className={compact ? "ui-card space-y-3" : "requests-empty"}>
+          <span className="requests-empty-icon" aria-hidden="true"><Search size={23} /></span>
+          <h3>{error && !requests.length ? "Requests could not load" : "No matching requests yet"}</h3>
+          <p>{error && !requests.length
+            ? "Check your connection and try again."
+            : "Try a different search or campus area. You can also ask the campus for what you need."}</p>
+          <div className="requests-empty-actions">
+            {error && !requests.length ? (
+              <button type="button" onClick={() => { setLoading(true); setRefresh((value) => value + 1); }}>Try again</button>
+            ) : (keyword || zone !== "all") ? (
+              <button type="button" onClick={() => { setKeyword(""); setZone("all"); setShowCount(8); }}>Clear filters</button>
+            ) : (
+              <button type="button" onClick={() => setPost(true)}>Post a request <ArrowRight size={15} aria-hidden="true" /></button>
+            )}
+            <Link href="/search">Explore businesses <ArrowRight size={15} aria-hidden="true" /></Link>
+          </div>
+        </div>
       ) : (
         <>
-          <p role="status" className="text-xs font-semibold text-[#607266]">
-            Showing {shown.length} of {visible.length} {visible.length === 1 ? "request" : "requests"}
-          </p>
-          <div className="request-board-grid grid gap-3 sm:grid-cols-2">
+          {compact && <p role="status" className="text-xs font-semibold text-[#607266]">Showing {shown.length} of {visible.length} requests</p>}
+          <div className="request-board-grid grid gap-3 lg:grid-cols-2">
             {shown.map((r) => {
               const owns = Boolean(receipts[r.id]);
               const expanded = expandedId === r.id;
@@ -195,7 +262,7 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
               return (
                 <article key={r.id} className="request-listing">
                   <div className="request-listing-top">
-                    <span className="request-listing-area">{ZONES.find((z) => z.slug === r.zone)?.name || "All campus"}</span>
+                    <span className="request-listing-area"><MapPin size={13} aria-hidden="true" />{ZONES.find((z) => z.slug === r.zone)?.name || "All campus"}</span>
                     <time className="text-xs text-[#68766c]" dateTime={r.createdAt}>
                       {new Date(r.createdAt).toLocaleString("en-KE", { timeZone: "Africa/Nairobi", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
                     </time>
@@ -227,7 +294,7 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
                     ) : r.canRespond ? (
                       <Link className="request-action-secondary" href="/login?next=/requests">Seller? Sign in to reply <ArrowRight size={14} aria-hidden="true" /></Link>
                     ) : (
-                      <span className="request-listing-note">WhatsApp replies not enabled for this request</span>
+                      <span className="request-listing-note"><MessageCircleOff size={15} aria-hidden="true" /> Seller replies not enabled</span>
                     )}
                   </div>
                 </article>

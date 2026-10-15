@@ -12,9 +12,9 @@ import { DealsPageClient } from "./DealsPageClient";
 
 export const metadata: Metadata = {
   title:
-    "Student Deals, Discounts & Campus Trust Guide | Moi University (Kesses)",
+    "Student Deals & Budget Finds | Moi University, Kesses",
   description:
-    "Exclusive Moi University student discounts in Kesses: save money on food, phone repairs, haircuts, printing and campus essentials with our safety guide.",
+    "Find seller-listed items under KES 300, limited-time campus deals and student offers in Kesses. Compare prices and contact nearby sellers directly.",
   keywords: [
     "student discounts Moi University",
     "campus deals Kesses",
@@ -29,18 +29,18 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      "Student Deals, Discounts & Campus Trust Guide | Moi University (Kesses)",
+      "Student Deals & Budget Finds | Moi University, Kesses",
     description:
-      "Exclusive Moi University student discounts in Kesses. Save money on food, phone repairs, haircuts, printing and campus essentials.",
+      "Browse affordable campus essentials, limited-time offers and student discounts around Moi University in Kesses.",
     url: "/deals",
     siteName: "MoiMashinani",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Student Deals & Discounts | Moi University (Kesses)",
+    title: "Student Deals & Budget Finds | Moi University (Kesses)",
     description:
-      "Find active student discounts and budget offers around campus.",
+      "Browse affordable campus finds, student discounts and limited-time deals in Kesses.",
   },
 };
 

@@ -58,7 +58,7 @@ export default function BusinessOnboardPage() {
             List your business — free
           </h1>
           <p className="text-sm text-[#667064]">
-            Two simple steps: add your business and core prices, then review photos and trust details. Sign in by phone to manage your listing, or use an email invitation.
+            Two simple steps: add your business and core prices, then review photos and trust details. Sign in with email and password to manage your listing, or accept an email invitation after submitting.
           </p>
         </div>
         <BusinessEnrollmentForm mode="public" />

@@ -40,8 +40,10 @@ export async function sendVerificationEmail(
   const subject =
     purpose === "RESET"
       ? "Reset your MoiMashinani password"
-      : "Verify your MoiMashinani business account";
-  const text = `Hello ${name},\n\n${purpose === "RESET" ? "Use this link to reset your password" : "Your business account is ready. Verify your email and set up your password"}:\n${link}\n\nThis link expires in 24 hours and can be used once. After verification, sign in to manage your business details, photos, products, customer requests and promotions.\n\nIf you did not request this, you can ignore this email.\nMoiMashinani`;
+      : purpose === "REGISTER"
+        ? "Confirm your MoiMashinani email address"
+        : "Verify your MoiMashinani business account";
+  const text = `Hello ${name},\n\n${purpose === "RESET" ? "Use this link to reset your password" : purpose === "REGISTER" ? "Confirm your email to activate your account. Enter your chosen password on the verification page" : "Your business account is ready. Verify your email and set up your password"}:\n${link}\n\nThis link expires in 24 hours and can be used once. After verification, sign in to manage your business details, photos, products, customer requests and promotions.\n\nIf you did not request this, you can ignore this email.\nMoiMashinani`;
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -58,8 +60,10 @@ export async function sendVerificationEmail(
           subject,
           purpose === "RESET"
             ? "Reset your password securely. This button expires in 24 hours and works once. If you did not request this, ignore this email."
-            : "Verify your email and set up your password. Then add profile, shop and product photos to help customers choose your business. This button expires in 24 hours and works once.",
-          purpose === "RESET" ? "Reset password" : "Verify my account",
+            : purpose === "REGISTER"
+              ? "Confirm your email with the password you chose at signup. This link expires in 24 hours and works once."
+              : "Verify your email and set up your password. Then add profile, shop and product photos to help customers choose your business. This button expires in 24 hours and works once.",
+          purpose === "RESET" ? "Reset password" : "Verify my email",
           link,
           name,
         ),

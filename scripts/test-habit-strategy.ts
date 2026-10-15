@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomBytes } from "node:crypto";
 import sharp from "sharp";
 const context = JSON.parse(
   readFileSync("/tmp/moimashinani-test-context.json", "utf8"),
@@ -13,8 +13,6 @@ async function main() {
   const { Store } = await import("../src/lib/store");
   const { newSession, hashPassword, hashToken } =
     await import("../src/lib/auth");
-  const { requestPhoneCode, verifyPhoneCode } =
-    await import("../src/lib/phone-auth");
   const { createMerchantAction } = await import("../src/lib/merchant-actions");
   const base = context.baseUrl,
     tag = randomUUID().slice(0, 8);
@@ -383,60 +381,26 @@ async function main() {
       true,
       "temporary closure keeps the profile visible and rejects new bookings with a clear conflict",
     );
-    let captured = "";
-    const phone = "+254711222333";
-    const challengeId = await requestPhoneCode(
-      phone,
-      "Student seller",
-      async (_phone, message) => {
-        captured = message.match(/\d{6}/)![0];
+    const studentEmail = `habit-student-${tag}@test.invalid`;
+    const studentPassword = "habit student password 2026";
+    const student = await prisma.account.create({
+      data: {
+        email: studentEmail,
+        name: "Student seller",
+        role: "BUSINESS",
+        emailVerifiedAt: new Date(),
+        passwordHash: await hashPassword(studentPassword),
       },
-    );
-    const badChallenge = await requestPhoneCode(
-      "+254711222334",
-      "Other",
-      async () => {},
-    );
-    for (let i = 0; i < 5; i++)
-      await assert.rejects(verifyPhoneCode(badChallenge, "000000"));
-    check(
-      (
-        await prisma.phoneChallenge.findUniqueOrThrow({
-          where: { id: badChallenge },
-        })
-      ).attempts === 5,
-      "failed OTP attempts persist and lock the challenge",
-    );
-    await call(
-      "/api/auth/phone/verify",
-      "POST",
-      { challengeId, code: "000000" },
-      "",
-      400,
-    );
-    const verified = await fetch(base + "/api/auth/phone/verify", {
-      method: "POST",
-      headers: { Origin: base, "Content-Type": "application/json" },
-      body: JSON.stringify({ challengeId, code: captured }),
     });
+    const studentCookie = `mm_session=${await newSession(student.id)}`;
+    const phone = "+254711222333";
+    await call("/api/auth/phone/request", "POST", { phone }, "", 410);
+    await call("/api/auth/phone/verify", "POST", { challengeId: "old", code: "000000" }, "", 410);
+    check(true, "retired SMS endpoints cannot create a session or incur charges");
     check(
-      verified.status === 200,
-      "SMS verification creates a phone identity without email acceptance",
+      (await call("/api/auth/me", "GET", undefined, studentCookie)).user.email === studentEmail,
+      "email-verified student session works through the account gate",
     );
-    const phoneCookie = verified.headers.get("set-cookie")!.split(";")[0];
-    check(
-      (await call("/api/auth/me", "GET", undefined, phoneCookie)).user.phone ===
-        phone,
-      "phone-verified session works through the existing account gate",
-    );
-    await call(
-      "/api/auth/phone/verify",
-      "POST",
-      { challengeId, code: captured },
-      "",
-      400,
-    );
-    check(true, "used SMS codes cannot create a second session");
     const image = await sharp({
       create: { width: 200, height: 100, channels: 3, background: "white" },
     })
@@ -462,6 +426,7 @@ async function main() {
       {
         name: `Declutter cylinder ${tag}`,
         ownerName: "Student seller",
+        ownerEmail: studentEmail,
         phone,
         primaryCategory: "phone-laptop-repair",
         zone: "stage",
@@ -476,7 +441,7 @@ async function main() {
         serviceModes: ["comes_to_you"],
         services: [{ id: "cylinder", name: "Used cylinder", priceFrom: 900 }],
       },
-      phoneCookie + "; " + staging,
+      studentCookie + "; " + staging,
       201,
     );
     check(
@@ -484,7 +449,7 @@ async function main() {
         listing.business.status === "PENDING" &&
         listing.business.listingExpiresAt &&
         listing.business.services.length === 1,
-      "phone-verified student posts one item without storefront or email",
+      "email-verified student posts one item without a storefront",
     );
     await call(`/api/businesses/${listing.slug}`, "GET", undefined, "", 404);
     check(true, "pending student identities never appear publicly");
@@ -531,7 +496,7 @@ async function main() {
       `/api/businesses/${listing.slug}/refresh-market`,
       "POST",
       {},
-      phoneCookie,
+      studentCookie,
     );
     check(
       Date.parse(refreshed.listingExpiresAt) > Date.now() + 29 * 864e5,
@@ -543,12 +508,14 @@ async function main() {
     });
     const adminCookie = `mm_session=${await newSession(admin.id)}`;
     const fieldPhone = `+25471${Math.floor(1000000 + Math.random() * 8999999)}`;
+    const fieldEmail = `field-owner-${tag}@test.invalid`;
     const fieldListing = await call(
       "/api/admin/enroll",
       "POST",
       {
-        name: `Phone-only field shop ${tag}`,
+        name: `Email-invited field shop ${tag}`,
         ownerName: "Field merchant",
+        ownerEmail: fieldEmail,
         phone: fieldPhone,
         primaryCategory: "food-cafes",
         zone: "stage",
@@ -563,27 +530,27 @@ async function main() {
       201,
     );
     check(
-      fieldListing.business.status === "ACTIVE" &&
-        !fieldListing.business.isClaimed &&
-        !fieldListing.invitation.sent,
-      "field merchant can enroll without email; unavailable SMS invitation is reported honestly",
+      fieldListing.business.status === "ACTIVE" && !fieldListing.business.isClaimed,
+      "field merchant receives email ownership invitation; listing is unclaimed",
     );
-    let fieldCode = "";
-    const fieldChallenge = await requestPhoneCode(
-      fieldPhone,
-      "Field merchant",
-      async (_phone, message) => {
-        fieldCode = message.match(/\d{6}/)![0];
+    const fieldOwner = await prisma.account.findUniqueOrThrow({ where: { email: fieldEmail } });
+    const fieldToken = randomBytes(32).toString("hex");
+    await prisma.verificationToken.create({
+      data: {
+        tokenHash: hashToken(fieldToken),
+        accountId: fieldOwner.id,
+        businessId: fieldListing.business.id,
+        purpose: "INVITE",
+        expiresAt: new Date(Date.now() + 3600000),
       },
-    );
-    const fieldAccount = await verifyPhoneCode(fieldChallenge, fieldCode);
+    });
+    await call("/api/auth/verify", "POST", { token: fieldToken, password: "strong field owner password 2026" });
     check(
       (
-        await prisma.business.findUniqueOrThrow({
-          where: { id: fieldListing.business.id },
-        })
-      ).isClaimed && fieldAccount.phoneVerifiedAt,
-      "SMS possession accepts the field-enrolled phone account and claims its storefront",
+        await prisma.business.findUniqueOrThrow({ where: { id: fieldListing.business.id } })
+      ).isClaimed &&
+      (await prisma.account.findUniqueOrThrow({ where: { id: fieldOwner.id } })).emailVerifiedAt,
+      "verified email invitation securely claims a field-enrolled storefront",
     );
     process.env.CRON_SECRET = "synthetic-habit-cron-secret";
     process.env.RESEND_API_KEY = "";
@@ -622,7 +589,9 @@ async function main() {
         businessId: business.id,
         dealId: deal.id,
         marketSlug: listing.slug,
-        phoneCookie,
+        studentCookie,
+        studentEmail,
+        studentPassword,
       }),
       { mode: 0o600 },
     );

@@ -1,5 +1,4 @@
 import { merchantActionPreview } from "./merchant-actions";
-import { sendRequestSms } from "./sms";
 import { prisma } from "./prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { applicationUrl, sendNotificationEmail } from "./mail";
@@ -15,7 +14,7 @@ export async function queueNotice(
   accountId: string | null | undefined,
   eventKey: string,
   content: NoticeContent,
-  channels: ("EMAIL" | "PUSH" | "SMS")[] = ["EMAIL", "PUSH"],
+  channels: ("EMAIL" | "PUSH")[] = ["EMAIL", "PUSH"],
   scopeBusinessId?: string,
 ) {
   if (!accountId) return;
@@ -32,17 +31,6 @@ export async function queueNotice(
     update: {},
   });
   const targets: { channel: string; target: string; deviceId?: string }[] = [];
-  if (channels.includes("SMS") && scopeBusinessId) {
-    const business = await tx.business.findUnique({
-      where: { id: scopeBusinessId },
-    });
-    if (
-      business?.requestAlertsEnabled &&
-      business.ownerPhone &&
-      business.ownerId === accountId
-    )
-      targets.push({ channel: "SMS", target: business.ownerPhone });
-  }
   if (channels.includes("EMAIL") && account.emailVerifiedAt)
     targets.push({ channel: "EMAIL", target: account.email });
   if (channels.includes("PUSH")) {
@@ -158,6 +146,15 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
     if (!claimed.count) continue;
     try {
       const n = delivery.notification;
+      // Retire queued SMS deliveries from earlier releases without contacting a provider.
+      if (delivery.channel === "SMS") {
+        await prisma.notificationDelivery.updateMany({
+          where: { id: delivery.id, claimedAt },
+          data: { stoppedAt: new Date(), claimedAt: null, error: "SMS delivery retired; use email or push" },
+        });
+        result.skipped++;
+        continue;
+      }
       let actionBusinessId: string | undefined;
       if (n.path.startsWith("/merchant/action/")) {
         try {
@@ -187,34 +184,6 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
           n.button,
           url,
           `notification/${delivery.id}`,
-        );
-      } else if (delivery.channel === "SMS") {
-        const business = await prisma.business.findFirst({
-          where: {
-            ...(actionBusinessId ? { id: actionBusinessId } : {}),
-            ownerId: n.accountId,
-            ownerPhone: delivery.target,
-            requestAlertsEnabled: true,
-            status: "ACTIVE",
-            isClaimed: true,
-            verificationLevel: "L2",
-          },
-        });
-        if (!business) {
-          await prisma.notificationDelivery.updateMany({
-            where: { id: delivery.id, claimedAt },
-            data: {
-              stoppedAt: new Date(),
-              claimedAt: null,
-              error: "SMS alerts disabled or listing unavailable",
-            },
-          });
-          result.skipped++;
-          continue;
-        }
-        await sendRequestSms(
-          delivery.target,
-          `Moi Mashinani: ${n.title}. ${n.body.slice(0, 100)} ${url}`,
         );
       } else {
         const device = delivery.device;
@@ -278,9 +247,7 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
             ? "Expired Firebase registration"
             : delivery.channel === "EMAIL"
               ? "Email provider unavailable or not configured"
-              : delivery.channel === "SMS"
-                ? "SMS provider unavailable or not configured"
-                : "Push provider unavailable or not configured",
+              : "Push provider unavailable or not configured",
           stoppedAt: invalid || attempts >= 10 ? new Date() : null,
           nextAttemptAt: new Date(
             Date.now() +

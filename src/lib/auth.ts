@@ -31,7 +31,7 @@ export function normalizeEmail(value: unknown): string {
     throw new ApiError(400, "A valid owner email is required");
   const email = value.trim().toLowerCase();
   if (email.endsWith("@phone.moimashinani.invalid"))
-    throw new ApiError(400, "Use phone sign-in or a personal email address.");
+    throw new ApiError(400, "Use a real personal email address.");
   return email;
 }
 export function validatePassword(value: unknown): asserts value is string {
@@ -86,7 +86,7 @@ export async function getCurrentUser(
   if (
     !session ||
     session.expiresAt <= new Date() ||
-    (!session.account.emailVerifiedAt && !session.account.phoneVerifiedAt)
+    !session.account.emailVerifiedAt
   )
     return null;
   return publicUser(session.account);

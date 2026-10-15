@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const result = await prisma.$transaction(async tx => {
       const record = await tx.verificationToken.findUnique({where:{tokenHash:hashToken(token)},include:{account:true}});
       if (!record || record.usedAt || record.expiresAt <= new Date()) throw new ApiError(400,'This verification link is invalid or expired. Request a new link.');
-      if (record.purpose === 'INVITE' && record.account.passwordHash && !await verifyPassword(password,record.account.passwordHash)) throw new ApiError(400,'This email already has an account. Enter your existing password or request a password reset.');
+      if ((record.purpose === 'INVITE' || record.purpose === 'REGISTER') && record.account.passwordHash && !await verifyPassword(password,record.account.passwordHash)) throw new ApiError(400,'This email already has an account. Enter your existing password or request a password reset.');
       const consumed = await tx.verificationToken.updateMany({where:{id:record.id,usedAt:null,expiresAt:{gt:new Date()}},data:{usedAt:new Date()}});
       if (consumed.count !== 1) throw new ApiError(400,'This link has already been used');
       const account = await tx.account.update({where:{id:record.accountId},data:{emailVerifiedAt:record.account.emailVerifiedAt || new Date(),passwordHash:record.purpose === 'RESET' || !record.account.passwordHash ? passwordHash : record.account.passwordHash}});

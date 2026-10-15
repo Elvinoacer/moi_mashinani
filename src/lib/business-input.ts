@@ -252,7 +252,7 @@ export function businessInput(
   }
   if (body.requestAlertsEnabled !== undefined) {
     if (typeof body.requestAlertsEnabled !== "boolean")
-      throw new ApiError(400, "Invalid SMS consent");
+      throw new ApiError(400, "Invalid email reminder preference");
     result.requestAlertsEnabled = body.requestAlertsEnabled;
   }
   if (body.isTemporarilyClosed !== undefined) {

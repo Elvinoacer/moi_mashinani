@@ -126,3 +126,16 @@ test("public verification links require HTTPS", async () => {
   );
   assert.equal(fetchMock.mock.callCount(), 0);
 });
+
+test("new registrations use an email verification link, not an SMS code", async () => {
+  mock.method(globalThis, "fetch", async (input: string, options: RequestInit) => {
+    assert.equal(input, "https://api.resend.com/emails");
+    const body = JSON.parse(String(options.body));
+    assert.equal(body.subject, "Confirm your MoiMashinani email address");
+    assert.ok(body.text.includes("Confirm your email to activate your account"));
+    assert.ok(body.text.includes("/verify?token=registration-token"));
+    assert.ok(!body.text.includes("SMS"));
+    return Response.json({ id: "register-id" });
+  });
+  await sendVerificationEmail("owner@test.invalid", "Owner", "registration-token", "REGISTER");
+});

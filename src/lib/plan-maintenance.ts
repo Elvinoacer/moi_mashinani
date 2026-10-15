@@ -20,7 +20,7 @@ export async function runPlanMaintenance(
   const thirtyAgo = new Date(now.getTime() - 30 * 864e5);
   const candidates = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT b."id" FROM "Business" b JOIN "Account" a ON a."id" = b."ownerId"
-    WHERE b."proEndsAt" <= ${seven} AND b."proEndsAt" >= ${thirtyAgo} AND (a."emailVerifiedAt" IS NOT NULL OR a."phoneVerifiedAt" IS NOT NULL)
+    WHERE b."proEndsAt" <= ${seven} AND b."proEndsAt" >= ${thirtyAgo} AND a."emailVerifiedAt" IS NOT NULL
     AND NOT EXISTS (SELECT 1 FROM "PlanNotice" n WHERE n."businessId" = b."id" AND n."endsAt" = b."proEndsAt"
       AND n."daysBefore" = CASE WHEN b."proEndsAt" <= ${now} THEN 0 WHEN b."proEndsAt" <= ${one} THEN 1 WHEN b."proEndsAt" <= ${three} THEN 3 ELSE 7 END
       AND n."sentAt" IS NOT NULL)
@@ -44,7 +44,7 @@ export async function runPlanMaintenance(
     });
     if (
       !business?.proEndsAt ||
-      (!business.owner?.emailVerifiedAt && !business.owner?.phoneVerifiedAt)
+      !business.owner?.emailVerifiedAt
     ) {
       result.skipped++;
       continue;
@@ -110,7 +110,7 @@ export async function runPlanMaintenance(
             path: `/pro/${business.slug}`,
             button: "Review & renew Pro",
           },
-          business.owner?.emailVerifiedAt ? ["PUSH"] : ["PUSH", "SMS"],
+          ["PUSH"],
           business.id,
         ),
       );

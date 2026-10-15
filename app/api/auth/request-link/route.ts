@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     const account = await prisma.account.findUnique({where:{email}});
     if (account) {
       const unclaimed = await prisma.business.findFirst({where:{ownerId:account.id,isClaimed:false},orderBy:{createdAt:'desc'},select:{id:true}});
-      await inviteAccount(account.id,unclaimed?.id,unclaimed ? 'INVITE' : account.passwordHash ? 'RESET':'INVITE');
+      await inviteAccount(account.id,unclaimed?.id,unclaimed ? 'INVITE' : account.emailVerifiedAt ? 'RESET' : account.passwordHash ? 'REGISTER' : 'INVITE');
     }
     return NextResponse.json({success:true,message:'If an account exists for this email, a verification or password reset link will be sent.'});
   } catch(error) { return apiError(error); }

@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { smsConfigured } from '../src/lib/sms';
 import { readdirSync } from 'node:fs';
 import { prisma } from '../src/lib/prisma';
 import { CATEGORIES, ZONES } from '../src/lib/constants';
@@ -18,7 +17,6 @@ async function main() {
       url.pathname === '/' && !url.search && !url.hash && !['localhost', '127.0.0.1', '::1'].includes(url.hostname));
   } catch { check('APP_URL is a public HTTPS origin', false); }
   check('Protected plan reminder scheduler is configured', Boolean(process.env.CRON_SECRET && process.env.CRON_SECRET.length >= 32));
-  check('SMS-code sign-in and merchant alerts are configured', smsConfigured());
   check('Resend sender and server API key are configured', Boolean(process.env.RESEND_API_KEY?.trim() && process.env.EMAIL_FROM?.trim()));
   check('Firebase web push configuration is complete', ['NEXT_PUBLIC_FIREBASE_API_KEY','NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN','NEXT_PUBLIC_FIREBASE_PROJECT_ID','NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID','NEXT_PUBLIC_FIREBASE_APP_ID','NEXT_PUBLIC_FIREBASE_VAPID_KEY'].every(key => Boolean(process.env[key]?.trim())));
   check('Firebase Admin credentials match the web project', Boolean(process.env.FIREBASE_CLIENT_EMAIL?.trim() && process.env.FIREBASE_PRIVATE_KEY?.trim() && process.env.FIREBASE_PROJECT_ID?.trim() && process.env.FIREBASE_PROJECT_ID === process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID));

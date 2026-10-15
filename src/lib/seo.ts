@@ -2,8 +2,11 @@ import { CATEGORIES, ZONES } from './constants';
 import { CATEGORY_GROUPS } from './categories';
 import type { Business } from './types';
 
-export const SITE_URL = process.env.APP_URL || 'https://moimashinani.gtss.software';
-export const SITE_NAME = 'MoiMashinani';
+// A single canonical origin keeps search engines from splitting the index between
+// Vercel preview / alternate hostnames and the public brand domain.
+export const SITE_URL = 'https://moimashinani.gtss.software';
+export const SITE_NAME = 'Moi Mashinani';
+export const SITE_ALTERNATE_NAMES = ['MoiMashinani', 'Moimashinani', 'Moishanani'];
 
 export const DEFAULT_CAMPUS = 'Moi University Main Campus (Kesses)';
 
@@ -80,7 +83,10 @@ export const CORE_CAMPUS_KEYWORDS = [
   'wifi installation Kesses',
   'student discounts Moi University',
   'M-Pesa agent Kesses',
+  'Moi Mashinani',
   'MoiMashinani',
+  'moimashinani',
+  'moishanani',
 ];
 
 /** Mapping of category slugs to high-value student search synonyms and intent keywords */
@@ -478,7 +484,7 @@ export function getBusinessSeoData(business: Business) {
     .slice(0, 4)
     .join(', ');
 
-  // Keep title punchy and localized (Next.js layout template will append "| MoiMashinani")
+  // Keep title punchy and localized (Next.js layout template appends "| Moi Mashinani")
   const title = `${business.name} – ${categoryName} in ${zoneName}, Kesses`;
 
   let description = `${business.name} in ${zoneName}, Moi University (Kesses). `;
@@ -490,7 +496,7 @@ export function getBusinessSeoData(business: Business) {
   if (serviceNames) {
     description += `Services: ${serviceNames}. `;
   }
-  description += `Call ${business.phone} or order on WhatsApp via MoiMashinani.`;
+  description += `Call ${business.phone} or order on WhatsApp via Moi Mashinani.`;
 
   const coverRaw = business.coverPhoto || business.photos?.[0] || '/brand/og-image.png';
   const coverImage = coverRaw.startsWith('http') ? coverRaw : `${SITE_URL}${coverRaw}`;
@@ -532,10 +538,13 @@ export function generateWebsiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
-    alternateName: ['Moi Mashinani', 'Moi University Campus Directory', 'MoiMashinani Directory'],
-    url: SITE_URL,
-    description: 'Hyper-local business and services directory for Moi University Main Campus (Kesses).',
+    alternateName: SITE_ALTERNATE_NAMES,
+    url: `${SITE_URL}/`,
+    inLanguage: 'en-KE',
+    description: 'Moi Mashinani connects Moi University students with campus shops, hostels, food sellers, services and local businesses around Kesses.',
+    publisher: { '@id': `${SITE_URL}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -552,8 +561,10 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    url: SITE_URL,
+    alternateName: SITE_ALTERNATE_NAMES,
+    url: `${SITE_URL}/`,
     logo: `${SITE_URL}/brand/moimashinani-logo.svg`,
     description: 'The campus business directory connecting Moi University students, staff and residents with verified local shops, services and fundis in Kesses.',
     areaServed: {

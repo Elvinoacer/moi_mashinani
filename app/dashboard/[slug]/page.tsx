@@ -665,13 +665,6 @@ function BusinessDashboard({ slug }: { slug: string }) {
               </div>
             </section>
           )}
-          {activeTab === "services" && (
-            <CatalogPlanPanel
-            business={business}
-            refreshKey={storageRefresh}
-            onUsage={setStorageUsage}
-          />
-          )}
           {activeTab === "details" && (
             <section className={panelClass}>
             <h2 className="text-xl font-bold">Trust & request alerts</h2>
@@ -784,12 +777,6 @@ function BusinessDashboard({ slug }: { slug: string }) {
           )}
       {activeTab === "overview" && <MerchantDailyTools business={business} />}
       {activeTab === "billing" && <BoostCheckout business={business} />}
-      {["overview", "bookings"].includes(activeTab) && (
-        <>
-          <LeadTimeline slug={slug} />
-          <RequestBoard compact />
-        </>
-      )}
       {activeTab === "overview" && (
         <div className="space-y-5">
           <div className={panelClass}>
@@ -1100,6 +1087,12 @@ function BusinessDashboard({ slug }: { slug: string }) {
         </section>
       )}
 
+      {activeTab === "overview" && (
+        <div className="space-y-5">
+          <LeadTimeline slug={slug} />
+          <RequestBoard compact />
+        </div>
+      )}
       {activeTab === "services" && (
         <section className={panelClass}>
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -1295,6 +1288,13 @@ function BusinessDashboard({ slug }: { slug: string }) {
         </section>
       )}
 
+          {activeTab === "services" && (
+            <CatalogPlanPanel
+            business={business}
+            refreshKey={storageRefresh}
+            onUsage={setStorageUsage}
+          />
+          )}
       {activeTab === "details" && (
         <form
           onSubmit={(event) => {

@@ -1102,86 +1102,31 @@ function BusinessDashboard({ slug }: { slug: string }) {
 
       {activeTab === "services" && (
         <section className={panelClass}>
-          <h2 className="font-display text-xl font-bold">
-            Services, products and prices
-          </h2>
-          <p className="text-sm text-[#667064]">
-            Unlimited catalogue items and stock updates are free.
-          </p>
-          <div className="divide-y divide-[#dfe5d8]">
-            {(business.services as EditableService[]).map((service) => (
-              <div
-                key={service.id}
-                className="flex flex-wrap items-center justify-between gap-3 py-3"
-              >
-                <div>
-                  <strong className="text-sm">{service.name}</strong>
-                  <p className="text-xs text-[#667064]">
-                    {service.priceFrom !== undefined
-                      ? `KSh ${service.priceFrom.toLocaleString()}`
-                      : "Contact for price"}
-                    {service.note ? ` · ${service.note}` : ""}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {(
-                    <button
-                      type="button"
-                      className="text-sm font-bold text-[#335e41]"
-                      disabled={!!busy}
-                      onClick={() =>
-                        void runAction("stock", () =>
-                          mutateProduct("PATCH", {
-                            ...service,
-                            inStock: service.inStock === false,
-                          }),
-                        )
-                      }
-                    >
-                      {service.inStock === false
-                        ? "Mark in stock"
-                        : "Mark sold out"}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    disabled={Boolean(busy)}
-                    onClick={() => {
-                      discardDraftPhoto(servicePhoto);
-                      setServiceId(service.id);
-                      setServiceName(service.name);
-                      setServicePrice(
-                        service.priceFrom === undefined
-                          ? ""
-                          : String(service.priceFrom),
-                      );
-                      setServiceNote(service.note || "");
-                      setServicePhoto(service.photo || "");
-                    }}
-                    className="text-sm font-bold text-[#335e41]"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Remove ${service.name}`}
-                    disabled={Boolean(busy)}
-                    onClick={() =>
-                      void runAction("remove-service", () =>
-                        mutateProduct("DELETE", { id: service.id }),
-                      )
-                    }
-                    className="p-2 text-[#a7302d]"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-xl font-bold">Products and services</h2>
+              <p className="mt-1 text-sm text-[#65746a]">Make it easy for customers to see what you offer.</p>
+            </div>
+            <button type="button" disabled={Boolean(busy)} onClick={() => { resetService(); setShowServiceForm(true); }} className="inline-flex min-h-11 items-center rounded-xl bg-[#24543b] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#34734e]">+ Add an item</button>
           </div>
+          <div className="grid gap-3 rounded-xl border border-[#e4eadf] bg-[#f8faf5] p-3 sm:grid-cols-[minmax(0,1fr)_180px] sm:items-end">
+            <label className="block text-xs font-bold text-[#334d3b]">Search catalogue
+              <input type="search" value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Find an item by name" className={inputClass} />
+            </label>
+            <label className="block text-xs font-bold text-[#334d3b]">Sort items
+              <select value={serviceSort} onChange={(event) => setServiceSort(event.target.value as typeof serviceSort)} className={inputClass}>
+                <option value="listed">Listing order</option>
+                <option value="name">Name A to Z</option>
+                <option value="stock">Available first</option>
+              </select>
+            </label>
+          </div>
+          <p aria-live="polite" className="text-xs text-[#65746a]">Showing {visibleServices.length} of {business.services.length} items</p>
+          {(showServiceForm || serviceId) && (
           <form
             onSubmit={saveService}
-            className="space-y-3 border-t border-[#dfe5d8] pt-4"
+            id="catalog-editor"
+            className="scroll-mt-28 space-y-3 rounded-2xl border border-[#d7e5ce] bg-[#f3f8ed] p-4 sm:p-5"
           >
             <fieldset
               disabled={
@@ -1191,7 +1136,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
               className="space-y-3 disabled:opacity-50"
             >
               <h3 className="font-bold">
-                {serviceId ? "Edit item" : "Add a service or product"}
+                {serviceId ? "Edit catalogue item" : "Add a product or service"}
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="text-xs font-bold">
@@ -1279,18 +1224,74 @@ function BusinessDashboard({ slug }: { slug: string }) {
                       ? "Save item"
                       : "Add item"}
                 </button>
-                {serviceId && (
+                {(serviceId || showServiceForm) && (
                   <button
                     type="button"
                     onClick={resetService}
-                    className="text-sm font-bold"
+                    className="min-h-11 rounded-xl border border-[#cadbc9] bg-white px-4 py-2 text-sm font-bold text-[#335e41]"
                   >
-                    Cancel edit
+                    Cancel
                   </button>
                 )}
               </div>
             </fieldset>
           </form>
+          )}
+          {!visibleServices.length && (
+            <div className="rounded-xl border border-dashed border-[#d8e2d5] bg-[#f8faf5] p-5 text-sm text-[#65746a]">
+              {business.services.length ? "No catalogue items match that search." : "Your catalogue is empty. Add your first product or service to get started."}
+            </div>
+          )}
+          {!!visibleServices.length && (
+            <div className="divide-y divide-[#e6ede4] overflow-hidden rounded-xl border border-[#e2e9df]">
+              {visibleServices.map((service) => (
+                <article key={service.id} className="space-y-3 bg-white px-3 py-3.5 sm:px-4">
+                  <div className="flex min-w-0 flex-wrap items-center gap-3">
+                    {service.photo ? (
+                      <Image unoptimized src={service.photo} width={56} height={56} alt="" className="h-12 w-12 shrink-0 rounded-lg border border-[#e0e8dd] object-cover" />
+                    ) : (
+                      <div aria-hidden="true" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#eff4e8] text-lg text-[#6a7d66]">◈</div>
+                    )}
+                    <div className="min-w-0 flex-[1_1_150px]">
+                      <h3 className="break-words text-sm font-bold text-[#234032]">{service.name}</h3>
+                      <p className="mt-0.5 text-xs font-semibold text-[#526657]">{service.priceFrom !== undefined ? "KSh " + service.priceFrom.toLocaleString("en-KE") : "Price on request"}</p>
+                      {service.note && <p className="mt-0.5 line-clamp-2 text-xs text-[#708074]">{service.note}</p>}
+                    </div>
+                    <span className={"shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold " + (service.inStock === false ? "bg-[#fff0e5] text-[#925530]" : "bg-[#e9f4e7] text-[#387048]")}>
+                      {service.inStock === false ? "Sold out" : "Available"}
+                    </span>
+                    <div className="flex w-full flex-wrap gap-2 sm:ml-auto sm:w-auto">
+                      <button type="button" disabled={Boolean(busy)} onClick={() => void runAction("stock", () => mutateProduct("PATCH", { ...service, inStock: service.inStock === false }), "Availability updated.")} className="min-h-10 rounded-lg border border-[#d7e2d2] bg-[#f7faf3] px-3 py-2 text-xs font-bold text-[#345e43] transition-colors hover:bg-[#eaf3de] disabled:opacity-50">
+                        {service.inStock === false ? "Mark available" : "Mark sold out"}
+                      </button>
+                      <button type="button" disabled={Boolean(busy)} onClick={() => {
+                        discardDraftPhoto(servicePhoto);
+                        setServiceId(service.id);
+                        setServiceName(service.name);
+                        setServicePrice(service.priceFrom === undefined ? "" : String(service.priceFrom));
+                        setServiceNote(service.note || "");
+                        setServicePhoto(service.photo || "");
+                        setShowServiceForm(true);
+                        window.requestAnimationFrame(() => document.getElementById("catalog-editor")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }));
+                      }} className="min-h-10 rounded-lg border border-[#cadbc9] bg-white px-3 py-2 text-xs font-bold text-[#335e41] transition-colors hover:bg-[#f3f8ee] disabled:opacity-50">Edit</button>
+                      <button type="button" aria-label={"Remove " + service.name} disabled={Boolean(busy)} onClick={() => setConfirmDeleteServiceId(service.id)} className="flex min-h-10 min-w-10 items-center justify-center rounded-lg border border-[#f0d4cd] text-[#a7302d] transition-colors hover:bg-[#fceeea] disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </div>
+                  {confirmDeleteServiceId === service.id && (
+                    <div role="group" aria-label={"Remove " + service.name} className="rounded-xl border border-[#efc5bd] bg-[#fff4f0] p-3 text-sm">
+                      <p className="font-bold text-[#913a30]">Remove “{service.name}” from your catalogue?</p>
+                      <p className="mt-1 text-xs text-[#7e554e]">This will remove the item from your public profile.</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button type="button" disabled={Boolean(busy)} onClick={() => void runAction("remove-service", async () => { await mutateProduct("DELETE", { id: service.id }); setConfirmDeleteServiceId(null); }, "Item removed.")} className="min-h-10 rounded-lg bg-[#993f35] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Remove item</button>
+                        <button type="button" onClick={() => setConfirmDeleteServiceId(null)} className="min-h-10 rounded-lg border border-[#d7bab3] bg-white px-3 py-2 text-xs font-bold text-[#633e37]">Keep item</button>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+
         </section>
       )}
 

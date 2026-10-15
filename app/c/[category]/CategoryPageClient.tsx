@@ -35,6 +35,7 @@ export function CategoryPageClient({
   );
   const [loading, setLoading] = useState(initialBusinesses === undefined);
   const [demandOpen, setDemandOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -138,11 +139,11 @@ export function CategoryPageClient({
               {error}
             </p>
           ) : loading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="directory-results-grid grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"
+                  className="h-[204px] rounded-[17px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"
                 />
               ))}
             </div>
@@ -190,10 +191,15 @@ export function CategoryPageClient({
                         </h3>
                       )}
                       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                        {otherBusinesses.map((biz) => (
+                        {otherBusinesses.slice(0, visibleCount).map((biz) => (
                           <BusinessCard key={biz.id} business={biz} />
                         ))}
                       </div>
+                      {visibleCount < otherBusinesses.length && (
+                        <button type="button" className="directory-load-more" onClick={() => setVisibleCount((count) => count + 12)}>
+                          Show more listings ({otherBusinesses.length - visibleCount} remaining)
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

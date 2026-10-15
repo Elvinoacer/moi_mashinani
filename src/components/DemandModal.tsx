@@ -2,7 +2,9 @@
 import { trackBusinessEvent } from "@/lib/track-business-event";
 import { useState } from "react";
 import Link from "next/link";
-import { ZONES, CATEGORIES } from "@/lib/constants";
+import { ZONES } from "@/lib/constants";
+import { CategorySelect } from "./CategorySelect";
+import { ArrowRight, CheckCircle2, Lightbulb, Plus } from "lucide-react";
 import { ModalFrame } from "./ModalFrame";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
@@ -71,7 +73,10 @@ export function DemandModal({
     <ModalFrame title="Post a comrade request" onClose={onClose}>
       {submitted ? (
         <div className="space-y-4 p-6">
-          <h3 className="text-xl font-bold">Your request is on the board</h3>
+          <div className="flex items-start gap-3 rounded-xl bg-[#edf5e9] p-4 text-[#183e35]">
+            <CheckCircle2 className="mt-0.5 shrink-0 text-[#377a47]" size={24} aria-hidden="true" />
+            <div><h3 className="text-xl font-bold">Your request is live</h3><p className="mt-1 text-sm text-[#456550]">It now appears on the campus request board.</p></div>
+          </div>
           <p>
             Matching verified sellers are notified. The request expires after
             seven days. You can close it sooner from this browser.
@@ -122,82 +127,99 @@ export function DemandModal({
           </Button>
         </div>
       ) : (
-        <form onSubmit={submit} className="space-y-4 p-5">
-          <p className="text-sm">
-            No login needed. Describe the item, budget and when you need it.
-            Keep phone numbers and private details out of the public request.
-          </p>
-          <label className="block text-sm font-semibold">
-            What do you need?
-            <Input
+        <form onSubmit={submit} className="space-y-5 p-5 sm:p-6">
+          <div className="flex items-start gap-3 rounded-xl border border-[#dbe9d7] bg-[#f0f6eb] p-4">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[#315f42]">
+              <Lightbulb size={20} aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <p className="font-bold text-[#1a4033]">A clear request gets better replies.</p>
+              <p className="mt-1 text-sm leading-relaxed text-[#526c5b]">
+                Describe what you need, your budget and when you need it. No account required.
+              </p>
+            </div>
+          </div>
+          <div>
+            <label htmlFor="request-description" className="mb-2 block text-sm font-bold text-[#244638]">
+              Describe what you need <span className="text-[#ab3d2d]">*</span>
+            </label>
+            <textarea
+              id="request-description"
               required
               maxLength={500}
+              rows={3}
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="HP blue-pin charger under KES 1,200 today"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="e.g. Looking for an HP charger under KES 1,200 near Stage today"
+              aria-describedby="request-description-hint"
+              className="min-h-28 w-full resize-y rounded-xl border border-[#bed0bd] bg-white px-3.5 py-3 text-base leading-relaxed text-[#183e35] outline-none placeholder:text-[#7a8d80] focus-visible:border-[#528b5d] focus-visible:ring-2 focus-visible:ring-[#a2c995]/60"
             />
-          </label>
-          <label className="block text-sm font-semibold">
-            Category
-            <select
-              className="ui-input"
-              aria-label="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="">Match by request text</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm font-semibold">
-            Campus zone
-            <select
-              className="ui-input"
-              aria-label="Campus zone"
-              value={zone}
-              onChange={(e) => setZone(e.target.value)}
-            >
-              {ZONES.map((z) => (
-                <option key={z.slug} value={z.slug}>
-                  {z.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm font-semibold">
-            Your WhatsApp (optional)
+            <div id="request-description-hint" className="mt-1 flex flex-wrap items-start justify-between gap-2 text-xs text-[#657a69]">
+              <span>Do not include your phone number or private details here.</span>
+              <span>{query.length}/500</span>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="min-w-0">
+              <p className="mb-2 text-sm font-bold text-[#244638]">Business category <span className="font-normal text-[#728274]">(optional)</span></p>
+              <CategorySelect value={category} onChange={setCategory} className="ui-input min-h-12 bg-white text-sm" />
+            </div>
+            <div className="min-w-0">
+              <label htmlFor="request-zone" className="mb-2 block text-sm font-bold text-[#244638]">
+                Campus area
+              </label>
+              <select
+                id="request-zone"
+                className="ui-input min-h-12 bg-white"
+                value={zone}
+                onChange={(event) => setZone(event.target.value)}
+              >
+                {ZONES.map((z) => (
+                  <option key={z.slug} value={z.slug}>{z.name}</option>
+                ))}
+              </select>
+              <p className="mt-2 text-xs leading-relaxed text-[#657a69]">Choose where you want to find it.</p>
+            </div>
+          </div>
+          <div className="rounded-xl border border-[#e1e9dd] bg-[#fafcf8] p-4">
+            <label htmlFor="request-whatsapp" className="mb-1 block text-sm font-bold text-[#244638]">
+              Your WhatsApp number <span className="font-normal text-[#728274]">(optional)</span>
+            </label>
+            <p className="mb-3 text-xs leading-relaxed text-[#627566]">
+              Only provide this if you want eligible sellers to contact you directly.
+            </p>
             <Input
+              id="request-whatsapp"
               type="tel"
               maxLength={20}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="0712 345 678"
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder="e.g. 0712 345 678"
+              autoComplete="tel"
+              className="min-h-12"
             />
-          </label>
-          {phone && (
-            <label className="flex gap-2 text-sm">
-              <input
-                type="checkbox"
-                required
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-              />
-              Allow active, verified sellers to access my WhatsApp number to
-              answer this request. It stays hidden on the public board.
-            </label>
-          )}
+            {phone && (
+              <label className="mt-3 flex items-start gap-3 rounded-lg bg-white p-3 text-sm leading-relaxed text-[#355546]">
+                <input
+                  type="checkbox"
+                  required
+                  checked={consent}
+                  onChange={(event) => setConsent(event.target.checked)}
+                  className="mt-1 h-5 w-5 shrink-0"
+                />
+                I agree to share this number privately with active, verified sellers responding to my request.
+              </label>
+            )}
+          </div>
           {error && (
             <p role="alert" className="text-red-800">
               {error}
             </p>
           )}
-          <Button type="submit" disabled={busy}>
-            {busy ? "Posting…" : "Post request"}
-          </Button>
+          <div className="flex flex-col-reverse gap-3 border-t border-[#e3ebe0] pt-4 sm:flex-row sm:justify-end">
+            <Button type="button" variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button>
+            <Button type="submit" disabled={busy} className="min-h-12"><Plus size={18} aria-hidden="true" /> {busy ? "Posting request…" : "Publish request"} <ArrowRight size={17} aria-hidden="true" /></Button>
+          </div>
         </form>
       )}
     </ModalFrame>

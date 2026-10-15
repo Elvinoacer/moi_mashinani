@@ -327,39 +327,62 @@ export function BusinessEnrollmentForm({
   }
   if (result)
     return (
-      <Card className="mx-auto max-w-2xl space-y-4">
-        <h2 className="text-2xl font-bold">
-          {result.business.name}: listing saved
+      <Card className="mx-auto max-w-2xl space-y-4 !p-5 sm:!p-7">
+        <span className="inline-flex rounded-full bg-[#edf2e5] px-3 py-1 text-xs font-bold text-[#265740]">
+          Listing submitted
+        </span>
+        <h2 className="text-xl font-extrabold text-[#183e35] sm:text-2xl">
+          {result.business.name} — listing saved
         </h2>
-        <p>
+        <p className="text-sm leading-relaxed text-[#53685b]">
           {result.business.status === "ACTIVE"
-            ? "Your inspected listing is live."
-            : "Your preview is saved for review."}{" "}
-          {signedInOwner
-            ? "Your email account can manage this listing now."
-            : `The owner can accept their invitation at ${details.ownerEmail} and set a password.`}
+            ? "Your listing is live."
+            : "Your listing is saved and awaiting review. We’ll notify the owner about the next steps."}
         </p>
+        {mode === "public" && !signedInOwner ? (
+          <div className="space-y-2 rounded-xl border border-[#dce7d8] bg-[#f2f6ee] p-4">
+            <h3 className="text-sm font-bold text-[#183e35]">Next: Check your email</h3>
+            <p className="break-words text-sm leading-relaxed text-[#4d6757]">
+              {result.invitation.sent
+                ? `We sent a secure account invitation to ${details.ownerEmail}. Open it to set your password and manage your business.`
+                : `Your listing is saved, but we couldn't deliver the invitation to ${details.ownerEmail}. You can request another account email below.`}
+            </p>
+            {result.invitation.sent && (
+              <p className="text-xs text-[#5e7464]">
+                The invitation expires after 24 hours. Check your spam folder if it isn’t in your inbox.
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-[#4f6959]">
+            {signedInOwner
+              ? "You can manage this listing using your signed-in email account."
+              : "The owner will receive an email invitation for account setup."}
+          </p>
+        )}
         {result.business.verificationVisitRequested && (
-          <p>A free verification visit is in the field queue.</p>
+          <p className="text-sm text-[#526d59]">Your request for a free verification visit is in the review queue.</p>
         )}
         {!result.invitation.sent && (
-          <p role="alert">
+          <p role="alert" className="rounded-lg border border-[#f1d0a7] bg-[#fff7e8] p-3 text-sm text-[#805114]">
             {result.invitation.error ||
-              "Invitation delivery unavailable. Your listing is saved; request the email again."}
+              "The email invitation could not be delivered. Your listing is still saved."}
           </p>
         )}
         {details.ownerEmail && !signedInOwner && (
-          <Button
-            disabled={busy}
-            variant="secondary"
-            onClick={() => void resend()}
-          >
-            Resend owner invitation
+          <Button disabled={busy} variant="secondary" onClick={() => void resend()}>
+            {busy ? "Requesting…" : "Request another account email"}
           </Button>
         )}
-        <Link href="/login" className="ui-button ui-button-primary">
-          Go to my account
-        </Link>
+        {(signedInOwner || mode !== "public") ? (
+          <Link href={signedInOwner ? "/dashboard" : "/login"} className="ui-button ui-button-primary">
+            Open my account
+          </Link>
+        ) : (
+          <Link href="/" className="inline-flex min-h-11 items-center text-sm font-bold text-[#265640] underline underline-offset-4">
+            Back to Moi Mashinani
+          </Link>
+        )}
         {(signedInOwner ||
           mode !== "public" ||
           result.business.status === "ACTIVE") && (
@@ -372,12 +395,12 @@ export function BusinessEnrollmentForm({
           </a>
         )}
         {result.business.status === "ACTIVE" && (
-          <Link className="block underline" href={`/b/${result.business.slug}`}>
-            View public page
+          <Link className="block text-sm font-semibold underline underline-offset-4" href={`/b/${result.business.slug}`}>
+            View public listing
           </Link>
         )}
-        {notice && <p role="status">{notice}</p>}
-        {error && <p role="alert">{error}</p>}
+        {notice && <p role="status" className="text-sm text-[#265640]">{notice}</p>}
+        {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
       </Card>
     );
   return (

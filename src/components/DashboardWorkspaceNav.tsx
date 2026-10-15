@@ -91,10 +91,10 @@ export function DashboardWorkspaceNav({
                       aria-current={selected ? "page" : undefined}
                       title={description}
                       className={
-                        "group flex min-h-11 shrink-0 items-center gap-2.5 rounded-xl border px-3 py-2.5 text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#537847] lg:w-full lg:gap-3 " +
+                        "group flex min-h-11 shrink-0 items-center gap-2.5 border-b-2 px-3 py-2.5 text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#537847] lg:w-full lg:gap-3 lg:rounded-lg lg:border-b-0 lg:border-l-[3px] " +
                         (selected
-                          ? "border-[#c6d9a2] bg-[#ecf4db] text-[#1c4434] lg:border-l-[3px] lg:border-l-[#406b45]"
-                          : "border-transparent text-[#55645a] hover:bg-[#f4f7ef] hover:text-[#183e35]")
+                          ? "border-b-[#406b45] bg-[#f5f9ed] text-[#1c4434] lg:border-l-[#406b45] lg:bg-[#ecf4db]"
+                          : "border-b-transparent text-[#55645a] hover:bg-[#f4f7ef] hover:text-[#183e35] lg:border-l-transparent")
                       }
                     >
                       <Icon aria-hidden="true" className="h-[18px] w-[18px] shrink-0" strokeWidth={selected ? 2.4 : 1.8} />

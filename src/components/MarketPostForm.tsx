@@ -2,15 +2,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CATEGORIES, ZONES } from "@/lib/constants";
-import { PhoneSignIn } from "./PhoneSignIn";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
-type Owner = { name: string; phone?: string };
+type Owner = { name: string; email: string };
 export function MarketPostForm() {
   const [owner, setOwner] = useState<Owner | null>(null),
     [loading, setLoading] = useState(true),
     [attempt, setAttempt] = useState(0);
-  const [kind, setKind] = useState("DECLUTTER"),
+  const [contactPhone, setContactPhone] = useState(""),
+    [kind, setKind] = useState("DECLUTTER"),
     [name, setName] = useState(""),
     [price, setPrice] = useState(""),
     [description, setDescription] = useState(""),
@@ -26,31 +26,27 @@ export function MarketPostForm() {
     fetch("/api/auth/me", { signal: controller.signal, cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
-        setOwner(data.user?.phone ? data.user : null);
+        setOwner(data.user?.email ? data.user : null);
         setLoading(false);
       })
       .catch(() => {
         if (!controller.signal.aborted) {
           setLoading(false);
-          setError("Could not check your phone sign-in.");
+          setError("Could not check your account.");
         }
       });
     return () => controller.abort();
   }, [attempt]);
-  if (loading) return <p role="status">Checking your phone sign-in…</p>;
+  if (loading) return <p role="status">Checking your account…</p>;
   if (!owner)
     return (
-      <div className="ui-card">
-        <PhoneSignIn
-          onSignedIn={() => {
-            setLoading(true);
-            setAttempt((n) => n + 1);
-          }}
-        />
-        <p className="mt-3 text-xs">
-          Verify your phone once to manage your listings. Your student ID is
-          checked separately.
-        </p>
+      <div className="ui-card space-y-3">
+        <h2 className="text-xl font-bold">Sign in to post</h2>
+        <p className="text-sm text-[#667064]">Use your verified email and password to manage listings. Your student ID is checked separately.</p>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/login?next=%2Fmarket" className="ui-button ui-button-primary">Sign in</Link>
+          <Link href="/register" className="ui-button ui-button-secondary">Create account</Link>
+        </div>
       </div>
     );
   if (slug)
@@ -87,8 +83,9 @@ export function MarketPostForm() {
             body: JSON.stringify({
               name,
               ownerName: owner.name,
-              phone: owner.phone,
-              whatsapp: owner.phone,
+              ownerEmail: owner.email,
+              phone: contactPhone,
+              whatsapp: contactPhone,
               zone,
               landmark,
               primaryCategory: category,
@@ -120,6 +117,9 @@ export function MarketPostForm() {
       }}
     >
       <h2 className="text-xl font-bold">One item or hostel service</h2>
+      <label className="block">Your WhatsApp or contact number
+        <Input required type="tel" autoComplete="tel" placeholder="0712 345 678" value={contactPhone} onChange={e=>setContactPhone(e.target.value)} />
+      </label>
       <label className="block">
         Listing type
         <select

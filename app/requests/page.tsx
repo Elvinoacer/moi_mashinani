@@ -1,3 +1,4 @@
+import "./requests.css";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -11,10 +12,9 @@ export const metadata: Metadata = {
 };
 export default function RequestsPage() {
   return (
-    <div className="interior-page">
+    <div className="interior-page requests-page">
       <Navbar />
-      <main className="mx-auto max-w-5xl space-y-6 px-4 py-8 pb-24">
-        <h1 className="text-3xl font-bold">Soko: ask the campus</h1>
+      <main className="requests-page mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 sm:pt-10">
         <RequestBoard />
       </main>
       <Footer />

@@ -6,6 +6,8 @@ require.extensions['.css'] = () => ({});
 
 import {
   SITE_URL,
+  SITE_NAME,
+  SITE_ALTERNATE_NAMES,
   CORE_CAMPUS_KEYWORDS,
   CATEGORY_ALIASES,
   getCategorySeoData,
@@ -25,7 +27,10 @@ import sitemap from '../app/sitemap';
 import manifest from '../app/manifest';
 
 test('SEO: Core campus keywords and site configuration', () => {
-  assert.ok(SITE_URL.startsWith('http'), 'SITE_URL is a valid HTTP(S) URL');
+  assert.equal(SITE_URL, 'https://moimashinani.gtss.software', 'Canonical domain is stable');
+  assert.equal(SITE_NAME, 'Moi Mashinani');
+  assert.ok(SITE_ALTERNATE_NAMES.includes('MoiMashinani'));
+  assert.ok(SITE_ALTERNATE_NAMES.includes('Moishanani'));
   assert.ok(CORE_CAMPUS_KEYWORDS.length >= 35, 'Rich array of campus keywords defined');
   assert.ok(CORE_CAMPUS_KEYWORDS.includes('Moi University'), 'Includes Moi University');
   assert.ok(CORE_CAMPUS_KEYWORDS.includes('Kesses'), 'Includes Kesses');
@@ -103,13 +108,16 @@ test('SEO: Structured data generators output valid Schema.org JSON-LD', () => {
   // WebSite schema
   const websiteSchema = generateWebsiteSchema();
   assert.equal(websiteSchema['@type'], 'WebSite');
-  assert.equal(websiteSchema.name, 'MoiMashinani');
+  assert.equal(websiteSchema.name, 'Moi Mashinani');
+  assert.ok(websiteSchema.alternateName.includes('Moishanani'));
+  assert.equal(websiteSchema.url, `${SITE_URL}/`);
   assert.ok(websiteSchema.potentialAction.target.urlTemplate.includes('/search?q='), 'SearchAction properly formed');
 
   // Organization schema
   const orgSchema = generateOrganizationSchema();
   assert.equal(orgSchema['@type'], 'Organization');
-  assert.equal(orgSchema.name, 'MoiMashinani');
+  assert.equal(orgSchema.name, 'Moi Mashinani');
+  assert.equal(orgSchema['@id'], `${SITE_URL}/#organization`);
   assert.ok(orgSchema.logo.includes('/brand/moimashinani-logo.svg'), 'Logo path present');
 
   // Breadcrumb schema
@@ -152,6 +160,7 @@ test('SEO: robots.ts configuration adheres to standards', () => {
   assert.ok(rules.allow?.includes('/c/'), 'Allows /c/');
   assert.ok(rules.allow?.includes('/b/'), 'Allows /b/');
   assert.ok(rules.allow?.includes('/onboard'), 'Allows /onboard');
+  assert.ok(rules.allow?.includes('/about'), 'Allows /about');
   assert.ok(rules.disallow?.includes('/admin/'), 'Disallows /admin/');
 });
 
@@ -160,7 +169,9 @@ test('SEO: sitemap.ts generates complete sitemap with image sitemaps and categor
   assert.ok(sitemapEntries.length > 75, 'Sitemap covers static, groups, categories, and businesses');
 
   const urls = sitemapEntries.map((e) => e.url);
-  assert.ok(urls.some((u) => u === SITE_URL), 'Root homepage in sitemap');
+  assert.ok(urls.some((u) => u === `${SITE_URL}/`), 'Canonical homepage in sitemap');
+  assert.ok(urls.some((u) => u === `${SITE_URL}/about`), 'About Moi Mashinani in sitemap');
+  assert.ok(urls.every((u) => u.startsWith(SITE_URL)), 'All sitemap pages use canonical host');
   assert.ok(urls.some((u) => u.includes('/categories')), '/categories in sitemap');
   assert.ok(urls.some((u) => u.includes('/deals')), '/deals in sitemap');
   assert.ok(urls.some((u) => u.includes('/search')), '/search in sitemap');
@@ -208,6 +219,16 @@ test('SEO: generateMetadata resolves correct metadata on dynamic and static rout
   const missingMeta = await generateCategoryMetadata({ params: Promise.resolve({ category: 'totally-invalid-cat' }) });
   assert.ok(missingMeta.robots && (missingMeta.robots as { index?: boolean }).index === false, 'Invalid category marked noindex');
 
+  // Canonical brand landing pages
+  const { metadata: homeMetadata } = await import('../app/page');
+  assert.ok(typeof homeMetadata.title === 'object' && homeMetadata.title?.absolute?.startsWith('Moi Mashinani'), 'Brand appears at start of homepage title');
+  assert.equal(homeMetadata.alternates?.canonical, '/');
+  const { metadata: aboutMetadata } = await import('../app/about/page');
+  assert.equal(aboutMetadata.alternates?.canonical, '/about');
+  assert.ok((aboutMetadata.description || '').includes('Moi Mashinani'));
+  const { metadata: marketMetadata } = await import('../app/market/page');
+  assert.equal(marketMetadata.alternates?.canonical, '/market', 'Market cannot inherit home canonical');
+
   // Static pages metadata
   const { metadata: categoriesMetadata } = await import('../app/categories/page');
   assert.ok(categoriesMetadata.title, 'Categories page has title');
@@ -225,8 +246,8 @@ test('SEO: generateMetadata resolves correct metadata on dynamic and static rout
 
 test('SEO: app/manifest.ts generates valid web manifest', () => {
   const m = manifest();
-  assert.equal(m.name, 'MoiMashinani — Moi University Campus Business Directory');
-  assert.equal(m.short_name, 'MoiMashinani');
+  assert.equal(m.name, 'Moi Mashinani — Moi University Campus Business Directory');
+  assert.equal(m.short_name, 'Moi Mashinani');
   assert.equal(m.start_url, '/');
   assert.equal(m.display, 'standalone');
   assert.equal(m.theme_color, '#183e35');

@@ -11,12 +11,12 @@ import {
   ChevronDown,
   MapPin,
   MessageCircle,
-  Percent,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
-  Store,
   Tag,
+  Search,
+  X,
 } from "lucide-react";
 import { FlashDeals } from "@/components/FlashDeals";
 import { CampusZonePicker } from "@/components/CampusZonePicker";
@@ -135,6 +135,7 @@ export function DealsPageClient({
 }: DealsPageClientProps) {
   const [zone, setZone] = useCampusZone();
   const [budget, setBudget] = useState(0);
+  const [itemSearch, setItemSearch] = useState("");
   const [shown, setShown] = useState(6);
   const [discountShown, setDiscountShown] = useState(6);
   const [dealBusinesses, setDealBusinesses] = useState<Business[]>(initialDeals ?? []);
@@ -164,8 +165,11 @@ export function DealsPageClient({
     return () => controller.abort();
   }, [initialDeals]);
 
+  const searchText = itemSearch.trim().toLocaleLowerCase();
   const affordable = initialBudget.filter((item) =>
-    inArea(item, zone) && (!budget || item.price <= budget),
+    inArea(item, zone) &&
+    (!budget || item.price <= budget) &&
+    (!searchText || `${item.name} ${item.businessName}`.toLocaleLowerCase().includes(searchText)),
   );
   const discounts = dealBusinesses.filter((item) => inArea(item, zone));
   const activeZone = ZONES.find((item) => item.slug === zone)?.name || "your campus area";
@@ -242,6 +246,23 @@ export function DealsPageClient({
               {affordable.length} {affordable.length === 1 ? "find" : "finds"}
             </span>
           </div>
+          <label className={styles.findSearch}>
+            <Search size={19} aria-hidden="true" />
+            <span className="sr-only">Find an affordable item or seller</span>
+            <input
+              type="search"
+              value={itemSearch}
+              onChange={(event) => { setItemSearch(event.target.value); setShown(6); }}
+              placeholder="Search these finds, e.g. printing, duvet, braids…"
+              autoComplete="off"
+            />
+            {itemSearch && (
+              <button type="button" aria-label="Clear budget item search"
+                onClick={() => { setItemSearch(""); setShown(6); }}>
+                <X size={16} aria-hidden="true" />
+              </button>
+            )}
+          </label>
           {affordable.length > 0 ? (
             <>
               <div className={styles.cardGrid}>
@@ -259,10 +280,10 @@ export function DealsPageClient({
               <span className={styles.zeroIcon}><ShoppingBag size={24} aria-hidden="true" /></span>
               <div>
                 <h3 className={styles.zeroTitle}>No matching budget finds in {zone === "all" ? "the directory" : activeZone} yet.</h3>
-                <p className={styles.zeroText}>Try another price or campus area, or ask local sellers for what you need.</p>
+                <p className={styles.zeroText}>Try another search, price or campus area, or ask local sellers for what you need.</p>
                 <div className={styles.zeroActions}>
-                  {(budget > 0 || zone !== "all") && (
-                    <button type="button" className={styles.textAction} onClick={() => { setBudget(0); changeZone("all"); }}>
+                  {(budget > 0 || zone !== "all" || itemSearch) && (
+                    <button type="button" className={styles.textAction} onClick={() => { setBudget(0); setItemSearch(""); changeZone("all"); }}>
                       Browse all campus finds <ArrowRight size={15} aria-hidden="true" />
                     </button>
                   )}

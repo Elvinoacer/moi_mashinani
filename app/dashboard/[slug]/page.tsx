@@ -648,23 +648,19 @@ function BusinessDashboard({ slug }: { slug: string }) {
             <label className="flex gap-3 text-sm">
               <input
                 type="checkbox"
-                disabled={!!busy || !storageUsage?.smsReady}
+                disabled={!!busy}
                 checked={Boolean(business.requestAlertsEnabled)}
                 onChange={(e) =>
-                  void runAction("sms", () =>
+                  void runAction("email-reminder", () =>
                     patchBusiness({ requestAlertsEnabled: e.target.checked }),
                   )
                 }
               />
-              Send matching requests by SMS to my private owner phone (with
-              my consent).
+              Email me a morning reminder to confirm my shop is open.
             </label>
-            {!storageUsage?.smsReady && (
-              <p className="text-xs">
-                SMS setup is pending. Matching requests still appear in your
-                inbox, email and opted-in push notifications.
-              </p>
-            )}
+            <p className="text-xs text-[#667064]">
+              Customer requests and booking updates also appear in your inbox and email. No SMS charges.
+            </p>
           </section>
           <section className={panelClass}>
             <h2 className="text-xl font-bold">Live campus status</h2>

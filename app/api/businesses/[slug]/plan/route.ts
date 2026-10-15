@@ -1,4 +1,3 @@
-import { smsConfigured } from "@/lib/sms";
 import { NextRequest, NextResponse } from "next/server";
 import { Store } from "@/lib/store";
 import { requireBusinessAccess } from "@/lib/auth";
@@ -22,7 +21,6 @@ export async function GET(
     const pro = hasPro(business);
     return NextResponse.json(
       {
-        smsReady: smsConfigured(),
         ...usage,
         plan: pro ? "PRO" : "FREE",
         productCount: business.services.length,

@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
             path: path!,
             button: "Confirm open now",
           },
-          ["SMS"],
+          ["EMAIL", "PUSH"],
           business.id,
         );
       });

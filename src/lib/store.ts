@@ -1,5 +1,4 @@
 import { createMerchantAction } from "./merchant-actions";
-import { smsConfigured } from "./sms";
 import { computeRelevance } from "./rank";
 import { queueNotice, queueAdmins, listingNotice } from "./notifications";
 import { nextProEnd, productLimitError, PRO_PRICE_KES } from "./catalog-plan";
@@ -1311,13 +1310,7 @@ export const Store = {
               path: actionPath || "/requests",
               button: "Respond to request",
             },
-            [
-              "EMAIL",
-              "PUSH",
-              ...(business.requestAlertsEnabled && smsConfigured()
-                ? ["SMS" as const]
-                : []),
-            ],
+            ["EMAIL", "PUSH"],
             business.id,
           );
         }
@@ -1375,7 +1368,7 @@ export const Store = {
             path: actionPath || `/dashboard/${business.slug}?tab=bookings`,
             button: "Accept & reply on WhatsApp",
           },
-          ["EMAIL", "PUSH", ...(smsConfigured() ? ["SMS" as const] : [])],
+          ["EMAIL", "PUSH"],
           business.id,
         );
         await queueAdmins(tx, `booking/${id}`, {

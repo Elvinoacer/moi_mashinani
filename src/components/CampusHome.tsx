@@ -254,6 +254,59 @@ export function CampusHome({
           </div>
         </div>
       </section>
+      <section className="space-y-4" aria-label="Nearby businesses">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold" aria-live="polite">
+            {intent === "open"
+              ? "Open right now"
+              : intent === "delivery"
+                ? "Delivering to hostels"
+                : intent === "hostels"
+                  ? "Verified vacant kejas · no broker fee"
+                  : intent === "backup"
+                    ? "Live backup power in your zone"
+                    : intent === "wifi"
+                      ? "Live Wi-Fi in your zone"
+                      : intent === "water"
+                        ? "Water available in your zone"
+                        : intent === "late"
+                          ? "Shops open past 9 PM & night bodas"
+                          : intent === "free-delivery"
+                            ? "Free delivery to your zone"
+                            : intent === "comrade"
+                              ? "Verified comrade sellers"
+                              : "Nearby prices & sellers"}
+          </h2>
+          <Link
+            className="text-sm underline"
+            href={`/search?zone=${zone}&survival=${intent}${intent === "open" ? "&availableNow=true" : intent === "delivery" ? "&delivery=true" : intent === "hostels" ? "&category=hostels-rooms" : ""}`}
+          >
+            See all
+          </Link>
+        </div>
+        {ranked.length ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {ranked.map(({ business, effectiveTier }) => (
+              <BusinessCard
+                key={business.id}
+                business={business}
+                effectiveTier={effectiveTier}
+              />
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <p>No listings match this area and filter yet. Try another area or clear the filter.</p>
+            {intent !== "all" && <Button variant="secondary" onClick={() => setIntent("all")} className="mt-3 mr-2">Clear filter</Button>}
+            <Button onClick={() => setPost(true)} className="mt-3">
+              Ask sellers for what you need
+            </Button>
+            <Link className="ml-3 underline" href="/search">
+              Explore campus
+            </Link>
+          </Card>
+        )}
+      </section>
       <section className="ui-card space-y-3">
         <h2 className="text-2xl font-bold">
           {now ? context.title : "Your campus pulse"}
@@ -300,58 +353,6 @@ export function CampusHome({
           </div>
         </section>
       )}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">
-            {intent === "open"
-              ? "Open right now"
-              : intent === "delivery"
-                ? "Delivering to hostels"
-                : intent === "hostels"
-                  ? "Verified vacant kejas · no broker fee"
-                  : intent === "backup"
-                    ? "Live backup power in your zone"
-                    : intent === "wifi"
-                      ? "Live Wi-Fi in your zone"
-                      : intent === "water"
-                        ? "Water available in your zone"
-                        : intent === "late"
-                          ? "Shops open past 9 PM & night bodas"
-                          : intent === "free-delivery"
-                            ? "Free delivery to your zone"
-                            : intent === "comrade"
-                              ? "Verified comrade sellers"
-                              : "Nearby prices & sellers"}
-          </h2>
-          <Link
-            className="text-sm underline"
-            href={`/search?zone=${zone}&survival=${intent}${intent === "open" ? "&availableNow=true" : intent === "delivery" ? "&delivery=true" : intent === "hostels" ? "&category=hostels-rooms" : ""}`}
-          >
-            See all
-          </Link>
-        </div>
-        {ranked.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ranked.map(({ business, effectiveTier }) => (
-              <BusinessCard
-                key={business.id}
-                business={business}
-                effectiveTier={effectiveTier}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <p>No matching listings in this zone yet.</p>
-            <Button onClick={() => setPost(true)} className="mt-3">
-              Ask sellers for what you need
-            </Button>
-            <Link className="ml-3 underline" href="/search">
-              Explore campus
-            </Link>
-          </Card>
-        )}
-      </section>
       <RequestBoard compact />
       <details className="ui-card">
         <summary className="cursor-pointer text-lg font-bold">

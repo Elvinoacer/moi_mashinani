@@ -9,15 +9,20 @@ import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
 import { generateWebsiteSchema, generateOrganizationSchema, safeJsonLd, SITE_NAME } from "@/lib/seo";
 export const metadata: Metadata = {
-  title: { absolute: "Moi Mashinani | Find Businesses & Services Near Moi University" },
+  title: { absolute: "Moi Mashinani | Businesses Around Moi University, Kesses" },
   description:
-    "Discover Moi Mashinani, the campus business directory for Moi University in Kesses. Find food, hostels, bedsitters, phone repairs, printing, salons and student services nearby. Compare prices and contact sellers directly.",
-  keywords: ["Moi Mashinani", "MoiMashinani", "moimashinani", "moishanani"],
+    "Find businesses around Moi University with Moi Mashinani. Explore shops, hostels, food, printing, repairs and student services in Kesses. Compare listings and contact sellers directly.",
+  keywords: [
+    "Moi Mashinani", "MoiMashinani", "moimashinani", "moishanani",
+    "Moi University businesses", "businesses around Moi University",
+    "shops near Moi University", "services near Moi University",
+    "Moi University business directory", "Kesses businesses",
+  ],
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Moi Mashinani | Campus Businesses & Services in Kesses",
+    title: "Moi Mashinani | Businesses Around Moi University",
     description:
-      "Find local shops, food, hostels, repairs, printing and student services around Moi University on Moi Mashinani.",
+      "Discover businesses near Moi University Main Campus in Kesses: shops, hostels, food, repairs, printing and student services.",
     url: "/",
     siteName: SITE_NAME,
     type: "website",

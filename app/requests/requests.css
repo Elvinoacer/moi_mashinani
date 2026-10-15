@@ -180,6 +180,7 @@
   font-weight: 500;
 }
 .requests-search-box input::placeholder { color: #718174; opacity: 1; }
+.requests-search-box input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 .requests-clear-input {
   display: grid;
   place-items: center;

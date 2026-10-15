@@ -429,7 +429,7 @@ export function SearchContent() {
           </section>
         )}
 
-        {/* ZERO RESULTS / DEMAND CAPTURE */
+        {/* ZERO RESULTS / DEMAND CAPTURE */}
         {!fetching && !error && results.length === 0 && (
           <div className="bg-white signboard-border signboard-shadow rounded-2xl p-8 sm:p-12 text-center max-w-xl mx-auto space-y-4">
             <div className="w-14 h-14 bg-[#e9eedf] rounded-full flex items-center justify-center mx-auto text-[#758071]">

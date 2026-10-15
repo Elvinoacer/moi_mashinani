@@ -66,9 +66,7 @@ function VerificationForm() {
       {token ? (
         <>
           <p className="text-sm text-[#667064]">
-            Set a password to complete account setup and sign in. Use at least
-            12 characters. If this invitation adds a business to an existing
-            account, enter your existing password instead.
+            Enter the password you chose at signup to confirm your email. If you received a business invitation or password-reset link, set a password instead. Use at least 12 characters. For another business added to an existing account, enter your current password.
           </p>
           <form onSubmit={verify} className="space-y-4">
             <PasswordField

@@ -13,11 +13,14 @@ import {
 } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'All Business Categories & Campus Services | Moi University (Kesses)',
+  title: 'Businesses Around Moi University | Browse by Category',
   description:
-    'Explore 65 categories of businesses and services around Moi University Main Campus (Kesses): food, kibandas, hostels, bedsitters, phone repairs, kinyozi salons, printing, and fundis.',
+    'Explore businesses around Moi University in Kesses by category. Browse food spots, hostels, shops, salons, printing, phone repairs and other campus services.',
   keywords: [
     'campus categories',
+    'businesses around Moi University',
+    'Moi University businesses',
+    'shops near Moi University',
     'Moi University directory',
     'student services Kesses',
     'business categories Moi',
@@ -28,11 +31,11 @@ export const metadata: Metadata = {
     canonical: '/categories',
   },
   openGraph: {
-    title: 'All Business Categories & Campus Services | Moi University (Kesses)',
+    title: 'Businesses Around Moi University | Browse by Category',
     description:
       'Explore 65 categories of businesses and student services around Moi University Main Campus (Kesses).',
     url: '/categories',
-    siteName: 'MoiMashinani',
+    siteName: 'Moi Mashinani',
     type: 'website',
   },
   twitter: {
@@ -90,10 +93,10 @@ export default function CategoriesPage() {
 
         <div>
           <h1 className="text-3xl md:text-4xl font-display font-black text-[#243b32] uppercase tracking-tight">
-            What do you need around campus?
+            Explore businesses around Moi University
           </h1>
           <p className="mt-2 text-[#667064] max-w-2xl text-sm md:text-base">
-            Explore {CATEGORIES.length} business types in {CATEGORY_GROUPS.length} groups across Moi University (Kesses), from daily student essentials to specialist fundis.
+            Looking for shops or services near Moi University Main Campus? Browse {CATEGORIES.length} business types in {CATEGORY_GROUPS.length} groups around Kesses, from everyday student essentials to local fundis.
           </p>
         </div>
 

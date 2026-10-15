@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { PhoneSignIn } from "./PhoneSignIn";
 import { ZONES } from "@/lib/constants";
 import { EnrollmentCategoryPicker } from "./EnrollmentCategoryPicker";
 import { PhotoUploader } from "./PhotoUploader";
@@ -43,11 +42,11 @@ export function BusinessEnrollmentForm({
   mode?: "admin" | "public" | "field";
   onEnrolled?: () => void;
 }) {
-  const [phoneOwner, setPhoneOwner] = useState<{
+  const [signedInOwner, setSignedInOwner] = useState<{
     name: string;
-    phone: string;
+    email: string;
+    phone?: string;
   } | null>(null);
-  const [authAttempt, setAuthAttempt] = useState(0);
   const [step, setStep] = useState(1);
   const stepNavRef = useRef<HTMLElement>(null);
   const [itemQuery, setItemQuery] = useState("");
@@ -77,19 +76,20 @@ export function BusinessEnrollmentForm({
     fetch("/api/auth/me", { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
-        if (data.user?.phone) {
-          setPhoneOwner(data.user);
+        if (data.user?.email) {
+          setSignedInOwner(data.user);
           setDetails((d) => ({
             ...d,
             ownerName: data.user.name,
-            ownerPhone: data.user.phone,
-            phone: d.phone || data.user.phone,
+            ownerEmail: data.user.email,
+            ownerPhone: data.user.phone || d.ownerPhone,
+            phone: d.phone || data.user.phone || "",
           }));
         }
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [mode, authAttempt]);
+  }, [mode]);
   const draftKey = "mm-enrollment-v3-" + mode;
   function field(key: keyof Details, label: string, type = "text") {
     return (
@@ -115,12 +115,10 @@ export function BusinessEnrollmentForm({
       !details.name.trim() ||
       !details.primaryCategory ||
       !details.ownerName.trim() ||
-      (!phoneOwner &&
-        mode === "public" &&
-        !/^\S+@\S+\.\S+$/.test(details.ownerEmail))
+      (!signedInOwner && !/^\S+@\S+\.\S+$/.test(details.ownerEmail))
     )
       throw new Error(
-        "Add the business name, category, owner name and a recovery email.",
+        "Add the business name, category, owner name and a valid owner email.",
       );
     if (
       !/^254[17]\d{8}$/.test(
@@ -337,11 +335,9 @@ export function BusinessEnrollmentForm({
           {result.business.status === "ACTIVE"
             ? "Your inspected listing is live."
             : "Your preview is saved for review."}{" "}
-          {phoneOwner
-            ? "Your phone account can manage this listing now."
-            : details.ownerEmail
-              ? `Accept the owner invitation at ${details.ownerEmail}, or verify your owner phone by SMS.`
-              : "The owner can verify their phone by SMS to manage this listing."}
+          {signedInOwner
+            ? "Your email account can manage this listing now."
+            : `The owner can accept their invitation at ${details.ownerEmail} and set a password.`}
         </p>
         {result.business.verificationVisitRequested && (
           <p>A free verification visit is in the field queue.</p>
@@ -352,7 +348,7 @@ export function BusinessEnrollmentForm({
               "Invitation delivery unavailable. Your listing is saved; request the email again."}
           </p>
         )}
-        {details.ownerEmail && !phoneOwner && (
+        {details.ownerEmail && !signedInOwner && (
           <Button
             disabled={busy}
             variant="secondary"
@@ -364,7 +360,7 @@ export function BusinessEnrollmentForm({
         <Link href="/login" className="ui-button ui-button-primary">
           Go to my account
         </Link>
-        {(phoneOwner ||
+        {(signedInOwner ||
           mode !== "public" ||
           result.business.status === "ACTIVE") && (
           <a
@@ -386,9 +382,14 @@ export function BusinessEnrollmentForm({
     );
   return (
     <>
-      {mode === "public" && !phoneOwner && (
-        <Card className="mx-auto max-w-3xl">
-          <PhoneSignIn onSignedIn={() => setAuthAttempt((n) => n + 1)} />
+      {mode === "public" && !signedInOwner && (
+        <Card className="mx-auto max-w-3xl space-y-3 !p-4 sm:!p-5">
+          <p className="text-sm font-semibold text-[#183e35]">Already have an account?</p>
+          <p className="text-sm text-[#667064]">Sign in with email and password to manage your listing immediately. Or continue below and accept the email invitation afterwards.</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/login?next=%2Fonboard" className="ui-button ui-button-primary">Sign in</Link>
+            <Link href="/register" className="ui-button ui-button-secondary">Create an account</Link>
+          </div>
         </Card>
       )}
       <form onSubmit={submit} className="mx-auto max-w-3xl space-y-5">
@@ -487,23 +488,19 @@ export function BusinessEnrollmentForm({
                 </select>
               </label>
               {field("ownerName", "Owner name")}
-              {!phoneOwner &&
-                field(
-                  "ownerEmail",
-                  mode === "public"
-                    ? "Recovery email (or sign in by phone above)"
-                    : "Owner email (optional for SMS setup)",
-                  "email",
-                )}
+              {signedInOwner ? (
+                <div className="min-w-0 space-y-1 text-sm">
+                  <span className="font-semibold">Verified owner email</span>
+                  <p className="break-all rounded-xl bg-[#edf2e5] p-3 text-[#183e35]">{signedInOwner.email}</p>
+                </div>
+              ) : field("ownerEmail", "Owner email (required)", "email")}
             </div>
             <p className="text-xs">
-              Your email is used once to accept ownership and set a password,
-              and for account recovery. Then sign in using your owner phone and
-              password.
+              Use email to accept the invitation, verify ownership and recover your account. Sign in with email and password.
             </p>
             <details>
               <summary className="cursor-pointer font-semibold">
-                Separate private owner phone
+                Private owner phone (optional contact detail)
               </summary>
               {field("ownerPhone", "Private owner phone (if different)", "tel")}
             </details>

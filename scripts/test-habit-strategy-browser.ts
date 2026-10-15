@@ -16,7 +16,6 @@ async function main() {
   );
   const { prisma } = await import("../src/lib/prisma");
   const { createMerchantAction } = await import("../src/lib/merchant-actions");
-  const { requestPhoneCode } = await import("../src/lib/phone-auth");
   const dropTitle = `Browser dinner drop ${randomUUID().slice(0, 8)}`;
   const seededDrop = await fetch(fixture.base + "/api/deals", {
     method: "POST",
@@ -201,30 +200,12 @@ async function main() {
     console.log(
       "PASS unauthenticated action confirms open status once and rejects replay",
     );
-    let code = "";
-    const phone = `+25471${Math.floor(1000000 + Math.random() * 8999999)}`;
-    const challengeId = await requestPhoneCode(
-      phone,
-      "Browser student",
-      async (_phone, message) => {
-        code = message.match(/\d{6}/)![0];
-      },
-    );
-    await guest.route("**/api/auth/phone/request", (route) =>
-      route.fulfill({
-        contentType: "application/json",
-        body: JSON.stringify({ challengeId, expiresIn: 300 }),
-      }),
-    );
     await page.goto("/login");
-    await page.getByLabel("Your phone", { exact: true }).fill(phone);
-    await page.getByRole("button", { name: "Send SMS code" }).click();
-    await page.getByLabel("SMS code", { exact: true }).fill(code);
-    await page.getByRole("button", { name: "Verify & sign in" }).click();
+    await page.getByLabel("Email address").fill(fixture.studentEmail);
+    await page.getByLabel("Password", { exact: true }).fill(fixture.studentPassword);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await page.waitForURL("**/dashboard");
-    console.log(
-      "PASS SMS-code UI establishes a real account session through the verify endpoint",
-    );
+    console.log("PASS email and password sign in establishes an authenticated merchant session");
     await page.goto("/market");
     await page
       .getByRole("button", { name: "Post a hustle or declutter item" })
@@ -232,6 +213,7 @@ async function main() {
     await expect(
       page.getByRole("heading", { name: "One item or hostel service" }),
     ).toBeVisible();
+    await page.getByLabel("Your WhatsApp or contact number").fill("0712345678");
     await page
       .getByLabel("Item or service name")
       .fill(`Browser declutter ${randomUUID().slice(0, 8)}`);

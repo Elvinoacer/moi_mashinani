@@ -227,8 +227,6 @@ export function DealsPageClient({
           </div>
         </section>
 
-        <FlashDeals compact={false} quietWhenEmpty maxPrice={budget} hideBudgetFilters />
-
         <section aria-labelledby="budget-finds-heading">
           <div className={styles.headingRow}>
             <div>
@@ -274,6 +272,8 @@ export function DealsPageClient({
             </div>
           )}
         </section>
+
+        <FlashDeals compact={false} quietWhenEmpty maxPrice={budget} hideBudgetFilters />
 
         {(dealLoading || dealError || discounts.length > 0) && (
           <section aria-labelledby="student-offers-heading">

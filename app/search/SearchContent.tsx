@@ -7,7 +7,6 @@ import {
   Activity,
   Bike,
   House,
-  MapPin,
   Moon,
   ShieldCheck,
   Tag,
@@ -17,6 +16,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
 import { BusinessCard } from "@/components/BusinessCard";
+import { CampusZonePicker } from "@/components/CampusZonePicker";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
 import { DemandModal } from "@/components/DemandModal";
 import { CATEGORIES, ZONES } from "@/lib/constants";
@@ -61,6 +61,8 @@ export function SearchContent() {
   const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
   const [resultKey, setResultKey] = useState<string | null>(null);
+  const [budgetInput, setBudgetInput] = useState<{ current: string; draft: string } | null>(null);
+  const budgetDraft = budgetInput?.current === maxPriceParam ? budgetInput.draft : maxPriceParam;
   const [pageView, setPageView] = useState({ key: "", count: 12 });
   const filterKey = searchParams.toString();
   const visibleCount = pageView.key === filterKey ? pageView.count : 12;
@@ -156,7 +158,7 @@ export function SearchContent() {
           <form
             onSubmit={handleSearchSubmit}
             role="search"
-            className="directory-search-form"
+            className="directory-search-form relative"
           >
             <Search className="w-5 h-5 text-[#758071] absolute left-4" />
             <input
@@ -195,46 +197,36 @@ export function SearchContent() {
             <div className="directory-filter-panel">
           {/* CHIPS ROW (ZONES & TOGGLES) */}
           <div className="flex flex-wrap items-center gap-2 pt-2">
-            {/* Zones Dropdown */}
-            <label className="inline-flex items-center gap-1.5 rounded-lg border border-[#dfe5d8] bg-[#f7f8f2] px-3 text-[#243b32]">
-              <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-              <select
-                aria-label="Campus zone"
-                value={zoneParam}
-                onChange={(e) => updateFilters({ zone: e.target.value })}
-                className="min-w-0 bg-transparent py-1.5 text-xs font-bold focus:outline-none"
-              >
-                {ZONES.map((z) => (
-                  <option key={z.slug} value={z.slug}>
-                    {z.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {/* Searchable location filter; floating results do not shift the listing grid. */}
+            <div className="min-w-[220px] max-w-xs flex-1">
+              <CampusZonePicker value={zoneParam} onChange={(value) => updateFilters({ zone: value })} />
+            </div>
 
             {/* Category Select */}
-            <div className="w-48">
+            <div className="min-w-[200px] flex-1 sm:flex-none">
               <CategorySelect
                 value={categoryParam}
                 onChange={(cat) => updateFilters({ category: cat })}
               />
             </div>
 
-            <label className="text-xs font-bold">
-              Budget cap · KES
-              <input
-                className="ui-input w-28"
-                type="number"
-                min="0"
-                value={maxPriceParam}
-                aria-label="Maximum price"
-                onChange={(e) =>
-                  updateFilters({ maxPrice: e.target.value || null })
-                }
-              />
-            </label>
+            <form className="min-w-[190px] flex-1 sm:flex-none" onSubmit={(event) => {
+              event.preventDefault();
+              updateFilters({ maxPrice: budgetDraft.trim() || null });
+              setBudgetInput(null);
+            }}>
+              <label htmlFor="directory-budget" className="mb-1 block text-xs font-bold">Price up to · KES</label>
+              <div className="flex items-center gap-2">
+                <input id="directory-budget" className="ui-input min-w-0 w-32" type="number"
+                  min="0" step="1" inputMode="numeric" value={budgetDraft}
+                  placeholder="Any"
+                  onChange={(event) => setBudgetInput({current: maxPriceParam, draft: event.target.value})} />
+                <button className="directory-budget-apply" type="submit">Apply</button>
+              </div>
+            </form>
             <button
               className="directory-filter-chip"
+              type="button"
               aria-pressed={deliveryParam}
               onClick={() =>
                 updateFilters({ delivery: deliveryParam ? null : "true" })
@@ -250,6 +242,7 @@ export function SearchContent() {
                   availableNow: availableNowParam ? null : "true",
                 })
               }
+              aria-pressed={availableNowParam}
               className={`directory-filter-chip ${
                 availableNowParam
                   ? "bg-[#183e35] text-white border-[#183e35]"
@@ -265,6 +258,7 @@ export function SearchContent() {
               onClick={() =>
                 updateFilters({ verified: verifiedParam ? null : "true" })
               }
+              aria-pressed={verifiedParam}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 verifiedParam
                   ? "bg-[#183e35] text-white border-[#183e35]"
@@ -283,6 +277,7 @@ export function SearchContent() {
               onClick={() =>
                 updateFilters({ discount: discountParam ? null : "true" })
               }
+              aria-pressed={discountParam}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
                 discountParam
                   ? "bg-[#183e35] text-white border-[#183e35]"

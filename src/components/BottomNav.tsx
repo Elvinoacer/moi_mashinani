@@ -7,40 +7,29 @@ import { Compass, House, MessageCircle, Percent, Store } from "lucide-react";
 const items = [
   { href: "/", label: "Home", icon: House },
   { href: "/search", label: "Explore", icon: Compass },
-  { href: "/requests", label: "Requests", icon: MessageCircle, primary: true },
+  { href: "/requests", label: "Requests", icon: MessageCircle },
   { href: "/deals", label: "Deals", icon: Percent },
   { href: "/market", label: "Market", icon: Store },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
-  if (
-    /^\/(b\/|onboard|promote\/|pro\/|ambassador|admin|login|verify|dashboard\/)/.test(
-      pathname,
-    )
-  )
+  if (/^\/(b\/|onboard|promote\/|pro\/|ambassador|admin|login|verify|dashboard\/)/.test(pathname))
     return null;
+
   return (
     <nav
-      aria-label="Mobile quick navigation"
-      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around gap-1 border-t border-[#dbe3ce] bg-[#f7f8f2]/95 px-2 pb-[calc(9px+env(safe-area-inset-bottom))] pt-2 shadow-[0_-5px_20px_#243b3207] backdrop-blur md:hidden"
+      aria-label="Primary mobile navigation"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-[#d9e4d6] bg-[#f8faf5]/97 px-1 pt-1.5 pb-[calc(7px+env(safe-area-inset-bottom))] shadow-[0_-9px_26px_#243b320d] backdrop-blur-md md:hidden"
     >
-      {items.map(({ href, label, icon: Icon, primary }) => {
-        const active =
-          href === "/" ? pathname === "/" : pathname.startsWith(href);
+      {items.map(({ href, label, icon: Icon }) => {
+        const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
         return (
-          <Link
-            key={href}
-            href={href}
-            aria-current={active ? "page" : undefined}
-            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-1 text-[10px] font-semibold ${primary ? "text-[#183e35]" : active ? "text-[#183e35]" : "text-[#667064]"}`}
-          >
-            <span
-              className={`grid h-9 w-10 place-items-center rounded-xl transition-colors ${primary ? "bg-[#183e35] text-[#d9f279]" : active ? "bg-[#e9eedf] text-[#335e41]" : "text-[#667064]"}`}
-            >
-              <Icon size={19} strokeWidth={1.9} />
-            </span>
-            <span>{label}</span>
+          <Link key={href} href={href} aria-current={active ? "page" : undefined}
+            className={`relative flex min-h-[61px] min-w-0 flex-col items-center justify-center gap-1 rounded-md px-0.5 text-center text-[11px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#467550] ${active ? "text-[#183e35]" : "text-[#66766c] hover:text-[#245744]"}`}>
+            <Icon size={21} strokeWidth={active ? 2.45 : 1.8} aria-hidden="true" />
+            <span className="truncate max-w-full">{label}</span>
+            <span aria-hidden="true" className={`absolute bottom-[2px] h-[3px] w-5 rounded-full bg-[#315f42] transition-[opacity,transform] duration-200 ${active ? "scale-100 opacity-100" : "scale-75 opacity-0"}`} />
           </Link>
         );
       })}

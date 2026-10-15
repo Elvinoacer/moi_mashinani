@@ -1,0 +1,41 @@
+
+.section { display: grid; gap: 14px; min-width: 0; }
+.heading { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+.kicker { display: inline-flex; gap: 6px; align-items: center; font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; color: #98751d; margin-bottom: 5px; }
+.title { font-size: clamp(21px,3vw,28px); font-weight: 850; letter-spacing: -.03em; line-height: 1.15; color: #193e34; }
+.description { font-size: 13px; line-height: 1.5; color: #64766a; margin-top: 5px; }
+.seeAll { min-height: 44px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: #28563f; font-size: 12px; font-weight: 850; text-decoration: underline; text-underline-offset: 3px; }
+.budgetFilters { display: flex; gap: 8px; flex-wrap: wrap; }
+.budgetFilters button { display: inline-flex; min-height: 42px; justify-content: center; align-items: center; padding: 8px 13px; border: 1px solid #d5e2d0; border-radius: 999px; background: #fff; color: #355a46; font-size: 12px; font-weight: 800; transition: background-color .18s ease; }
+.budgetFilters button[aria-pressed="true"] { background: #183e35; color: white; border-color: #183e35; }
+.grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.card { min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 15px; border: 1px solid #e4e4d3; border-radius: 17px; background: #fffef9; box-shadow: 0 4px 14px #283b2e0d; transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease; }
+.cardTop { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; }
+.timer { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 7px; background: #fff1c6; color: #775218; font-size: 11px; font-weight: 850; }
+.ad { font-size: 10px; font-weight: 800; color: #886326; }
+.cardName { font-size: 16px; font-weight: 850; line-height: 1.35; color: #1c4032; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.price { font-size: 21px; font-weight: 900; line-height: 1.15; letter-spacing: -.035em; color: #224c37; }
+.seller { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; width: fit-content; max-width: 100%; color: #3d7551; font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.dropDetail { font-size: 12px; color: #5e6f61; line-height: 1.55; }
+.dropDetail strong { color: #285342; font-weight: 850; }
+.cardFooter { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: auto; padding-top: 10px; border-top: 1px solid #efeddd; }
+.action { display: inline-flex; flex: 1; gap: 7px; align-items: center; justify-content: center; min-height: 44px; border: 0; border-radius: 10px; padding: 10px; background: #183e35; color: #fff; font-size: 12px; font-weight: 850; text-align: center; transition: background-color .2s ease; }
+.action:hover { background: #315c48; }
+.action:disabled { opacity: .55; cursor: wait; }
+.view { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 9px 11px; border: 1px solid #d8e2d0; border-radius: 9px; font-size: 11px; font-weight: 800; color: #305844; }
+.view:hover { background: #edf2e7; }
+.error { padding: 11px 14px; border-radius: 10px; background: #fff3ee; color: #8e3834; font-size: 12px; line-height: 1.45; }
+.empty { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; border: 1px solid #e3e8dc; border-radius: 14px; background: #fff; padding: 14px; color: #5f7163; font-size: 13px; }
+.empty a, .handoff { color: #246342; font-size: 12px; font-weight: 850; text-decoration: underline; text-underline-offset: 3px; }
+.disclaimer { font-size: 11px; line-height: 1.6; color: #64736a; }
+.card:focus-within { border-color: #9eba95; }
+:where(.section) :is(a,button):focus-visible { outline: 3px solid #4e8154; outline-offset: 3px; }
+@media (hover:hover) { .card:hover { transform: translateY(-2px); box-shadow: 0 11px 27px #1d36291a; border-color: #d3d5b0; } }
+@media(max-width:930px) { .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:640px) {
+  .grid { grid-template-columns: minmax(0,1fr); gap: 10px; }
+  .card { padding: 13px; }
+  .title { font-size: 22px; }
+  .heading { align-items: start; }
+}
+@media(prefers-reduced-motion:reduce) { .card,.action,.budgetFilters button { animation: none!important; transition: none!important; transform: none!important; } }

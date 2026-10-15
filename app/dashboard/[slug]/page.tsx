@@ -118,24 +118,10 @@ function BusinessDashboard({ slug }: { slug: string }) {
   const [busy, setBusy] = useState("");
   const [liveStatus, setLiveStatus] = useState("");
   const requestedTab = searchParams.get("tab");
-  const [tabSelection, setTabSelection] = useState<{
-    query: string | null;
-    tab: Tab;
-  }>({
-    query: requestedTab,
-    tab: tabs.includes(requestedTab as Tab)
-      ? (requestedTab as Tab)
-      : "overview",
-  });
-  const activeTab =
-    tabSelection.query === requestedTab
-      ? tabSelection.tab
-      : tabs.includes(requestedTab as Tab)
-        ? (requestedTab as Tab)
-        : "overview";
-  function setActiveTab(tab: Tab) {
-    setTabSelection({ query: requestedTab, tab });
-  }
+  // The URL is the single source of truth, including browser Back/Forward.
+  const activeTab: Tab = tabs.includes(requestedTab as Tab)
+    ? (requestedTab as Tab)
+    : "overview";
   const [draft, setDraft] = useState({
     name: "",
     tagline: "",
@@ -637,7 +623,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
         </p>
       )}
       <div className="grid min-w-0 items-start gap-5 lg:grid-cols-[245px_minmax(0,1fr)] lg:gap-7">
-        <DashboardWorkspaceNav slug={business.slug} activeTab={activeTab} pendingBookings={pendingBookings} onNavigate={(next) => { setActiveTab(next); setError(""); setNotice(""); }} />
+        <DashboardWorkspaceNav slug={business.slug} activeTab={activeTab} pendingBookings={pendingBookings} onNavigate={() => { setError(""); setNotice(""); }} />
         <div className="min-w-0 space-y-5">
           <header className="flex flex-wrap items-end justify-between gap-3 px-1">
             <div>
@@ -648,12 +634,12 @@ function BusinessDashboard({ slug }: { slug: string }) {
           </header>
           {activeTab === "overview" && (
             <section aria-label="Quick actions" className="grid gap-3 sm:grid-cols-3">
-              <Link href={"/dashboard/" + business.slug + "?tab=bookings"} scroll={false} onClick={() => setActiveTab("bookings")} className="rounded-2xl border border-[#d9e7cb] bg-[#eaf3db] p-4 transition-colors hover:bg-[#deedca]">
+              <Link href={"/dashboard/" + business.slug + "?tab=bookings"} scroll={false} className="rounded-2xl border border-[#d9e7cb] bg-[#eaf3db] p-4 transition-colors hover:bg-[#deedca]">
                 <p className="text-xs font-semibold text-[#43624a]">Requests to handle</p>
                 <p className="mt-1 text-3xl font-extrabold text-[#204834]">{openBookings}</p>
                 <p className="mt-2 text-xs font-bold text-[#315d41]">View bookings →</p>
               </Link>
-              <Link href={"/dashboard/" + business.slug + "?tab=services"} scroll={false} onClick={() => setActiveTab("services")} className="rounded-2xl border border-[#e0e8dd] bg-white p-4 transition-colors hover:bg-[#f5f8f1]">
+              <Link href={"/dashboard/" + business.slug + "?tab=services"} scroll={false} className="rounded-2xl border border-[#e0e8dd] bg-white p-4 transition-colors hover:bg-[#f5f8f1]">
                 <p className="text-xs font-semibold text-[#65746a]">Catalogue items</p>
                 <p className="mt-1 text-3xl font-extrabold text-[#204834]">{business.services.length}</p>
                 <p className="mt-2 text-xs font-bold text-[#315d41]">Edit prices & stock →</p>

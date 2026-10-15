@@ -61,6 +61,7 @@ export function SearchContent() {
   const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
   const [resultKey, setResultKey] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
   const [budgetInput, setBudgetInput] = useState<{ current: string; draft: string } | null>(null);
   const budgetDraft = budgetInput?.current === maxPriceParam ? budgetInput.draft : maxPriceParam;
   const [pageView, setPageView] = useState({ key: "", count: 12 });
@@ -100,9 +101,10 @@ export function SearchContent() {
         }
       });
     return () => controller.abort();
-  }, [searchParams]);
+  }, [searchParams, retry]);
 
   const updateFilters = (newParams: Record<string, string | null>) => {
+    setError("");
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([k, v]) => {
       if (v === null || v === "" || v === "all") params.delete(k);
@@ -382,7 +384,7 @@ export function SearchContent() {
               {error}
             </h3>
             <button
-              onClick={() => updateFilters({})}
+              onClick={() => { setLoading(true); setError(""); setRetry((value) => value + 1); }}
               className="text-xs bg-[#243b32] text-white px-4 py-2 rounded-full uppercase font-bold"
             >
               Retry Search

@@ -991,20 +991,35 @@ function BusinessDashboard({ slug }: { slug: string }) {
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
           </div>
-          <p className="text-sm text-[#667064]">
-            Contact the customer to agree on the appointment before confirming a
-            request.
-          </p>
+          <p className="text-sm leading-relaxed text-[#667064]">Contact the customer to agree on the appointment before confirming a request. Status changes are saved immediately.</p>
+          <div className="grid gap-3 rounded-xl border border-[#e4eadf] bg-[#f8faf5] p-3 sm:grid-cols-[minmax(0,1fr)_190px] sm:items-end">
+            <label className="block text-xs font-bold text-[#334d3b]">
+              Search bookings
+              <input type="search" value={bookingQuery} onChange={(event) => setBookingQuery(event.target.value)} placeholder="Customer, service or phone" className={inputClass} />
+            </label>
+            <label className="block text-xs font-bold text-[#334d3b]">
+              Show requests
+              <select value={bookingFilter} onChange={(event) => setBookingFilter(event.target.value as typeof bookingFilter)} className={inputClass}>
+                <option value="OPEN">Open (new & confirmed)</option>
+                <option value="NEW">New only</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="ALL">All requests</option>
+              </select>
+            </label>
+          </div>
+          <p aria-live="polite" className="text-xs text-[#647267]">Showing {visibleBookings.length} of {bookings.length} requests. {pendingBookings} new.</p>
           {bookingError ? (
             <p role="alert" className="text-sm text-[#a7302d]">
               {bookingError}
             </p>
-          ) : !bookings.length ? (
-            <p className="text-sm text-[#667064]">No booking requests yet.</p>
+          ) : !visibleBookings.length ? (
+            <p className="rounded-xl border border-dashed border-[#d8e2d5] bg-[#f8faf5] p-5 text-sm text-[#667064]">{bookings.length ? "No requests match these filters. Try another status or search." : "No booking requests yet. New customer requests will appear here."}</p>
           ) : (
             <div className="divide-y divide-[#dfe5d8]">
-              {bookings.map((booking) => (
-                <article key={booking.id} className="space-y-2 py-4">
+              {visibleBookings.map((booking) => (
+                <article key={booking.id} className="space-y-2 py-3.5">
                   <div className="flex flex-wrap justify-between gap-2">
                     <div>
                       <h3 className="font-bold">{booking.serviceName}</h3>

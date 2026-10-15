@@ -55,5 +55,6 @@ jobs:
           npm run test:onboarding:uploads
           npm run test:engine
           npm run test:mail
+          npm run test:seo
       - name: Production build
         run: npm run build

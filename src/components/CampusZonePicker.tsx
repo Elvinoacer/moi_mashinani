@@ -104,13 +104,15 @@ export function CampusZonePicker({ value, onChange, disabled = false }: CampusZo
           </div>
           <div id={listId} role="listbox" aria-label="Campus areas" className="campus-zone-options">
             {results.length ? results.map((zone, index) => (
-              <div
+              <button
+                type="button"
                 key={zone.slug}
                 id={`${listId}-option-${zone.slug}`}
                 role="option"
                 aria-selected={zone.slug === selected.slug}
                 className={`campus-zone-option ${index === active ? "campus-zone-option-active" : ""}`}
                 onMouseDown={(event) => event.preventDefault()}
+                onMouseEnter={() => setActive(index)}
                 onClick={() => choose(zone.slug)}
               >
                 <span className="min-w-0">
@@ -118,7 +120,7 @@ export function CampusZonePicker({ value, onChange, disabled = false }: CampusZo
                   <small>{zone.landmarkHint}</small>
                 </span>
                 {zone.slug === selected.slug && <Check size={18} aria-hidden="true" />}
-              </div>
+              </button>
             )) : <p className="campus-zone-empty" role="status">No matching area. Try another landmark or choose All Kesses.</p>}
           </div>
           <p className="campus-zone-keyboard">Type to filter · Use ↑ ↓ and Enter to choose</p>

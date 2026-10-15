@@ -170,11 +170,11 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
           <div className="requests-filters" role="search" aria-label="Search campus requests">
             <div className="requests-filters-heading">
               <h2>Explore requests</h2>
-              <p>Search by need, or narrow the board to a campus area. Results update as you type.</p>
+              <p>Filter posts by keyword or campus area. Searching never publishes a request.</p>
             </div>
             <div className="request-board-toolbar">
               <div className="requests-search-field">
-                <label className="requests-field-label" htmlFor="requests-search-input">What are you looking for?</label>
+                <label className="requests-field-label" htmlFor="requests-search-input">Search existing requests</label>
                 <div className="requests-search-box">
                   <Search size={20} aria-hidden="true" />
                   <input
@@ -182,7 +182,7 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
                     type="search"
                     value={keyword}
                     autoComplete="off"
-                    placeholder="Search e.g. charger, bedsitter, fundi"
+                    placeholder="e.g. charger, bedsitter, fundi"
                     onChange={(event) => { setKeyword(event.target.value); setShowCount(8); }}
                   />
                   {keyword && (
@@ -317,6 +317,7 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
       {post && (
         <DemandModal
           initialZone={zone}
+          initialQuery={keyword}
           onClose={() => setPost(false)}
           onPosted={() => setRefresh((r) => r + 1)}
         />

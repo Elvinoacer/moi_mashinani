@@ -64,12 +64,12 @@ export function FlashDeals({
   );
   return (
     <section
-      className="space-y-4"
+      className="space-y-3"
       aria-label="Daily flash deals and delivery drops"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-2xl font-bold">
-          Daily flash deals & delivery drops
+        <h2 className="text-xl sm:text-2xl font-bold">
+          Today’s campus deals
         </h2>
         {compact && (
           <Link href="/deals" className="underline">
@@ -77,7 +77,7 @@ export function FlashDeals({
           </Link>
         )}
       </div>
-      <div className="flex flex-wrap gap-2" aria-label="Deal budget">
+      {!compact && <div className="directory-deal-budgets flex flex-wrap gap-2" role="group" aria-label="Deal budget">
         {[
           [0, "Any budget"],
           [100, "Under KES 100"],
@@ -92,8 +92,8 @@ export function FlashDeals({
             {label}
           </Button>
         ))}
-      </div>
-      {error && <p role="alert">{error}</p>}
+      </div>}
+      {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
       {handoff && (
         <a
           href={handoff}
@@ -104,23 +104,23 @@ export function FlashDeals({
         </a>
       )}
       {filtered.length ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="directory-results-grid grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, compact ? 3 : 100).map((d) => (
-            <article key={d.id} className="ui-card space-y-3">
+            <article key={d.id} className="directory-deal-card space-y-2.5">
               {d.sponsored && (
-                <p className="text-xs font-bold">Promoted deal</p>
+                <p className="directory-deal-sponsored text-xs font-bold">Promoted · Ad</p>
               )}
-              <p className="text-xs font-bold">{countdown(d.endsAt, now)}</p>
-              <h3 className="text-lg font-bold">{d.title}</h3>
-              <p className="text-xl font-bold">
+              <p className="directory-deal-time text-xs font-bold">{countdown(d.endsAt, now)}</p>
+              <h3 className="line-clamp-2 text-sm sm:text-base font-extrabold">{d.title}</h3>
+              <p className="directory-deal-price text-lg font-extrabold">
                 KES {d.priceKes.toLocaleString("en-KE")}
               </p>
-              <Link href={`/b/${d.slug}`} className="text-sm underline">
+              <Link href={`/b/${d.slug}`} className="block truncate text-xs font-semibold text-[#2f6146] underline">
                 {d.businessName}
               </Link>
               {d.dropZone && d.dropAt ? (
                 <>
-                  <p className="text-sm">
+                  <p className="directory-deal-detail text-xs">
                     Batch delivery to{" "}
                     {ZONES.find((z) => z.slug === d.dropZone)?.name ||
                       d.dropZone}{" "}
@@ -132,7 +132,7 @@ export function FlashDeals({
                     })}{" "}
                     EAT
                   </p>
-                  <p className="text-sm font-bold">
+                  <p className="directory-deal-detail text-xs font-semibold">
                     {d.deliveryFeeKes === 0
                       ? "Free zone delivery"
                       : `Delivery KES ${d.deliveryFeeKes}`}{" "}
@@ -191,7 +191,7 @@ export function FlashDeals({
         </div>
       ) : (
         <div className="ui-card">
-          <p>
+          <p className="text-sm">
             {now === 0
               ? "Loading today’s deals…"
               : "No active drops match your zone and budget yet."}
@@ -201,10 +201,10 @@ export function FlashDeals({
           </Link>
         </div>
       )}
-      <p className="text-xs">
+      {!compact && <p className="text-xs">
         Joining records interest. Send your order in WhatsApp; the seller
         confirms stock and delivery. Budgets include any listed delivery fee.
-      </p>
+      </p>}
     </section>
   );
 }

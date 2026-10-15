@@ -221,7 +221,7 @@ test('SEO: generateMetadata resolves correct metadata on dynamic and static rout
 
   // Canonical brand landing pages
   const { metadata: homeMetadata } = await import('../app/page');
-  assert.ok(typeof homeMetadata.title === 'object' && homeMetadata.title?.absolute?.startsWith('Moi Mashinani'), 'Brand appears at start of homepage title');
+  assert.ok(typeof homeMetadata.title === 'object' && (homeMetadata.title as { absolute?: string })?.absolute?.startsWith('Moi Mashinani'), 'Brand appears at start of homepage title');
   assert.equal(homeMetadata.alternates?.canonical, '/');
   const { metadata: aboutMetadata } = await import('../app/about/page');
   assert.equal(aboutMetadata.alternates?.canonical, '/about');

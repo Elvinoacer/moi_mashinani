@@ -5,7 +5,7 @@ The current two-step flow, hostel-seller evidence and field roles are documented
 # Business enrollment and accounts
 ## Guided enrollment
 
-`/onboard`, `/admin/enroll` and the appointed ambassador field tool share two steps: **Essentials & prices → Preview & trust**. The first step collects the business name, category, WhatsApp, campus zone, owner name and recovery email, with an optional separate private owner phone. Owners select three to five core items and enter prices. Category templates suggest names, not prices or unverified claims. Prices can be edited later in the merchant dashboard.
+`/onboard`, `/admin/enroll` and the appointed ambassador field tool share two steps: **Essentials & prices → Preview & trust**. The first step collects the business name, category, WhatsApp, campus zone, owner name and a required owner email, with an optional separate contact phone. Owners select three to five core items and enter prices. Category templates suggest names, not prices or unverified claims. Prices can be edited later in the merchant dashboard.
 
 The second step previews the actual items and prices, collects a landmark or safe hostel meeting point, offers hours presets and delivery, and lets the seller upload public shop/product photos or request a free field visit. Comrade sellers upload a private student ID plus a public product/workspace photo, or request an in-person identity check. A trust badge is awarded from evidence, independently of paid plans.
 
@@ -15,7 +15,7 @@ Public gallery uploads before invitation acceptance use `/api/enrollment/media` 
 
 Private student IDs use `/api/enrollment/proof`, separate PostgreSQL storage and authenticated, uncached retrieval. They never become public gallery URLs. Owners and admins can review them; appointed field workers can review a business’s ID while an authorized visit is pending. Abandoned staged proof is removed after the 24-hour window by plan maintenance. Attached evidence remains private and is removed when replaced or when the listing is deleted.
 
-Drafts stay in the current tab for 24 hours. An active staging cookie is required to attach restored images. Listing submission is online; owners accept the email invitation once to set a password, then may sign in with their private owner phone. Email links remain recovery.
+Drafts stay in the current tab for 24 hours. An active staging cookie is required to attach restored images. Listing submission is online; owners accept their email invitation to set a password, or sign up first with email and password, verify their inbox, then enroll while signed in. Phone and WhatsApp numbers remain contact details, not credentials.
 
 ## Operator flow
 
@@ -36,7 +36,7 @@ Account verification accepts only the business named in that invitation: generic
 
 See [production setup](production.md) for the Neon pooled/direct connections, reference-only production seed and readiness checks. A new production database needs `npm run db:migrate` followed by `npm run seed:production`; do not run the demo seed against production.
 
-Copy `.env.example` to your environment and supply `DATABASE_URL`, `APP_URL`, `RESEND_API_KEY` and `EMAIL_FROM`. Use a sender whose domain is verified in Resend. All email requests use the Resend HTTPS API. `APP_URL` must be the public HTTPS origin for email/payment return links.
+Copy `.env.example` to your environment and supply `DATABASE_URL`, `APP_URL`, `RESEND_API_KEY` and `EMAIL_FROM`. SMS is no longer used for sign-in, invitations, or notices. Email delivery must be configured for new signups. Use a sender whose domain is verified in Resend. All email requests use the Resend HTTPS API. `APP_URL` must be the public HTTPS origin for email/payment return links.
 
 Configure the server-only `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT` and `R2_PUBLIC_URL`. Set `R2_KEY_PREFIX=moimashinani` to keep this app’s media separate in the shared `gtss` bucket. New image keys are `moimashinani/photos/<account-id>/<uuid>.webp`. `NEXT_PUBLIC_R2_PUBLIC_URL` may mirror the public URL; credentials must never use the `NEXT_PUBLIC_` prefix. Enable public reads for the configured URL. Uploads go through the authenticated app server, so browser upload CORS rules are unnecessary. Missing R2 configuration returns 503; failed writes return 502 and attempt to remove partial uploads.
 

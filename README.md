@@ -36,3 +36,8 @@ The [isolated workflow harness](docs/onboarding.md#testing) runs PostgreSQL, HTT
 See the [verification record](docs/verification.md) for tested workflows and the remaining external-service setup.
 
 See [catalogue plans](docs/catalog-plans.md) for free unlimited catalogues, visibility plans, storage accounting and manual monthly renewal.
+
+
+### Email-first accounts
+
+Owners register at `/register` using email and a password (12–128 characters), then confirm their email using a one-use link. Sign in at `/login` or request a password reset by email. An administrator can invite an owner to claim a listing by email. Business telephone/WhatsApp numbers are only for customer contact; SMS codes and SMS notifications have been retired. The app needs `APP_URL`, `RESEND_API_KEY`, and `EMAIL_FROM` set to a verified sending domain. Existing phone-only accounts require verified email migration by an administrator before using the new sign-in flow.

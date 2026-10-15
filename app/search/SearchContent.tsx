@@ -60,6 +60,11 @@ export function SearchContent() {
   const [loading, setLoading] = useState(true);
   const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
+  const [resultKey, setResultKey] = useState<string | null>(null);
+  const [pageView, setPageView] = useState({ key: "", count: 12 });
+  const filterKey = searchParams.toString();
+  const visibleCount = pageView.key === filterKey ? pageView.count : 12;
+  const fetching = loading || resultKey !== filterKey;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -76,12 +81,14 @@ export function SearchContent() {
       .then((data) => {
         if (!controller.signal.aborted) {
           setResults(data.results || []);
+          setResultKey(params.toString());
           setError("");
           setLoading(false);
         }
       })
       .catch((err) => {
         if (!controller.signal.aborted) {
+          setResultKey(params.toString());
           setError(
             err instanceof Error
               ? err.message
@@ -131,7 +138,7 @@ export function SearchContent() {
     <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20 md:pb-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-5 pb-32 md:pb-12">
         {/* Breadcrumb Navigation */}
         <nav
           aria-label="Breadcrumb"
@@ -144,33 +151,12 @@ export function SearchContent() {
           <span className="text-[#243b32]">Search Directory</span>
         </nav>
 
-        <div
-          className="flex flex-wrap gap-2"
-          aria-label="Campus survival filters"
-        >
-          {SURVIVAL_FILTERS.map(({ value, label, icon: Icon }) => (
-            <button
-              key={value}
-              type="button"
-              className="ui-button ui-button-secondary"
-              aria-pressed={searchParams.get("survival") === value}
-              onClick={() =>
-                updateFilters({
-                  survival:
-                    searchParams.get("survival") === value ? null : value,
-                })
-              }
-            >
-              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {label}
-            </button>
-          ))}
-        </div>
         {/* SEARCH BAR & QUICK FILTERS HERO */}
         <section className="bg-white signboard-border signboard-shadow-sm rounded-2xl p-4 sm:p-6 space-y-4">
           <form
             onSubmit={handleSearchSubmit}
-            className="relative flex items-center"
+            role="search"
+            className="directory-search-form"
           >
             <Search className="w-5 h-5 text-[#758071] absolute left-4" />
             <input
@@ -181,7 +167,7 @@ export function SearchContent() {
               }
               aria-label="Search products or services"
               placeholder="Search phone repair, chapo, salon, cyber, kibanda..."
-              className="w-full pl-12 pr-24 py-3 bg-[#f7f8f2] border border-[#dfe5d8] rounded-xl text-[#243b32] text-sm md:text-base font-body focus:outline-none focus:ring-2 focus:ring-[#183e35]"
+              className="directory-query-input w-full min-w-0 pl-11 pr-4 py-3.5 bg-[#f7f8f2] border border-[#dfe5d8] rounded-xl text-[#243b32] text-base font-body focus:outline-none focus:ring-2 focus:ring-[#183e35]"
             />
             {searchInput && (
               <button
@@ -190,21 +176,25 @@ export function SearchContent() {
                   setSearchDraft({ query: queryParam, text: "" });
                   updateFilters({ q: "" });
                 }}
-                className="absolute right-20 text-xs text-[#758071] hover:text-[#243b32]"
+                className="directory-query-clear text-sm text-[#43614e] hover:underline"
               >
                 Clear
               </button>
             )}
             <button
               type="submit"
-              className="absolute right-2 bg-[#243b32] text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-tight hover:bg-[#183e35] transition"
+              className="directory-query-submit bg-[#243b32] text-white px-5 py-3 rounded-lg text-sm font-bold hover:bg-[#183e35] transition-colors"
             >
               Search
             </button>
           </form>
 
+
+          <details className="directory-filter-disclosure" open={hasActiveFilters ? true : undefined}>
+            <summary className="directory-filter-toggle">Refine results <span className="directory-filter-toggle-hint">Area, category, budget & more filters</span></summary>
+            <div className="directory-filter-panel">
           {/* CHIPS ROW (ZONES & TOGGLES) */}
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#dfe5d8]">
+          <div className="flex flex-wrap items-center gap-2 pt-2">
             {/* Zones Dropdown */}
             <label className="inline-flex items-center gap-1.5 rounded-lg border border-[#dfe5d8] bg-[#f7f8f2] px-3 text-[#243b32]">
               <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -244,7 +234,7 @@ export function SearchContent() {
               />
             </label>
             <button
-              className="ui-button ui-button-secondary"
+              className="directory-filter-chip"
               aria-pressed={deliveryParam}
               onClick={() =>
                 updateFilters({ delivery: deliveryParam ? null : "true" })
@@ -260,7 +250,7 @@ export function SearchContent() {
                   availableNow: availableNowParam ? null : "true",
                 })
               }
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${
+              className={`directory-filter-chip ${
                 availableNowParam
                   ? "bg-[#183e35] text-white border-[#183e35]"
                   : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
@@ -313,14 +303,40 @@ export function SearchContent() {
               </button>
             )}
           </div>
+
+        <div
+          className="flex flex-wrap gap-2"
+          aria-label="Campus survival filters"
+        >
+          {SURVIVAL_FILTERS.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              className="directory-filter-chip"
+              aria-pressed={searchParams.get("survival") === value}
+              onClick={() =>
+                updateFilters({
+                  survival:
+                    searchParams.get("survival") === value ? null : value,
+                })
+              }
+            >
+              <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+            </div>
+          </details>
         </section>
 
         {/* RESULTS HEADER & SORTING */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h1 className="font-display font-black text-xl md:text-2xl text-[#243b32] uppercase tracking-tight">
-              {loading ? (
-                "Searching campus directory..."
+            <h1 className="font-display font-extrabold text-xl md:text-2xl text-[#243b32] tracking-tight">
+              {fetching ? (
+                "Finding matching businesses…"
               ) : (
                 <>
                   {results.length}{" "}
@@ -336,11 +352,12 @@ export function SearchContent() {
           </div>
 
           <div className="flex items-center gap-3 self-end sm:self-auto text-xs">
-            <span className="text-[#667064]">Sort by:</span>
+            <label htmlFor="directory-sort" className="text-[#667064]">Sort by</label>
             <select
+              id="directory-sort"
               value={sortParam}
               onChange={(e) => updateFilters({ sort: e.target.value })}
-              className="bg-white border border-[#dfe5d8] rounded-lg px-2.5 py-1 font-bold text-[#243b32] focus:outline-none"
+              className="min-h-11 max-w-[205px] bg-white border border-[#dfe5d8] rounded-lg px-2.5 py-1 font-bold text-[#243b32] focus-visible:outline-2 focus-visible:outline-[#335e41]"
             >
               <option value="best_match">Recommended & Best Match</option>
               <option value="price">
@@ -363,7 +380,7 @@ export function SearchContent() {
         </div>
 
         {/* ERROR STATE */}
-        {error && (
+        {!fetching && error && (
           <div className="bg-white signboard-border rounded-xl p-6 text-center space-y-3">
             <AlertCircle className="w-8 h-8 text-[#a7302d] mx-auto" />
             <h3 className="font-display font-bold text-base text-[#243b32]">
@@ -379,21 +396,23 @@ export function SearchContent() {
         )}
 
         {/* LOADING SKELETON */}
-        {loading && !error && (
+        {fetching && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="h-[465px] rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"
+                className="h-[205px] rounded-[17px] border border-[#e1e7dc] bg-[#e9eedf] animate-pulse"
               />
             ))}
           </div>
         )}
 
         {/* RESULTS GRID */}
-        {!loading && !error && results.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {results.map((biz) => (
+        {!fetching && !error && results.length > 0 && (
+          <section aria-label="Matching business listings" className="space-y-3">
+            <p role="status" className="text-xs text-[#667064]">Showing {Math.min(visibleCount, results.length)} of {results.length} listings</p>
+            <div className="directory-results-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {results.slice(0, visibleCount).map((biz) => (
               <BusinessCard
                 key={biz.id}
                 business={biz}
@@ -401,11 +420,17 @@ export function SearchContent() {
                 effectiveTier={biz.effectiveTier}
               />
             ))}
-          </div>
+            </div>
+            {visibleCount < results.length && (
+              <button type="button" className="directory-load-more" onClick={() => setPageView({key: filterKey, count: visibleCount + 12})}>
+                Show more businesses ({results.length - visibleCount} remaining)
+              </button>
+            )}
+          </section>
         )}
 
-        {/* ZERO RESULTS / DEMAND CAPTURE */}
-        {!loading && !error && results.length === 0 && (
+        {/* ZERO RESULTS / DEMAND CAPTURE */
+        {!fetching && !error && results.length === 0 && (
           <div className="bg-white signboard-border signboard-shadow rounded-2xl p-8 sm:p-12 text-center max-w-xl mx-auto space-y-4">
             <div className="w-14 h-14 bg-[#e9eedf] rounded-full flex items-center justify-center mx-auto text-[#758071]">
               <Search className="w-7 h-7" />

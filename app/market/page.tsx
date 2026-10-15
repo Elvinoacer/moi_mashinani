@@ -9,7 +9,15 @@ import { BottomNav } from "@/components/BottomNav";
 export const metadata = {
   title: "Comrade Market — Student Hustles & Declutter",
   description:
-    "Verified Moi student sellers, hostel services and second-hand campus essentials. Post a student hustle or declutter item for free.",
+    "Find student sellers, second-hand goods and campus services in Moi Mashinani's Comrade Market around Moi University in Kesses.",
+  alternates: { canonical: "/market" },
+  openGraph: {
+    title: "Comrade Market | Moi Mashinani",
+    description: "Browse campus hustles, student sellers, second-hand goods and local services around Moi University.",
+    url: "/market",
+    siteName: "Moi Mashinani",
+    type: "website" as const,
+  },
 };
 export default async function MarketPage() {
   await connection();

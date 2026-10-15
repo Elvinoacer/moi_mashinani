@@ -1,312 +1,344 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BadgeCheck,
+  Check,
+  ChevronDown,
+  MapPin,
+  MessageCircle,
+  Percent,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Store,
+  Tag,
+} from "lucide-react";
 import { FlashDeals } from "@/components/FlashDeals";
-import { ZONES } from "@/lib/constants";
-import { useCampusZone } from "@/lib/useCampusZone";
+import { CampusZonePicker } from "@/components/CampusZonePicker";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
-import { Business } from "@/lib/types";
 import { BusinessCard } from "@/components/BusinessCard";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
-import { CheckCircle2, Tag, ShieldCheck } from "@/components/icons";
+import { ZONES } from "@/lib/constants";
+import { useCampusZone } from "@/lib/useCampusZone";
+import { whatsappUrl } from "@/lib/whatsapp";
+import { trackBusinessEvent } from "@/lib/track-business-event";
+import type { Business } from "@/lib/types";
+import styles from "./deals.module.css";
+
+type BudgetPick = {
+  id: string;
+  serviceId: string;
+  businessId: string;
+  name: string;
+  price: number;
+  businessName: string;
+  slug: string;
+  zone: string;
+  servesZones: string[];
+  whatsapp: string;
+  photo: string;
+  verified: boolean;
+};
 
 interface DealsPageClientProps {
   initialDeals?: Business[];
-  initialBudget?: Array<{
-    id: string;
-    name: string;
-    price: number;
-    businessName: string;
-    slug: string;
-    zone: string;
-  }>;
+  initialBudget?: BudgetPick[];
+}
+
+const budgetOptions = [
+  { value: 0, label: "All finds" },
+  { value: 100, label: "KES 100 or less" },
+  { value: 200, label: "KES 200 or less" },
+] as const;
+
+function inArea(
+  item: { zone: string; servesZones?: string[] },
+  zone: string,
+) {
+  return zone === "all" || item.zone === zone || Boolean(item.servesZones?.includes(zone));
+}
+
+function BudgetFindCard({ item }: { item: BudgetPick }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const zoneName = ZONES.find((area) => area.slug === item.zone)?.name || item.zone.replaceAll("-", " ");
+  const itemUrl = `/b/${item.slug}#service-${encodeURIComponent(item.serviceId)}`;
+  const contactUrl = whatsappUrl(item.whatsapp,
+    `Hi ${item.businessName}! I saw ${item.name} from KES ${item.price.toLocaleString("en-KE")} on Moi Mashinani. Is it available, and can you confirm the final price?`);
+  return (
+    <article className={styles.findCard}>
+      <div className={styles.findMain}>
+        <Link href={itemUrl} className={styles.findMedia} aria-label={`View ${item.name} from ${item.businessName}`}>
+          {item.photo && !imageFailed ? (
+            <Image
+              src={item.photo}
+              alt=""
+              fill
+              sizes="(max-width: 660px) 86px, 92px"
+              unoptimized
+              onError={() => setImageFailed(true)}
+            />
+          ) : (
+            <ShoppingBag size={30} strokeWidth={1.55} aria-hidden="true" />
+          )}
+        </Link>
+        <div className={styles.findInfo}>
+          <p className={styles.findCategory}>
+            {item.verified ? <BadgeCheck size={13} aria-hidden="true" /> : <Tag size={12} aria-hidden="true" />}
+            {item.verified ? "Seller verified" : "Seller-listed price"}
+          </p>
+          <h3 className={styles.findName}>{item.name}</h3>
+          <p className={styles.findPrice}>
+            <span className={styles.findPriceLabel}>{item.price === 0 ? "Listed as" : "From"}</span>
+            <strong>{item.price === 0 ? "Free" : `KES ${item.price.toLocaleString("en-KE")}`}</strong>
+          </p>
+        </div>
+      </div>
+      <p className={styles.findSeller} title={`${item.businessName} · ${zoneName}`}>
+        <MapPin size={14} aria-hidden="true" />
+        <span>{item.businessName} · {zoneName}</span>
+      </p>
+      <div className={styles.findFooter}>
+        <Link className={styles.viewAction} href={itemUrl}>
+          View item <ArrowUpRight size={15} aria-hidden="true" />
+        </Link>
+        {contactUrl ? (
+          <a
+            className={styles.contactAction}
+            href={contactUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Ask ${item.businessName} about ${item.name} on WhatsApp`}
+            onClick={() => trackBusinessEvent(item.businessId, "whatsapp")}
+          >
+            <MessageCircle size={16} aria-hidden="true" /> Ask seller
+          </a>
+        ) : (
+          <Link className={styles.contactAction} href={itemUrl}>
+            Check seller <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        )}
+      </div>
+    </article>
+  );
 }
 
 export function DealsPageClient({
   initialDeals,
   initialBudget = [],
 }: DealsPageClientProps) {
-  const [dealBusinesses, setDealBusinesses] = useState<Business[]>(
-    initialDeals ?? [],
-  );
-  const [dealLoading, setDealLoading] = useState(initialDeals === undefined);
   const [zone, setZone] = useCampusZone();
-  const [error, setError] = useState("");
+  const [budget, setBudget] = useState(0);
+  const [shown, setShown] = useState(6);
+  const [discountShown, setDiscountShown] = useState(6);
+  const [dealBusinesses, setDealBusinesses] = useState<Business[]>(initialDeals ?? []);
+  const [dealLoading, setDealLoading] = useState(initialDeals === undefined);
+  const [dealError, setDealError] = useState("");
 
   useEffect(() => {
     if (initialDeals !== undefined) return;
-
     const controller = new AbortController();
     fetch("/api/businesses?discount=true", { signal: controller.signal })
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok)
-          throw new Error(
-            data.error || "Could not load student deals. Please reload.",
-          );
+        if (!response.ok) throw new Error(data.error || "Unable to load student discounts.");
         return data;
       })
       .then((data) => {
+        if (!controller.signal.aborted) setDealBusinesses(data.results || []);
+      })
+      .catch((error: unknown) => {
         if (!controller.signal.aborted) {
-          setDealBusinesses(data.results || []);
-          setDealLoading(false);
+          setDealError(error instanceof Error ? error.message : "Unable to load student discounts.");
         }
       })
-      .catch((cause) => {
-        if (!controller.signal.aborted) {
-          setError(
-            cause instanceof Error
-              ? cause.message
-              : "Connection error. Please reload.",
-          );
-          setDealLoading(false);
-        }
+      .finally(() => {
+        if (!controller.signal.aborted) setDealLoading(false);
       });
     return () => controller.abort();
   }, [initialDeals]);
 
+  const affordable = initialBudget.filter((item) =>
+    inArea(item, zone) && (!budget || item.price <= budget),
+  );
+  const discounts = dealBusinesses.filter((item) => inArea(item, zone));
+  const activeZone = ZONES.find((item) => item.slug === zone)?.name || "your campus area";
+
+  function changeZone(value: string) {
+    setZone(value);
+    setShown(6);
+    setDiscountShown(6);
+  }
+
+  function changeBudget(value: number) {
+    setBudget(value);
+    setShown(6);
+  }
+
   return (
-    <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
+    <div className={`interior-page ${styles.page}`}>
       <Navbar />
-
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pb-20 md:pb-12">
-        <label className="block font-bold">
-          Your delivery zone
-          <select
-            aria-label="Your delivery zone"
-            className="ui-input"
-            value={zone}
-            onChange={(e) => setZone(e.target.value)}
-          >
-            {ZONES.map((z) => (
-              <option key={z.slug} value={z.slug}>
-                {z.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <FlashDeals />
-        {dealBusinesses.length < 6 && (
-          <section className="space-y-3">
-            <h2 className="text-2xl font-bold">
-              Budget comrade picks under KES 300
-            </h2>
-            <p className="text-sm">
-              Everyday listed prices. Confirm the current price and availability
-              with the seller.
+      <main className={styles.main}>
+        <section className={styles.hero} aria-labelledby="deals-heading">
+          <div className={styles.heroContent}>
+            <p className={styles.kicker}>
+              <Sparkles size={15} aria-hidden="true" /> Moi University · Kesses
             </p>
-            {initialBudget.length ? (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {initialBudget.map((item) => (
-                  <Link
-                    className="ui-card"
-                    href={`/b/${item.slug}`}
-                    key={item.id}
-                  >
-                    <h3 className="font-bold">{item.name}</h3>
-                    <p className="my-2 text-lg font-bold">
-                      KES {item.price.toLocaleString("en-KE")}
-                    </p>
-                    <p className="text-sm">
-                      {item.businessName} · {item.zone.replaceAll("-", " ")}
-                    </p>
-                    <span className="mt-3 inline-block text-sm underline">
-                      View prices →
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="ui-card">
-                <p>Help us find your next budget pick.</p>
-                <Link
-                  className="ui-button ui-button-primary mt-3"
-                  href="/requests"
-                >
-                  Post your budget request
-                </Link>
-              </div>
-            )}
-          </section>
-        )}
-        {/* Header Banner */}
-        <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase mb-3"
-          >
-            <Link href="/" className="hover:underline">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-[#243b32]">Student Deals</span>
-          </nav>
-
-          <div className="inline-flex items-center gap-1.5 bg-[#e9eedf] text-[#526936] text-xs font-display font-bold px-3 py-1 rounded-full border border-[#dfe5d8] mb-3">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>DAILY COMRADE DEALS & DROPS</span>
+            <h1 className={styles.heroTitle} id="deals-heading">
+              Better deals.<br /><span>Less wandering.</span>
+            </h1>
+            <p className={styles.heroText}>
+              Find low-priced campus essentials, student offers and delivery drops.
+              See the listed price, find a seller and reach them directly.
+            </p>
+            <div className={styles.heroFoot}>
+              <span><Check size={15} aria-hidden="true" /> Compare local prices</span>
+              <span><MessageCircle size={15} aria-hidden="true" /> Contact sellers directly</span>
+            </div>
           </div>
-          <h1 className="font-display font-black text-3xl md:text-5xl text-[#243b32] uppercase tracking-tight">
-            Today’s Campus Deals
-          </h1>
-          <p className="text-sm md:text-base text-[#667064] mt-2 max-w-2xl leading-relaxed font-body">
-            Moi University student discounts, safety tips for hiring campus
-            fundis, and what our listing and verification levels mean.
-          </p>
         </section>
 
-        {/* ACTIVE STUDENT DEALS GRID */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight flex items-center gap-2">
-              <Tag className="w-6 h-6 text-[#526936]" />
-              <span>Active Student Discounts</span>
-            </h2>
-            <span className="text-xs text-[#667064]">
-              Show Student ID to claim
+        <section className={styles.filterBar} aria-label="Find deals near you">
+          <div className={styles.zoneBlock}>
+            <CampusZonePicker value={zone} onChange={changeZone} />
+          </div>
+          <div className={styles.budgetBlock}>
+            <span className={styles.filterLabel} id="deal-price-filter-label">Filter by item price</span>
+            <div className={styles.budgetRail} role="group" aria-labelledby="deal-price-filter-label">
+              {budgetOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={budget === option.value}
+                  className={styles.budgetPill}
+                  onClick={() => changeBudget(option.value)}
+                >
+                  {budget === option.value && <Check size={14} strokeWidth={3} aria-hidden="true" />}
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <FlashDeals compact={false} quietWhenEmpty maxPrice={budget} hideBudgetFilters />
+
+        <section aria-labelledby="budget-finds-heading">
+          <div className={styles.headingRow}>
+            <div>
+              <p className={styles.eyebrow}>Affordable around campus</p>
+              <h2 className={styles.sectionTitle} id="budget-finds-heading">
+                Everyday budget finds
+              </h2>
+              <p className={styles.sectionSub}>
+                {budget ? `Listed from KES ${budget} or less` : "Listed from KES 300 or less"} · Ask sellers to confirm prices and stock.
+              </p>
+            </div>
+            <span className={styles.sectionCount} role="status">
+              {affordable.length} {affordable.length === 1 ? "find" : "finds"}
             </span>
           </div>
-
-          {error ? (
-            <p
-              role="alert"
-              className="rounded-xl bg-white p-5 text-sm text-[#a7302d]"
-            >
-              {error}
-            </p>
-          ) : dealLoading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {[1, 2, 3].map((item) => (
-                <div
-                  key={item}
-                  className="h-[460px] animate-pulse rounded-[22px] border border-[#e1e7dc] bg-[#e9eedf]"
-                />
-              ))}
-            </div>
-          ) : dealBusinesses.length ? (
-            <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {dealBusinesses.map((biz) => (
-                <BusinessCard key={biz.id} business={biz} />
-              ))}
-            </div>
+          {affordable.length > 0 ? (
+            <>
+              <div className={styles.cardGrid}>
+                {affordable.slice(0, shown).map((item) => <BudgetFindCard key={item.id} item={item} />)}
+              </div>
+              {shown < affordable.length && (
+                <button type="button" className={styles.moreButton} onClick={() => setShown((count) => count + 6)}>
+                  Show more finds <ArrowRight size={16} aria-hidden="true" />
+                  <span>({affordable.length - shown} left)</span>
+                </button>
+              )}
+            </>
           ) : (
-            <div className="rounded-[22px] border border-[#dce6d1] bg-white px-6 py-10 text-center">
-              <Tag className="mx-auto mb-3 h-9 w-9 text-[#6f8949]" />
-              <h3 className="text-lg font-bold text-[#183e35]">
-                Fresh student deals are on their way.
-              </h3>
-              <p className="mt-2 text-sm text-[#667064]">
-                Explore nearby businesses while owners prepare their next
-                offers.
-              </p>
-              <Link
-                href="/search"
-                className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#183e35] px-5 text-sm font-semibold text-white"
-              >
-                Explore local businesses →
-              </Link>
+            <div className={styles.zero}>
+              <span className={styles.zeroIcon}><ShoppingBag size={24} aria-hidden="true" /></span>
+              <div>
+                <h3 className={styles.zeroTitle}>No matching budget finds in {zone === "all" ? "the directory" : activeZone} yet.</h3>
+                <p className={styles.zeroText}>Try another price or campus area, or ask local sellers for what you need.</p>
+                <div className={styles.zeroActions}>
+                  {(budget > 0 || zone !== "all") && (
+                    <button type="button" className={styles.textAction} onClick={() => { setBudget(0); changeZone("all"); }}>
+                      Browse all campus finds <ArrowRight size={15} aria-hidden="true" />
+                    </button>
+                  )}
+                  <Link href="/requests" className={styles.textAction}>Post a request <ArrowUpRight size={15} aria-hidden="true" /></Link>
+                </div>
+              </div>
             </div>
           )}
         </section>
 
+        {(dealLoading || dealError || discounts.length > 0) && (
+          <section aria-labelledby="student-offers-heading">
+            <div className={styles.headingRow}>
+              <div>
+                <p className={styles.eyebrow}>Extra value for comrades</p>
+                <h2 className={styles.sectionTitle} id="student-offers-heading">Student offers</h2>
+                <p className={styles.sectionSub}>These sellers advertise a student discount. Ask each seller how to claim it.</p>
+              </div>
+              {!dealLoading && !dealError && <span className={styles.sectionCount}>{discounts.length} offers</span>}
+            </div>
+            {dealError ? (
+              <p role="alert" className={styles.zeroText}>{dealError}</p>
+            ) : dealLoading ? (
+              <div className={styles.dealGrid} aria-label="Loading student discounts">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="h-48 animate-pulse rounded-2xl bg-[#e8efe4] motion-reduce:animate-none" />
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className={styles.dealGrid}>
+                  {discounts.slice(0, discountShown).map((item) => (
+                    <BusinessCard key={item.id} business={item} />
+                  ))}
+                </div>
+                {discountShown < discounts.length && (
+                  <button type="button" className={styles.moreButton} onClick={() => setDiscountShown((count) => count + 6)}>
+                    View more student offers <ArrowRight size={16} aria-hidden="true" />
+                  </button>
+                )}
+              </>
+            )}
+          </section>
+        )}
+
+        <details className={styles.trust}>
+          <summary>
+            <span className={styles.trustSymbol}><ShieldCheck size={24} aria-hidden="true" /></span>
+            <span className={styles.trustLabel}>
+              <strong>Shop with confidence</strong>
+              <small>Verification levels, safer payments and campus trading tips</small>
+            </span>
+            <ChevronDown className={styles.trustChevron} size={20} aria-hidden="true" />
+          </summary>
+          <div className={styles.trustContent}>
+            <p className="mt-3">A verification badge describes checks made by the team, not a guarantee of every transaction.</p>
+            <div className={styles.trustLevels}>
+              <div className={styles.trustLevel}><strong>Listed</strong><p>Business is listed; key identity or location details may be unconfirmed.</p></div>
+              <div className={styles.trustLevel}><strong>Recheck needed</strong><p>Owner details have changed or a field check remains outstanding.</p></div>
+              <div className={styles.trustLevel}><strong>Team verified</strong><p>A reviewer checked the shop or student identity and campus location.</p></div>
+            </div>
+            <h3>Before paying</h3>
+            <ul>
+              <li>Confirm the final price and stock directly with the seller.</li>
+              <li>Inspect repairs and second-hand goods before making full payment.</li>
+              <li>Visit rooms in person before sending deposits or broker fees.</li>
+              <li>Request a receipt or use a traceable payment method.</li>
+              <li>Report incorrect details or suspicious listings through the business profile.</li>
+            </ul>
+          </div>
+        </details>
+
         <JoinNeighborhoodCard />
-
-        {/* TRUST & VERIFICATION LEVELS */}
-        <section className="bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-6 md:p-8 space-y-6">
-          <div>
-            <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-[#335e41]" />
-              <span>Understand campus verification</span>
-            </h2>
-            <p className="text-xs md:text-sm text-[#667064] mt-1 font-body">
-              Listings have different evidence levels. A badge describes checks,
-              and does not guarantee a transaction:
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-body">
-            <div className="p-4 bg-[#e9eedf] rounded-xl border border-[#dfe5d8] space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#667064]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#758071]" />
-                Level 0: Listed
-              </div>
-              <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Basic Community Entry
-              </h3>
-              <p className="text-xs text-[#667064] leading-relaxed">
-                Initial entry. Unconfirmed phone or address. Students should
-                exercise standard caution before making large advance payments.
-              </p>
-            </div>
-
-            <div className="p-4 bg-[#e9eedf] rounded-xl border border-[#dfe5d8] space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#335e41]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#335e41]" />
-                Level 1: Recheck Needed
-              </div>
-              <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Details Awaiting Field Check
-              </h3>
-              <p className="text-xs text-[#667064] leading-relaxed">
-                Owner details are on file, or key details changed after a visit.
-                Current identity and location still need a field check.
-              </p>
-            </div>
-
-            <div className="p-4 bg-[#edf2e5] border-2 border-[#335e41] rounded-xl shadow-sm space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase text-[#335e41]">
-                <CheckCircle2 className="w-4 h-4 text-[#335e41]" />
-                Level 2: Team Verified
-              </div>
-              <h3 className="font-display font-bold text-lg text-[#243b32]">
-                Shop or Comrade Seller Checked
-              </h3>
-              <p className="text-xs text-[#243b32] leading-relaxed">
-                A field reviewer checked the shopfront or student seller
-                identity and campus location. See the profile for the check date
-                and open reports.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 5 GOLDEN RULES FOR CAMPUS TRADE */}
-        <section className="bg-[#edf2e5] border border-[#dfe5d8] rounded-2xl p-6 md:p-8 space-y-4">
-          <h2 className="font-display font-black text-2xl text-[#243b32] uppercase">
-            5 Golden Rules for Hiring Campus Services
-          </h2>
-
-          <div className="space-y-3 text-sm text-[#243b32] font-body">
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>1. Inspect before full payment:</strong> Always test
-              replaced screens, laptop keyboards, or tailored clothes before
-              leaving the kiosk.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>2. Pay via M-Pesa Buy Goods / Till:</strong> Official till
-              numbers provide clear transactional audit trails.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>
-                3. Never send deposit to unverified phone numbers:
-              </strong>{" "}
-              For hostels or room deposits, visit in person first.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>4. Report ghost or inactive numbers:</strong> Click the
-              three dots on any profile to report outdated contacts.
-            </div>
-            <div className="p-3 bg-white border border-[#dfe5d8] rounded-lg">
-              <strong>5. Agree on diagnosis costs upfront:</strong> Confirm
-              whether opening a phone or laptop incurs a diagnostic fee.
-            </div>
-          </div>
-        </section>
       </main>
-
       <Footer />
       <BottomNav />
     </div>

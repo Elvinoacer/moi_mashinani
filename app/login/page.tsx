@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { PhoneSignIn } from "@/components/PhoneSignIn";
 import { PasswordField } from "@/components/PasswordField";
 
 function LoginForm() {
@@ -34,7 +33,7 @@ function LoginForm() {
           body: JSON.stringify(
             requestLink
               ? { email: email.trim() }
-              : { identifier: email.trim(), password },
+              : { email: email.trim(), password },
           ),
         },
       );
@@ -84,36 +83,17 @@ function LoginForm() {
         <p className="mt-2 text-sm text-[#667064]">
           {requestLink
             ? "Request a new link if your invitation expired, you need to verify your email, or you forgot your password."
-            : "Use your private owner phone (07… / 01…) or email and password. Browse and contact sellers without signing in."}
+            : "Sign in with your email and password. No SMS or phone verification needed."}
         </p>
       </div>
-      <PhoneSignIn
-        onSignedIn={() => {
-          const next = params.get("next");
-          router.replace(
-            next &&
-              next.startsWith("/") &&
-              !next.startsWith("//") &&
-              !next.includes("\\") &&
-              !/[\u0000-\u001f]/.test(next)
-              ? next
-              : "/dashboard",
-          );
-          router.refresh();
-        }}
-      />
-      <details>
-        <summary className="cursor-pointer font-bold">
-          Use phone/email and password
-        </summary>
-        <form onSubmit={submit} className="space-y-4">
+      <form onSubmit={submit} className="space-y-4">
           <label className="block">
             <span className="mb-1.5 block text-xs font-bold text-[#243b32]">
-              {requestLink ? "Recovery email address" : "Owner phone or email"}
+              {requestLink ? "Recovery email address" : "Email address"}
             </span>
             <input
               required
-              type={requestLink ? "email" : "text"}
+              type="email"
               maxLength={254}
               autoComplete="username"
               value={email}
@@ -174,9 +154,9 @@ function LoginForm() {
         >
           {requestLink
             ? "Back to sign in"
-            : "Verify your email or reset your password"}
+            : "Forgot password or need a verification email?"}
         </button>
-      </details>
+      <p className="text-sm text-[#667064]">New here? <Link href="/register" className="font-semibold text-[#335e41] underline">Create an account with email</Link></p>
       <p className="text-xs text-[#667064]">
         New business?{" "}
         <Link
@@ -193,7 +173,7 @@ export default function LoginPage() {
   return (
     <div className="interior-page flex min-h-screen flex-col bg-[#f7f8f2]">
       <Navbar />
-      <main className="mx-auto w-full max-w-lg flex-1 px-4 py-10">
+      <main className="mx-auto w-full max-w-lg flex-1 px-3 py-5 sm:px-4 sm:py-10">
         <Suspense fallback={<p role="status">Loading sign in…</p>}>
           <LoginForm />
         </Suspense>

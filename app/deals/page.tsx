@@ -61,26 +61,54 @@ export default async function DealsAndSafetyPage() {
           Boolean(a.dealBlastEndsAt && Date.parse(a.dealBlastEndsAt) > now),
         ),
     );
-  const budget = all
-    .flatMap((b) =>
-      b.services
-        .filter(
-          (s) =>
-            s.inStock !== false &&
-            s.priceFrom !== undefined &&
-            s.priceFrom <= 300,
-        )
-        .map((s) => ({
-          id: b.id + "-" + s.id,
-          name: s.name,
-          price: s.priceFrom!,
-          businessName: b.name,
-          slug: b.slug,
-          zone: b.zone,
-        })),
-    )
-    .sort((a, b) => a.price - b.price)
-    .slice(0, 12);
+  // Keep useful local variety: avoid the old global top-12 cutoff that could
+  // exclude an entire campus zone before the visitor chooses where to shop.
+  // Item photos are used only when the seller uploaded a photo for that item.
+  const affordable = all.flatMap((business) =>
+    business.services
+      .filter((service) =>
+        service.inStock !== false &&
+        typeof service.priceFrom === "number" &&
+        Number.isFinite(service.priceFrom) &&
+        service.priceFrom >= 0 &&
+        service.priceFrom <= 300,
+      )
+      .map((service) => ({
+        id: business.id + "-" + service.id,
+        serviceId: service.id,
+        businessId: business.id,
+        name: service.name,
+        price: service.priceFrom!,
+        businessName: business.name,
+        slug: business.slug,
+        zone: business.zone,
+        servesZones: business.servesZones,
+        whatsapp: business.whatsapp || business.phone,
+        photo: service.photo || "",
+        verified: business.verificationLevel === "L2",
+      })),
+  ).sort((a, b) => a.price - b.price);
+
+  // Round-robin by business so a shop with a large catalogue cannot occupy
+  // all the first rows. Preserve cheapest-first order within each business.
+  const byBusiness = new Map<string, typeof affordable>();
+  for (const item of affordable) {
+    const group = byBusiness.get(item.businessId) || [];
+    group.push(item);
+    byBusiness.set(item.businessId, group);
+  }
+  const budget: typeof affordable = [];
+  let nextRound = true;
+  while (nextRound) {
+    nextRound = false;
+    for (const group of byBusiness.values()) {
+      const item = group.shift();
+      if (item) {
+        budget.push(item);
+        nextRound = true;
+      }
+    }
+  }
 
   const breadcrumbsSchema = generateBreadcrumbSchema([
     { name: "Home", url: "/" },

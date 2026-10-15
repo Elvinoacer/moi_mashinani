@@ -42,11 +42,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
-      url: SITE_URL,
-      lastModified: now,
+      url: `${SITE_URL}/`,
       changeFrequency: "daily",
       priority: 1.0,
       images: [`${SITE_URL}/brand/og-image.png`],
+    },
+    {
+      url: `${SITE_URL}/about`,
+      changeFrequency: "monthly",
+      priority: 0.65,
     },
     {
       url: `${SITE_URL}/categories`,

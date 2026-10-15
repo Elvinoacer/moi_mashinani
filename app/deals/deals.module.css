@@ -113,3 +113,30 @@
   .budgetPill,.findCard,.viewAction,.contactAction,.moreButton,.trustChevron,.cardGrid > *,.dealGrid > *,.trustContent { transition: none !important; animation: none !important; }
   .findCard:hover { transform: none; }
 }
+
+/* Search stays separate from navigation and the zone picker. */
+.findSearch {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; max-width: 560px; min-height: 47px;
+  margin: 0 0 13px; padding: 0 12px;
+  border: 1px solid #d5e2d0; border-radius: 12px;
+  background: #fff; color: #597661;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.findSearch:focus-within { border-color: #59886b; box-shadow: 0 0 0 3px #7eac7940; }
+.findSearch svg { flex: 0 0 auto; }
+.findSearch input {
+  display: block; flex: 1; min-width: 0; min-height: 45px;
+  background: transparent; color: #183e35; outline: none;
+  font-size: 16px;
+}
+.findSearch input::placeholder { color: #7d8c7f; }
+.findSearch button {
+  width: 40px; height: 40px; flex: 0 0 40px;
+  display: grid; place-items: center; border-radius: 9px;
+  color: #416a54;
+}
+.findSearch button:hover { background: #edf3e9; }
+@media (prefers-reduced-motion: reduce) {
+  .findSearch { transition: none; }
+}

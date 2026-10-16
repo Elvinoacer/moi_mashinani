@@ -1,34 +1,25 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Activity,
   ArrowRight,
-  ArrowUpRight,
   ChevronDown,
-  Compass,
-  Search,
   SlidersHorizontal,
   Bike,
   Droplets,
   GraduationCap,
   House,
-  BedDouble,
-  Printer,
-  UtensilsCrossed,
-  Wrench,
   Megaphone,
   Moon,
   Wifi,
-  X,
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { Business } from "@/lib/types";
 import { ZONES } from "@/lib/constants";
 import { useCampusZone, useClientReady } from "@/lib/useCampusZone";
-import { CampusZonePicker } from "./CampusZonePicker";
+import { CampusHero } from "./CampusHero";
 import { useNow } from "@/lib/useNow";
 import {
   campusContext,
@@ -42,17 +33,9 @@ import { CategoryBrowser } from "./CategoryBrowser";
 import { DemandModal } from "./DemandModal";
 import { RequestBoard } from "./RequestBoard";
 import { Button } from "./ui/Button";
-import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 import { JoinNeighborhoodCard } from "./JoinNeighborhoodCard";
-const CAMPUS_SHORTCUTS = [
-  { slug: "food-cafes", label: "Food", icon: UtensilsCrossed },
-  { slug: "hostels-rooms", label: "Hostels", icon: BedDouble },
-  { slug: "printing-cyber", label: "Printing", icon: Printer },
-  { slug: "phone-laptop-repair", label: "Repairs", icon: Wrench },
-];
-
 const QUICK_INTENTS = [
   { value: "open", label: "Open right now", icon: Activity },
   { value: "delivery", label: "Hostel delivery", icon: Bike },
@@ -181,92 +164,13 @@ export function CampusHome({
   return (
     <>
 
-      <section className="campus-home-hero" aria-labelledby="campus-home-heading">
-        <div className="campus-home-hero-backdrop" aria-hidden="true">
-          <Image
-            src="/images/talai_stage.webp"
-            alt=""
-            fill
-            sizes="(max-width: 1152px) 100vw, 1104px"
-            preload
-            className="campus-home-hero-photo"
-          />
-        </div>
-        <div className="campus-home-hero-main">
-          <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Moi University · Kesses</span>
-          <h1 id="campus-home-heading">
-            Find it nearby.<br /><span>Get it sorted.</span>
-          </h1>
-          <p className="campus-home-intro">
-            <span className="campus-home-intro-desktop">Find food, hostels, shops and local services near Moi University. Compare options and contact sellers directly.</span>
-            <span className="campus-home-intro-mobile">Food, hostels, shops and services around Moi. Find sellers fast.</span>
-          </p>
-          <form
-            role="search"
-            className="campus-home-search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const params = new URLSearchParams();
-              if (query.trim()) params.set("q", query.trim());
-              if (zone !== "all") params.set("zone", zone);
-              const qs = params.toString();
-              router.push(qs ? "/search?" + qs : "/search");
-            }}
-          >
-            <label htmlFor="landing-query" className="campus-home-search-label">What are you looking for?</label>
-            <div className="campus-home-search-row">
-              <div className="campus-home-search-field relative">
-                <Search size={21} aria-hidden="true" />
-                <Input
-                  id="landing-query"
-                  name="q"
-                  type="search"
-                  enterKeyHint="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search food, hostels, printing…"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    aria-label="Clear search query"
-                    className="rounded-full p-1 text-stone-500 hover:bg-stone-200/70 hover:text-stone-800"
-                  >
-                    <X size={16} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-              <button type="submit" className="campus-home-search-submit" aria-label="Search businesses">
-                <span className="campus-home-search-submit-text">Search</span> <ArrowRight size={19} aria-hidden="true" />
-              </button>
-            </div>
-          </form>
-          <nav className="campus-home-popular" aria-label="Quick category shortcuts">
-            <span>Quick picks</span>
-            <div className="campus-home-shortcuts">
-              {CAMPUS_SHORTCUTS.map(({ slug, label, icon: Icon }) => (
-                <Link key={slug}
-                  href={"/search?category=" + encodeURIComponent(slug) + (zone === "all" ? "" : "&zone=" + encodeURIComponent(zone))}>
-                  <Icon size={16} aria-hidden="true" />
-                  <span>{label}</span>
-                  <ArrowUpRight size={13} className="campus-home-shortcut-arrow" aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
-          </nav>
-        </div>
-        <aside className="campus-home-hero-aside" aria-label="Search location">
-          <CampusZonePicker value={zone} onChange={setZone} disabled={!ready} />
-          <div className="campus-home-location-tip">
-            <Compass size={19} aria-hidden="true" />
-            <p>Choose a campus area to see nearby sellers, services and prices.</p>
-            <Link href={"/search" + (zone === "all" ? "" : "?zone=" + encodeURIComponent(zone))}>
-              Explore all businesses <ArrowUpRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-        </aside>
-      </section>
+      <CampusHero
+        zone={zone}
+        onZoneChange={setZone}
+        query={query}
+        onQueryChange={setQuery}
+        ready={ready}
+      />
 
       <section className="campus-home-request" aria-labelledby="campus-request-heading">
         <div className="campus-home-request-icon" aria-hidden="true"><Megaphone size={23} /></div>

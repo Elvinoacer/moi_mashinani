@@ -1,0 +1,192 @@
+.card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #294d40;
+  border-radius: 26px;
+  background: #173e34;
+  color: #f7f8ef;
+  box-shadow: 0 15px 40px #183e3512;
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: clamp(30px, 4vw, 49px);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 20px;
+  color: #dae8cc;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.heading {
+  max-width: 15ch;
+  margin: 0;
+  font-size: clamp(31px, 3.7vw, 46px);
+  font-weight: 800;
+  letter-spacing: -.055em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.heading span { color: #d9f279; }
+
+.description {
+  max-width: 43ch;
+  margin: 19px 0 0;
+  color: #d8e4d7;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+  margin-top: 25px;
+}
+
+.primaryAction,
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  font-size: 13px;
+  font-weight: 800;
+  transition: background-color .18s ease, color .18s ease;
+}
+
+.primaryAction {
+  gap: 13px;
+  padding: 12px 17px;
+  border: 1px solid #d9f279;
+  border-radius: 11px;
+  background: #d9f279;
+  color: #173e34;
+}
+
+.primaryAction svg { flex-shrink: 0; }
+.primaryAction:hover { background: #e7f9a9; }
+
+.secondaryAction {
+  color: #eef3e9;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-color: #d9e6d980;
+}
+
+.secondaryAction:hover { color: #d9f279; }
+
+.primaryAction:focus-visible,
+.secondaryAction:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 5px;
+}
+
+.note {
+  margin: 11px 0 0;
+  color: #b8ccba;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.scene {
+  position: relative;
+  min-width: 0;
+  min-height: 340px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.photo {
+  object-fit: cover;
+  object-position: 28% center;
+}
+
+.scene::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(90deg, #173e3440, transparent 35%), linear-gradient(0deg, #0e2828bb, transparent 55%);
+  pointer-events: none;
+}
+
+.caption {
+  position: absolute;
+  z-index: 1;
+  top: 22px;
+  left: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid #f9fff03b;
+  border-radius: 30px;
+  background: #183e35db;
+  color: #f8f8ee;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sceneMessage {
+  position: absolute;
+  z-index: 1;
+  bottom: 30px;
+  left: 28px;
+  color: #fffdf2;
+  font-size: clamp(22px, 2.5vw, 30px);
+  font-weight: 750;
+  letter-spacing: -.04em;
+  line-height: 1.15;
+}
+
+@media (max-width: 850px) and (min-width: 640px) {
+  .copy { padding: 29px 24px; }
+  .actions { gap: 2px 16px; margin-top: 18px; }
+  .primaryAction { padding-inline: 13px; gap: 8px; }
+}
+
+@media (max-width: 639px) {
+  .card { grid-template-columns: minmax(0, 1fr); border-radius: 20px; }
+  .copy { padding: 20px 20px 19px; }
+  .eyebrow { gap: 7px; margin-bottom: 12px; font-size: 9px; letter-spacing: .1em; }
+  .eyebrow svg { width: 13px; height: 13px; }
+  .heading { max-width: 19ch; font-size: clamp(27px, 7.2vw, 33px); line-height: 1.08; }
+  .description { margin-top: 11px; font-size: 12px; line-height: 1.55; }
+  .actions { flex-wrap: nowrap; justify-content: space-between; gap: 10px; margin-top: 16px; }
+  .primaryAction, .secondaryAction { min-height: 44px; font-size: 11px; }
+  .primaryAction { padding: 10px 12px; gap: 7px; border-radius: 9px; }
+  .primaryAction svg { width: 15px; height: 15px; }
+  .secondaryAction { flex-shrink: 0; }
+  .note { margin-top: 9px; font-size: 9px; }
+  .scene { grid-row: 1; min-height: 154px; }
+  .photo { object-position: center 45%; }
+  .scene::after { background: linear-gradient(0deg, #102e2c64, transparent 52%); }
+  .caption { top: auto; bottom: 12px; left: 15px; padding: 6px 9px; font-size: 9px; }
+  .caption svg { width: 12px; height: 12px; }
+  .sceneMessage { display: none; }
+}
+
+@media (max-width: 359px) {
+  .copy { padding-inline: 16px; }
+  .primaryAction { padding-inline: 9px; gap: 4px; font-size: 10px; }
+  .secondaryAction { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryAction, .secondaryAction { transition: none; }
+}

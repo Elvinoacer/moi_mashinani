@@ -84,12 +84,16 @@ export function BusinessCard({
         <div className={styles.body}>
           <div className={styles.categoryRow}>
             <span className={styles.category}>{category}</span>
-            {business.verificationLevel === "L2" && (
+            {business.verificationLevel === "L2" ? (
               <span className={styles.verified} title="Identity or business location verified">
                 <BadgeCheck size={15} aria-hidden="true" />
                 <span className={styles.srOnly}>Verified listing</span>
               </span>
-            )}
+            ) : business.sellerType === "COMRADE" ? (
+              <span className={styles.comradeTag} title="Unverified Comrade Seller — Meet in public on campus">
+                Comrade
+              </span>
+            ) : null}
           </div>
           <Link href={profileUrl} className={styles.titleLink}>
             <h3 className={styles.title}>{business.name}</h3>

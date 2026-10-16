@@ -18,6 +18,14 @@ export async function POST(req: NextRequest) {
       where: { email },
       select: { id: true, emailVerifiedAt: true, passwordHash: true },
     });
+    const nextParam =
+      typeof body.next === "string" &&
+      body.next.startsWith("/") &&
+      !body.next.startsWith("//") &&
+      !body.next.includes("\\") &&
+      !/[\u0000-\u001f]/.test(body.next)
+        ? body.next
+        : undefined;
     if (existing && !existing.emailVerifiedAt) {
       // A previously invited owner can finish setup without creating a
       // duplicate account. Never replace their password before verification.
@@ -30,6 +38,7 @@ export async function POST(req: NextRequest) {
         existing.id,
         pending?.id,
         pending ? "INVITE" : existing.passwordHash ? "REGISTER" : "INVITE",
+        nextParam,
       );
     }
     if (!existing) {
@@ -41,7 +50,7 @@ export async function POST(req: NextRequest) {
         throw error;
       });
       if (account) {
-        const invitation = await inviteAccount(account.id, undefined, "REGISTER");
+        const invitation = await inviteAccount(account.id, undefined, "REGISTER", nextParam);
         if (!invitation.sent) throw new ApiError(503, "Account created, but verification email could not be sent. Request a new account link from sign in.");
       }
     }

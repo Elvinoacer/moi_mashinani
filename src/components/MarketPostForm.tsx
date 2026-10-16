@@ -10,7 +10,7 @@ import {
   useCampusZone,
 } from "@/lib/useCampusZone";
 type Owner = { name: string; email: string };
-export function MarketPostForm() {
+export function MarketPostForm({ onClose }: { onClose?: () => void } = {}) {
   const [owner, setOwner] = useState<Owner | null>(null),
     [loading, setLoading] = useState(true);
   const [savedZone] = useCampusZone();
@@ -49,28 +49,39 @@ export function MarketPostForm() {
         <h2 className="text-xl font-bold">Sign in to post</h2>
         <p className="text-sm text-[#667064]">Use your verified email and password to manage listings. Your student ID is checked separately.</p>
         <div className="flex flex-wrap gap-2">
-          <Link href="/login?next=%2Fmarket" className="ui-button ui-button-primary">Sign in</Link>
-          <Link href="/register" className="ui-button ui-button-secondary">Create account</Link>
+          <Link href="/login?next=%2Fmarket%3Fpost%3D1" className="ui-button ui-button-primary">Sign in</Link>
+          <Link href="/register?next=%2Fmarket%3Fpost%3D1" className="ui-button ui-button-secondary">Create account</Link>
         </div>
       </div>
     );
   if (slug)
     return (
       <div className="ui-card space-y-3">
-        <h2 className="text-xl font-bold">
-          Your student listing is saved for review
+        <h2 className="text-xl font-bold text-[#183e35]">
+          Your student listing is submitted!
         </h2>
-        <p>
+        <p className="text-sm leading-relaxed text-[#50675a]">
           Your ID stays private. A field reviewer checks your student identity
           and campus meeting point before publication. Listings expire after 30
           days; mark items sold from your dashboard.
         </p>
-        <Link
-          className="ui-button ui-button-primary"
-          href={`/dashboard/${slug}`}
-        >
-          Manage my listing
-        </Link>
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Link
+            className="ui-button ui-button-primary"
+            href={`/dashboard/${slug}`}
+          >
+            Manage my listing
+          </Link>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="ui-button ui-button-secondary"
+            >
+              Back to listings
+            </button>
+          )}
+        </div>
       </div>
     );
   return (
@@ -215,9 +226,8 @@ export function MarketPostForm() {
         />
       </label>
       <label className="block">
-        Private student ID (required for review)
+        Private student ID (optional — unlocks Verified Comrade badge)
         <input
-          required={!proofId}
           type="file"
           accept="image/jpeg,image/png,image/webp"
           disabled={busy}
@@ -246,10 +256,13 @@ export function MarketPostForm() {
           }}
         />
       </label>
-      {proofId && (
-        <p className="text-xs">
-          Student ID uploaded privately. It will never appear on your public
-          listing.
+      {proofId ? (
+        <p className="text-xs text-[#335e41]">
+          ✓ Student ID uploaded privately. It will never appear on your public listing.
+        </p>
+      ) : (
+        <p className="text-xs text-[#667064]">
+          Optional: You can list second-hand items immediately without an ID. Uploading your student ID unlocks verified comrade status.
         </p>
       )}
       <label className="flex gap-2 text-sm">
@@ -261,7 +274,7 @@ export function MarketPostForm() {
           {error}
         </p>
       )}
-      <Button type="submit" disabled={busy || !proofId}>
+      <Button type="submit" disabled={busy}>
         {busy ? "Saving…" : "Submit free student listing"}
       </Button>
     </form>

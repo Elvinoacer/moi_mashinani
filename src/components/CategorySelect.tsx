@@ -4,18 +4,46 @@ import { useId, useState } from 'react';
 import { CATEGORIES, CATEGORY_GROUPS, categorySearchText } from '@/lib/categories';
 
 /** Native grouped selection keeps touch and keyboard navigation familiar. */
-export function CategorySelect({ value, onChange, className, allowAll = false, required = false }: {
+export function CategorySelect({ value, onChange, className, allowAll = false, required = false, compact = false }: {
   value: string;
   onChange: (value: string) => void;
   className?: string;
   allowAll?: boolean;
   required?: boolean;
+  compact?: boolean;
 }) {
   const id = useId();
   const [query, setQuery] = useState('');
   const words = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   const matches = CATEGORIES.filter(category => words.every(word => categorySearchText(category).includes(word)));
   const selected = CATEGORIES.find(category => category.slug === value);
+
+  if (compact) {
+    return (
+      <div className="min-w-0">
+        <label htmlFor={`${id}-select`} className="sr-only">Category</label>
+        <select
+          id={`${id}-select`}
+          aria-label="Category"
+          value={value}
+          required={required}
+          onChange={event => onChange(event.target.value)}
+          className={className ?? 'w-full rounded-lg border border-[#dfe5d8] bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-[#335e41]'}
+        >
+          <option value="">{allowAll ? 'All categories' : 'Choose a business type'}</option>
+          {CATEGORY_GROUPS.map(group => (
+            <optgroup key={group.slug} label={group.name}>
+              {allowAll && <option value={group.slug}>All {group.name.toLowerCase()}</option>}
+              {CATEGORIES.filter(category => category.group === group.slug).map(category => (
+                <option key={category.slug} value={category.slug}>{category.name}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
   return (
     <div className="min-w-0 space-y-1.5">
       <label htmlFor={`${id}-search`} className="sr-only">Search business categories</label>

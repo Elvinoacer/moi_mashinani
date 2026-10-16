@@ -3,12 +3,12 @@ import { prisma } from './prisma';
 import { hashToken } from './auth';
 import { sendVerificationEmail } from './mail';
 
-export async function inviteAccount(accountId: string, businessId?: string, purpose = 'INVITE') {
+export async function inviteAccount(accountId: string, businessId?: string, purpose = 'INVITE', nextUrl?: string) {
   const account = await prisma.account.findUniqueOrThrow({ where: { id: accountId } });
   const token = randomBytes(32).toString('hex');
   const record = await prisma.verificationToken.create({ data: { accountId, businessId, purpose, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + 24 * 3600e3) } });
   try {
-    await sendVerificationEmail(account.email, account.name, token, purpose);
+    await sendVerificationEmail(account.email, account.name, token, purpose, nextUrl);
     // Retain old valid links until delivery succeeds; invalidate others only after acceptance.
     await prisma.verificationToken.updateMany({ where: { accountId, id: { not: record.id }, purpose, businessId: businessId || null, usedAt: null }, data: { usedAt: new Date() } });
     if (businessId) await prisma.business.update({ where: { id: businessId }, data: { invitationSentAt: new Date(), invitationError: null } });

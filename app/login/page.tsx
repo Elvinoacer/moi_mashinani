@@ -10,6 +10,15 @@ import { PasswordField } from "@/components/PasswordField";
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const next = params.get("next");
+  const safeNext =
+    next &&
+    next.startsWith("/") &&
+    !next.startsWith("//") &&
+    !next.includes("\\") &&
+    !/[\u0000-\u001f]/.test(next)
+      ? next
+      : null;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -46,15 +55,6 @@ function LoginForm() {
         );
         return;
       }
-      const next = params.get("next");
-      const safeNext =
-        next &&
-        next.startsWith("/") &&
-        !next.startsWith("//") &&
-        !next.includes("\\") &&
-        !/[\u0000-\u001f]/.test(next)
-          ? next
-          : null;
       router.replace(
         safeNext ||
           (data.user?.role === "ADMIN"
@@ -156,7 +156,15 @@ function LoginForm() {
             ? "Back to sign in"
             : "Forgot password or need a verification email?"}
         </button>
-      <p className="text-sm text-[#667064]">New here? <Link href="/register" className="font-semibold text-[#335e41] underline">Create an account with email</Link></p>
+      <p className="text-sm text-[#667064]">
+        New here?{" "}
+        <Link
+          href={safeNext ? `/register?next=${encodeURIComponent(safeNext)}` : "/register"}
+          className="font-semibold text-[#335e41] underline"
+        >
+          Create an account with email
+        </Link>
+      </p>
       <p className="text-xs text-[#667064]">
         New business?{" "}
         <Link

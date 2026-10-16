@@ -27,6 +27,7 @@ export async function sendVerificationEmail(
   name: string,
   token: string,
   purpose: string,
+  nextUrl?: string,
 ) {
   const origin = applicationUrl();
   const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -36,7 +37,8 @@ export async function sendVerificationEmail(
       503,
       "Email delivery is not configured. Configure RESEND_API_KEY and EMAIL_FROM, then resend the invitation.",
     );
-  const link = `${origin}/verify?token=${encodeURIComponent(token)}`;
+  const nextQuery = nextUrl ? `&next=${encodeURIComponent(nextUrl)}` : "";
+  const link = `${origin}/verify?token=${encodeURIComponent(token)}${nextQuery}`;
   const subject =
     purpose === "RESET"
       ? "Reset your MoiMashinani password"

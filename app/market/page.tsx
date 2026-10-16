@@ -1,7 +1,8 @@
+import { Suspense } from "react";
 import { connection } from "next/server";
 import { Store } from "@/lib/store";
 import { publicBusiness } from "@/lib/business-input";
-import { survivalMatch } from "@/lib/campus-value";
+import { publicListing, survivalMatch } from "@/lib/campus-value";
 import { ComradeMarket } from "@/components/ComradeMarket";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -23,13 +24,20 @@ export default async function MarketPage() {
   await connection();
   const now = new Date().getTime();
   const listings = (await Store.getBusinesses())
-    .filter((b) => survivalMatch(b, "comrade", now))
+    .filter((b) =>
+      survivalMatch(b, "comrade", now) ||
+      (publicListing(b, now) &&
+        b.sellerType === "COMRADE" &&
+        b.services.some((s) => s.inStock !== false))
+    )
     .map(publicBusiness);
   return (
     <div className="interior-page">
       <Navbar />
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 pb-24">
-        <ComradeMarket initial={listings} />
+        <Suspense fallback={<p role="status">Loading market…</p>}>
+          <ComradeMarket initial={listings} />
+        </Suspense>
       </main>
       <Footer />
       <BottomNav />

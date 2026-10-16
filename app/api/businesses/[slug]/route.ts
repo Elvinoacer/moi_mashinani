@@ -24,12 +24,7 @@ export async function GET(
       user &&
       (user.role === "ADMIN" ||
         (user.id === business.ownerId && business.isClaimed));
-    if (
-      (!publicListing(business, Date.now()) ||
-        (business.sellerType === "COMRADE" &&
-          business.verificationLevel !== "L2")) &&
-      !canManage
-    )
+    if (!publicListing(business, Date.now()) && !canManage)
       throw new ApiError(404, "Business not found");
     return NextResponse.json(canManage ? business : publicBusiness(business), {
       headers: { "Cache-Control": "no-store" },

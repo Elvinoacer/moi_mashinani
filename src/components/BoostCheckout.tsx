@@ -166,11 +166,12 @@ export function BoostCheckout({ business }: { business: Business }) {
   }
   return (
     <Card className="space-y-5">
-      <h2 className="text-2xl font-bold">Boost & upgrade</h2>
-      <p className="text-sm">
-        One-time M-Pesa purchases. Verification is earned through evidence and
-        is available on the free plan.
-      </p>
+      <div>
+        <h2 className="text-2xl font-bold text-[#183e35]">Plans &amp; Promotion</h2>
+        <p className="mt-1 text-sm text-[#50675a] leading-relaxed">
+          Compare plans side-by-side. Free tier gives permanent campus visibility. Boosts and Pro subscriptions give priority placement and deal broadcasts via one-time M-Pesa payments.
+        </p>
+      </div>
       {error && (
         <p role="alert" className="text-red-800">
           {error}
@@ -279,22 +280,47 @@ export function BoostCheckout({ business }: { business: Business }) {
         </section>
       ) : (
         <>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="ui-card bg-[#f7faf5] border border-[#dce5d7] flex flex-col justify-between p-4">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#183e35]">Free Listing</span>
+                  <span className="rounded-full bg-[#e9eedf] px-2 py-0.5 text-[10px] font-bold text-[#335e41]">
+                    Baseline
+                  </span>
+                </div>
+                <p className="my-2 text-2xl font-bold text-[#183e35]">KES 0</p>
+                <p className="text-xs text-[#50675a] leading-relaxed">
+                  Permanent directory &amp; Comrade Market listing, customer orders, directions, and free L2 verification.
+                </p>
+              </div>
+              <p className="mt-3 text-[11px] font-semibold text-[#335e41]">
+                {business.activeTier === "NONE" ? "● Your current active tier" : "Baseline included"}
+              </p>
+            </div>
             {packages.map((p) => (
               <label
-                className={`ui-card cursor-pointer ${plan === p.id ? "ring-2 ring-[#335e41]" : ""}`}
+                className={`ui-card cursor-pointer flex flex-col justify-between p-4 ${plan === p.id ? "ring-2 ring-[#335e41] border-[#335e41]" : "border-[#dfe5d8]"}`}
                 key={p.id}
               >
-                <input
-                  type="radio"
-                  name="boost-package"
-                  value={p.id}
-                  checked={plan === p.id}
-                  onChange={() => setPlan(p.id)}
-                />
-                <span className="ml-2 font-bold">{p.name}</span>
-                <p className="my-3 text-2xl font-bold">KES {p.price}</p>
-                <p className="text-sm">{p.description}</p>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#183e35]">{p.name}</span>
+                    <input
+                      type="radio"
+                      name="boost-package"
+                      value={p.id}
+                      checked={plan === p.id}
+                      onChange={() => setPlan(p.id)}
+                      className="accent-[#335e41]"
+                    />
+                  </div>
+                  <p className="my-2 text-2xl font-bold text-[#183e35]">KES {p.price}</p>
+                  <p className="text-xs text-[#50675a] leading-relaxed">{p.description}</p>
+                </div>
+                <span className="mt-3 text-[11px] font-bold text-[#244b37]">
+                  {plan === p.id ? "✓ Selected for upgrade" : "Tap to select"}
+                </span>
               </label>
             ))}
           </div>

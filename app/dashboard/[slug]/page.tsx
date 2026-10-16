@@ -135,6 +135,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
     studentDiscount: "",
     latitude: "",
     longitude: "",
+    comradeListingKind: "" as "" | "DECLUTTER" | "HUSTLE",
   });
   const [hours, setHours] = useState<BusinessHours>({});
   const [serviceId, setServiceId] = useState("");
@@ -192,6 +193,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
           studentDiscount: data.studentDiscount || "",
           latitude: data.mapPin ? String(data.mapPin.lat) : "",
           longitude: data.mapPin ? String(data.mapPin.lng) : "",
+          comradeListingKind: (data.comradeListingKind || "") as "" | "DECLUTTER" | "HUSTLE",
         });
         setHours(
           Object.fromEntries(
@@ -522,16 +524,18 @@ function BusinessDashboard({ slug }: { slug: string }) {
   return (
     <main className="mx-auto w-full max-w-[1440px] flex-1 space-y-5 px-3 py-5 sm:px-6 lg:px-9 lg:py-8">
       <div
-        className="relative flex flex-wrap items-center justify-between gap-5 overflow-hidden rounded-[26px] border border-[#dce7d2] bg-[linear-gradient(115deg,#f0f6e8_0%,#ffffff_75%)] px-5 py-6 shadow-[0_9px_30px_rgba(31,61,42,0.06)] sm:px-7"
+        className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-5 overflow-hidden rounded-[26px] border border-[#dce7d2] bg-[linear-gradient(115deg,#f0f6e8_0%,#ffffff_75%)] px-5 py-6 shadow-[0_9px_30px_rgba(31,61,42,0.06)] sm:px-7"
       >
-        <div className="min-w-0 flex-1">
+        <div className="w-full min-w-0 flex-1">
           <Link href="/dashboard" className="mb-3 inline-flex items-center text-xs font-semibold text-[#56755b] hover:underline">← All my businesses</Link>
           <p className="mb-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#637d5b]">Merchant workspace</p>
-          <h1 className="font-display break-words text-2xl font-extrabold text-[#183e35] sm:text-[30px]">
+          <h1 className="font-display break-words [word-break:normal] [overflow-wrap:break-word] text-2xl font-extrabold text-[#183e35] sm:text-[30px] min-w-0">
             {business.name}
           </h1>
-          <p className="mt-1 text-xs text-[#667064]">
-            <span className="font-bold text-[#335e41]">{business.status === "ACTIVE" ? "Published" : business.status.toLowerCase()}</span> · {business.landmark || "Campus business"}
+          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#667064]">
+            <span className="font-bold text-[#335e41]">{business.status === "ACTIVE" ? "Published" : business.status.toLowerCase()}</span>
+            <span>·</span>
+            <span>{business.landmark || "Campus business"}</span>
           </p>
           {switcherBusinesses.length > 1 && (
             <label className="mt-2 block text-xs font-bold text-[#243b32]">
@@ -553,58 +557,86 @@ function BusinessDashboard({ slug }: { slug: string }) {
             </label>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2.5 w-full sm:w-auto sm:flex sm:flex-wrap shrink-0">
           <Link
             href={`/b/${business.slug}`}
             target="_blank"
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#cbd9c7] bg-white px-4 py-2 text-sm font-bold text-[#294a36] transition-colors hover:bg-[#f3f7ed]"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#cbd9c7] bg-white px-4 py-2 text-sm font-bold text-[#294a36] transition-colors hover:bg-[#f3f7ed]"
           >
             <Eye className="h-4 w-4" /> View profile
           </Link>
-          <Link
-            href={`/dashboard/${business.slug}?tab=billing`}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#244b37] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#35684a]"
-          >
-            <Rocket className="h-4 w-4" /> Promote
-          </Link>
+          {business.status === "ACTIVE" ? (
+            <Link
+              href={`/dashboard/${business.slug}?tab=billing`}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#244b37] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#35684a]"
+            >
+              <Rocket className="h-4 w-4" /> Promote
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled
+              title="Promotion is available once your listing is active."
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#dfe5d8] bg-[#f0f4ec] px-4 py-2 text-sm font-bold text-[#869687] cursor-not-allowed opacity-60"
+            >
+              <Rocket className="h-4 w-4" /> Promote
+            </button>
+          )}
         </div>
       </div>
 
       {business.status !== "ACTIVE" && (
-        <p className="rounded bg-[#eff4da] p-4 text-sm text-[#526936]">
-          This listing is {business.status.toLowerCase()}. You can update its
-          information here; customers can book after admin approval.
-          {business.moderationReason && (
-            <span className="mt-2 block font-semibold">
-              Reason: {business.moderationReason}
+        <section aria-label="Listing status notice" className="rounded-2xl border border-[#e4d98a] bg-[#fdfbe9] p-5 text-sm text-[#4e451b] shadow-xs space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#faecc3] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#73510e]">
+              Listing {business.status.toLowerCase()}
             </span>
+            <span className="text-xs text-[#73510e]">Awaiting verification or corrections</span>
+          </div>
+          <p className="leading-relaxed">
+            This listing is {business.status.toLowerCase()}. You can update its
+            information here; customers can book after admin approval.
+          </p>
+          {business.moderationReason && (
+            <div className="rounded-xl border border-[#eedc9e] bg-white/80 p-3.5 text-xs text-[#61450a]">
+              <strong className="block text-xs font-bold text-[#3d2b06] uppercase tracking-wider mb-1">Moderation reason:</strong>
+              {business.moderationReason}
+            </div>
           )}
-          {business.status === "REJECTED" && (
-            <button
-              type="button"
-              disabled={Boolean(busy)}
-              className="mt-3 block rounded-xl bg-[#243b32] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
-              onClick={() =>
-                void runAction(
-                  "resubmit",
-                  async () => {
-                    const response = await fetch(
-                      `/api/businesses/${encodeURIComponent(slug)}/resubmit`,
-                      { method: "POST" },
-                    );
-                    const data = await readResponse<{ business: Business }>(
-                      response,
-                    );
-                    setBusiness(data.business);
-                  },
-                  "Corrections submitted. Your listing is awaiting another review.",
-                )
-              }
-            >
-              Resubmit corrected listing for review
-            </button>
+          {(business.status === "REJECTED" || business.status === "SUSPENDED") && (
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <Link
+                href={`/dashboard/${encodeURIComponent(slug)}?tab=details#business-details-form`}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#dfe5d8] bg-white px-4 py-2 text-sm font-bold text-[#183e35] shadow-xs transition-colors hover:bg-[#edf2e5]"
+              >
+                ✏️ Edit listing details
+              </Link>
+              <button
+                type="button"
+                disabled={Boolean(busy)}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#243b32] px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-colors hover:bg-[#183e35] disabled:opacity-50"
+                onClick={() =>
+                  void runAction(
+                    "resubmit",
+                    async () => {
+                      const response = await fetch(
+                        `/api/businesses/${encodeURIComponent(slug)}/resubmit`,
+                        { method: "POST" },
+                      );
+                      const data = await readResponse<{ business: Business }>(
+                        response,
+                      );
+                      setBusiness(data.business);
+                    },
+                    "Corrections submitted. Your listing is awaiting another review.",
+                  )
+                }
+              >
+                Resubmit for Approval
+              </button>
+            </div>
           )}
-        </p>
+        </section>
       )}
       {error && (
         <p
@@ -1286,7 +1318,10 @@ function BusinessDashboard({ slug }: { slug: string }) {
           onSubmit={(event) => {
             event.preventDefault();
             void runAction("details", () => {
-              const update = { ...draft };
+              const update: Record<string, unknown> = { ...draft };
+              if (!draft.comradeListingKind) {
+                delete update.comradeListingKind;
+              }
               Object.assign(update, {
                 mapPin:
                   draft.latitude && draft.longitude
@@ -1300,9 +1335,10 @@ function BusinessDashboard({ slug }: { slug: string }) {
                 return Promise.reject(
                   new Error("Enter both map coordinates or leave both blank."),
                 );
-              return patchBusiness(update);
+              return patchBusiness(update as Partial<Business>);
             });
           }}
+          id="business-details-form"
           className={panelClass}
         >
           <h2 className="font-display text-xl font-bold">
@@ -1377,6 +1413,25 @@ function BusinessDashboard({ slug }: { slug: string }) {
                 ))}
               </select>
             </label>
+            {business.sellerType === "COMRADE" && (
+              <label className="text-xs font-bold">
+                Comrade listing type
+                <select
+                  aria-label="Comrade listing type"
+                  value={draft.comradeListingKind || "HUSTLE"}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      comradeListingKind: event.target.value as "DECLUTTER" | "HUSTLE",
+                    }))
+                  }
+                  className={inputClass}
+                >
+                  <option value="DECLUTTER">Declutter / second-hand item</option>
+                  <option value="HUSTLE">Student hustle / service</option>
+                </select>
+              </label>
+            )}
           </div>
           <div className="rounded-xl border border-[#dfe5d8] p-4 space-y-3">
             <p className="text-xs text-[#667064]">

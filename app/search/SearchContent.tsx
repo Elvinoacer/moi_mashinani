@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -75,6 +75,8 @@ export function SearchContent() {
   const [demandModalOpen, setDemandModalOpen] = useState(false);
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
   const [resultKey, setResultKey] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const [retry, setRetry] = useState(0);
   const [budgetInput, setBudgetInput] = useState<{ current: string; draft: string } | null>(null);
   const budgetDraft = budgetInput?.current === maxPriceParam ? budgetInput.draft : maxPriceParam;
@@ -136,7 +138,9 @@ export function SearchContent() {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFiltersOpen(false);
     updateFilters({ q: searchInput.trim() });
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const activeZoneObj = ZONES.find((z) => z.slug === zoneParam);
@@ -262,31 +266,21 @@ export function SearchContent() {
           <form
             onSubmit={handleSearchSubmit}
             role="search"
-            className="directory-search-form relative"
+            className="directory-search-form"
           >
-            <Search className="w-5 h-5 text-[#758071] absolute left-4" />
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) =>
-                setSearchDraft({ query: queryParam, text: e.target.value })
-              }
-              aria-label="Search products or services"
-              placeholder="Search phone repair, chapo, salon, cyber, kibanda..."
-              className="directory-query-input w-full min-w-0 pl-11 pr-4 py-3.5 bg-[#f7f8f2] border border-[#dfe5d8] rounded-xl text-[#243b32] text-base font-body focus:outline-none focus:ring-2 focus:ring-[#183e35]"
-            />
-            {searchInput && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchDraft({ query: queryParam, text: "" });
-                  updateFilters({ q: "" });
-                }}
-                className="directory-query-clear text-sm text-[#43614e] hover:underline"
-              >
-                Clear
-              </button>
-            )}
+            <div className="relative flex-1 min-w-0">
+              <Search className="w-5 h-5 text-[#758071] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) =>
+                  setSearchDraft({ query: queryParam, text: e.target.value })
+                }
+                aria-label="Search products or services"
+                placeholder="Search phone repair, chapo, salon, cyber, kibanda..."
+                className="directory-query-input w-full min-w-0 pl-11 pr-4 py-3.5 bg-[#f7f8f2] border border-[#dfe5d8] rounded-xl text-[#243b32] text-base font-body focus:outline-none focus:ring-2 focus:ring-[#183e35]"
+              />
+            </div>
             <button
               type="submit"
               className="directory-query-submit bg-[#243b32] text-white px-5 py-3 rounded-lg text-sm font-bold hover:bg-[#183e35] transition-colors"
@@ -341,8 +335,22 @@ export function SearchContent() {
             </div>
           )}
 
-          <details className="directory-filter-disclosure" open={hasActiveFilters ? true : undefined}>
-            <summary className="directory-filter-toggle">Refine results <span className="directory-filter-toggle-hint">Area, category, budget & more filters</span></summary>
+          <details
+            className="directory-filter-disclosure"
+            open={filtersOpen}
+            onToggle={(e) => setFiltersOpen(e.currentTarget.open)}
+          >
+            <summary className="directory-filter-toggle">
+              <span>Refine results</span>
+              {hasActiveFilters && (
+                <span className="rounded-full bg-[#183e35] px-2 py-0.5 text-[11px] font-bold text-white">
+                  {activeFilterPills.length} active
+                </span>
+              )}
+              <span className="directory-filter-toggle-hint">
+                {fetching ? "Searching…" : `${results.length} found`} · Area, category, budget &amp; more filters
+              </span>
+            </summary>
             <div className="directory-filter-panel">
           {/* CHIPS ROW (ZONES & TOGGLES) */}
           <div className="flex flex-wrap items-center gap-2 pt-2">
@@ -360,6 +368,8 @@ export function SearchContent() {
             {/* Category Select */}
             <div className="min-w-[200px] flex-1 sm:flex-none">
               <CategorySelect
+                compact
+                allowAll
                 value={categoryParam}
                 onChange={(cat) => updateFilters({ category: cat })}
               />
@@ -497,12 +507,24 @@ export function SearchContent() {
           ))}
         </div>
 
+            <div className="pt-2 sm:hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  setFiltersOpen(false);
+                  resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className="w-full min-h-[44px] rounded-xl bg-[#243b32] py-2.5 text-center text-xs font-bold text-white shadow-xs transition-colors hover:bg-[#183e35]"
+              >
+                Show {fetching ? "…" : results.length} {results.length === 1 ? "result" : "results"}
+              </button>
+            </div>
             </div>
           </details>
         </section>
 
         {/* RESULTS HEADER & SORTING */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div ref={resultsRef} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 scroll-mt-24">
           <div>
             <h1 className="font-display font-extrabold text-xl md:text-2xl text-[#243b32] tracking-tight">
               {fetching ? (

@@ -37,6 +37,11 @@ function NavbarInner() {
     ZONES.find((zone) => zone.slug === currentZone) || ZONES[0];
   const [zoneOpen, setZoneOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [chooserOpen, setChooserOpen] = useState(false);
+  const hideListFree =
+    pathname === "/onboard" ||
+    pathname === "/market" ||
+    pathname.startsWith("/dashboard");
   const [queryDraft, setQueryDraft] = useState<{
     source: string;
     value: string;
@@ -50,6 +55,15 @@ function NavbarInner() {
   } | null>(null);
   const [signingOut, setSigningOut] = useState(false);
   const [accountError, setAccountError] = useState("");
+
+  useEffect(() => {
+    if (!chooserOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setChooserOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [chooserOpen]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -223,32 +237,38 @@ function NavbarInner() {
               Sign in
             </Link>
           )}
-          {pathname !== "/onboard" && (
-          <Link
-            href={
-              user?.role === "ADMIN"
-                ? "/admin/enroll"
-                : user?.role === "AMBASSADOR"
-                  ? "/ambassador"
-                  : "/onboard"
-            }
-            className="inline-flex min-h-11 items-center gap-1.5 rounded-[9px] bg-[#183e35] px-2.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4"
-          >
-            <Plus size={16} />
-            <span className="hidden sm:inline">
-              {user?.role === "ADMIN"
-                ? "Enroll business"
-                : "List your business"}
-            </span>
-            <span className="sm:hidden">
-              {user?.role === "ADMIN" ? "Enroll" : "List free"}
-            </span>
-            {user?.role !== "ADMIN" && (
-              <span className="hidden rounded bg-[#d9f279] px-1.5 py-0.5 text-[9px] font-bold text-[#264b36] lg:inline">
-                Free
-              </span>
-            )}
-          </Link>
+
+          {/* Top navigation notification bell container */}
+          <div id="navbar-notifications-slot" className="flex items-center" />
+
+          {!hideListFree && (
+            user?.role === "ADMIN" || user?.role === "AMBASSADOR" ? (
+              <Link
+                href={user?.role === "ADMIN" ? "/admin/enroll" : "/ambassador"}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-[9px] bg-[#183e35] px-2.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4"
+              >
+                <Plus size={16} />
+                <span className="hidden sm:inline">
+                  {user?.role === "ADMIN" ? "Enroll business" : "Ambassador"}
+                </span>
+                <span className="sm:hidden">
+                  {user?.role === "ADMIN" ? "Enroll" : "Ambassador"}
+                </span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setChooserOpen(true)}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-[9px] bg-[#183e35] px-2.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4"
+              >
+                <Plus size={16} />
+                <span className="hidden sm:inline">List your business</span>
+                <span className="sm:hidden">List free</span>
+                <span className="hidden rounded bg-[#d9f279] px-1.5 py-0.5 text-[9px] font-bold text-[#264b36] lg:inline">
+                  Free
+                </span>
+              </button>
+            )
           )}
           <button
             type="button"
@@ -261,6 +281,66 @@ function NavbarInner() {
           </button>
         </div>
       </div>
+
+      {chooserOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="listing-chooser-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setChooserOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 id="listing-chooser-title" className="text-lg font-bold text-[#183e35]">
+                What would you like to list?
+              </h2>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={() => setChooserOpen(false)}
+                className="rounded-full p-1.5 text-[#667064] hover:bg-[#edf2e5]"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-xs text-[#667064]">
+              Choose whether you are setting up a campus shop or selling second-hand goods.
+            </p>
+            <div className="grid gap-3 pt-1">
+              <Link
+                href="/onboard"
+                onClick={() => setChooserOpen(false)}
+                className="flex items-start gap-3 rounded-xl border border-[#dfe5d8] p-4 transition-colors hover:border-[#335e41] hover:bg-[#f7faf5]"
+              >
+                <span className="text-2xl shrink-0" aria-hidden="true">🏪</span>
+                <div>
+                  <strong className="block text-sm text-[#183e35]">Register a Campus Business / Shop</strong>
+                  <span className="text-xs text-[#667064] leading-relaxed block mt-0.5">
+                    For shops, food kibandas, printing cybers, salons, pharmacies or hostels around campus.
+                  </span>
+                </div>
+              </Link>
+              <Link
+                href="/market?post=1"
+                onClick={() => setChooserOpen(false)}
+                className="flex items-start gap-3 rounded-xl border border-[#dfe5d8] p-4 transition-colors hover:border-[#335e41] hover:bg-[#f7faf5]"
+              >
+                <span className="text-2xl shrink-0" aria-hidden="true">🎒</span>
+                <div>
+                  <strong className="block text-sm text-[#183e35]">Sell a Second-Hand Item / Student Hustle</strong>
+                  <span className="text-xs text-[#667064] leading-relaxed block mt-0.5">
+                    Instant free Comrade Market post for second-hand items, declutter, electronics, textbooks or student skills.
+                  </span>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
       {accountError && (
         <p
           role="alert"

@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Plus, Search, Store, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { ArrowRight, Plus, Search, Store, X } from "lucide-react";
 import type { Business } from "@/lib/types";
 import { useCampusZone } from "@/lib/useCampusZone";
 import { useNow } from "@/lib/useNow";
-import { survivalMatch } from "@/lib/campus-value";
+import { publicListing, survivalMatch } from "@/lib/campus-value";
 import { CampusZonePicker } from "./CampusZonePicker";
 import { BusinessCard } from "./BusinessCard";
 import { MarketPostForm } from "./MarketPostForm";
 import { DemandModal } from "./DemandModal";
+import { ModalFrame } from "./ModalFrame";
 
 const types = [
   { value: "all", label: "All listings" },
@@ -25,17 +27,32 @@ function lowestPrice(business: Business) {
 }
 
 export function ComradeMarket({ initial }: { initial: Business[] }) {
+  const searchParams = useSearchParams();
   const [zone, setZone] = useCampusZone();
   const [kind, setKind] = useState("all");
   const [keyword, setKeyword] = useState("");
   const [sort, setSort] = useState<"recommended" | "price">("recommended");
-  const [post, setPost] = useState(false);
+  const [postOverride, setPostOverride] = useState<boolean | null>(null);
+  const post = postOverride ?? (searchParams.get("post") === "1");
   const [ask, setAsk] = useState(false);
   const [count, setCount] = useState(12);
   const now = useNow();
+
+  const closePostModal = () => {
+    setPostOverride(false);
+    if (typeof window !== "undefined" && window.location.search.includes("post=1")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("post");
+      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+    }
+  };
+
   const term = keyword.trim().toLowerCase();
   const filtered = initial.filter((business) =>
-    survivalMatch(business, "comrade", now) &&
+    (survivalMatch(business, "comrade", now) ||
+      (publicListing(business, now) &&
+        business.sellerType === "COMRADE" &&
+        business.services.some((service) => service.inStock !== false))) &&
     (zone === "all" || business.zone === zone || business.servesZones.includes(zone)) &&
     (kind === "all" || business.comradeListingKind === kind) &&
     (!term || [
@@ -50,19 +67,41 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
   return (
     <section className="space-y-5" aria-label="Comrade Market">
       <div className="page-hero rounded-2xl p-5 sm:p-7">
-        <p className="text-xs font-bold tracking-widest text-[#466d50] uppercase">Built for comrades</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-[#183e35]">Comrade Market</h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#50675a]">
-          Find student-run services and second-hand essentials near you. Sellers are verified before listing.
-        </p>
-        <button type="button" onClick={() => setPost((previous) => !previous)}
-          className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#183e35] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#315c46]">
-          {post ? <><ArrowLeft size={17} /> Back to listings</> : <><Plus size={17} /> Post a free listing</>}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold tracking-widest text-[#466d50] uppercase">Built for comrades</p>
+            <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold text-[#183e35]">Comrade Market</h1>
+            <p className="mt-1 max-w-xl text-sm leading-relaxed text-[#50675a]">
+              Find student-run services and second-hand essentials near you. Sellers are verified before listing.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPostOverride(true)}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#183e35] px-5 py-2.5 text-sm font-bold text-white shadow-xs transition-colors hover:bg-[#315c46] shrink-0"
+          >
+            <Plus size={17} /> Post a free listing
+          </button>
+        </div>
+      </div>
+
+      {post && (
+        <ModalFrame title="Post a Comrade Market listing" onClose={closePostModal}>
+          <div className="p-4 sm:p-6">
+            <MarketPostForm onClose={closePostModal} />
+          </div>
+        </ModalFrame>
+      )}
+
+      <div className="fixed bottom-20 right-4 z-30 md:hidden">
+        <button
+          type="button"
+          onClick={() => setPostOverride(true)}
+          className="flex items-center gap-2 rounded-full bg-[#183e35] px-4 py-3 text-xs font-bold text-white shadow-lg transition-transform active:scale-95"
+        >
+          <Plus size={16} /> Post item
         </button>
       </div>
-      {post ? (
-        <div className="directory-form-enter"><MarketPostForm /></div>
-      ) : (
         <>
           <div className="directory-market-toolbar">
             <label className="directory-market-search">
@@ -138,7 +177,6 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
             </div>
           )}
         </>
-      )}
       {ask && (
         <DemandModal
           initialQuery={keyword}

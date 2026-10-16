@@ -38,14 +38,24 @@ function VerificationForm() {
           data.error ||
             "Could not verify this link. Request a new account link and try again.",
         );
+      const next = params.get("next");
+      const safeNext =
+        next &&
+        next.startsWith("/") &&
+        !next.startsWith("//") &&
+        !next.includes("\\") &&
+        !/[\u0000-\u001f]/.test(next)
+          ? next
+          : null;
       router.replace(
-        data.user?.role === "ADMIN"
-          ? "/admin"
-          : data.user?.role === "AMBASSADOR"
-            ? "/ambassador"
-            : data.business?.slug
-              ? `/dashboard/${data.business.slug}`
-              : "/dashboard",
+        safeNext ||
+          (data.user?.role === "ADMIN"
+            ? "/admin"
+            : data.user?.role === "AMBASSADOR"
+              ? "/ambassador"
+              : data.business?.slug
+                ? `/dashboard/${data.business.slug}`
+                : "/dashboard"),
       );
       router.refresh();
     } catch (cause) {

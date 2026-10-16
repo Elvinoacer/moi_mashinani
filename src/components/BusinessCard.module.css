@@ -43,6 +43,7 @@
 .categoryRow { width: 100%; display: flex; align-items: center; gap: 5px; }
 .category { font-size: 10px; text-transform: uppercase; letter-spacing: .045em; font-weight: 750; color: #506e55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .verified { display: inline-flex; flex: 0 0 auto; color: #24734c; }
+.comradeTag { display: inline-flex; flex: 0 0 auto; font-size: 9px; font-weight: 750; text-transform: uppercase; letter-spacing: .03em; color: #78350f; background: #fef3c7; padding: 1px 4px; border-radius: 4px; }
 .srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 .titleLink { display: block; width: 100%; color: #193c32; text-decoration: none; }
 .title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 15px; font-weight: 800; line-height: 1.32; letter-spacing: -.02em; }

@@ -73,10 +73,7 @@ export function availabilityLabel(b: Business, now: number) {
 export function publicListing(b: Business, now: number) {
   if (b.status !== "ACTIVE") return false;
   if (b.sellerType !== "COMRADE") return true;
-  return (
-    b.verificationLevel === "L2" &&
-    (!b.listingExpiresAt || Date.parse(b.listingExpiresAt) > now)
-  );
+  return !b.listingExpiresAt || Date.parse(b.listingExpiresAt) > now;
 }
 export function survivalMatch(b: Business, intent: string, now: number) {
   if (!publicListing(b, now) || b.isTemporarilyClosed) return false;

@@ -23,11 +23,7 @@ async function fetchBusiness(slug: string): Promise<Business | undefined> {
   try {
     const business = await Store.getBusinessBySlug(slug);
     if (business)
-      return publicListing(business, Date.now()) &&
-        (business.sellerType !== "COMRADE" ||
-          business.verificationLevel === "L2")
-        ? business
-        : undefined;
+      return publicListing(business, Date.now()) ? business : undefined;
   } catch {
     // Database fallback
   }

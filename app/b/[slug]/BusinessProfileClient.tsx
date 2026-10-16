@@ -331,14 +331,18 @@ export function BusinessProfileClient({
               </span>
             )}
 
-            {business.verificationLevel === "L2" && (
+            {business.verificationLevel === "L2" ? (
               <span className="bg-white text-[#243b32] font-display font-bold text-xs px-2 py-0.5 rounded signboard-border flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#335e41]" />
                 {business.sellerType === "COMRADE"
                   ? "Comrade verified"
                   : "Shopfront verified"}
               </span>
-            )}
+            ) : business.sellerType === "COMRADE" ? (
+              <span className="bg-[#fef9c3] text-[#713f12] font-display font-bold text-xs px-2 py-0.5 rounded border border-[#fde047] flex items-center gap-1" title="Meet in public on campus before paying">
+                Unverified Comrade Seller
+              </span>
+            ) : null}
 
             {isAvailableNow && (
               <span className="bg-[#d9f279]/30 text-[#243b32] font-display font-bold text-xs px-2 py-0.5 rounded border border-[#d9f279] flex items-center gap-1">
@@ -617,38 +621,34 @@ export function BusinessProfileClient({
               </button>
             </div>
 
-            {/* Quick Actions / Report / Claim */}
+            {/* Quick Actions / Desktop In-App Booking & Claim */}
             <div className="space-y-2 pt-2">
               <button
-                onClick={() => setBookingModalOpen(true)}
-                className="w-full bg-[#243b32] text-white py-3 rounded-xl font-display font-black text-xs uppercase tracking-tight hover:bg-[#183e35] transition"
+                type="button"
+                onClick={() => {
+                  setBookingService(undefined);
+                  setBookingModalOpen(true);
+                }}
+                className="w-full hidden sm:flex items-center justify-center gap-2 min-h-[44px] rounded-xl bg-[#243b32] text-white py-2.5 font-display font-bold text-xs uppercase tracking-tight hover:bg-[#183e35] transition"
               >
-                Order / inquire via WhatsApp
+                📅 Book / Inquire In-App
               </button>
-
-              <div className="flex items-center justify-between text-xs pt-2">
-                <button
-                  onClick={() => setReportModalOpen(true)}
-                  className="text-[#a7302d] hover:underline"
-                >
-                  Report a Problem
-                </button>
-
-                {!business.isClaimed && (
+              {!business.isClaimed && (
+                <div className="text-center text-xs">
                   <button
                     onClick={() => setClaimModalOpen(true)}
-                    className="text-[#183e35] font-bold hover:underline"
+                    className="w-full rounded-xl border border-[#dfe5d8] bg-white py-2.5 font-bold text-[#183e35] hover:bg-[#edf2e5] transition"
                   >
-                    Claim This Shop
+                    Are you the owner? Claim This Shop
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <CampusUtilityDetails business={business} />
-        <TrustShield slug={slug} />
+        <TrustShield slug={slug} business={business} onReportProblem={() => setReportModalOpen(true)} />
         <TrustShare business={business} />
 
         {/* SIMILAR BUSINESSES IN THIS CATEGORY - Suppressed on Featured profiles */}
@@ -704,7 +704,7 @@ export function BusinessProfileClient({
           href={`tel:${business.phone}`}
           onClick={handleCall}
         >
-          Call
+          📞 Call
         </a>
         <button
           type="button"
@@ -715,7 +715,7 @@ export function BusinessProfileClient({
             setBookingModalOpen(true);
           }}
         >
-          Order / book
+          📅 Book In-App
         </button>
         <a
           className="ui-button ui-button-whatsapp flex-[1.4]"
@@ -724,7 +724,7 @@ export function BusinessProfileClient({
           target="_blank"
           rel="noopener noreferrer"
         >
-          WhatsApp now
+          💬 WhatsApp
         </a>
       </nav>
 

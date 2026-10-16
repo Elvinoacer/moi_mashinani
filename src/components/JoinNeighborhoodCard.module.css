@@ -31,7 +31,7 @@
   text-transform: uppercase;
 }
 
-.heading {
+.card .heading {
   max-width: 15ch;
   margin: 0;
   font-size: clamp(31px, 3.7vw, 46px);
@@ -165,7 +165,7 @@
   .copy { padding: 20px 20px 19px; }
   .eyebrow { gap: 7px; margin-bottom: 12px; font-size: 9px; letter-spacing: .1em; }
   .eyebrow svg { width: 13px; height: 13px; }
-  .heading { max-width: 19ch; font-size: clamp(27px, 7.2vw, 33px); line-height: 1.08; }
+  .card .heading { max-width: 19ch; font-size: clamp(27px, 7.2vw, 33px); line-height: 1.08; }
   .description { margin-top: 11px; font-size: 12px; line-height: 1.55; }
   .actions { flex-wrap: nowrap; justify-content: space-between; gap: 10px; margin-top: 16px; }
   .primaryAction, .secondaryAction { min-height: 44px; font-size: 11px; }

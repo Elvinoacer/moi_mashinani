@@ -38,3 +38,35 @@ export function useCampusZone() {
   }
   return [zone, setZone] as const;
 }
+
+const contactKey = "mm-student-contact";
+
+export function getSavedStudentContact(): { name: string; phone: string } {
+  if (typeof window === "undefined") return { name: "", phone: "" };
+  try {
+    const raw = localStorage.getItem(contactKey);
+    if (!raw) return { name: "", phone: "" };
+    const parsed = JSON.parse(raw);
+    return {
+      name: typeof parsed?.name === "string" ? parsed.name : "",
+      phone: typeof parsed?.phone === "string" ? parsed.phone : "",
+    };
+  } catch {
+    return { name: "", phone: "" };
+  }
+}
+
+export function saveStudentContact(contact: { name?: string; phone?: string }) {
+  if (typeof window === "undefined") return;
+  try {
+    const current = getSavedStudentContact();
+    const next = {
+      name: contact.name !== undefined ? contact.name.trim() : current.name,
+      phone: contact.phone !== undefined ? contact.phone.trim() : current.phone,
+    };
+    localStorage.setItem(contactKey, JSON.stringify(next));
+  } catch {
+    /* Storage optional. */
+  }
+}
+

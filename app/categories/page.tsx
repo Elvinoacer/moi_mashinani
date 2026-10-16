@@ -84,7 +84,7 @@ export default function CategoriesPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(categoryGroupsSchema) }}
       />
       <Navbar />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 space-y-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-5 pt-8 pb-28 md:pt-10 md:pb-12 space-y-6">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-bold text-[#667064] uppercase">
           <Link href="/" className="hover:underline">Home</Link>
           <span>/</span>

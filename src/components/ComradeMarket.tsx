@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, ArrowRight, Plus, Search, Store } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Search, Store, X } from "lucide-react";
 import type { Business } from "@/lib/types";
 import { useCampusZone } from "@/lib/useCampusZone";
 import { useNow } from "@/lib/useNow";
@@ -10,6 +9,7 @@ import { survivalMatch } from "@/lib/campus-value";
 import { CampusZonePicker } from "./CampusZonePicker";
 import { BusinessCard } from "./BusinessCard";
 import { MarketPostForm } from "./MarketPostForm";
+import { DemandModal } from "./DemandModal";
 
 const types = [
   { value: "all", label: "All listings" },
@@ -17,15 +17,24 @@ const types = [
   { value: "DECLUTTER", label: "Second-hand" },
 ];
 
+function lowestPrice(business: Business) {
+  const prices = business.services
+    .map((service) => service.priceFrom)
+    .filter((price): price is number => typeof price === "number");
+  return prices.length ? Math.min(...prices) : Number.POSITIVE_INFINITY;
+}
+
 export function ComradeMarket({ initial }: { initial: Business[] }) {
   const [zone, setZone] = useCampusZone();
   const [kind, setKind] = useState("all");
   const [keyword, setKeyword] = useState("");
+  const [sort, setSort] = useState<"recommended" | "price">("recommended");
   const [post, setPost] = useState(false);
+  const [ask, setAsk] = useState(false);
   const [count, setCount] = useState(12);
   const now = useNow();
   const term = keyword.trim().toLowerCase();
-  const listings = initial.filter((business) =>
+  const filtered = initial.filter((business) =>
     survivalMatch(business, "comrade", now) &&
     (zone === "all" || business.zone === zone || business.servesZones.includes(zone)) &&
     (kind === "all" || business.comradeListingKind === kind) &&
@@ -34,6 +43,10 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
       ...business.services.map((service) => service.name),
     ].join(" ").toLowerCase().includes(term))
   );
+  const listings =
+    sort === "price"
+      ? [...filtered].sort((a, b) => lowestPrice(a) - lowestPrice(b))
+      : filtered;
   return (
     <section className="space-y-5" aria-label="Comrade Market">
       <div className="page-hero rounded-2xl p-5 sm:p-7">
@@ -57,18 +70,41 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
               <span className="sr-only">Search student listings</span>
               <input type="search" value={keyword} placeholder="Search an item or hustle…"
                 onChange={(event) => { setKeyword(event.target.value); setCount(12); }} />
+              {keyword && (
+                <button
+                  type="button"
+                  aria-label="Clear listing search"
+                  className="rounded-full p-1 text-[#596f60] hover:bg-[#e9eedf]"
+                  onClick={() => { setKeyword(""); setCount(12); }}
+                >
+                  <X size={16} aria-hidden="true" />
+                </button>
+              )}
             </label>
             <div className="directory-market-zone">
               <CampusZonePicker value={zone} onChange={(value) => { setZone(value); setCount(12); }} />
             </div>
           </div>
-          <div className="directory-market-types" role="group" aria-label="Listing type">
-            {types.map(({ value, label }) => (
-              <button key={value} type="button" aria-pressed={kind === value}
-                onClick={() => { setKind(value); setCount(12); }}>
-                {label}
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="directory-market-types" role="group" aria-label="Listing type">
+              {types.map(({ value, label }) => (
+                <button key={value} type="button" aria-pressed={kind === value}
+                  onClick={() => { setKind(value); setCount(12); }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-xs font-semibold text-[#596f60]">
+              Sort by
+              <select
+                className="min-h-11 rounded-lg border border-[#dfe5d8] bg-white px-2.5 font-bold text-[#243b32]"
+                value={sort}
+                onChange={(event) => setSort(event.target.value as "recommended" | "price")}
+              >
+                <option value="recommended">Recommended</option>
+                <option value="price">Lowest price</option>
+              </select>
+            </label>
           </div>
           <p className="text-xs font-semibold text-[#596f60]" role="status">
             Showing {Math.min(count, listings.length)} of {listings.length} student listings
@@ -95,13 +131,20 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
                 <button type="button" className="text-sm font-bold underline" onClick={() => { setKind("all"); setKeyword(""); setZone("all"); }}>
                   Clear filters
                 </button>
-                <Link className="inline-flex items-center gap-1 text-sm font-bold underline" href="/requests">
+                <button type="button" className="inline-flex items-center gap-1 text-sm font-bold underline" onClick={() => setAsk(true)}>
                   Ask Mashinani <ArrowRight size={15} aria-hidden="true" />
-                </Link>
+                </button>
               </div>
             </div>
           )}
         </>
+      )}
+      {ask && (
+        <DemandModal
+          initialQuery={keyword}
+          initialZone={zone}
+          onClose={() => setAsk(false)}
+        />
       )}
     </section>
   );

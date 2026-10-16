@@ -16,6 +16,7 @@ import {
   Megaphone,
   Moon,
   Wifi,
+  X,
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -50,6 +51,25 @@ const QUICK_INTENTS = [
   { value: "free-delivery", label: "Free zone delivery", icon: Bike },
   { value: "comrade", label: "Comrade Market", icon: GraduationCap },
 ];
+
+function buildSeeAllHref(zone: string, intent: string): string {
+  const params = new URLSearchParams();
+  if (zone && zone !== "all") {
+    params.set("zone", zone);
+  }
+  if (intent === "open") {
+    params.set("availableNow", "true");
+  } else if (intent === "delivery") {
+    params.set("delivery", "true");
+  } else if (intent === "hostels") {
+    params.set("category", "hostels-rooms");
+    params.set("survival", "hostels");
+  } else if (intent && intent !== "all") {
+    params.set("survival", intent);
+  }
+  const qs = params.toString();
+  return qs ? `/search?${qs}` : "/search";
+}
 
 export function CampusHome({
   businesses: initial,
@@ -127,6 +147,13 @@ export function CampusHome({
           new Date(now),
         ).slice(0, 3)
       : [];
+  const activeExtraIntent = QUICK_INTENTS.slice(3).find(
+    (item) => item.value === intent,
+  );
+  const activeZoneName =
+    zone === "all"
+      ? "All Kesses"
+      : ZONES.find((z) => z.slug === zone)?.name || zone;
   function choose(value: string) {
     if (value === "deals") {
       router.push("/deals");
@@ -157,26 +184,36 @@ export function CampusHome({
             className="campus-home-search"
             onSubmit={(event) => {
               event.preventDefault();
-              if (!query.trim()) return;
-              const params = new URLSearchParams({ q: query.trim() });
+              const params = new URLSearchParams();
+              if (query.trim()) params.set("q", query.trim());
               if (zone !== "all") params.set("zone", zone);
-              router.push("/search?" + params.toString());
+              const qs = params.toString();
+              router.push(qs ? "/search?" + qs : "/search");
             }}
           >
             <label htmlFor="landing-query" className="campus-home-search-label">What are you looking for?</label>
             <div className="campus-home-search-row">
-              <div className="campus-home-search-field">
+              <div className="campus-home-search-field relative">
                 <Search size={21} aria-hidden="true" />
                 <Input
                   id="landing-query"
                   name="q"
                   type="search"
                   enterKeyHint="search"
-                  required
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="e.g. Gas refill, braids, printing…"
                 />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    aria-label="Clear search query"
+                    className="rounded-full p-1 text-stone-500 hover:bg-stone-200/70 hover:text-stone-800"
+                  >
+                    <X size={16} aria-hidden="true" />
+                  </button>
+                )}
               </div>
               <button type="submit" className="campus-home-search-submit">
                 Search <ArrowRight size={19} aria-hidden="true" />
@@ -222,7 +259,9 @@ export function CampusHome({
         <div className="campus-home-filter-heading">
           <div>
             <h2>Discover around you</h2>
-            <p>Make your search more specific with optional filters.</p>
+            <p>
+              Showing listings for <strong>{activeZoneName}</strong>. Make your search more specific with optional filters.
+            </p>
           </div>
           {intent !== "all" && (
             <button type="button" className="campus-home-filter-reset" onClick={() => setIntent("all")}>
@@ -237,6 +276,20 @@ export function CampusHome({
               <Icon size={17} aria-hidden="true" /> {label}
             </button>
           ))}
+          {!moreFilters && activeExtraIntent && (() => {
+            const ExtraIcon = activeExtraIntent.icon;
+            return (
+              <button
+                key={activeExtraIntent.value}
+                type="button"
+                aria-pressed={true}
+                className="campus-home-filter-chip"
+                onClick={() => choose(activeExtraIntent.value)}
+              >
+                <ExtraIcon size={17} aria-hidden="true" /> {activeExtraIntent.label}
+              </button>
+            );
+          })()}
           <button type="button" className="campus-home-more-filters" aria-expanded={moreFilters}
             aria-controls="campus-extra-filters" onClick={() => setMoreFilters((expanded) => !expanded)}>
             <SlidersHorizontal size={17} aria-hidden="true" /> More filters
@@ -255,6 +308,29 @@ export function CampusHome({
           </div>
         </div>
       </section>
+      {live.length > 0 && (
+        <section className="space-y-3" aria-label="Live seller updates">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-xl font-bold">Live on campus now</h2>
+            <p className="text-xs text-stone-600">
+              Seller updates expire after four hours. Confirm before travelling.
+            </p>
+          </div>
+          <div className="campus-pulse">
+            {live.map((b) => (
+              <Link href={`/b/${b.slug}`} key={b.id} className="ui-card">
+                <p className="truncate font-bold">{b.name}</p>
+                <p className="my-2 text-sm">
+                  {b.liveStatus || availabilityLabel(b, now)}
+                </p>
+                <Badge>
+                  {ZONES.find((z) => z.slug === b.zone)?.name || b.zone}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
       <section className="space-y-4" aria-label="Nearby businesses">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold" aria-live="polite">
@@ -280,7 +356,7 @@ export function CampusHome({
           </h2>
           <Link
             className="text-sm underline"
-            href={`/search?zone=${zone}&survival=${intent}${intent === "open" ? "&availableNow=true" : intent === "delivery" ? "&delivery=true" : intent === "hostels" ? "&category=hostels-rooms" : ""}`}
+            href={buildSeeAllHref(zone, intent)}
           >
             See all
           </Link>
@@ -333,27 +409,6 @@ export function CampusHome({
         </div>
       </section>
       <FlashDeals compact />
-      {live.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="text-xl font-bold">Live on campus now</h2>
-          <p className="text-xs">
-            Seller updates expire after four hours. Confirm before travelling.
-          </p>
-          <div className="campus-pulse">
-            {live.map((b) => (
-              <Link href={`/b/${b.slug}`} key={b.id} className="ui-card">
-                <p className="truncate font-bold">{b.name}</p>
-                <p className="my-2 text-sm">
-                  {b.liveStatus || availabilityLabel(b, now)}
-                </p>
-                <Badge>
-                  {ZONES.find((z) => z.slug === b.zone)?.name || b.zone}
-                </Badge>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
       <RequestBoard compact />
       <details className="ui-card">
         <summary className="cursor-pointer text-lg font-bold">

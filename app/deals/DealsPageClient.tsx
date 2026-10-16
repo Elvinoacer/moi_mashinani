@@ -171,7 +171,13 @@ export function DealsPageClient({
     (!budget || item.price <= budget) &&
     (!searchText || `${item.name} ${item.businessName}`.toLocaleLowerCase().includes(searchText)),
   );
-  const discounts = dealBusinesses.filter((item) => inArea(item, zone));
+  const discounts = dealBusinesses.filter((item) =>
+    inArea(item, zone) &&
+    (!searchText ||
+      `${item.name} ${item.studentDiscount || ""} ${item.tagline || ""}`
+        .toLocaleLowerCase()
+        .includes(searchText)),
+  );
   const activeZone = ZONES.find((item) => item.slug === zone)?.name || "your campus area";
 
   function changeZone(value: string) {
@@ -230,6 +236,8 @@ export function DealsPageClient({
             </div>
           </div>
         </section>
+
+        <FlashDeals compact={false} quietWhenEmpty maxPrice={budget} hideBudgetFilters />
 
         <section aria-labelledby="budget-finds-heading">
           <div className={styles.headingRow}>
@@ -293,8 +301,6 @@ export function DealsPageClient({
             </div>
           )}
         </section>
-
-        <FlashDeals compact={false} quietWhenEmpty maxPrice={budget} hideBudgetFilters />
 
         {(dealLoading || dealError || discounts.length > 0) && (
           <section aria-labelledby="student-offers-heading">

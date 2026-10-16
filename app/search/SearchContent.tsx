@@ -6,10 +6,14 @@ import Link from "next/link";
 import {
   Activity,
   Bike,
+  Droplets,
+  GraduationCap,
   House,
+  MapPin,
   Moon,
   ShieldCheck,
   Tag,
+  Wifi,
   Zap,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
@@ -19,17 +23,24 @@ import { BusinessCard } from "@/components/BusinessCard";
 import { CampusZonePicker } from "@/components/CampusZonePicker";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
 import { DemandModal } from "@/components/DemandModal";
+import { ModalFrame } from "@/components/ModalFrame";
 import { CATEGORIES, ZONES } from "@/lib/constants";
 import { CategorySelect } from "@/components/CategorySelect";
+import { useCampusZone } from "@/lib/useCampusZone";
 import { Business, Tier } from "@/lib/types";
 import { Search, AlertCircle, Info, X } from "@/components/icons";
 
 const SURVIVAL_FILTERS = [
   { value: "backup", label: "Blackout / backup power", icon: Zap },
+  { value: "wifi", label: "Live Wi-Fi", icon: Wifi },
+  { value: "water", label: "Water available", icon: Droplets },
   { value: "late", label: "Open past 9 PM", icon: Moon },
   { value: "free-delivery", label: "Free zone delivery", icon: Bike },
   { value: "hostels", label: "Verified vacant kejas", icon: House },
+  { value: "comrade", label: "Comrade sellers", icon: GraduationCap },
 ];
+
+const QUICK_BUDGETS = ["100", "200", "500"];
 
 interface SearchResultItem extends Business {
   effectiveTier?: Tier;
@@ -38,6 +49,7 @@ interface SearchResultItem extends Business {
 export function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [storedZone, setStoredZone] = useCampusZone();
 
   const queryParam = searchParams.get("q") || "";
   const zoneParam = searchParams.get("zone") || "all";
@@ -47,6 +59,8 @@ export function SearchContent() {
   const deliveryParam = searchParams.get("delivery") === "true";
   const maxPriceParam = searchParams.get("maxPrice") || "";
   const discountParam = searchParams.get("discount") === "true";
+  const survivalRaw = searchParams.get("survival") || "";
+  const survivalParam = survivalRaw === "all" ? "" : survivalRaw;
   const sortParam = searchParams.get("sort") || "best_match";
 
   const [searchDraft, setSearchDraft] = useState<{
@@ -72,6 +86,9 @@ export function SearchContent() {
   useEffect(() => {
     const controller = new AbortController();
     const params = new URLSearchParams(searchParams.toString());
+    if (params.get("survival") === "all") {
+      params.delete("survival");
+    }
     fetch(`/api/businesses?${params.toString()}`, { signal: controller.signal })
       .then(async (res) => {
         const data = await res.json();
@@ -84,14 +101,14 @@ export function SearchContent() {
       .then((data) => {
         if (!controller.signal.aborted) {
           setResults(data.results || []);
-          setResultKey(params.toString());
+          setResultKey(searchParams.toString());
           setError("");
           setLoading(false);
         }
       })
       .catch((err) => {
         if (!controller.signal.aborted) {
-          setResultKey(params.toString());
+          setResultKey(searchParams.toString());
           setError(
             err instanceof Error
               ? err.message
@@ -106,11 +123,15 @@ export function SearchContent() {
   const updateFilters = (newParams: Record<string, string | null>) => {
     setError("");
     const params = new URLSearchParams(searchParams.toString());
+    if (params.get("survival") === "all") {
+      params.delete("survival");
+    }
     Object.entries(newParams).forEach(([k, v]) => {
       if (v === null || v === "" || v === "all") params.delete(k);
       else params.set(k, v);
     });
-    router.replace(`/search?${params.toString()}`, { scroll: false });
+    const qs = params.toString();
+    router.replace(qs ? `/search?${qs}` : "/search", { scroll: false });
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -119,10 +140,16 @@ export function SearchContent() {
   };
 
   const activeZoneObj = ZONES.find((z) => z.slug === zoneParam);
+  const storedZoneObj =
+    storedZone !== "all" ? ZONES.find((z) => z.slug === storedZone) : undefined;
   const activeCategoryObj = CATEGORIES.find((c) => c.slug === categoryParam);
+  const activeSurvivalObj = SURVIVAL_FILTERS.find(
+    (s) => s.value === survivalParam,
+  );
 
   const clearAllFilters = () => {
     setSearchDraft(null);
+    setBudgetInput(null);
     router.replace("/search", { scroll: false });
   };
 
@@ -135,8 +162,83 @@ export function SearchContent() {
     discountParam ||
     deliveryParam ||
     maxPriceParam ||
-    searchParams.get("survival"),
+    survivalParam,
   );
+
+  const activeFilterPills: Array<{
+    key: string;
+    label: string;
+    onRemove: () => void;
+  }> = [];
+  if (queryParam) {
+    activeFilterPills.push({
+      key: "q",
+      label: `“${queryParam}”`,
+      onRemove: () => {
+        setSearchDraft({ query: queryParam, text: "" });
+        updateFilters({ q: null });
+      },
+    });
+  }
+  if (zoneParam !== "all" && activeZoneObj) {
+    activeFilterPills.push({
+      key: "zone",
+      label: `Area: ${activeZoneObj.name}`,
+      onRemove: () => updateFilters({ zone: null }),
+    });
+  }
+  if (categoryParam && activeCategoryObj) {
+    activeFilterPills.push({
+      key: "category",
+      label: activeCategoryObj.name,
+      onRemove: () => updateFilters({ category: null }),
+    });
+  }
+  if (maxPriceParam) {
+    activeFilterPills.push({
+      key: "maxPrice",
+      label: `≤ KES ${maxPriceParam}`,
+      onRemove: () => {
+        setBudgetInput(null);
+        updateFilters({ maxPrice: null });
+      },
+    });
+  }
+  if (deliveryParam) {
+    activeFilterPills.push({
+      key: "delivery",
+      label: "Hostel delivery",
+      onRemove: () => updateFilters({ delivery: null }),
+    });
+  }
+  if (availableNowParam) {
+    activeFilterPills.push({
+      key: "availableNow",
+      label: "Open Now",
+      onRemove: () => updateFilters({ availableNow: null }),
+    });
+  }
+  if (verifiedParam) {
+    activeFilterPills.push({
+      key: "verified",
+      label: "Team Verified (L2)",
+      onRemove: () => updateFilters({ verified: null }),
+    });
+  }
+  if (discountParam) {
+    activeFilterPills.push({
+      key: "discount",
+      label: "Student Deals",
+      onRemove: () => updateFilters({ discount: null }),
+    });
+  }
+  if (survivalParam) {
+    activeFilterPills.push({
+      key: "survival",
+      label: activeSurvivalObj ? activeSurvivalObj.label : survivalParam,
+      onRemove: () => updateFilters({ survival: null }),
+    });
+  }
 
   return (
     <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
@@ -193,6 +295,51 @@ export function SearchContent() {
             </button>
           </form>
 
+          {/* 1-tap Saved Campus Zone Prompt when browsing "all" */}
+          {zoneParam === "all" && storedZoneObj && (
+            <div className="flex flex-wrap items-center gap-2 text-xs text-[#43614e]">
+              <span className="inline-flex items-center gap-1 font-semibold">
+                <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                Your saved campus area:
+              </span>
+              <button
+                type="button"
+                onClick={() => updateFilters({ zone: storedZoneObj.slug })}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#c9d6c1] bg-[#eef3e8] px-3 py-1 font-bold text-[#183e35] hover:bg-[#e1ead8]"
+              >
+                Filter by {storedZoneObj.name}
+              </button>
+            </div>
+          )}
+
+          {/* Removable Active Filter Pills */}
+          {activeFilterPills.length > 0 && (
+            <div
+              className="flex flex-wrap items-center gap-2 pt-1"
+              aria-label="Active search filters"
+            >
+              <span className="text-xs font-bold text-[#667064]">Active:</span>
+              {activeFilterPills.map((pill) => (
+                <button
+                  key={pill.key}
+                  type="button"
+                  onClick={pill.onRemove}
+                  aria-label={`Remove filter ${pill.label}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#183e35]/25 bg-[#eef3e8] px-3 py-1 text-xs font-bold text-[#183e35] hover:bg-[#e1ead8]"
+                >
+                  <span>{pill.label}</span>
+                  <X className="h-3 w-3 shrink-0" />
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="text-xs font-bold text-[#a7302d] hover:underline ml-1"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
 
           <details className="directory-filter-disclosure" open={hasActiveFilters ? true : undefined}>
             <summary className="directory-filter-toggle">Refine results <span className="directory-filter-toggle-hint">Area, category, budget & more filters</span></summary>
@@ -201,7 +348,13 @@ export function SearchContent() {
           <div className="flex flex-wrap items-center gap-2 pt-2">
             {/* Searchable location filter; floating results do not shift the listing grid. */}
             <div className="min-w-[220px] max-w-xs flex-1">
-              <CampusZonePicker value={zoneParam} onChange={(value) => updateFilters({ zone: value })} />
+              <CampusZonePicker
+                value={zoneParam}
+                onChange={(value) => {
+                  setStoredZone(value);
+                  updateFilters({ zone: value });
+                }}
+              />
             </div>
 
             {/* Category Select */}
@@ -218,12 +371,33 @@ export function SearchContent() {
               setBudgetInput(null);
             }}>
               <label htmlFor="directory-budget" className="mb-1 block text-xs font-bold">Price up to · KES</label>
-              <div className="flex items-center gap-2">
-                <input id="directory-budget" className="ui-input min-w-0 w-32" type="number"
+              <div className="flex flex-wrap items-center gap-2">
+                <input id="directory-budget" className="ui-input min-w-0 w-28" type="number"
                   min="0" step="1" inputMode="numeric" value={budgetDraft}
                   placeholder="Any"
                   onChange={(event) => setBudgetInput({current: maxPriceParam, draft: event.target.value})} />
                 <button className="directory-budget-apply" type="submit">Apply</button>
+                <div className="flex items-center gap-1" role="group" aria-label="Quick budget presets">
+                  {QUICK_BUDGETS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      aria-pressed={maxPriceParam === preset}
+                      onClick={() => {
+                        const next = maxPriceParam === preset ? null : preset;
+                        setBudgetInput(null);
+                        updateFilters({ maxPrice: next });
+                      }}
+                      className={`rounded-md border px-2 py-1 text-xs font-bold transition ${
+                        maxPriceParam === preset
+                          ? "border-[#183e35] bg-[#183e35] text-white"
+                          : "border-[#dfe5d8] bg-[#f7f8f2] text-[#243b32] hover:bg-[#e9eedf]"
+                      }`}
+                    >
+                      ≤{preset}
+                    </button>
+                  ))}
+                </div>
               </div>
             </form>
             <button
@@ -310,11 +484,10 @@ export function SearchContent() {
               key={value}
               type="button"
               className="directory-filter-chip"
-              aria-pressed={searchParams.get("survival") === value}
+              aria-pressed={survivalParam === value}
               onClick={() =>
                 updateFilters({
-                  survival:
-                    searchParams.get("survival") === value ? null : value,
+                  survival: survivalParam === value ? null : value,
                 })
               }
             >
@@ -407,7 +580,16 @@ export function SearchContent() {
         {/* RESULTS GRID */}
         {!fetching && !error && results.length > 0 && (
           <section aria-label="Matching business listings" className="space-y-3">
-            <p role="status" className="text-xs text-[#667064]">Showing {Math.min(visibleCount, results.length)} of {results.length} listings</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p role="status" className="text-xs text-[#667064]">Showing {Math.min(visibleCount, results.length)} of {results.length} listings</p>
+              <button
+                type="button"
+                onClick={() => setDemandModalOpen(true)}
+                className="text-xs font-bold text-[#335e41] hover:underline"
+              >
+                Don&apos;t see what you need? Post a request →
+              </button>
+            </div>
             <div className="directory-results-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {results.slice(0, visibleCount).map((biz) => (
               <BusinessCard
@@ -473,56 +655,52 @@ export function SearchContent() {
       {demandModalOpen && (
         <DemandModal
           initialQuery={queryParam}
+          initialZone={zoneParam !== "all" ? zoneParam : storedZone}
+          initialCategory={categoryParam}
           onClose={() => setDemandModalOpen(false)}
         />
       )}
 
       {/* HOW RANKING WORKS MODAL */}
       {rankingModalOpen && (
-        <div className="fixed inset-0 bg-[#243b32]/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white signboard-border-thick signboard-shadow-lg rounded-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-[#183e35] text-white p-4 flex items-center justify-between">
-              <h3 className="font-display font-black text-base uppercase tracking-tight">
-                How Rankings Work on MoiMashinani
-              </h3>
-              <button onClick={() => setRankingModalOpen(false)}>
-                <X className="w-5 h-5 text-white" />
-              </button>
-            </div>
-            <div className="p-4 md:p-6 text-sm text-[#243b32] space-y-3 leading-relaxed">
-              <p>
-                <strong>1. Relevance First:</strong> A business only appears if
-                it genuinely offers what you searched for (phone technician,
-                braids, cyber, etc.). Paying cannot make an irrelevant shop show
-                up.
-              </p>
-              <p>
-                <strong>2. Featured Tier:</strong> Guaranteed top placement in
-                the top block of relevant results with a bright Jua Sun Yellow
-                border.
-              </p>
-              <p>
-                <strong>3. Recommended Tier:</strong> Placed above all free
-                listings with a Deep Teal sticker.
-              </p>
-              <p>
-                <strong>4. Fair Rotation:</strong> Paying businesses with equal
-                match scores rotate evenly per session so every local operator
-                gets fair exposure.
-              </p>
-              <p>
-                <strong>5. Capped per page:</strong> At least 4 out of 10 slots
-                are always reserved for organic local shops.
-              </p>
-              <button
-                onClick={() => setRankingModalOpen(false)}
-                className="w-full mt-4 bg-[#243b32] text-white py-2 rounded-full font-bold text-xs uppercase"
-              >
-                Close
-              </button>
-            </div>
+        <ModalFrame
+          title="How Rankings Work on MoiMashinani"
+          onClose={() => setRankingModalOpen(false)}
+        >
+          <div className="p-4 md:p-6 text-sm text-[#243b32] space-y-3 leading-relaxed">
+            <p>
+              <strong>1. Relevance First:</strong> A business only appears if
+              it genuinely offers what you searched for (phone technician,
+              braids, cyber, etc.). Paying cannot make an irrelevant shop show
+              up.
+            </p>
+            <p>
+              <strong>2. Featured Tier:</strong> Guaranteed top placement in
+              the top block of relevant results with a bright Jua Sun Yellow
+              border.
+            </p>
+            <p>
+              <strong>3. Recommended Tier:</strong> Placed above all free
+              listings with a Deep Teal sticker.
+            </p>
+            <p>
+              <strong>4. Fair Rotation:</strong> Paying businesses with equal
+              match scores rotate evenly per session so every local operator
+              gets fair exposure.
+            </p>
+            <p>
+              <strong>5. Capped per page:</strong> At least 4 out of 10 slots
+              are always reserved for organic local shops.
+            </p>
+            <button
+              type="button"
+              onClick={() => setRankingModalOpen(false)}
+              className="w-full mt-4 bg-[#243b32] text-white py-2.5 rounded-full font-bold text-xs uppercase"
+            >
+              Close
+            </button>
           </div>
-        </div>
+        </ModalFrame>
       )}
     </div>
   );

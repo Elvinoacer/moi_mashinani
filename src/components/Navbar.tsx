@@ -15,6 +15,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { ZONES } from "@/lib/constants";
+import { useCampusZone } from "@/lib/useCampusZone";
 import { SiteBrand } from "@/components/SiteBrand";
 
 const navLinks = [
@@ -29,12 +30,20 @@ function NavbarInner() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentZone = searchParams.get("zone") || "all";
+  const [storedZone, setStoredZone] = useCampusZone();
+  const urlZone = searchParams.get("zone");
+  const currentZone = urlZone || storedZone || "all";
   const currentZoneInfo =
     ZONES.find((zone) => zone.slug === currentZone) || ZONES[0];
   const [zoneOpen, setZoneOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [queryDraft, setQueryDraft] = useState<{
+    source: string;
+    value: string;
+  } | null>(null);
+  const urlQuery = searchParams.get("q") || "";
+  const query =
+    queryDraft?.source === urlQuery ? queryDraft.value : urlQuery;
   const [user, setUser] = useState<{
     name: string;
     role: "ADMIN" | "BUSINESS" | "AMBASSADOR";
@@ -75,19 +84,23 @@ function NavbarInner() {
   function selectZone(zone: string) {
     setZoneOpen(false);
     setMobileOpen(false);
-    const params = new URLSearchParams(searchParams.toString());
-    if (zone === "all") params.delete("zone");
-    else params.set("zone", zone);
-    router.push(`${pathname}${params.size ? `?${params.toString()}` : ""}`);
+    setStoredZone(zone);
+    if (pathname === "/search" || searchParams.has("zone")) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (zone === "all") params.delete("zone");
+      else params.set("zone", zone);
+      router.push(`${pathname}${params.size ? `?${params.toString()}` : ""}`);
+    }
   }
 
   function submitSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!query.trim()) return;
-    const params = new URLSearchParams({ q: query.trim() });
+    const trimmed = query.trim();
+    const params = new URLSearchParams();
+    if (trimmed) params.set("q", trimmed);
     if (currentZone !== "all") params.set("zone", currentZone);
     setMobileOpen(false);
-    router.push(`/search?${params.toString()}`);
+    router.push(`/search${params.size ? `?${params.toString()}` : ""}`);
   }
 
   return (
@@ -155,8 +168,20 @@ function NavbarInner() {
             placeholder="Find something nearby..."
             className="min-w-0 w-full bg-transparent text-xs text-[#183e35] outline-none placeholder:text-[#879084]"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) =>
+              setQueryDraft({ source: urlQuery, value: event.target.value })
+            }
           />
+          {query && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => setQueryDraft({ source: urlQuery, value: "" })}
+              className="shrink-0 text-[#667064] hover:text-[#183e35]"
+            >
+              <X size={14} />
+            </button>
+          )}
         </form>
 
         <nav
@@ -250,13 +275,16 @@ function NavbarInner() {
             <input
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) =>
+                setQueryDraft({ source: urlQuery, value: event.target.value })
+              }
               aria-label="Search local businesses"
               className="min-w-0 flex-1 rounded-xl border border-[#dce5d7] bg-white px-3.5 py-3 text-sm text-[#183e35]"
               placeholder="Search around campus..."
             />
             <button
               type="submit"
+              aria-label="Search"
               className="rounded-xl bg-[#183e35] px-4 text-xs font-semibold text-white"
             >
               <Search size={18} />

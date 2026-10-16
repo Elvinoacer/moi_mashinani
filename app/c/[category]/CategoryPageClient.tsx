@@ -1,16 +1,18 @@
 "use client";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORIES, ZONES } from "@/lib/constants";
 
 import { DemandModal } from "@/components/DemandModal";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
 import { BusinessCard } from "@/components/BusinessCard";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
+import { CampusZonePicker } from "@/components/CampusZonePicker";
+import { useCampusZone } from "@/lib/useCampusZone";
 import { Business, Category } from "@/lib/types";
-import { Search, Star } from "lucide-react";
+import { Bike, Search, ShieldCheck, Star, X } from "lucide-react";
 import { CategoryIcon, Store } from "@/components/icons";
 import { useNow } from "@/lib/useNow";
 
@@ -30,13 +32,106 @@ export function CategoryPageClient({
   popularSearches = [],
 }: CategoryPageClientProps) {
   const now = useNow();
-  const [businesses, setBusinesses] = useState<Business[]>(
-    initialBusinesses ?? [],
-  );
-  const [loading, setLoading] = useState(initialBusinesses === undefined);
+  const [zone, setZone] = useCampusZone();
+  const [keyword, setKeyword] = useState("");
+  const [openNow, setOpenNow] = useState(false);
+  const [deliveryOnly, setDeliveryOnly] = useState(false);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [fetchState, setFetchState] = useState<{
+    slug: string;
+    loading: boolean;
+    data: Business[] | null;
+    error: string;
+  }>({
+    slug: categorySlug,
+    loading: initialBusinesses === undefined,
+    data: null,
+    error: "",
+  });
   const [demandOpen, setDemandOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
-  const [error, setError] = useState("");
+
+  const [prevCategorySlug, setPrevCategorySlug] = useState(categorySlug);
+  if (prevCategorySlug !== categorySlug) {
+    setPrevCategorySlug(categorySlug);
+    setVisibleCount(12);
+    setKeyword("");
+  }
+
+  const businesses = useMemo(() => {
+    if (initialBusinesses !== undefined) return initialBusinesses;
+    if (fetchState.slug === categorySlug && fetchState.data) {
+      return fetchState.data;
+    }
+    return [];
+  }, [initialBusinesses, fetchState, categorySlug]);
+
+  const loading =
+    initialBusinesses === undefined &&
+    (fetchState.loading || fetchState.slug !== categorySlug);
+  const error =
+    fetchState.slug === categorySlug ? fetchState.error : "";
+
+  const searchTerms = useMemo(() => {
+    return keyword.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  }, [keyword]);
+
+  const hasQuickFilters =
+    searchTerms.length > 0 ||
+    openNow ||
+    deliveryOnly ||
+    verifiedOnly;
+
+  const hasActiveFilters = zone !== "all" || hasQuickFilters;
+
+  const filteredBusinesses = useMemo(() => {
+    return businesses.filter((b) => {
+      if (zone !== "all" && b.zone !== zone && !b.servesZones?.includes(zone)) {
+        return false;
+      }
+      if (openNow) {
+        const isOpen =
+          !b.isTemporarilyClosed &&
+          Boolean(b.availableNowUntil && new Date(b.availableNowUntil).getTime() > now);
+        if (!isOpen) return false;
+      }
+      if (deliveryOnly && !b.serviceModes?.includes("delivery")) {
+        return false;
+      }
+      if (verifiedOnly && b.verificationLevel !== "L2") {
+        return false;
+      }
+      if (searchTerms.length > 0) {
+        const pool = [
+          b.name,
+          b.tagline,
+          b.description,
+          b.landmark,
+          ...(b.tags || []),
+          ...(b.services || []).map((s) => s.name),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        if (!searchTerms.every((term) => pool.includes(term))) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [businesses, zone, openNow, deliveryOnly, verifiedOnly, searchTerms, now]);
+
+  const activeZoneObj = ZONES.find((z) => z.slug === zone);
+  const zoneLabel = zone === "all" ? "Kesses" : activeZoneObj?.name || zone;
+
+  function clearQuickFilters() {
+    setKeyword("");
+    setOpenNow(false);
+    setDeliveryOnly(false);
+    setVerifiedOnly(false);
+    setVisibleCount(12);
+  }
 
   useEffect(() => {
     if (initialBusinesses !== undefined) return;
@@ -55,19 +150,25 @@ export function CategoryPageClient({
       })
       .then((data) => {
         if (!controller.signal.aborted) {
-          setBusinesses(data.results || []);
-          setError("");
-          setLoading(false);
+          setFetchState({
+            slug: categorySlug,
+            loading: false,
+            data: data.results || [],
+            error: "",
+          });
         }
       })
       .catch((cause) => {
         if (!controller.signal.aborted) {
-          setError(
-            cause instanceof Error
-              ? cause.message
-              : "Connection error. Please reload.",
-          );
-          setLoading(false);
+          setFetchState({
+            slug: categorySlug,
+            loading: false,
+            data: [],
+            error:
+              cause instanceof Error
+                ? cause.message
+                : "Connection error. Please reload.",
+          });
         }
       });
     return () => controller.abort();
@@ -77,7 +178,7 @@ export function CategoryPageClient({
     <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 pb-20 md:pb-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 pb-28 md:pb-12">
         {/* Category Header Banner */}
         <section className="page-hero bg-white border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] rounded-2xl p-5 md:p-8 flex items-start gap-4">
           <div
@@ -115,16 +216,144 @@ export function CategoryPageClient({
           </div>
         </section>
 
+        {/* Interactive In-category Search & Zone Filter Bar */}
+        <section
+          className="bg-white border border-[#dfe5d8] shadow-[0_6px_20px_#243b320a] rounded-2xl p-4 md:p-5 space-y-3.5"
+          aria-label={`Filter and search ${categoryObj.name} around campus`}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 items-center">
+            {/* Campus Zone Picker */}
+            <div className="min-w-0">
+              <CampusZonePicker
+                value={zone}
+                onChange={(value) => {
+                  setZone(value);
+                  setVisibleCount(12);
+                }}
+              />
+            </div>
+
+            {/* Keyword / item search within category */}
+            <div className="relative">
+              <label htmlFor="category-keyword-search" className="sr-only">
+                Search within {categoryObj.name}
+              </label>
+              <Search
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#758071] pointer-events-none"
+                aria-hidden="true"
+              />
+              <input
+                id="category-keyword-search"
+                type="search"
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  setVisibleCount(12);
+                }}
+                placeholder={`Search in ${categoryObj.name} (e.g. food, printing, bedsitters)…`}
+                className="w-full rounded-xl border border-[#dfe5d8] bg-[#f7f8f2] pl-10 pr-10 py-2.5 text-sm text-[#243b32] placeholder:text-[#758071] focus:bg-white focus:outline-2 focus:outline-[#335e41]"
+              />
+              {keyword && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setKeyword("");
+                    setVisibleCount(12);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#758071] hover:text-[#243b32] rounded-full hover:bg-[#e9eedf] transition"
+                  aria-label="Clear in-category search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Quick filter chips & active indicator */}
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#dfe5d8]/70">
+            <span className="text-xs font-bold text-[#667064] mr-1 uppercase tracking-wider">
+              Quick filters:
+            </span>
+
+            <button
+              type="button"
+              aria-pressed={openNow}
+              onClick={() => {
+                setOpenNow((prev) => !prev);
+                setVisibleCount(12);
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition border ${
+                openNow
+                  ? "bg-[#335e41] text-white border-[#335e41] shadow-sm"
+                  : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
+              }`}
+            >
+              <span
+                className={`inline-block w-2 h-2 rounded-full ${
+                  openNow ? "bg-white" : "bg-[#25855a]"
+                }`}
+                aria-hidden="true"
+              />
+              Open now
+            </button>
+
+            <button
+              type="button"
+              aria-pressed={deliveryOnly}
+              onClick={() => {
+                setDeliveryOnly((prev) => !prev);
+                setVisibleCount(12);
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition border ${
+                deliveryOnly
+                  ? "bg-[#335e41] text-white border-[#335e41] shadow-sm"
+                  : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
+              }`}
+            >
+              <Bike className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              Hostel delivery
+            </button>
+
+            <button
+              type="button"
+              aria-pressed={verifiedOnly}
+              onClick={() => {
+                setVerifiedOnly((prev) => !prev);
+                setVisibleCount(12);
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition border ${
+                verifiedOnly
+                  ? "bg-[#335e41] text-white border-[#335e41] shadow-sm"
+                  : "bg-[#f7f8f2] text-[#243b32] border-[#dfe5d8] hover:bg-[#e9eedf]"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+              Team verified
+            </button>
+
+            {hasQuickFilters && (
+              <button
+                type="button"
+                onClick={clearQuickFilters}
+                className="ml-auto inline-flex items-center gap-1 text-xs font-bold text-[#a7302d] hover:underline px-2 py-1"
+              >
+                <X className="w-3.5 h-3.5" />
+                Reset filters
+              </button>
+            )}
+          </div>
+        </section>
+
         {/* Listings in this Category */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-display font-bold text-lg md:text-xl text-[#243b32] uppercase">
               {loading
                 ? "Finding shops..."
-                : `${businesses.length} verified listings in Kesses`}
+                : `${filteredBusinesses.length} ${filteredBusinesses.length === 1 ? "verified listing" : "verified listings"} in ${zoneLabel}`}
             </h2>
             <Link
-              href={`/search?category=${categorySlug}`}
+              href={`/search?category=${encodeURIComponent(categorySlug)}${zone !== 'all' ? `&zone=${encodeURIComponent(zone)}` : ''}${keyword.trim() ? `&q=${encodeURIComponent(keyword.trim())}` : ''}${openNow ? '&availableNow=true' : ''}${deliveryOnly ? '&delivery=true' : ''}${verifiedOnly ? '&verified=true' : ''}`}
               className="text-xs font-bold text-[#183e35] hover:underline"
             >
               Open in Advanced Filter →
@@ -147,14 +376,14 @@ export function CategoryPageClient({
                 />
               ))}
             </div>
-          ) : businesses.length > 0 ? (
+          ) : filteredBusinesses.length > 0 ? (
             (() => {
-              const featuredInCat = businesses.filter(
+              const featuredInCat = filteredBusinesses.filter(
                 (b) =>
                   b.activeTier === "FEATURED" &&
                   (!b.tierEndsAt || new Date(b.tierEndsAt).getTime() > now),
               );
-              const otherBusinesses = businesses.filter(
+              const otherBusinesses = filteredBusinesses.filter(
                 (b) => !featuredInCat.some((f) => f.id === b.id),
               );
 
@@ -186,7 +415,7 @@ export function CategoryPageClient({
                     <div className="space-y-3">
                       {featuredInCat.length > 0 && (
                         <h3 className="text-xs font-bold uppercase tracking-wider text-[#667064]">
-                          All {categoryObj.name} in Kesses (
+                          All {categoryObj.name} in {zoneLabel} (
                           {otherBusinesses.length})
                         </h3>
                       )}
@@ -206,20 +435,58 @@ export function CategoryPageClient({
               );
             })()
           ) : (
-            <div className="bg-white p-8 rounded-2xl border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] text-center space-y-3">
-              <Store className="w-12 h-12 text-[#758071] mx-auto" />
-              <h3 className="font-display font-bold text-xl text-[#243b32]">
-                No businesses listed in this category yet!
-              </h3>
-              <p className="text-sm text-[#667064] font-body">
-                Ask for what you need while we add providers in this category.
-              </p>
-              <Link
-                href="/onboard"
-                className="inline-block bg-[#335e41] text-white px-5 py-2.5 rounded-full font-bold text-xs uppercase border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] press-action"
-              >
-                + List Your Shop
-              </Link>
+            <div className="bg-white p-8 rounded-2xl border border-[#dfe5d8] shadow-[0_10px_28px_#243b3212] text-center space-y-4">
+              <div className="w-12 h-12 rounded-full bg-[#f7f8f2] border border-[#dfe5d8] flex items-center justify-center mx-auto text-[#758071]">
+                <Store className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-bold text-xl text-[#243b32]">
+                  {hasActiveFilters
+                    ? `No ${categoryObj.name.toLowerCase()} found matching your filters`
+                    : `No businesses listed in this category yet!`}
+                </h3>
+                <p className="text-sm text-[#667064] font-body max-w-md mx-auto">
+                  {hasActiveFilters
+                    ? `Can't find ${keyword.trim() ? `"${keyword.trim()}"` : "what you need"} in ${categoryObj.name}${zone !== "all" ? ` around ${zoneLabel}` : ""}? Post a request and local sellers or fundis will reach out via WhatsApp.`
+                    : "Ask for what you need while we add providers in this category."}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDemandOpen(true)}
+                  className="inline-flex items-center gap-2 bg-[#183e35] text-white px-5 py-2.5 rounded-full font-bold text-xs uppercase shadow hover:bg-[#243b32] transition"
+                >
+                  Post a request
+                </button>
+                {hasQuickFilters && (
+                  <button
+                    type="button"
+                    onClick={clearQuickFilters}
+                    className="inline-flex items-center gap-1.5 bg-[#f7f8f2] text-[#243b32] px-4 py-2.5 rounded-full font-bold text-xs uppercase border border-[#dfe5d8] hover:bg-[#e9eedf] transition"
+                  >
+                    Clear filters
+                  </button>
+                )}
+                {zone !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setZone("all");
+                      setVisibleCount(12);
+                    }}
+                    className="inline-flex items-center gap-1.5 bg-[#f7f8f2] text-[#243b32] px-4 py-2.5 rounded-full font-bold text-xs uppercase border border-[#dfe5d8] hover:bg-[#e9eedf] transition"
+                  >
+                    View all in Kesses
+                  </button>
+                )}
+                <Link
+                  href="/onboard"
+                  className="inline-flex items-center gap-1.5 bg-[#f7f8f2] text-[#243b32] px-4 py-2.5 rounded-full font-bold text-xs uppercase border border-[#dfe5d8] hover:bg-[#e9eedf] transition"
+                >
+                  + List Your Shop
+                </Link>
+              </div>
             </div>
           )}
         </section>
@@ -246,7 +513,12 @@ export function CategoryPageClient({
                 ? categorySlug
                 : ""
             }
-            initialQuery={`Looking for ${categoryObj.name.toLowerCase()}: `}
+            initialZone={zone}
+            initialQuery={
+              keyword.trim()
+                ? `Looking for ${keyword.trim()} (${categoryObj.name.toLowerCase()}): `
+                : `Looking for ${categoryObj.name.toLowerCase()}: `
+            }
             onClose={() => setDemandOpen(false)}
           />
         )}

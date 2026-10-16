@@ -8,6 +8,14 @@ import { ArrowRight, CheckCircle2, Lightbulb, Plus } from "lucide-react";
 import { ModalFrame } from "./ModalFrame";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
+import { getSavedStudentContact, saveStudentContact } from "@/lib/useCampusZone";
+
+const REQUEST_EXAMPLES = [
+  "Need a single room near Stage under KES 4,000",
+  "Looking for a laptop charger (HP) today",
+  "Need someone to fix a cracked phone screen",
+  "Printing & binding 50 pages tonight",
+];
 export function DemandModal({
   initialQuery = "",
   initialCategory = "",
@@ -24,7 +32,7 @@ export function DemandModal({
   const [query, setQuery] = useState(initialQuery);
   const [zone, setZone] = useState(initialZone);
   const [category, setCategory] = useState(initialCategory);
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(() => getSavedStudentContact().phone);
   const [consent, setConsent] = useState(false);
   const [handoffs, setHandoffs] = useState<
     Array<{ name: string; businessId: string; url: string }>
@@ -60,6 +68,7 @@ export function DemandModal({
       } catch {
         /* Posting works with storage disabled. */
       }
+      if (phone.trim()) saveStudentContact({ phone });
       setHandoffs(data.handoffs || []);
       setSubmitted(true);
       onPosted?.();
@@ -158,6 +167,20 @@ export function DemandModal({
               <span>Do not include your phone number or private details here.</span>
               <span>{query.length}/500</span>
             </div>
+            {!query.trim() && (
+              <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Example requests">
+                {REQUEST_EXAMPLES.map((example) => (
+                  <button
+                    key={example}
+                    type="button"
+                    onClick={() => setQuery(example)}
+                    className="rounded-full border border-[#cfdcca] bg-white px-3 py-1.5 text-xs font-semibold text-[#2f5440] hover:bg-[#eef5ea]"
+                  >
+                    {example}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="min-w-0">

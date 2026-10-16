@@ -6,5 +6,13 @@ const { workAsyncStorage } =
   await import("next/dist/server/app-render/work-async-storage.external.js");
 const { workUnitAsyncStorage } =
   await import("next/dist/server/app-render/work-unit-async-storage.external.js");
-workAsyncStorage.enterWith({ route: "/__test_request", afterContext: { after() {} } });
-workUnitAsyncStorage.enterWith({ type: "request", phase: "render" });
+const origWorkGetStore = workAsyncStorage.getStore.bind(workAsyncStorage);
+const testWorkStore = { route: "/__test_request", afterContext: { after() {} } };
+workAsyncStorage.getStore = () => origWorkGetStore() || testWorkStore;
+workAsyncStorage.enterWith(testWorkStore);
+
+const origUnitGetStore = workUnitAsyncStorage.getStore.bind(workUnitAsyncStorage);
+const testUnitStore = { type: "request", phase: "render" };
+workUnitAsyncStorage.getStore = () => origUnitGetStore() || testUnitStore;
+workUnitAsyncStorage.enterWith(testUnitStore);
+

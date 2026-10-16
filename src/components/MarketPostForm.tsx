@@ -4,17 +4,22 @@ import Link from "next/link";
 import { CATEGORIES, ZONES } from "@/lib/constants";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
+import {
+  getSavedStudentContact,
+  saveStudentContact,
+  useCampusZone,
+} from "@/lib/useCampusZone";
 type Owner = { name: string; email: string };
 export function MarketPostForm() {
   const [owner, setOwner] = useState<Owner | null>(null),
-    [loading, setLoading] = useState(true),
-    [attempt, setAttempt] = useState(0);
-  const [contactPhone, setContactPhone] = useState(""),
+    [loading, setLoading] = useState(true);
+  const [savedZone] = useCampusZone();
+  const [contactPhone, setContactPhone] = useState(() => getSavedStudentContact().phone),
     [kind, setKind] = useState("DECLUTTER"),
     [name, setName] = useState(""),
     [price, setPrice] = useState(""),
     [description, setDescription] = useState(""),
-    [zone, setZone] = useState("stage"),
+    [zone, setZone] = useState(savedZone !== "all" ? savedZone : "stage"),
     [landmark, setLandmark] = useState(""),
     [category, setCategory] = useState("phone-laptop-repair"),
     [proofId, setProofId] = useState("");
@@ -36,7 +41,7 @@ export function MarketPostForm() {
         }
       });
     return () => controller.abort();
-  }, [attempt]);
+  }, []);
   if (loading) return <p role="status">Checking your account…</p>;
   if (!owner)
     return (
@@ -108,6 +113,7 @@ export function MarketPostForm() {
           });
           const data = await r.json();
           if (!r.ok) throw new Error(data.error);
+          if (contactPhone.trim()) saveStudentContact({ phone: contactPhone.trim() });
           setSlug(data.slug);
         } catch (cause) {
           setError(cause instanceof Error ? cause.message : "Could not post.");
@@ -158,9 +164,19 @@ export function MarketPostForm() {
           minLength={20}
           maxLength={1000}
           value={description}
+          aria-describedby="market-details-count"
           onChange={(e) => setDescription(e.target.value)}
         />
       </label>
+      <p
+        id="market-details-count"
+        className={`-mt-2 text-xs ${description.trim().length < 20 ? "text-[#a7302d]" : "text-[#596f60]"}`}
+      >
+        {description.trim().length < 20
+          ? `${20 - description.trim().length} more characters needed · `
+          : ""}
+        {description.length}/1000
+      </p>
       <label className="block">
         Category
         <select

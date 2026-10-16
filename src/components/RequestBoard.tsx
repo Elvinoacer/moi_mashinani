@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Business, ServiceRequest } from "@/lib/types";
-import { ZONES } from "@/lib/constants";
+import { CATEGORIES, ZONES } from "@/lib/constants";
 import { CampusZonePicker } from "./CampusZonePicker";
 import { ArrowRight, Check, ChevronDown, MapPin, MessageCircle, MessageCircleOff, Plus, Search, X } from "lucide-react";
 import { DemandModal } from "./DemandModal";
@@ -28,6 +28,7 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [receipts, setReceipts] = useState<Record<string, string>>({});
+  const [mineOnly, setMineOnly] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     let inFlight = false;
@@ -131,11 +132,16 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
     }
   }
 
-  const visible = requests.filter((r) =>
-    !r.closedAt &&
-    Date.parse(r.createdAt) > now - 7 * 864e5 &&
-    (zone === "all" || r.zone === "all" || r.zone === zone) &&
-    (keyword.trim() === "" || (r.query + " " + (ZONES.find((z) => z.slug === r.zone)?.name || "")).toLowerCase().includes(keyword.toLowerCase().trim()))
+  const categoryName = (slug?: string) =>
+    slug ? CATEGORIES.find((c) => c.slug === slug)?.name || "" : "";
+  const active = requests.filter((r) =>
+    !r.closedAt && Date.parse(r.createdAt) > now - 7 * 864e5,
+  );
+  const myCount = active.filter((r) => receipts[r.id]).length;
+  const showMine = mineOnly && myCount > 0;
+  const visible = active.filter((r) =>
+    (showMine ? Boolean(receipts[r.id]) : zone === "all" || r.zone === "all" || r.zone === zone) &&
+    (keyword.trim() === "" || (r.query + " " + (ZONES.find((z) => z.slug === r.zone)?.name || "") + " " + categoryName(r.category)).toLowerCase().includes(keyword.toLowerCase().trim()))
   ).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const shown = compact ? visible.slice(0, 2) : visible.slice(0, showCount);
   return (
@@ -220,8 +226,18 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
             <span className="requests-results-count" role="status">
               {loading ? "Loading…" : visible.length + (visible.length === 1 ? " active request" : " active requests")}
             </span>
-            {(keyword || zone !== "all") && (
-              <button type="button" className="requests-reset" onClick={() => { setKeyword(""); setZone("all"); setShowCount(8); }}>
+            {myCount > 0 && (
+              <button
+                type="button"
+                className="requests-reset"
+                aria-pressed={showMine}
+                onClick={() => { setMineOnly((value) => !value); setShowCount(8); }}
+              >
+                {showMine ? "Show all requests" : `My requests (${myCount})`}
+              </button>
+            )}
+            {(keyword || zone !== "all" || showMine) && (
+              <button type="button" className="requests-reset" onClick={() => { setKeyword(""); setZone("all"); setMineOnly(false); setShowCount(8); }}>
                 Clear filters
               </button>
             )}
@@ -268,6 +284,16 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
                     </time>
                   </div>
                   <p className={`request-listing-query ${!expanded && long ? "line-clamp-2" : ""}`}>{r.query}</p>
+                  {(owns || categoryName(r.category)) && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {owns && (
+                        <span className="rounded-full bg-[#d9f279] px-2 py-0.5 text-[11px] font-bold text-[#243b32]">Your request</span>
+                      )}
+                      {categoryName(r.category) && (
+                        <span className="rounded-full border border-[#dfe5d8] bg-[#f7f8f2] px-2 py-0.5 text-[11px] font-semibold text-[#43614e]">{categoryName(r.category)}</span>
+                      )}
+                    </div>
+                  )}
                   {long && <button type="button" className="request-expand" aria-expanded={expanded}
                     onClick={() => setExpandedId(expanded ? null : r.id)}>
                     {expanded ? "Show less" : "Read full request"} <ChevronDown size={15} className={expanded ? "rotate-180" : ""} aria-hidden="true" />

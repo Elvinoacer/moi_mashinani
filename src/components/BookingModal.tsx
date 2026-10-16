@@ -7,6 +7,11 @@ import { WhatsAppIcon } from "@/components/icons";
 import { ZONES } from "@/lib/constants";
 import { whatsappUrl, orderMessage } from "@/lib/whatsapp";
 import { ModalFrame } from "@/components/ModalFrame";
+import {
+  getSavedStudentContact,
+  saveStudentContact,
+  useCampusZone,
+} from "@/lib/useCampusZone";
 
 const fieldClass =
   "w-full rounded border border-[#dfe5d8] bg-[#e9eedf] px-3 py-2 text-sm text-[#243b32]";
@@ -49,9 +54,14 @@ export function BookingModal({
   const [selectedTime, setSelectedTime] = useState(
     "Afternoon (2:00 - 4:00 PM)",
   );
-  const [studentName, setStudentName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [zone, setZone] = useState("all");
+  const [savedZone] = useCampusZone();
+  const [studentName, setStudentName] = useState(
+    () => getSavedStudentContact().name,
+  );
+  const [contactPhone, setContactPhone] = useState(
+    () => getSavedStudentContact().phone,
+  );
+  const [zone, setZone] = useState(savedZone);
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -79,6 +89,7 @@ export function BookingModal({
     }
     // Start the handoff in the original user gesture. Analytics never blocks the chat.
     window.open(target, "_blank", "noopener,noreferrer");
+    saveStudentContact({ name: studentName, phone: contactPhone });
     trackBusinessEvent(business.id, "whatsapp");
     setSubmitted(true);
     void fetch("/api/bookings", {
@@ -224,6 +235,7 @@ export function BookingModal({
               className={`${fieldClass} mt-1`}
             >
               {[
+                "As soon as possible",
                 "Morning (9:00 - 11:00 AM)",
                 "Afternoon (2:00 - 4:00 PM)",
                 "Evening (5:00 - 7:30 PM)",
@@ -282,6 +294,12 @@ export function BookingModal({
               className={`${fieldClass} mt-1`}
             />
           </label>
+          <details className="rounded border border-[#dfe5d8] bg-white p-3 text-xs text-[#243b32]">
+            <summary className="cursor-pointer font-bold">
+              Preview your WhatsApp message
+            </summary>
+            <p className="mt-2 whitespace-pre-wrap text-[#4b5a4c]">{message}</p>
+          </details>
           <p className="text-xs text-[#667064]">
             Your name, phone and note are shared with this business to respond
             to your request.

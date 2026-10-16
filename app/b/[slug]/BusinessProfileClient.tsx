@@ -56,6 +56,7 @@ export function BusinessProfileClient({
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [error, setError] = useState("");
+  const [serviceFilter, setServiceFilter] = useState("");
 
   useEffect(() => {
     if (initialBusiness && initialBusiness.status === "ACTIVE") {
@@ -179,6 +180,14 @@ export function BusinessProfileClient({
   );
 
   const handleCall = () => trackBusinessEvent(business.id, "call");
+  const serviceTerm = serviceFilter.trim().toLowerCase();
+  const visibleServices = serviceTerm
+    ? business.services.filter((service) =>
+        `${service.name} ${service.unit || ""} ${service.note || ""}`
+          .toLowerCase()
+          .includes(serviceTerm),
+      )
+    : business.services;
   const handleWhatsApp = () => trackBusinessEvent(business.id, "whatsapp");
 
   const handleDirections = () => {
@@ -226,7 +235,7 @@ export function BusinessProfileClient({
     <div className="interior-page min-h-screen flex flex-col bg-[#f7f8f2]">
       <Navbar />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-24 md:pb-12">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-36 md:pb-12">
         {/* Breadcrumb Navigation */}
         <nav
           aria-label="Breadcrumb"
@@ -378,6 +387,21 @@ export function BusinessProfileClient({
           </div>
         </div>
 
+        {business.isTemporarilyClosed && (
+          <p
+            role="status"
+            className="rounded-xl border border-[#f0c6bd] bg-[#fce7e1] p-4 text-sm font-bold text-[#a7302d]"
+          >
+            This business is temporarily closed. You can still call to confirm
+            when they reopen, or browse similar shops below.
+          </p>
+        )}
+        {isAvailableNow && business.liveStatus && (
+          <p className="rounded-xl border border-[#d9f279] bg-[#edf2e5] p-4 text-sm font-bold text-[#243b32]">
+            <span aria-hidden="true">● </span>Live update: {business.liveStatus}
+          </p>
+        )}
+
         {/* PRIMARY ACTION BUTTONS */}
         {business.services.length > 0 && <a href="#services-and-prices" className="inline-flex min-h-11 items-center text-sm font-bold text-[#205443] underline underline-offset-4">Jump to item prices ↓</a>}
         <div className="grid grid-cols-2 gap-3">
@@ -456,8 +480,39 @@ export function BusinessProfileClient({
                   </span>
                 </div>
 
+                {business.services.length > 5 && (
+                  <div className="relative">
+                    <label htmlFor="service-filter" className="sr-only">
+                      Filter items and prices
+                    </label>
+                    <input
+                      id="service-filter"
+                      type="search"
+                      value={serviceFilter}
+                      onChange={(event) => setServiceFilter(event.target.value)}
+                      placeholder={`Search ${business.services.length} items…`}
+                      className="ui-input w-full"
+                    />
+                  </div>
+                )}
+
                 <div className="divide-y divide-[#dfe5d8]">
-                  {business.services.map((service, idx) => (
+                  {visibleServices.length === 0 && (
+                    <p className="py-3 text-sm text-[#667064]">
+                      No items match “{serviceFilter}”.{" "}
+                      <button
+                        type="button"
+                        className="font-bold text-[#205443] underline"
+                        onClick={() => {
+                          setBookingService(undefined);
+                          setBookingModalOpen(true);
+                        }}
+                      >
+                        Ask the seller instead
+                      </button>
+                    </p>
+                  )}
+                  {visibleServices.map((service, idx) => (
                     <div
                       key={service.id || idx}
                       id={`service-${service.id}`}
@@ -473,6 +528,11 @@ export function BusinessProfileClient({
                             {service.unit}
                           </span>
                         )}
+                        {service.note && (
+                          <span className="block text-xs text-[#667064]">
+                            {service.note}
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -486,6 +546,7 @@ export function BusinessProfileClient({
                             service.inStock === false ||
                             business.isTemporarilyClosed
                           }
+                          aria-label="WhatsApp"
                           onClick={() => {
                             setBookingService(service.name);
                             setBookingModalOpen(true);
@@ -586,6 +647,10 @@ export function BusinessProfileClient({
           </div>
         </div>
 
+        <CampusUtilityDetails business={business} />
+        <TrustShield slug={slug} />
+        <TrustShare business={business} />
+
         {/* SIMILAR BUSINESSES IN THIS CATEGORY - Suppressed on Featured profiles */}
         {business.activeTier === "FEATURED" &&
         (!business.tierEndsAt ||
@@ -628,23 +693,11 @@ export function BusinessProfileClient({
         ) : null}
       </main>
 
-      <div className="mx-auto mb-24 w-full max-w-5xl px-4">
-        <CampusUtilityDetails business={business} />
-        <TrustShield slug={slug} />
-        <div className="mt-4">
-          <TrustShare business={business} />
-        </div>
-        {isAvailableNow && business.liveStatus && (
-          <p className="mt-3 rounded-xl bg-[#edf2e5] p-4 font-bold">
-            ● {business.liveStatus}
-          </p>
-        )}
-      </div>
       <Footer />
       <BottomNav />
       <nav
         aria-label="Contact seller"
-        className="fixed inset-x-0 bottom-0 z-40 flex gap-3 border-t bg-white p-3 pb-[calc(.75rem+env(safe-area-inset-bottom))] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t bg-white p-3 pb-[calc(.75rem+env(safe-area-inset-bottom))] md:hidden"
       >
         <a
           className="ui-button ui-button-secondary flex-1"
@@ -653,8 +706,19 @@ export function BusinessProfileClient({
         >
           Call
         </a>
+        <button
+          type="button"
+          className="ui-button ui-button-secondary flex-1"
+          disabled={business.isTemporarilyClosed}
+          onClick={() => {
+            setBookingService(undefined);
+            setBookingModalOpen(true);
+          }}
+        >
+          Order / book
+        </button>
         <a
-          className="ui-button ui-button-whatsapp flex-[2]"
+          className="ui-button ui-button-whatsapp flex-[1.4]"
           href={whatsappUrl}
           onClick={handleWhatsApp}
           target="_blank"

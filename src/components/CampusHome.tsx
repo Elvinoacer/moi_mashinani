@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Activity,
   ArrowRight,
@@ -40,6 +41,7 @@ import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
+import { JoinNeighborhoodCard } from "./JoinNeighborhoodCard";
 const QUICK_INTENTS = [
   { value: "open", label: "Open right now", icon: Activity },
   { value: "delivery", label: "Hostel delivery", icon: Bike },
@@ -169,6 +171,16 @@ export function CampusHome({
     <>
 
       <section className="campus-home-hero" aria-labelledby="campus-home-heading">
+        <div className="campus-home-hero-backdrop" aria-hidden="true">
+          <Image
+            src="/images/talai_stage.webp"
+            alt=""
+            fill
+            sizes="(max-width: 1152px) 100vw, 1104px"
+            preload
+            className="campus-home-hero-photo"
+          />
+        </div>
         <div className="campus-home-hero-main">
           <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Moi Mashinani · Made for Moi University, Kesses</span>
           <h1 id="campus-home-heading">
@@ -416,19 +428,7 @@ export function CampusHome({
         </summary>
         <CategoryBrowser />
       </details>
-      <Card>
-        <h2 className="text-xl font-bold">Have a shop or a hostel hustle?</h2>
-        <p className="my-3 text-sm">
-          List unlimited items with prices for free. Request a free verification
-          visit and let students find you.
-        </p>
-        <Link className="ui-button ui-button-primary" href="/onboard">
-          List your business free
-        </Link>
-        <Link className="ml-4 inline-block text-sm underline" href="/dashboard">
-          Manage my shop
-        </Link>
-      </Card>
+      <JoinNeighborhoodCard />
       {post && (
         <DemandModal
           initialQuery={query}

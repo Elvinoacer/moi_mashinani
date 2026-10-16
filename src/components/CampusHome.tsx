@@ -14,6 +14,10 @@ import {
   Droplets,
   GraduationCap,
   House,
+  BedDouble,
+  Printer,
+  UtensilsCrossed,
+  Wrench,
   Megaphone,
   Moon,
   Wifi,
@@ -42,6 +46,13 @@ import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 import { JoinNeighborhoodCard } from "./JoinNeighborhoodCard";
+const CAMPUS_SHORTCUTS = [
+  { slug: "food-cafes", label: "Food", icon: UtensilsCrossed },
+  { slug: "hostels-rooms", label: "Hostels", icon: BedDouble },
+  { slug: "printing-cyber", label: "Printing", icon: Printer },
+  { slug: "phone-laptop-repair", label: "Repairs", icon: Wrench },
+];
+
 const QUICK_INTENTS = [
   { value: "open", label: "Open right now", icon: Activity },
   { value: "delivery", label: "Hostel delivery", icon: Bike },
@@ -182,14 +193,13 @@ export function CampusHome({
           />
         </div>
         <div className="campus-home-hero-main">
-          <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Moi Mashinani · Made for Moi University, Kesses</span>
+          <span className="campus-home-eyebrow"><span className="campus-home-dot" aria-hidden="true" /> Moi University · Kesses</span>
           <h1 id="campus-home-heading">
             Find it nearby.<br /><span>Get it sorted.</span>
           </h1>
           <p className="campus-home-intro">
-            Moi Mashinani connects students with food, hostels, repairs, printing and
-            other local businesses around Moi University. Compare prices and
-            contact sellers directly — all in one place.
+            <span className="campus-home-intro-desktop">Find food, hostels, shops and local services near Moi University. Compare options and contact sellers directly.</span>
+            <span className="campus-home-intro-mobile">Food, hostels, shops and services around Moi. Find sellers fast.</span>
           </p>
           <form
             role="search"
@@ -214,7 +224,7 @@ export function CampusHome({
                   enterKeyHint="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="e.g. Gas refill, braids, printing…"
+                  placeholder="Search food, hostels, printing…"
                 />
                 {query && (
                   <button
@@ -227,22 +237,24 @@ export function CampusHome({
                   </button>
                 )}
               </div>
-              <button type="submit" className="campus-home-search-submit">
-                Search <ArrowRight size={19} aria-hidden="true" />
+              <button type="submit" className="campus-home-search-submit" aria-label="Search businesses">
+                <span className="campus-home-search-submit-text">Search</span> <ArrowRight size={19} aria-hidden="true" />
               </button>
             </div>
           </form>
-          <div className="campus-home-popular">
-            <span>Popular:</span>
-            {["Food", "Hostels", "Printing", "Phone repairs"].map((term) => (
-              <Link
-                key={term}
-                href={"/search?q=" + encodeURIComponent(term) + (zone === "all" ? "" : "&zone=" + encodeURIComponent(zone))}
-              >
-                {term} <ArrowUpRight size={13} aria-hidden="true" />
-              </Link>
-            ))}
-          </div>
+          <nav className="campus-home-popular" aria-label="Quick category shortcuts">
+            <span>Quick picks</span>
+            <div className="campus-home-shortcuts">
+              {CAMPUS_SHORTCUTS.map(({ slug, label, icon: Icon }) => (
+                <Link key={slug}
+                  href={"/search?category=" + encodeURIComponent(slug) + (zone === "all" ? "" : "&zone=" + encodeURIComponent(zone))}>
+                  <Icon size={16} aria-hidden="true" />
+                  <span>{label}</span>
+                  <ArrowUpRight size={13} className="campus-home-shortcut-arrow" aria-hidden="true" />
+                </Link>
+              ))}
+            </div>
+          </nav>
         </div>
         <aside className="campus-home-hero-aside" aria-label="Search location">
           <CampusZonePicker value={zone} onChange={setZone} disabled={!ready} />
@@ -259,11 +271,11 @@ export function CampusHome({
       <section className="campus-home-request" aria-labelledby="campus-request-heading">
         <div className="campus-home-request-icon" aria-hidden="true"><Megaphone size={23} /></div>
         <div className="campus-home-request-copy">
-          <h2 id="campus-request-heading">Can’t find it? Ask Mashinani.</h2>
+          <h2 id="campus-request-heading"><span className="campus-home-request-title-long">Can’t find it? Ask Mashinani.</span><span className="campus-home-request-title-short">Can’t find it?</span></h2>
           <p>Post what you need and let matching sellers know. No account required.</p>
         </div>
         <button type="button" className="campus-home-request-action" disabled={!ready} onClick={() => setPost(true)}>
-          Post a request <ArrowRight size={17} aria-hidden="true" />
+          <span className="campus-home-request-action-long">Post a request</span><span className="campus-home-request-action-short">Post request</span> <ArrowRight size={17} aria-hidden="true" />
         </button>
       </section>
 

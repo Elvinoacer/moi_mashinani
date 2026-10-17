@@ -7,7 +7,7 @@ import { withNotificationDelivery } from "@/lib/notification-response";
 import { NextRequest, NextResponse } from "next/server";
 import { Store } from "@/lib/store";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, hashToken } from "@/lib/auth";
+import { getCurrentUser, hashToken, requireAdmin } from "@/lib/auth";
 import {
   apiError,
   ApiError,
@@ -131,6 +131,23 @@ export async function PATCH(req: NextRequest) {
         "Use the browser where you posted this request to close it.",
       );
     return NextResponse.json({ closed: true });
+  } catch (error) {
+    return apiError(error);
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    assertSameOrigin(req);
+    await requireAdmin(req);
+    const body = await jsonBody(req);
+    const id = textField(body.id, "Request ID", 100, true);
+    const result = await prisma.serviceRequest.deleteMany({ where: { id } });
+    if (!result.count) throw new ApiError(404, "Demand request not found");
+    return NextResponse.json(
+      { success: true },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     return apiError(error);
   }

@@ -69,9 +69,17 @@ test('server prices enforce allowed durations and bundle discounts', () => {
   assert.equal(calculateUpgrade(business, 'FEATURED', 1).chargeKes, 200);
   assert.equal(calculateUpgrade(business, 'FEATURED', 2).chargeKes, 380);
   assert.equal(calculateUpgrade(business, 'FEATURED', 4).chargeKes, 600);
+  assert.equal(calculateUpgrade(business, 'FEATURED', 12).chargeKes, 1560);
   assert.equal(calculateUpgrade(business, 'RECOMMENDED', 1).chargeKes, 100);
   assert.equal(calculateUpgrade(business, 'RECOMMENDED', 2).chargeKes, 190);
   assert.equal(calculateUpgrade(business, 'RECOMMENDED', 4).chargeKes, 300);
+  assert.equal(calculateUpgrade(business, 'RECOMMENDED', 12).chargeKes, 780);
+  const comradeBiz = { ...business, sellerType: 'COMRADE' } as Business;
+  assert.equal(calculateUpgrade(comradeBiz, 'RECOMMENDED', 1).chargeKes, 50);
+  assert.equal(calculateUpgrade(comradeBiz, 'FEATURED', 4).chargeKes, 300);
+  const hostelBiz = { ...business, primaryCategory: 'hostels-rooms' } as Business;
+  assert.equal(calculateUpgrade(hostelBiz, 'RECOMMENDED', 1).chargeKes, 150);
+  assert.equal(calculateUpgrade(hostelBiz, 'FEATURED', 1).chargeKes, 300);
   for (const duration of [0, -1, 0.5, 52, NaN]) assert.throws(() => calculateUpgrade(business, 'FEATURED', duration));
   assert.equal(formatKenyanPhone('+254 712 345 678'), '254712345678');
   assert.equal(formatKenyanPhone('0712345678'), '254712345678');

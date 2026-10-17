@@ -94,9 +94,10 @@ export async function consumeMerchantAction(token: string) {
         !request.contactPhone
       )
         throw new ApiError(410, "The student request is no longer available.");
+      const refCode = `#MM-${request.id.slice(-4).toUpperCase()}`;
       url = whatsappUrl(
         request.contactPhone,
-        `Hi! I run ${business.name}. I saw your Moi Mashinani request: ${request.query}. My price list: ${applicationUrl()}/b/${business.slug}. What price and pickup time work for you?`,
+        `Hi! I run ${business.name}. I saw your Moi Mashinani request (${refCode}): ${request.query}. My price list: ${applicationUrl()}/b/${business.slug}. What price and pickup time work for you?`,
       );
     } else if (action.kind === "BOOKING") {
       await tx.$queryRaw`SELECT "id" FROM "BookingIntent" WHERE "id" = ${action.resourceId || ""} FOR UPDATE`;
@@ -115,9 +116,10 @@ export async function consumeMerchantAction(token: string) {
         where: { id: booking.id },
         data: { status: "CONFIRMED" },
       });
+      const refCode = `#MM-${booking.id.slice(-4).toUpperCase()}`;
       url = whatsappUrl(
         booking.contactPhone,
-        `Hi ${booking.studentName}! ${business.name} has accepted your request for ${booking.serviceName} on ${booking.day} at ${booking.time}. Let’s confirm the price and details. Found through Moi Mashinani.`,
+        `Hi ${booking.studentName}! ${business.name} has accepted your request (${refCode}) for ${booking.serviceName} on ${booking.day} at ${booking.time}. Let’s confirm the price and details. Found through Moi Mashinani.`,
       );
     } else throw new ApiError(400, "Unknown merchant action.");
     await tx.merchantAction.update({
@@ -130,6 +132,11 @@ export async function consumeMerchantAction(token: string) {
         type: action.kind === "OPEN" ? "open_confirmed" : "merchant_reply",
       },
     });
+    if (action.kind === "REQUEST" || action.kind === "BOOKING") {
+      await tx.$executeRaw`
+        UPDATE "Business" SET "metrics" = jsonb_set("metrics"::jsonb, '{whatsapp}',
+          to_jsonb(COALESCE(("metrics"->>'whatsapp')::int, 0) + 1)), "updatedAt" = NOW() WHERE "id" = ${business.id}`;
+    }
     return {
       done: true,
       url,

@@ -602,6 +602,65 @@ export function SearchContent() {
         {/* RESULTS GRID */}
         {!fetching && !error && results.length > 0 && (
           <section aria-label="Matching business listings" className="space-y-3">
+            {queryParam.trim() && (() => {
+              const needle = queryParam.trim().toLowerCase();
+              const matchedCatalog = results
+                .flatMap((biz) =>
+                  (biz.services || [])
+                    .filter(
+                      (s) =>
+                        s.inStock !== false &&
+                        typeof s.priceFrom === "number" &&
+                        `${s.name} ${s.note || ""}`.toLowerCase().includes(needle),
+                    )
+                    .map((s) => ({
+                      biz,
+                      service: s,
+                      isPriority:
+                        biz.effectiveTier === "FEATURED" ||
+                        biz.effectiveTier === "RECOMMENDED" ||
+                        Boolean(biz.proEndsAt),
+                    })),
+                )
+                .sort((a, b) => Number(b.isPriority) - Number(a.isPriority) || (a.service.priceFrom || 0) - (b.service.priceFrom || 0))
+                .slice(0, 4);
+              if (!matchedCatalog.length) return null;
+              return (
+                <div className="rounded-xl border border-[#dce5d7] bg-[#f7faf5] p-3.5 space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#183e35]">
+                    Matched Campus Items &amp; Prices for “{queryParam}”
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                    {matchedCatalog.map(({ biz, service, isPriority }) => (
+                      <Link
+                        key={`${biz.id}-${service.id}`}
+                        href={`/b/${biz.slug}#services-and-prices`}
+                        className="flex flex-col justify-between rounded-lg border border-[#dfe5d8] bg-white p-2.5 text-xs hover:border-[#335e41] transition"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-bold text-[#183e35] truncate">
+                              {service.name}
+                            </span>
+                            {isPriority && (
+                              <span className="shrink-0 rounded bg-[#d9f279] px-1.5 py-0.5 text-[10px] font-bold text-[#183e35]">
+                                Top Pick
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 text-[11px] text-[#667064] truncate">
+                            {biz.name}
+                          </p>
+                        </div>
+                        <p className="mt-1.5 font-extrabold text-[#244b37]">
+                          KES {service.priceFrom?.toLocaleString("en-KE")}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p role="status" className="text-xs text-[#667064]">Showing {Math.min(visibleCount, results.length)} of {results.length} listings</p>
               <button

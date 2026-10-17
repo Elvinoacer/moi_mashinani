@@ -948,7 +948,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
                     business.metrics.bookingRequests}
                 </p>
                 <p className="text-[11px] text-[#667064] mt-1">
-                  Calls, WhatsApp, directions & bookings
+                  Calls, WhatsApp (#MM-XXXX tagged), directions &amp; bookings
                 </p>
               </div>
               <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
@@ -968,15 +968,31 @@ function BusinessDashboard({ slug }: { slug: string }) {
           </div>
 
           <div className={panelClass}>
-            <h2 className="font-display text-xl font-bold">Promotion status</h2>
-            <p className="text-sm">
-              {tierActive
-                ? `${business.activeTier} placement until ${new Date(business.tierEndsAt!).toLocaleString("en-GB", { timeZone: "Africa/Nairobi" })}`
-                : "Free organic listing"}
-            </p>
-            <p className="text-xs text-[#667064]">
-              Paid placement activates after payment verification.
-            </p>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="font-display text-xl font-bold">
+                  Promotion status &amp; Value Guarantee
+                </h2>
+                <p className="mt-1 text-sm">
+                  {tierActive
+                    ? `${business.activeTier} placement until ${new Date(business.tierEndsAt!).toLocaleString("en-GB", { timeZone: "Africa/Nairobi" })}`
+                    : pro
+                      ? `Moi Mashinani Pro active until ${new Date(business.proEndsAt!).toLocaleDateString("en-GB", { timeZone: "Africa/Nairobi" })}`
+                      : "Free organic listing (includes 3 free Request Board lead replies/month)"}
+                </p>
+                <p className="mt-1 text-xs text-[#667064]">
+                  {tierActive
+                    ? "Protected by our 3-Lead Value Guarantee: if your boost run finishes with fewer than 3 customer contacts, we automatically extend it by 7 days free."
+                    : "Upgrade to Recommended, Featured, or Pro for priority search placement, unlimited Request Board leads, and our 3-Lead Value Guarantee."}
+                </p>
+              </div>
+              <Link
+                href={`/dashboard/${business.slug}?tab=billing`}
+                className="inline-flex min-h-10 items-center rounded-xl bg-[#183e35] px-4 py-2 text-xs font-bold text-white hover:bg-[#244b37]"
+              >
+                {tierActive || pro ? "Manage / Extend Plan" : "View Boosts & Pro"}
+              </Link>
+            </div>
           </div>
         </div>
       )}

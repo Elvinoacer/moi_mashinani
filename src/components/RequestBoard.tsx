@@ -89,12 +89,14 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
       .catch(() => {});
     return () => controller.abort();
   }, []);
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
   async function respond(id: string) {
     if (busy) return;
     const chat = window.open("about:blank", "_blank");
     if (chat) chat.opener = null;
     setBusy(id);
     setError("");
+    setUpgradeRequired(false);
     try {
       const response = await fetch(`/api/demand/${id}/respond`, {
         method: "POST",
@@ -102,7 +104,10 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
         body: JSON.stringify({ businessId: selected }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not respond.");
+      if (!response.ok) {
+        if (response.status === 402) setUpgradeRequired(true);
+        throw new Error(data.error || "Could not respond.");
+      }
       if (chat) chat.location.href = data.url;
       else window.location.assign(data.url);
     } catch (cause) {
@@ -131,6 +136,16 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
       setBusy("");
     }
   }
+
+  const selectedBiz = businesses.find((b) => b.id === selected) || businesses[0];
+  const isSelectedPaid = Boolean(
+    selectedBiz &&
+      ((selectedBiz.proEndsAt && Date.parse(selectedBiz.proEndsAt) > now) ||
+        ((selectedBiz.activeTier === "RECOMMENDED" ||
+          selectedBiz.activeTier === "FEATURED") &&
+          selectedBiz.tierEndsAt &&
+          Date.parse(selectedBiz.tierEndsAt) > now)),
+  );
 
   const categoryName = (slug?: string) =>
     slug ? CATEGORIES.find((c) => c.slug === slug)?.name || "" : "";
@@ -206,15 +221,48 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
           </div>
         </>
       )}
-      {businesses.length > 1 && (
-        <label className="flex flex-wrap items-center gap-2 text-sm font-semibold">
-          Reply as
-          <select className="ui-input max-w-xs" value={selected} onChange={(e) => setSelected(e.target.value)}>
-            {businesses.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
-        </label>
+      {businesses.length > 0 && selectedBiz && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#dce5d7] bg-[#f7faf5] px-4 py-3 text-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            {businesses.length > 1 ? (
+              <label className="flex flex-wrap items-center gap-2 font-semibold text-[#183e35]">
+                Reply as
+                <select className="ui-input max-w-xs" value={selected} onChange={(e) => setSelected(e.target.value)}>
+                  {businesses.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </label>
+            ) : (
+              <span className="font-semibold text-[#183e35]">
+                Replying as verified seller: <strong>{selectedBiz.name}</strong>
+              </span>
+            )}
+            <span className="rounded-full bg-[#e9eedf] px-2.5 py-0.5 text-xs font-bold text-[#244b37]">
+              {isSelectedPaid ? "✓ Unlimited Lead Replies Active" : "Free Tier: 3 Lead Replies / Month"}
+            </span>
+          </div>
+          {!isSelectedPaid && (
+            <Link
+              href={`/dashboard/${selectedBiz.slug}?tab=billing`}
+              className="text-xs font-bold text-[#183e35] underline hover:text-[#335e41]"
+            >
+              Unlock unlimited student leads →
+            </Link>
+          )}
+        </div>
       )}
-      {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
+      {error && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-800 space-y-2">
+          <p>{error}</p>
+          {upgradeRequired && selectedBiz && (
+            <Link
+              href={`/dashboard/${selectedBiz.slug}?tab=billing`}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#183e35] px-3.5 py-2 text-xs font-bold text-white"
+            >
+              Upgrade {selectedBiz.name} for Unlimited Leads <ArrowRight size={14} aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+      )}
       {!compact && (
         <div className="requests-results-header" id="requests-results">
           <div>

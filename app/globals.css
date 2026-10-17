@@ -2,6 +2,7 @@
 
 @layer base {
   :root {
+    --brand-color: #335e41;
     --chalk: #f7f8f2;
     --paper: #ffffff;
     --surface: #f7f8f2;
@@ -37,6 +38,35 @@
   h6 {
     font-family: var(--font-manrope), Arial, sans-serif;
     letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"],
+  progress {
+    accent-color: var(--brand-color);
+    color-scheme: light;
+  }
+
+  @supports not (accent-color: #000) {
+    input[type="checkbox"],
+    input[type="radio"] {
+      appearance: none;
+      width: 1.15rem;
+      height: 1.15rem;
+      border: 2px solid var(--brand-color);
+      border-radius: 0.25rem;
+    }
+    input[type="checkbox"]:checked,
+    input[type="radio"]:checked {
+      background-color: var(--brand-color);
+    }
   }
 }
 

@@ -48,9 +48,10 @@ export function BusinessCard({
   const profileUrl = `/b/${business.slug}`;
   const pricesUrl = business.services.length ? `${profileUrl}#services-and-prices` : profileUrl;
   const contactable = business.status === "ACTIVE" && !business.isTemporarilyClosed;
+  const refTag = `#MM-${business.id.slice(-4).toUpperCase()}`;
   const whatsapp = contactable ? whatsappUrl(
     business.whatsapp || business.phone,
-    `Hi ${business.name}, I found your listing on Moi Mashinani. Can you confirm price and availability?`,
+    `Hi ${business.name}, I found your listing on Moi Mashinani (${refTag}). Can you confirm price and availability?`,
   ) : "";
   const phone = contactable ? business.phone : "";
   const isConfirmed = confirmedOpen(business, now);

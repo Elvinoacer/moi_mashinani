@@ -22,24 +22,47 @@ export async function GET(req: NextRequest) {
         emailVerifiedAt: true,
       },
     });
-    const [businesses, audits] = await Promise.all([
+    const [businesses, audits, payments] = await Promise.all([
       prisma.business.findMany({
         where: { ambassadorId: { not: null } },
-        select: { ambassadorId: true, verificationLevel: true },
+        select: { id: true, ambassadorId: true, verificationLevel: true },
       }),
       prisma.businessAudit.findMany({
         where: { action: { in: ["FIELD_ENROLLED", "FIELD_VERIFIED"] } },
         select: { actorId: true, businessId: true },
       }),
+      prisma.paymentRecord.findMany({
+        where: { state: "COMPLETE" },
+        orderBy: { createdAt: "asc" },
+        select: { businessId: true, amountKes: true },
+      }),
     ]);
     return NextResponse.json(
-      accounts.map((a) => ({
-        ...a,
-        enrolled: businesses.filter((b) => b.ambassadorId === a.id).length,
-        verified: new Set(
-          audits.filter((e) => e.actorId === a.id).map((e) => e.businessId),
-        ).size,
-      })),
+      accounts.map((a) => {
+        const myBizIds = new Set(
+          businesses.filter((b) => b.ambassadorId === a.id).map((b) => b.id),
+        );
+        const seenBiz = new Set<string>();
+        let revenueKes = 0;
+        let commissionKes = 0;
+        for (const p of payments) {
+          if (!myBizIds.has(p.businessId)) continue;
+          revenueKes += p.amountKes;
+          const isFirst = !seenBiz.has(p.businessId);
+          seenBiz.add(p.businessId);
+          commissionKes += Math.round(p.amountKes * (isFirst ? 0.25 : 0.1));
+        }
+        return {
+          ...a,
+          enrolled: myBizIds.size,
+          verified: new Set(
+            audits.filter((e) => e.actorId === a.id).map((e) => e.businessId),
+          ).size,
+          paidConversions: seenBiz.size,
+          revenueKes,
+          commissionKes,
+        };
+      }),
       { headers: { "Cache-Control": "private, no-store" } },
     );
   } catch (error) {

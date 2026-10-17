@@ -1,4 +1,5 @@
 import { survivalMatch } from "@/lib/campus-value";
+import { hasPro } from "@/lib/catalog-plan";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { computeRelevance } from "@/lib/rank";
 import { randomBytes } from "node:crypto";
@@ -68,10 +69,19 @@ export async function POST(req: NextRequest) {
     );
     const { contactPhone, ...safe } = created;
     void contactPhone;
+    const now = Date.now();
+    const refCode = `#MM-${created.id.slice(-4).toUpperCase()}`;
+    const tierWeight = (b: Awaited<ReturnType<typeof Store.getBusinesses>>[number]) => {
+      const tierActive = !b.tierEndsAt || Date.parse(b.tierEndsAt) > now;
+      if (hasPro(b, now)) return 3;
+      if (tierActive && b.activeTier === "FEATURED") return 2;
+      if (tierActive && b.activeTier === "RECOMMENDED") return 1;
+      return 0;
+    };
     const handoffs = (await Store.getBusinesses())
       .filter(
         (b) =>
-          survivalMatch(b, "all", Date.now()) &&
+          survivalMatch(b, "all", now) &&
           b.verificationLevel === "L2" &&
           (zone === "all" || b.zone === zone || b.servesZones.includes(zone)) &&
           (category
@@ -79,13 +89,22 @@ export async function POST(req: NextRequest) {
               b.extraCategories.includes(category)
             : computeRelevance(b, created.query) >= 0.25),
       )
+      .sort((a, b) => {
+        const diff = tierWeight(b) - tierWeight(a);
+        if (diff !== 0) return diff;
+        return (
+          computeRelevance(b, created.query) -
+          computeRelevance(a, created.query)
+        );
+      })
       .slice(0, 5)
       .map((b) => ({
         name: b.name,
         businessId: b.id,
+        isPro: tierWeight(b) > 0,
         url: whatsappUrl(
           b.whatsapp || b.phone,
-          `I posted this request on Moi Mashinani: ${created.query}. Zone: ${zone}. Can you help with the price and availability?`,
+          `I posted this request on Moi Mashinani (${refCode}): ${created.query}. Zone: ${zone}. Can you help with the price and availability?`,
         ),
       }))
       .filter((b) => b.url);

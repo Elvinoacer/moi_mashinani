@@ -23,6 +23,9 @@ function FieldTool() {
   const [zone, setZone] = useState("all");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completed, setCompleted] = useState(0);
+  const [enrolledCount, setEnrolledCount] = useState(0);
+  const [paidConversions, setPaidConversions] = useState(0);
+  const [commissionKes, setCommissionKes] = useState(0);
   const [code, setCode] = useState("");
   const [enroll, setEnroll] = useState(false);
   const [refresh, setRefresh] = useState(0);
@@ -47,6 +50,9 @@ function FieldTool() {
         if (!r.ok) throw new Error(data.error);
         setTasks(data.tasks);
         setCompleted(data.completed);
+        setEnrolledCount(data.enrolledCount || 0);
+        setPaidConversions(data.paidConversions || 0);
+        setCommissionKes(data.commissionEarnedKes || 0);
         setCode(data.referralCode);
       })
       .catch((cause) => {
@@ -100,18 +106,35 @@ function FieldTool() {
           ))}
         </select>
       </label>
-      <Card>
-        <h2 className="text-xl font-bold">Today’s zone progress</h2>
-        <p className="my-3">
-          {completed} verified today · {tasks.length} visits waiting
-        </p>
-        <progress
-          aria-label="Today's zone progress"
-          className="h-4 w-full"
-          max={Math.max(1, completed + tasks.length)}
-          value={completed}
-        />
-      </Card>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Card>
+          <h2 className="text-xl font-bold">Today’s zone progress</h2>
+          <p className="my-3">
+            {completed} verified today · {tasks.length} visits waiting
+          </p>
+          <progress
+            aria-label="Today's zone progress"
+            className="h-4 w-full"
+            max={Math.max(1, completed + tasks.length)}
+            value={completed}
+          />
+        </Card>
+        <Card className="border-[#dce5d7] bg-[#f7faf5]">
+          <h2 className="text-xl font-bold text-[#183e35]">
+            Referral &amp; Commission Tracker
+          </h2>
+          <p className="mt-2 text-2xl font-bold text-[#183e35]">
+            KES {commissionKes.toLocaleString("en-KE")}{" "}
+            <span className="text-xs font-semibold text-[#335e41]">
+              earned commission
+            </span>
+          </p>
+          <p className="mt-1 text-xs text-[#50675a]">
+            {enrolledCount} shops attributed · {paidConversions} paid upgrades
+            (25% on 1st upgrade, 10% on renewals)
+          </p>
+        </Card>
+      </div>
       <div className="flex flex-wrap gap-3">
         <Button onClick={() => setEnroll(!enroll)}>
           {enroll ? "Back to visits" : "Quick enroll shop / hustle"}

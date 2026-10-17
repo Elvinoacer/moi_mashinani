@@ -54,11 +54,11 @@ export async function POST(req: NextRequest) {
         planId !== "PRO" &&
         planId !== "DEAL_BLAST") ||
       typeof weeks !== "number" ||
-      ![1, 2, 4].includes(weeks)
+      ![1, 2, 4, 12].includes(weeks)
     ) {
       throw new ApiError(
         400,
-        "Choose Pro for one month, or a valid promotion plan and 1, 2, or 4 weeks",
+        "Choose Pro for one month, or a valid promotion plan and 1, 2, 4, or 12 weeks",
       );
     }
     if (body.method && body.method !== "INTASEND_CHECKOUT")

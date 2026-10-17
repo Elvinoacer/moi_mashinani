@@ -10,6 +10,9 @@ export function FieldTeam() {
       email: string;
       enrolled: number;
       verified: number;
+      paidConversions?: number;
+      revenueKes?: number;
+      commissionKes?: number;
     }>
   >([]);
   const [email, setEmail] = useState("");
@@ -37,13 +40,16 @@ export function FieldTeam() {
   return (
     <details className="ui-card">
       <summary className="cursor-pointer font-bold">
-        Field ambassadors & referral results
+        Field ambassadors &amp; referral results
       </summary>
       <div className="mt-4 space-y-4">
         {team.map((a) => (
           <p className="text-sm" key={a.id}>
             <strong>{a.name}</strong> · {a.enrolled} listings attributed ·{" "}
-            {a.verified} field checks
+            {a.verified} field checks · {a.paidConversions ?? 0} paid upgrades ·{" "}
+            <span className="font-semibold text-[#183e35]">
+              KES {(a.commissionKes ?? 0).toLocaleString("en-KE")} commission
+            </span>
           </p>
         ))}
         <form

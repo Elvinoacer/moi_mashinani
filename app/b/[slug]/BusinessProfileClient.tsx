@@ -226,8 +226,9 @@ export function BusinessProfileClient({
   const whatsappPhone = recipient.startsWith("0")
     ? "254" + recipient.slice(1)
     : recipient;
+  const refTag = `#MM-${business.id.slice(-4).toUpperCase()}`;
   const whatsappMessage = encodeURIComponent(
-    `Habari ${business.name}, nimeona profile yako kwa MoiMashinani campus directory. Naomba kuuliza kuhusu huduma zenu.`,
+    `Habari ${business.name}, nimeona profile yako kwa MoiMashinani campus directory (${refTag}). Naomba kuuliza kuhusu huduma zenu.`,
   );
   const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMessage}`;
 

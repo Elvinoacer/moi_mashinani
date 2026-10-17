@@ -6,6 +6,8 @@ import { removeUnusedMedia } from "./media-storage";
 import { deletePhotosFromR2 } from "./r2";
 import { ENROLLMENT_MEDIA_WINDOW_MS } from "./enrollment-media";
 
+const GUARANTEED_MIN_LEADS = 3;
+
 export async function runPlanMaintenance(
   now = new Date(),
   send = sendProPlanEmail,
@@ -18,6 +20,7 @@ export async function runPlanMaintenance(
   const three = new Date(now.getTime() + 3 * 864e5);
   const one = new Date(now.getTime() + 864e5);
   const thirtyAgo = new Date(now.getTime() - 30 * 864e5);
+
   const candidates = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT b."id" FROM "Business" b JOIN "Account" a ON a."id" = b."ownerId"
     WHERE b."proEndsAt" <= ${seven} AND b."proEndsAt" >= ${thirtyAgo} AND a."emailVerifiedAt" IS NOT NULL
@@ -25,6 +28,7 @@ export async function runPlanMaintenance(
       AND n."daysBefore" = CASE WHEN b."proEndsAt" <= ${now} THEN 0 WHEN b."proEndsAt" <= ${one} THEN 1 WHEN b."proEndsAt" <= ${three} THEN 3 ELSE 7 END
       AND n."sentAt" IS NOT NULL)
     ORDER BY b."proEndsAt" ASC LIMIT ${batchSize}`;
+
   const result = {
     sent: 0,
     skipped: 0,
@@ -32,6 +36,7 @@ export async function runPlanMaintenance(
     cleaned: 0,
     cleanupFailed: 0,
   };
+
   for (const candidate of candidates) {
     if (
       Date.now() - started > Math.min(200000, budgetMs) ||
@@ -42,10 +47,7 @@ export async function runPlanMaintenance(
       where: { id: candidate.id },
       include: { owner: true },
     });
-    if (
-      !business?.proEndsAt ||
-      !business.owner?.emailVerifiedAt
-    ) {
+    if (!business?.proEndsAt || !business.owner?.emailVerifiedAt) {
       result.skipped++;
       continue;
     }
@@ -85,7 +87,7 @@ export async function runPlanMaintenance(
     try {
       const current = await prisma.business.findUnique({
         where: { id: business.id },
-        select: { proEndsAt: true },
+        select: { proEndsAt: true, metrics: true },
       });
       if (current?.proEndsAt?.getTime() !== business.proEndsAt.getTime()) {
         await prisma.planNotice.update({
@@ -95,6 +97,18 @@ export async function runPlanMaintenance(
         result.skipped++;
         continue;
       }
+      const metricsObj =
+        (current?.metrics as Record<string, number> | null) || {};
+      const totalLeads =
+        (metricsObj.calls || 0) +
+        (metricsObj.whatsapp || 0) +
+        (metricsObj.bookingRequests || 0);
+      const totalViews = metricsObj.views || 0;
+      const roiSnippet =
+        totalLeads > 0 || totalViews > 0
+          ? ` Your profile has generated ${totalLeads} direct student contacts and ${totalViews} profile views.`
+          : "";
+
       await prisma.$transaction((tx) =>
         queueNotice(
           tx,
@@ -106,7 +120,7 @@ export async function runPlanMaintenance(
               stage === 0
                 ? "Your Pro plan has ended"
                 : `Your Pro plan ends in ${stage} days`,
-            body: `${business.name}: ${stage === 0 ? "your listing has returned to Free. Your content remains saved." : "renew to keep Pro benefits without interruption."} Renew manually from your dashboard; you will not be charged automatically.`,
+            body: `${business.name}:${roiSnippet} ${stage === 0 ? "Your listing has returned to Free and your content remains saved." : "Renew to keep Pro visibility and unlimited student lead alerts without interruption."} Renew manually from your dashboard; you will not be charged automatically.`,
             path: `/pro/${business.slug}`,
             button: "Review & renew Pro",
           },
@@ -144,6 +158,81 @@ export async function runPlanMaintenance(
   }
   // Only unreferenced uploads are eligible. Expired Pro products continue to reference their photos.
   if (Date.now() - started > budgetMs || options.signal?.aborted) return result;
+
+  // 3-Lead Value Guarantee: If a paid RECOMMENDED or FEATURED boost is expiring within 24 hours
+  // (or expired in the last 48 hours) and received fewer than 3 customer contacts during its run,
+  // automatically extend it by 7 days once per boost run.
+  const twoDaysAgo = new Date(now.getTime() - 2 * 864e5);
+  const expiringBoosts = await prisma.business.findMany({
+    where: {
+      status: "ACTIVE",
+      activeTier: { in: ["RECOMMENDED", "FEATURED"] },
+      tierEndsAt: { gte: twoDaysAgo, lte: one },
+    },
+    take: batchSize,
+  });
+
+  for (const biz of expiringBoosts) {
+    if (
+      Date.now() - started > Math.min(200000, budgetMs) ||
+      options.signal?.aborted
+    )
+      break;
+    if (!biz.tierEndsAt) continue;
+    const runStart =
+      biz.tierStartsAt ?? new Date(biz.tierEndsAt.getTime() - 7 * 864e5);
+    const alreadyExtended = await prisma.businessAudit.findFirst({
+      where: {
+        businessId: biz.id,
+        action: "VALUE_GUARANTEE_EXTENSION",
+        createdAt: { gte: runStart },
+      },
+    });
+    if (alreadyExtended) continue;
+
+    const leadEvents = await prisma.businessEvent.count({
+      where: {
+        businessId: biz.id,
+        type: { in: ["call", "whatsapp", "booking", "merchant_reply"] },
+        createdAt: { gte: runStart, lte: biz.tierEndsAt },
+      },
+    });
+
+    if (leadEvents < GUARANTEED_MIN_LEADS) {
+      const extendedUntil = new Date(
+        Math.max(now.getTime(), biz.tierEndsAt.getTime()) + 7 * 864e5,
+      );
+      await prisma.$transaction(async (tx) => {
+        await tx.business.update({
+          where: { id: biz.id },
+          data: { tierEndsAt: extendedUntil },
+        });
+        await tx.businessAudit.create({
+          data: {
+            businessId: biz.id,
+            actorId: null,
+            action: "VALUE_GUARANTEE_EXTENSION",
+            details: `Auto-extended ${biz.activeTier} by 7 days under 3-Lead Value Guarantee (${leadEvents} leads recorded since ${runStart.toISOString()})`,
+          },
+        });
+        await queueNotice(
+          tx,
+          biz.ownerId,
+          `guarantee/${biz.id}/${runStart.toISOString()}`,
+          {
+            kind: "PLAN_EXPIRY",
+            title: "3-Lead Guarantee: +7 Free Boost Days Added!",
+            body: `${biz.name} received ${leadEvents} tracked customer contacts during your ${biz.activeTier} run. Under our 3-Lead Value Guarantee, we have automatically extended your boost by 7 extra days at no charge!`,
+            path: `/dashboard/${biz.slug}?tab=billing`,
+            button: "View my active boost",
+          },
+          ["EMAIL", "PUSH"],
+          biz.id,
+        );
+      });
+      result.sent++;
+    }
+  }
   const cutoff = new Date(now.getTime() - 864e5);
   const unused = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT m."id" FROM "BusinessMedia" m LEFT JOIN "Business" b ON b."id" = m."businessId"

@@ -60,10 +60,35 @@ export async function GET(req: NextRequest) {
     const completed = await prisma.business.count({
       where: { id: { in: ids }, ...(zone === "all" ? {} : { zone }) },
     });
+    const attributedBusinesses = await prisma.business.findMany({
+      where: { ambassadorId: user.id },
+      select: { id: true },
+    });
+    const attributedIds = attributedBusinesses.map((b) => b.id);
+    const completedPayments = attributedIds.length
+      ? await prisma.paymentRecord.findMany({
+          where: { businessId: { in: attributedIds }, state: "COMPLETE" },
+          orderBy: { createdAt: "asc" },
+          select: { businessId: true, amountKes: true },
+        })
+      : [];
+    const seenBusiness = new Set<string>();
+    let attributedRevenueKes = 0;
+    let commissionEarnedKes = 0;
+    for (const p of completedPayments) {
+      attributedRevenueKes += p.amountKes;
+      const isFirst = !seenBusiness.has(p.businessId);
+      seenBusiness.add(p.businessId);
+      commissionEarnedKes += Math.round(p.amountKes * (isFirst ? 0.25 : 0.1));
+    }
     return NextResponse.json(
       {
         referralCode: user.id,
         completed,
+        enrolledCount: attributedIds.length,
+        paidConversions: seenBusiness.size,
+        attributedRevenueKes,
+        commissionEarnedKes,
         tasks: tasks.map((b) => ({
           id: b.id,
           name: b.name,

@@ -1,35 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PAYMENT_PLAN_LABELS } from "@/lib/payments";
+import {
+  PAYMENT_PLAN_LABELS,
+  PROMOTION_WEEKS,
+  promotionPrice,
+  type PromotionPlanId,
+  type PromotionWeeks,
+} from "@/lib/payments";
 import type { Business, PaymentRecord } from "@/lib/types";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
-const packages = [
-  {
-    id: "DEAL_BLAST",
-    name: "24-hour deal blast",
-    price: 30,
-    description:
-      "Put your student deal first on Deals for 24 hours; notify opted-in campus accounts.",
-  },
-  {
-    id: "RECOMMENDED",
-    name: "7-day category top spot",
-    price: 100,
-    description:
-      "Appear above free listings in matching category and zone results.",
-  },
-  {
-    id: "PRO",
-    name: "Moi Mashinani Pro",
-    price: 250,
-    description:
-      "A calendar month of featured zone visibility and daily deal broadcasts. Catalogues, stock updates and verification stay free.",
-  },
-] as const;
+
 export function BoostCheckout({ business }: { business: Business }) {
   const [plan, setPlan] = useState<PaymentRecord["planId"]>("RECOMMENDED");
+  const [weeks, setWeeks] = useState<PromotionWeeks>(1);
   const [phone, setPhone] = useState(business.phone);
   const [payment, setPayment] = useState<PaymentRecord | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,6 +22,66 @@ export function BoostCheckout({ business }: { business: Business }) {
   const [pollError, setPollError] = useState("");
   const [receipt, setReceipt] = useState("");
   const [elapsed, setElapsed] = useState(0);
+
+  const pricingContext = {
+    sellerType: business.sellerType,
+    primaryCategory: business.primaryCategory,
+  };
+
+  const isComrade = business.sellerType === "COMRADE";
+  const isHostel = business.primaryCategory === "hostels-rooms";
+
+  const recQuote = promotionPrice("RECOMMENDED", weeks, pricingContext);
+  const featQuote = promotionPrice("FEATURED", weeks, pricingContext);
+
+  const packages = [
+    {
+      id: "DEAL_BLAST" as const,
+      name: "24-hour deal blast",
+      price: 30,
+      fullPrice: 30,
+      savings: 0,
+      badge: "Flash Promo",
+      description:
+        "Put your student deal first on Deals for 24 hours; notify opted-in campus accounts.",
+    },
+    {
+      id: "RECOMMENDED" as const,
+      name: `${weeks === 12 ? "Semester (12w)" : `${weeks}-week`} Recommended`,
+      price: recQuote.chargeKes,
+      fullPrice: recQuote.fullPriceKes,
+      savings: recQuote.savingsKes,
+      badge: isComrade ? "50% Comrade Rate" : "Popular",
+      description:
+        "Appear above all free listings in matching category & zone results + Unlimited Request Board replies + 3-Lead Guarantee.",
+    },
+    {
+      id: "FEATURED" as const,
+      name: `${weeks === 12 ? "Semester (12w)" : `${weeks}-week`} Featured Spotlight`,
+      price: featQuote.chargeKes,
+      fullPrice: featQuote.fullPriceKes,
+      savings: featQuote.savingsKes,
+      badge: "Top 3 + Homepage",
+      description:
+        "Top-3 search & category placement, Homepage “Featured around campus” spotlight, Unlimited Request Board replies + 3-Lead Guarantee.",
+    },
+    {
+      id: "PRO" as const,
+      name: "Moi Mashinani Pro (30 Days)",
+      price: 250,
+      fullPrice: 250,
+      savings: 0,
+      badge: "Best All-Round",
+      description:
+        "A calendar month of featured zone visibility, instant Request Board student lead routing, and daily deal broadcasts.",
+    },
+  ];
+
+  const totalContacts =
+    (business.metrics?.calls || 0) +
+    (business.metrics?.whatsapp || 0) +
+    (business.metrics?.bookingRequests || 0);
+
   useEffect(() => {
     const controller = new AbortController();
     fetch(`/api/payments?businessId=${business.id}`, {
@@ -62,10 +107,12 @@ export function BoostCheckout({ business }: { business: Business }) {
       });
     return () => controller.abort();
   }, [business.id]);
+
   const pendingId =
     payment && ["CREATED", "PENDING", "PROCESSING"].includes(payment.state)
       ? payment.id
       : null;
+
   useEffect(() => {
     if (!pendingId) return;
     const controller = new AbortController();
@@ -113,11 +160,14 @@ export function BoostCheckout({ business }: { business: Business }) {
       clearInterval(tick);
     };
   }, [pendingId]);
+
   async function checkout() {
     if (busy) return;
     setBusy(true);
     setError("");
     try {
+      const effectiveWeeks =
+        plan === "RECOMMENDED" || plan === "FEATURED" ? weeks : 1;
       const response = payment
         ? await fetch(`/api/payments/${payment.id}/retry`, { method: "POST" })
         : await fetch("/api/payments", {
@@ -126,7 +176,7 @@ export function BoostCheckout({ business }: { business: Business }) {
             body: JSON.stringify({
               businessId: business.id,
               planId: plan,
-              weeks: 1,
+              weeks: effectiveWeeks,
               phone,
               method: "INTASEND_CHECKOUT",
             }),
@@ -141,6 +191,7 @@ export function BoostCheckout({ business }: { business: Business }) {
       setBusy(false);
     }
   }
+
   async function verify(submitReceipt = false) {
     if (!payment || busy) return;
     setBusy(true);
@@ -164,19 +215,57 @@ export function BoostCheckout({ business }: { business: Business }) {
       setBusy(false);
     }
   }
+
+  const isMultiWeekPlan = (p: string): p is PromotionPlanId =>
+    p === "RECOMMENDED" || p === "FEATURED";
+
   return (
     <Card className="space-y-5">
-      <div>
-        <h2 className="text-2xl font-bold text-[#183e35]">Plans &amp; Promotion</h2>
-        <p className="mt-1 text-sm text-[#50675a] leading-relaxed">
-          Compare plans side-by-side. Free tier gives permanent campus visibility. Boosts and Pro subscriptions give priority placement and deal broadcasts via one-time M-Pesa payments.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-[#183e35]">
+            Plans &amp; Promotion
+          </h2>
+          <p className="mt-1 text-sm text-[#50675a] leading-relaxed">
+            Compare plans side-by-side. Every paid boost includes our{" "}
+            <strong className="text-[#183e35]">3-Lead Value Guarantee</strong>:
+            get at least 3 customer contacts during your run or we automatically
+            extend your boost by 7 days free.
+          </p>
+        </div>
+        <div className="rounded-xl border border-[#dce5d7] bg-[#f7faf5] px-4 py-3 text-right">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[#50675a]">
+            Your Tracked Moi Mashinani ROI
+          </p>
+          <p className="mt-0.5 text-xl font-bold text-[#183e35]">
+            {totalContacts} direct leads · {business.metrics?.views || 0} views
+          </p>
+          <p className="text-[11px] text-[#335e41]">
+            Calls, WhatsApp orders &amp; bookings attributed to your profile
+          </p>
+        </div>
       </div>
+
+      {isComrade && (
+        <div className="rounded-xl border border-[#b7d6c2] bg-[#edf6f0] px-4 py-2.5 text-xs font-semibold text-[#1f4d35]">
+          🎓 Comrade Seller Subsidy Active: You automatically get 50% off all
+          Recommended and Featured weekly rates!
+        </div>
+      )}
+      {isHostel && !isComrade && (
+        <div className="rounded-xl border border-[#e3d4a5] bg-[#fdf9ec] px-4 py-2.5 text-xs font-semibold text-[#634b13]">
+          🏠 Hostels &amp; Housing Category: Includes priority placement on the
+          Keja Hunter map, vacancy filters, and high-ticket student booking
+          leads.
+        </div>
+      )}
+
       {error && (
         <p role="alert" className="text-red-800">
           {error}
         </p>
       )}
+
       {payment ? (
         <section className="space-y-4" aria-live="polite">
           <h3 className="text-xl font-bold">
@@ -187,7 +276,8 @@ export function BoostCheckout({ business }: { business: Business }) {
                 : "Waiting for payment confirmation"}
           </h3>
           <p>
-            KES {payment.amountKes} · {PAYMENT_PLAN_LABELS[payment.planId]}
+            KES {payment.amountKes} · {PAYMENT_PLAN_LABELS[payment.planId]} (
+            {payment.weeks} {payment.weeks === 1 ? "week" : "weeks"})
           </p>
           <ol className="space-y-3 text-sm">
             <li>
@@ -266,7 +356,7 @@ export function BoostCheckout({ business }: { business: Business }) {
                   disabled={busy || receipt.length !== 10}
                   onClick={() => void verify(true)}
                 >
-                  Save reference & check payment
+                  Save reference &amp; check payment
                 </Button>
                 {payment.submittedReceipt && (
                   <p className="mt-2 text-sm">
@@ -280,7 +370,42 @@ export function BoostCheckout({ business }: { business: Business }) {
         </section>
       ) : (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-xl border border-[#dce5d7] bg-[#f7faf5] p-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#183e35]">
+                Select Duration (for Recommended &amp; Featured boosts):
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {PROMOTION_WEEKS.map((w) => {
+                  const selected = weeks === w;
+                  const label =
+                    w === 1
+                      ? "1 Week"
+                      : w === 2
+                        ? "2 Weeks (-5%)"
+                        : w === 4
+                          ? "4 Weeks (Pay for 3!)"
+                          : "12 Weeks Semester Pass (-35%)";
+                  return (
+                    <button
+                      key={w}
+                      type="button"
+                      onClick={() => setWeeks(w)}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                        selected
+                          ? "bg-[#183e35] text-white shadow-sm"
+                          : "bg-white text-[#244b37] border border-[#dce5d7] hover:bg-[#e9eedf]"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div className="ui-card bg-[#f7faf5] border border-[#dce5d7] flex flex-col justify-between p-4">
               <div>
                 <div className="flex items-center justify-between">
@@ -291,21 +416,31 @@ export function BoostCheckout({ business }: { business: Business }) {
                 </div>
                 <p className="my-2 text-2xl font-bold text-[#183e35]">KES 0</p>
                 <p className="text-xs text-[#50675a] leading-relaxed">
-                  Permanent directory &amp; Comrade Market listing, customer orders, directions, and free L2 verification.
+                  Permanent directory &amp; Comrade Market listing, customer
+                  orders, 3 free Request Board lead replies/month, and free L2
+                  verification.
                 </p>
               </div>
               <p className="mt-3 text-[11px] font-semibold text-[#335e41]">
-                {business.activeTier === "NONE" ? "● Your current active tier" : "Baseline included"}
+                {business.activeTier === "NONE"
+                  ? "● Your current active tier"
+                  : "Baseline included"}
               </p>
             </div>
             {packages.map((p) => (
               <label
-                className={`ui-card cursor-pointer flex flex-col justify-between p-4 ${plan === p.id ? "ring-2 ring-[#335e41] border-[#335e41]" : "border-[#dfe5d8]"}`}
+                className={`ui-card cursor-pointer flex flex-col justify-between p-4 ${
+                  plan === p.id
+                    ? "ring-2 ring-[#335e41] border-[#335e41] bg-[#fbfdf9]"
+                    : "border-[#dfe5d8]"
+                }`}
                 key={p.id}
               >
                 <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#183e35]">{p.name}</span>
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="rounded-full bg-[#e9eedf] px-2 py-0.5 text-[10px] font-bold text-[#244b37]">
+                      {p.badge}
+                    </span>
                     <input
                       type="radio"
                       name="boost-package"
@@ -315,8 +450,27 @@ export function BoostCheckout({ business }: { business: Business }) {
                       className="accent-[#335e41]"
                     />
                   </div>
-                  <p className="my-2 text-2xl font-bold text-[#183e35]">KES {p.price}</p>
-                  <p className="text-xs text-[#50675a] leading-relaxed">{p.description}</p>
+                  <p className="mt-2 font-bold text-[#183e35] text-sm">
+                    {p.name}
+                  </p>
+                  <div className="my-2 flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-[#183e35]">
+                      KES {p.price}
+                    </span>
+                    {p.savings > 0 && (
+                      <span className="text-xs text-[#6b7d72] line-through">
+                        KES {p.fullPrice}
+                      </span>
+                    )}
+                  </div>
+                  {p.savings > 0 && (
+                    <p className="mb-1.5 text-[11px] font-bold text-[#1f6b3b]">
+                      Save KES {p.savings} with bundle!
+                    </p>
+                  )}
+                  <p className="text-xs text-[#50675a] leading-relaxed">
+                    {p.description}
+                  </p>
                 </div>
                 <span className="mt-3 text-[11px] font-bold text-[#244b37]">
                   {plan === p.id ? "✓ Selected for upgrade" : "Tap to select"}
@@ -324,10 +478,19 @@ export function BoostCheckout({ business }: { business: Business }) {
               </label>
             ))}
           </div>
+
+          {isMultiWeekPlan(plan) && weeks > 1 && (
+            <p className="text-xs font-semibold text-[#335e41]">
+              ✓ {weeks}-week bundle selected for {PAYMENT_PLAN_LABELS[plan]}.
+              Any remaining active boost time on your account is preserved and
+              carried forward automatically.
+            </p>
+          )}
+
           {plan === "DEAL_BLAST" && !business.studentDiscount && (
-            <p className="text-sm">
-              Add a student deal under My shop & prices → details before buying
-              a deal blast.
+            <p className="text-sm text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Add a student deal under My shop &amp; prices → details before
+              buying a deal blast.
             </p>
           )}
           <label className="block text-sm font-bold">

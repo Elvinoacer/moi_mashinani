@@ -35,7 +35,7 @@ export function DemandModal({
   const [phone, setPhone] = useState(() => getSavedStudentContact().phone);
   const [consent, setConsent] = useState(false);
   const [handoffs, setHandoffs] = useState<
-    Array<{ name: string; businessId: string; url: string }>
+    Array<{ name: string; businessId: string; url: string; isPro?: boolean }>
   >([]);
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -101,12 +101,17 @@ export function DemandModal({
                   href={seller.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ui-button ui-button-primary"
+                  className="ui-button ui-button-primary flex items-center justify-between gap-2"
                   onClick={() =>
                     trackBusinessEvent(seller.businessId, "whatsapp")
                   }
                 >
-                  WhatsApp {seller.name}
+                  <span>WhatsApp {seller.name}</span>
+                  {seller.isPro && (
+                    <span className="rounded-full bg-[#d9f279] px-2 py-0.5 text-[10px] font-bold text-[#183e35]">
+                      Priority Seller
+                    </span>
+                  )}
                 </a>
               ))}
             </div>

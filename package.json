@@ -40,6 +40,7 @@
     "test:admin:deletion": "tsx scripts/test-admin-deletion.ts",
     "test:value": "tsx scripts/test-value-loops.ts",
     "test:value:browser": "tsx scripts/test-value-browser.ts",
+    "test:request-modal:browser": "tsx scripts/test-request-success-modal-browser.ts",
     "test:value:unit": "tsx --test scripts/test-campus-value.ts",
     "test:habit": "tsx scripts/test-habit-strategy.ts",
     "test:habit:unit": "tsx --test scripts/test-habit-strategy-unit.ts",

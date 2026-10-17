@@ -48,6 +48,9 @@ function AdminConsoleContent() {
   const [busyTarget, setBusyTarget] = useState("");
   const [listingSearch, setListingSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Business | null>(null);
+  const [demandDeleteTarget, setDemandDeleteTarget] =
+    useState<ServiceRequest | null>(null);
+  const [demandDeleteError, setDemandDeleteError] = useState("");
   const [confirmationName, setConfirmationName] = useState("");
   const [ownerEditTarget, setOwnerEditTarget] = useState<Business | null>(null);
   const [ownerEditEmail, setOwnerEditEmail] = useState("");
@@ -277,6 +280,38 @@ function AdminConsoleContent() {
     }
   };
 
+  const deleteDemandRequest = async () => {
+    if (!demandDeleteTarget || busyTarget) return;
+    const id = demandDeleteTarget.id;
+    setBusyTarget(id);
+    setDemandDeleteError("");
+    setError("");
+    setActionMessage("");
+    try {
+      const response = await fetch("/api/demand", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success)
+        throw new Error(data.error || "Could not delete the demand request.");
+      setDemandRequests((current) =>
+        current.filter((request) => request.id !== id),
+      );
+      setDemandDeleteTarget(null);
+      setActionMessage("Demand request deleted.");
+    } catch (cause) {
+      setDemandDeleteError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not delete the demand request.",
+      );
+    } finally {
+      setBusyTarget("");
+    }
+  };
+
   const pendingListings = businesses.filter((b) => b.status === "PENDING");
   const activeListings = businesses.filter((b) => b.status === "ACTIVE");
   const openReports = reports.filter((r) => r.status === "OPEN");
@@ -420,6 +455,47 @@ function AdminConsoleContent() {
                 </article>
               ))
             )}
+          </div>
+        </ModalFrame>
+      )}
+      {demandDeleteTarget && (
+        <ModalFrame
+          title="Delete demand request?"
+          onClose={() => {
+            if (!busyTarget) setDemandDeleteTarget(null);
+          }}
+        >
+          <div className="space-y-4 p-5">
+            <p className="text-sm text-[#243b32]">
+              Permanently delete this student request? It will disappear from
+              Demand Insights and the public requests board. This cannot be undone.
+            </p>
+            <p className="rounded-xl bg-[#f7f8f2] px-3 py-3 text-sm font-semibold text-[#243b32] break-words">
+              &ldquo;{demandDeleteTarget.query}&rdquo;
+            </p>
+            {demandDeleteError && (
+              <p role="alert" className="text-sm text-[#a7302d]">
+                {demandDeleteError}
+              </p>
+            )}
+            <div className="flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                disabled={!!busyTarget}
+                onClick={() => setDemandDeleteTarget(null)}
+                className="rounded-xl border border-[#dfe5d8] px-4 py-2 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!!busyTarget}
+                onClick={() => void deleteDemandRequest()}
+                className="rounded-xl bg-[#a7302d] px-4 py-2 text-sm font-bold text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a7302d]"
+              >
+                {busyTarget ? "Deleting…" : "Delete request"}
+              </button>
+            </div>
           </div>
         </ModalFrame>
       )}
@@ -1073,34 +1149,54 @@ function AdminConsoleContent() {
             </p>
           </div>
 
-          <div className="divide-y divide-[#dfe5d8]">
-            {demandRequests.map((req) => (
-              <div
-                key={req.id}
-                className="py-3 flex items-center justify-between"
-              >
-                <div>
-                  <div className="font-display font-bold text-base text-[#243b32]">
-                    &ldquo;{req.query}&rdquo;
+          {demandRequests.length === 0 ? (
+            <p className="py-8 text-center text-sm text-[#667064]">
+              No student demand requests to review yet.
+            </p>
+          ) : (
+            <div className="divide-y divide-[#dfe5d8]">
+              {demandRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <div className="font-display font-bold text-base text-[#243b32] break-words">
+                      &ldquo;{req.query}&rdquo;
+                    </div>
+                    <div className="text-xs text-[#667064]">
+                      Zone: {req.zone} •{" "}
+                      {new Date(req.createdAt).toLocaleDateString()}
+                    </div>
                   </div>
-                  <div className="text-xs text-[#667064]">
-                    Zone: {req.zone} •{" "}
-                    {new Date(req.createdAt).toLocaleDateString()}
+                  <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                    {req.contactPhone && (
+                      <a
+                        href={`https://wa.me/${req.contactPhone.replace(/\D/g, "").replace(/^0/, "254")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-9 items-center rounded-full bg-[#25D366] px-3 py-1.5 text-xs font-bold text-[#243b32] signboard-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
+                      >
+                        WhatsApp Student
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      aria-label={`Delete student demand: ${req.query}`}
+                      disabled={!!busyTarget}
+                      onClick={() => {
+                        setDemandDeleteError("");
+                        setDemandDeleteTarget(req);
+                      }}
+                      className="inline-flex min-h-9 items-center rounded-full border border-[#e4b3af] bg-white px-3 py-1.5 text-xs font-bold text-[#a7302d] transition-colors hover:bg-[#fce7e1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a7302d] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
-                {req.contactPhone && (
-                  <a
-                    href={`https://wa.me/${req.contactPhone.replace(/\D/g, "").replace(/^0/, "254")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#25D366] text-[#243b32] text-xs font-bold px-3 py-1 rounded-full signboard-border"
-                  >
-                    WhatsApp Student
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

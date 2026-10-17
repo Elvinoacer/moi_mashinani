@@ -84,15 +84,21 @@ export function DemandModal({
   return (
     <ModalFrame title="Post a comrade request" onClose={onClose}>
       {submitted ? (
-        <div className="space-y-4 p-6">
-          <div className="flex items-start gap-3 rounded-xl bg-[#edf5e9] p-4 text-[#183e35]">
-            <CheckCircle2 className="mt-0.5 shrink-0 text-[#377a47]" size={24} aria-hidden="true" />
-            <div><h3 className="text-xl font-bold">Your request is live</h3><p className="mt-1 text-sm text-[#456550]">It now appears on the campus request board.</p></div>
+        <div className="space-y-4 p-4 sm:p-6">
+          <div role="status" className="flex items-start gap-3 rounded-xl border border-[#d1e4d0] bg-[#edf5e9] p-4 text-[#183e35]">
+            <CheckCircle2
+              className="mt-0.5 shrink-0 text-[#377a47]"
+              size={24}
+              aria-hidden="true"
+            />
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold leading-snug">Your request is live</h3>
+              <p className="mt-1 text-sm leading-relaxed text-[#456550]">
+                Posted to the campus board for seven days. Close it sooner anytime from this browser.
+              </p>
+            </div>
           </div>
-          <p>
-            Matching verified sellers are notified. The request expires after
-            seven days. You can close it sooner from this browser.
-          </p>
+
           <CampusPushOptIn
             variant="request-submitted"
             keyword={query}
@@ -100,55 +106,73 @@ export function DemandModal({
             category={category || undefined}
             requestId={submittedId || undefined}
           />
-          {handoffs.length ? (
-            <div className="space-y-3">
-              <p className="font-bold">
-                Want a faster reply? Ping a matching verified seller:
-              </p>
-              {handoffs.map((seller) => (
-                <a
-                  key={seller.businessId}
-                  href={seller.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ui-button ui-button-primary flex items-center justify-between gap-2"
-                  onClick={() =>
-                    trackBusinessEvent(seller.businessId, "whatsapp")
-                  }
-                >
-                  <span>WhatsApp {seller.name}</span>
-                  {seller.isPro && (
-                    <span className="rounded-full bg-[#d9f279] px-2 py-0.5 text-[10px] font-bold text-[#183e35]">
-                      Priority Seller
-                    </span>
-                  )}
-                </a>
-              ))}
-            </div>
+
+          {handoffs.length > 0 ? (
+            <details className="group rounded-xl border border-[#dce5d7] bg-white">
+              <summary className="flex min-h-12 cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-bold text-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]">
+                <span>
+                  Contact {handoffs.length} matching verified seller{handoffs.length === 1 ? "" : "s"}
+                </span>
+                <span className="shrink-0 text-xs font-semibold text-[#526d59] group-open:hidden">
+                  Show
+                </span>
+                <span className="hidden shrink-0 text-xs font-semibold text-[#526d59] group-open:inline">
+                  Hide
+                </span>
+              </summary>
+              <div className="max-h-52 space-y-2 overflow-y-auto border-t border-[#e3ebe0] p-3">
+                {handoffs.map((seller) => (
+                  <a
+                    key={seller.businessId}
+                    href={seller.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-[#dce5d7] px-3 py-2 text-sm font-semibold text-[#183e35] transition-colors hover:bg-[#f0f6eb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
+                    onClick={() =>
+                      trackBusinessEvent(seller.businessId, "whatsapp")
+                    }
+                  >
+                    <span className="min-w-0 break-words">WhatsApp {seller.name}</span>
+                    {seller.isPro && (
+                      <span className="shrink-0 rounded-full bg-[#d9f279] px-2 py-1 text-[10px] font-bold text-[#183e35]">
+                        Priority
+                      </span>
+                    )}
+                  </a>
+                ))}
+              </div>
+            </details>
           ) : (
-            <p>
-              No matching seller contact yet. Share your request in your campus
-              WhatsApp group.
+            <p className="text-sm leading-relaxed text-[#526d59]">
+              No matching seller yet. You can share the request with your campus WhatsApp group.
             </p>
           )}
+
+          <div className="flex flex-col gap-2 border-t border-[#e3ebe0] pt-4 sm:flex-row">
+            <Link
+              href="/requests"
+              className="ui-button ui-button-primary min-h-11 w-full justify-center text-center sm:flex-1"
+              onClick={onClose}
+            >
+              View request board <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <Button
+              type="button"
+              variant="secondary"
+              className="min-h-11 w-full sm:w-auto sm:min-w-24"
+              onClick={onClose}
+            >
+              Done
+            </Button>
+          </div>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(`Can anyone help? ${query}. Zone: ${zone}. Find verified sellers and post requests on Moi Mashinani: ${typeof window === "undefined" ? "" : window.location.origin}/requests`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="ui-button ui-button-secondary"
+            className="inline-flex min-h-9 items-center text-sm font-semibold text-[#275d47] underline underline-offset-4 hover:text-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
           >
             Share request on WhatsApp
           </a>
-          <Link
-            href="/requests"
-            className="ui-button ui-button-primary"
-            onClick={onClose}
-          >
-            View requests
-          </Link>
-          <Button variant="secondary" onClick={onClose}>
-            Done
-          </Button>
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-5 p-5 sm:p-6">

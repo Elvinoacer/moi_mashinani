@@ -8,6 +8,7 @@ const stageLabels={pending:'Pending',preparing:'Preparing image',uploading:'Uplo
 type Props={label:string;businessId?:string;enrollment?:boolean;multiple?:boolean;maxFiles?:number;disabled?:boolean;disabledReason?:string;camera?:boolean;readyMessage?:string;saveMessage?:string;onUploaded:(urls:string[])=>Promise<unknown>|void;onBusyChange?:(busy:boolean)=>void};
 export function PhotoUploader({label,businessId,enrollment=false,multiple=false,maxFiles=1,disabled=false,disabledReason,camera=false,readyMessage='Done. Your photo has been saved.',saveMessage='Saving to your listing…',onUploaded,onBusyChange}:Props) {
   const id=useId();const selection=useRef<File[]>([]);const uploaded=useRef<string[]>([]);const controller=useRef<AbortController|null>(null);
+  const [dragging,setDragging]=useState(false);
   const [items,setItems]=useState<PhotoUploadItem[]>([]);const [phase,setPhase]=useState<'idle'|'uploading'|'saving'|'done'|'failed'>('idle');const [error,setError]=useState('');const [pendingSave,setPendingSave]=useState(false);
   useEffect(()=>()=>controller.current?.abort(),[]);
   const busy=phase==='uploading'||phase==='saving';
@@ -23,8 +24,9 @@ export function PhotoUploader({label,businessId,enrollment=false,multiple=false,
     finally{controller.current=null;onBusyChange?.(false);}
   }
   function choose(files:FileList|null){if(files?.length)void start(Array.from(files));}
-  return <section aria-label={`${label} upload`} className="space-y-3 rounded-xl border border-[#dfe5d8] bg-[#f7f8f2] p-4">
-    <h3 id={id} className="text-sm font-bold text-[#243b32]">{label}</h3>
+  return <section aria-label={`${label} upload`} onDragOver={event=>{event.preventDefault();if(!busy&&!disabled)setDragging(true);}} onDragLeave={()=>setDragging(false)} onDrop={event=>{event.preventDefault();setDragging(false);if(!busy&&!disabled&&event.dataTransfer.files.length)void start(Array.from(event.dataTransfer.files));}} className={`space-y-3 rounded-2xl border-2 border-dashed p-4 sm:p-5 transition-colors ${dragging?'border-[#53764d] bg-[#edf5e2]':'border-[#d7e2ce] bg-[#f8faf4]'}`}>
+    <div className="flex items-center gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-[#dce6d2] bg-white text-[#527348]"><Upload size={19} aria-hidden="true" /></span><div>
+    <h3 id={id} className="text-sm font-extrabold text-[#243b32]">{label}</h3><p className="mt-1 text-[11px] leading-5 text-[#617469]">{dragging?'Drop your photos here':'Choose from your device, or drag photos here.'}</p></div></div>
     <p className="text-xs text-[#667064]">JPG, PNG or WebP · up to 5 MB each. We compress images before uploading. {multiple?`Room for ${maxFiles} more ${maxFiles===1?'photo':'photos'}.`: 'Choose one photo.'}</p>
     <div className="flex flex-wrap gap-2">
       <label className={`inline-flex items-center gap-2 rounded-lg border border-[#dfe5d8] bg-white px-4 py-3 text-sm font-bold text-[#243b32] focus-within:outline-2 focus-within:outline-[#335e41] ${busy||disabled?'opacity-50':'cursor-pointer'}`}><Upload size={16}/>{multiple?'Choose photos':'Choose photo'}<input type="file" aria-label={label} accept="image/jpeg,image/png,image/webp" multiple={multiple} disabled={busy||disabled} className="sr-only" onChange={event=>{choose(event.target.files);event.target.value='';}}/></label>

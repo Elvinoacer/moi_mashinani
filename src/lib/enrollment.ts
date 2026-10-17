@@ -22,6 +22,7 @@ export async function enrollBusiness(
   fields.sellerType = sellerType as "SHOPFRONT" | "COMRADE";
   fields.verificationVisitRequested =
     !admin && body.verificationVisitRequested === true;
+  const hasPublicPhoto = Boolean(fields.photos?.length || fields.services?.some((item) => item.photo));
   if (
     !admin &&
     (!fields.services ||
@@ -36,7 +37,7 @@ export async function enrollBusiness(
     sellerType === "COMRADE" &&
     !admin &&
     !fields.verificationVisitRequested &&
-    (!body.proofId || !fields.photos?.length)
+    (!body.proofId || !hasPublicPhoto)
   )
     throw new ApiError(
       400,
@@ -45,7 +46,7 @@ export async function enrollBusiness(
   if (
     !admin &&
     sellerType === "SHOPFRONT" &&
-    !fields.photos?.length &&
+    !hasPublicPhoto &&
     !fields.verificationVisitRequested
   )
     throw new ApiError(

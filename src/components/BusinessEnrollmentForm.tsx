@@ -8,6 +8,9 @@ import { PhotoUploader } from "./PhotoUploader";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
+import { ArrowRight, ImagePlus, MapPin, Package, ShieldCheck, Store } from "lucide-react";
+import { ListingFlowHeader, ListingPhotoGallery } from "./ListingFlow";
+import styles from "./ListingFlow.module.css";
 import {
   templateSuggestions,
   hoursPreset,
@@ -153,6 +156,22 @@ export function BusinessEnrollmentForm({
       setUploading(false);
     }
   }
+  async function removeGalleryPhoto(url: string) {
+    if (busy || uploading) return;
+    setUploading(true);
+    setError("");
+    try {
+      if (!items.some((item) => item.photo === url)) {
+        const response = await fetch(`/api/enrollment/media?url=${encodeURIComponent(url)}`, { method: "DELETE" });
+        if (!response.ok && response.status !== 404) {
+          const data = await response.json();
+          throw new Error(data.error || "Could not remove the photo. Please retry.");
+        }
+      }
+      setPhotos((current) => current.filter((photo) => photo !== url));
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not remove the photo."); }
+    finally { setUploading(false); }
+  }
   function essentialsValid() {
     if (
       !details.name.trim() ||
@@ -184,9 +203,12 @@ export function BusinessEnrollmentForm({
       );
   }
   function scrollToSteps() {
+    requestAnimationFrame(() => {
     stepNavRef.current?.scrollIntoView({
       block: "start",
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+    stepNavRef.current?.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
     });
   }
   function returnToEssentials() {
@@ -280,7 +302,7 @@ export function BusinessEnrollmentForm({
       essentialsValid();
       if (!details.landmark.trim())
         throw new Error("Add a landmark or hostel/zone meeting point.");
-      if (mode === "public" && !visit && !photos.length)
+      if (mode === "public" && !visit && !photos.length && !items.some((item) => item.photo))
         throw new Error("Upload a shop/product photo or request a free visit.");
       if (mode === "public" && sellerType === "COMRADE" && !visit && !proofId)
         throw new Error(
@@ -450,53 +472,25 @@ export function BusinessEnrollmentForm({
     );
   return (
     <>
-      <form onSubmit={submit} className="mx-auto w-full max-w-3xl space-y-4">
-        <section ref={stepNavRef} aria-labelledby="enrollment-stage-heading" className="scroll-mt-6 px-1 py-1 sm:px-0">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="font-bold text-[#335e41]">Step {step} of 2</span>
-            <span className="font-medium text-[#657569]">{step === 1 ? "Business essentials" : "Ready to submit"}</span>
-          </div>
-          <div
-            role="progressbar"
-            aria-label="Listing setup progress"
-            aria-valuemin={0}
-            aria-valuemax={2}
-            aria-valuenow={step}
-            className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#dce6d9]"
-          >
-            <div
-              className="h-full rounded-full bg-[#245947] transition-[width] duration-300 ease-out motion-reduce:transition-none"
-              style={{ width: `${step * 50}%` }}
-            />
-          </div>
-          <ol className="mt-2 flex items-center justify-between gap-3 text-xs text-[#6b786d]" aria-label="Listing setup steps">
-            <li aria-current={step === 1 ? "step" : undefined} className={step === 1 ? "font-bold text-[#183e35]" : ""}>
-              1. Business &amp; prices
-            </li>
-            <li aria-current={step === 2 ? "step" : undefined} className={step === 2 ? "font-bold text-[#183e35]" : ""}>
-              2. Review &amp; submit
-            </li>
-          </ol>
-          <h2 id="enrollment-stage-heading" className="mt-3 text-lg font-extrabold text-[#183e35] sm:text-xl">
-            {step === 1 ? "Tell students what you offer" : "Check everything before submitting"}
-          </h2>
-          <p className="mt-0.5 text-sm leading-relaxed text-[#607267]">
-            {step === 1
-              ? "Start with your business details and a few everyday prices."
-              : "Confirm prices, your location and the details needed for review."}
-          </p>
+      <form onSubmit={submit} className={`${styles.flow} mx-auto w-full max-w-3xl space-y-4`}>
+        <section ref={stepNavRef} aria-labelledby="enrollment-stage-heading" className="scroll-mt-24">
+          <ListingFlowHeader step={step}
+            title={step === 1 ? "Give your business a place on campus." : "Your business, ready to be discovered."}
+            description={step === 1 ? "A shop, a stall or a growing hustle. Start with the essentials and show students what you offer." : "Take a look at your listing, add a few photos and help customers find you."}
+            labels={["Business & prices", "Review & submit"]}
+          />
         </section>
         {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}
         {notice && <p role="status" className="rounded-xl bg-[#edf2e5] p-3 text-sm text-[#335e41]">{notice}</p>}
         {step === 1 ? (
-          <Card key="details" className="enrollment-step-panel space-y-5 !p-4 sm:!p-6">
+          <Card key="details" className={`${styles.section} enrollment-step-panel space-y-6`}>
             <fieldset>
-              <legend className="mb-2 font-bold">How do you operate?</legend>
-              <div role="radiogroup" aria-label="Business operating style" className="grid gap-2 sm:grid-cols-2">
+              <legend className="mb-3 text-base font-extrabold">How do you operate?</legend>
+              <div role="radiogroup" aria-label="Business operating style" className={styles.choiceGrid}>
                 {(["SHOPFRONT", "COMRADE"] as const).map((type) => (
                   <label
                     key={type}
-                    className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors ${sellerType === type ? "border-[#335e41] bg-[#edf2e5] text-[#183e35]" : "border-[#dfe5d8] bg-white text-[#526154]"}`}
+                    className={styles.choice}
                   >
                     <input
                       type="radio"
@@ -505,7 +499,7 @@ export function BusinessEnrollmentForm({
                       onChange={() => setSellerType(type)}
                       className="size-4 shrink-0"
                     />
-                    <span>{type === "SHOPFRONT" ? "Shop or stall" : "Hostel / mobile hustle"}</span>
+                    <span><strong>{type === "SHOPFRONT" ? "Shop or stall" : "Hostel / mobile hustle"}</strong><small>{type === "SHOPFRONT" ? "A place customers can walk into." : "A skill, a service or a student-run business."}</small></span>
                   </label>
                 ))}
               </div>
@@ -556,9 +550,9 @@ export function BusinessEnrollmentForm({
               </summary>
               {field("ownerPhone", "Private owner phone (if different)", "tel")}
             </details>
-            <div>
-              <h3 className="text-lg font-bold">Add core prices</h3>
-              <p className="mt-1 text-sm text-[#667064]">Choose suggested items or add your own. Set a price for each. Product photos are optional and appear beside the item on your business profile.</p>
+            <div className={`${styles.sectionHeading} border-t border-[#e4ebdf] pt-6`}>
+              <span className={styles.sectionIcon}><Package size={19} aria-hidden="true" /></span>
+              <div><h3>Add your everyday offers</h3><p>{sellerType === "COMRADE" ? "Start with at least one item." : "Start with at least three items."} Choose a suggestion or add your own. Photos help each item stand out.</p></div>
             </div>
             <div className="space-y-3">
               <Input
@@ -589,7 +583,7 @@ export function BusinessEnrollmentForm({
             </div>
             {items.map((item, index) => (
               <div
-                className="space-y-3 rounded-xl border border-[#dfe5d8] p-3"
+                className="space-y-3 rounded-2xl border border-[#dfe5d8] bg-[#f9fbf6] p-4"
                 key={item.id}
               >
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_150px_auto]">
@@ -692,9 +686,10 @@ export function BusinessEnrollmentForm({
           </Card>
         ) : (
           <div key="review" className="enrollment-step-panel space-y-5">
-            <Card className="space-y-3 !p-4 sm:!p-6">
-              <h3 className="text-xl font-bold">Instant listing preview</h3>
-              <p className="font-bold">
+            <Card className={`${styles.section} space-y-4`}>
+              <div className={styles.sectionHeading}><span className={styles.sectionIcon}><Store size={19} aria-hidden="true" /></span><div><h3>Your listing preview</h3><p>Here’s what you’re sharing with campus.</p></div></div>
+              {(photos[0] || items.find((item) => item.photo)?.photo) && <Image unoptimized src={photos[0] || items.find((item) => item.photo)!.photo!} width={800} height={400} alt={`${details.name} cover preview`} className="max-h-56 w-full rounded-xl object-cover" />}
+              <p className="text-xl font-extrabold tracking-tight">
                 {details.name} ·{" "}
                 {ZONES.find((z) => z.slug === details.zone)?.name}
               </p>
@@ -716,8 +711,8 @@ export function BusinessEnrollmentForm({
                 review.
               </p>
             </Card>
-            <Card className="space-y-4 !p-4 sm:!p-6">
-              <h3 className="text-xl font-bold">Trust &amp; verification</h3>
+            <Card className={`${styles.section} space-y-5`}>
+              <div className={styles.sectionHeading}><span className={styles.sectionIcon}><MapPin size={19} aria-hidden="true" /></span><div><h3>Help customers find you</h3><p>A clear landmark makes that first visit easy.</p></div></div>
               {field(
                 "landmark",
                 sellerType === "COMRADE"
@@ -751,6 +746,7 @@ export function BusinessEnrollmentForm({
                 />
                 I deliver to hostels
               </label>
+              <div className={`${styles.sectionHeading} border-t border-[#e4ebdf] pt-5`}><span className={styles.sectionIcon}><ImagePlus size={19} aria-hidden="true" /></span><div><h3>Put a face to your business</h3><p>Your cover is the first photo students see. Add up to 8 public photos.</p></div></div>
               <PhotoUploader
                 enrollment
                 multiple
@@ -764,20 +760,14 @@ export function BusinessEnrollmentForm({
                 }
                 onBusyChange={setUploading}
                 onUploaded={(urls) => setPhotos((p) => [...p, ...urls])}
+                saveMessage="Adding photos to your draft…"
+                readyMessage="Photos added to your draft. Submit your listing to save them."
               />
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {photos.map((url, index) => (
-                  <Image
-                    key={url}
-                    src={url}
-                    alt={`Listing photo ${index + 1}`}
-                    width={180}
-                    height={120}
-                    unoptimized
-                    className="rounded-lg"
-                  />
-                ))}
-              </div>
+              <ListingPhotoGallery photos={photos} coverPhoto={photos[0]} disabled={busy || uploading}
+                onCover={(url) => setPhotos((current) => [url, ...current.filter((photo) => photo !== url)])}
+                onRemove={(url) => void removeGalleryPhoto(url)}
+              />
+              <div className={`${styles.sectionHeading} border-t border-[#e4ebdf] pt-5`}><span className={styles.sectionIcon}><ShieldCheck size={19} aria-hidden="true" /></span><div><h3>Build a little trust</h3><p>Verification is free. Your private documents never appear on your listing.</p></div></div>
               {sellerType === "COMRADE" && (
                 <label className="block space-y-2 text-sm font-semibold">
                   Student ID (private; only you and reviewers can see it)
@@ -833,7 +823,7 @@ export function BusinessEnrollmentForm({
             </Card>
           </div>
         )}
-        <div className="flex flex-col gap-3 rounded-2xl border border-[#dfe5d8] bg-white p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4 md:sticky md:bottom-3 md:z-20 md:shadow-lg">
+        <div className={`${styles.actions} !bottom-[calc(78px+env(safe-area-inset-bottom))] md:!bottom-3`}>
           <Button
             type="submit"
             disabled={busy || uploading}
@@ -846,6 +836,7 @@ export function BusinessEnrollmentForm({
                 : mode === "public"
                   ? "Submit listing for review"
                   : "Save listing & request verification"}
+            <ArrowRight size={16} aria-hidden="true" />
           </Button>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 sm:order-1 sm:justify-start">
             {step === 2 && (

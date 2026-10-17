@@ -87,8 +87,8 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
       </div>
 
       {post && (
-        <ModalFrame title="Post a Comrade Market listing" onClose={closePostModal}>
-          <div className="p-4 sm:p-6">
+        <ModalFrame wide title="Create your free listing" onClose={closePostModal}>
+          <div className="p-3 sm:p-5">
             <MarketPostForm onClose={closePostModal} />
           </div>
         </ModalFrame>

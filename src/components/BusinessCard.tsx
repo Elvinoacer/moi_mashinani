@@ -10,6 +10,7 @@ import { useNow } from "@/lib/useNow";
 import { trackBusinessEvent } from "@/lib/track-business-event";
 import { whatsappUrl } from "@/lib/whatsapp";
 import type { Business, Tier } from "@/lib/types";
+import { listingCoverPhoto } from "@/lib/listing-media";
 import styles from "./BusinessCard.module.css";
 
 interface BusinessCardProps {
@@ -44,7 +45,7 @@ export function BusinessCard({
   const lowest = priced.reduce<(typeof priced)[number] | undefined>(
     (winner, item) => !winner || item.priceFrom! < winner.priceFrom! ? item : winner, undefined,
   );
-  const photo = business.coverPhoto || business.photos?.[0];
+  const photo = listingCoverPhoto(business);
   const profileUrl = `/b/${business.slug}`;
   const pricesUrl = business.services.length ? `${profileUrl}#services-and-prices` : profileUrl;
   const contactable = business.status === "ACTIVE" && !business.isTemporarilyClosed;

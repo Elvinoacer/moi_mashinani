@@ -503,11 +503,12 @@ Changing the business name does not regenerate its existing profile URL. The own
 1. Open **Photos**.
 2. Use **Add photos** to select JPEG/JPG, PNG or WebP images, up to 5 MB each.
 3. Keep at most eight gallery photos. Remove an existing photo before adding more if full.
-4. Wait for the upload and save message.
+4. Wait for the message confirming that photos were added to your draft.
 5. Select **Use as cover** on the image you want customers to see first.
 6. Use **Remove** under a photo to remove it from the gallery.
+7. Select **Save photos** in the persistent save bar to publish these changes. Use **Discard** to return to the saved gallery.
 
-Uploads, cover changes and gallery removals save immediately. The selected cover button displays **Cover photo**. Removing the current cover chooses the first remaining gallery photo, or leaves no cover if the gallery is empty.
+Uploads, cover changes and gallery removals remain drafts until **Save photos** succeeds. The save bar shows unsaved changes, saving, errors and confirmation, with a public-view link for active listings. Removing the current cover chooses the first remaining gallery photo; when the gallery is empty, the public profile uses the first available product photo.
 
 Gallery photos and item photos are separate uses. Removing a gallery image does not automatically remove an item's existing reference to that image; edit the item separately if needed.
 

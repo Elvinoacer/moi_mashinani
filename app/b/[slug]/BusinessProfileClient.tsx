@@ -17,6 +17,7 @@ import { ClaimModal } from "@/components/ClaimModal";
 import { BusinessCard } from "@/components/BusinessCard";
 import { CampusPushOptIn } from "@/components/CampusPushOptIn";
 import { Business } from "@/lib/types";
+import { listingGalleryPhotos } from "@/lib/listing-media";
 import { CATEGORIES } from "@/lib/constants";
 import { useNow } from "@/lib/useNow";
 import { trackBusinessEvent } from "@/lib/track-business-event";
@@ -45,9 +46,9 @@ export function BusinessProfileClient({
   initialSimilar = [],
 }: BusinessProfileClientProps) {
   const now = useNow();
-  const [business, setBusiness] = useState<Business | null>(
-    initialBusiness ?? null,
-  );
+  const [loadedBusiness, setBusiness] = useState<Business | null>(null);
+  const business = loadedBusiness && (!initialBusiness || loadedBusiness.updatedAt >= initialBusiness.updatedAt)
+    ? loadedBusiness : initialBusiness ?? loadedBusiness;
   const [similarBusinesses, setSimilarBusinesses] =
     useState<Business[]>(initialSimilar);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
@@ -67,14 +68,14 @@ export function BusinessProfileClient({
   }, [initialBusiness]);
 
   useEffect(() => {
-    // Only fetch if initialBusiness was not provided
-    if (initialBusiness !== undefined) return;
-
     const controller = new AbortController();
+    let inFlight = false;
     async function load() {
+      if (inFlight) return;
+      inFlight = true;
       try {
         const response = await fetch(
-          `/api/businesses/${encodeURIComponent(slug)}`,
+          `/api/businesses/${encodeURIComponent(slug)}?public=1`,
           {
             signal: controller.signal,
             cache: "no-store",
@@ -90,7 +91,9 @@ export function BusinessProfileClient({
         }
         if (controller.signal.aborted) return;
         setBusiness(data);
-        if (data.status === "ACTIVE") trackBusinessEvent(data.id, "view");
+        if (initialBusiness === undefined && data.status === "ACTIVE") trackBusinessEvent(data.id, "view");
+
+        if (initialBusiness !== undefined) return;
 
         const isFeatured =
           data.activeTier === "FEATURED" &&
@@ -123,11 +126,19 @@ export function BusinessProfileClient({
           );
         }
       } finally {
+        inFlight = false;
         if (!controller.signal.aborted) setLoading(false);
       }
     }
     void load();
-    return () => controller.abort();
+    const refresh = () => { if (document.visibilityState === "visible") void load(); };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      controller.abort();
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, [slug, initialBusiness]);
 
   if (loading) {
@@ -166,9 +177,8 @@ export function BusinessProfileClient({
     );
   }
 
-  const galleryPhotos = Array.from(
-    new Set([business.coverPhoto, ...business.photos].filter(Boolean)),
-  );
+  const galleryPhotos = listingGalleryPhotos(business);
+  const visiblePhotoIdx = Math.min(activePhotoIdx, Math.max(0, galleryPhotos.length - 1));
   const promotionActive = Boolean(
     business.tierEndsAt && new Date(business.tierEndsAt).getTime() > now,
   );
@@ -270,7 +280,7 @@ export function BusinessProfileClient({
                 unoptimized
                 width={1200}
                 height={800}
-                src={galleryPhotos[activePhotoIdx] || galleryPhotos[0]}
+                src={galleryPhotos[visiblePhotoIdx]}
                 alt={`${business.name} storefront in ${business.zone}, Moi University Kesses`}
                 priority
                 className="w-full h-full object-cover"
@@ -284,7 +294,7 @@ export function BusinessProfileClient({
             {/* Photo Counter Badge */}
             {galleryPhotos.length > 1 && (
               <div className="absolute bottom-3 right-3 bg-[#243b32]/80 text-white font-display text-xs font-bold px-2.5 py-1 rounded-full signboard-border backdrop-blur-xs">
-                {activePhotoIdx + 1} / {galleryPhotos.length}
+                {visiblePhotoIdx + 1} / {galleryPhotos.length}
               </div>
             )}
           </div>
@@ -299,7 +309,7 @@ export function BusinessProfileClient({
                   type="button"
                   onClick={() => setActivePhotoIdx(i)}
                   className={`w-16 h-16 rounded overflow-hidden signboard-border shrink-0 press-action ${
-                    activePhotoIdx === i
+                    visiblePhotoIdx === i
                       ? "ring-2 ring-[#183e35]"
                       : "opacity-70"
                   }`}

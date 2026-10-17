@@ -40,6 +40,9 @@ import {
   photoReferences,
 } from "@/lib/catalog-plan";
 import { PhotoUploader } from "@/components/PhotoUploader";
+import { ListingPhotoGallery, ListingSaveBar } from "@/components/ListingFlow";
+import flowStyles from "@/components/ListingFlow.module.css";
+import { Images, ShieldCheck } from "lucide-react";
 import { Eye, Rocket, Trash2, RefreshCw } from "@/components/icons";
 
 const detailLabels = {
@@ -100,6 +103,24 @@ async function readResponse<T>(response: Response): Promise<T> {
   return data as T;
 }
 
+function detailsDraft(business: Business) {
+  return {
+    name: business.name, tagline: business.tagline || "", description: business.description || "",
+    phone: business.phone, whatsapp: business.whatsapp, landmark: business.landmark,
+    address: business.address || "", zone: business.zone, primaryCategory: business.primaryCategory,
+    studentDiscount: business.studentDiscount || "", latitude: business.mapPin ? String(business.mapPin.lat) : "",
+    longitude: business.mapPin ? String(business.mapPin.lng) : "",
+    comradeListingKind: business.comradeListingKind || "" as "" | "DECLUTTER" | "HUSTLE",
+  };
+}
+function hoursDraft(business: Business): BusinessHours {
+  return Object.fromEntries(days.map((day) => [day, {
+    open: business.hours[day]?.open || "08:00", close: business.hours[day]?.close || "18:00",
+    closed: business.hours[day]?.closed ?? !business.hours[day],
+    appointmentOnly: Boolean(business.hours[day]?.appointmentOnly),
+  }]));
+}
+
 function BusinessDashboard({ slug }: { slug: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -139,6 +160,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
     comradeListingKind: "" as "" | "DECLUTTER" | "HUSTLE",
   });
   const [hours, setHours] = useState<BusinessHours>({});
+  const [photoDraft, setPhotoDraft] = useState<{ photos: string[]; coverPhoto: string } | null>(null);
   const [serviceId, setServiceId] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [servicePrice, setServicePrice] = useState("");
@@ -152,6 +174,19 @@ function BusinessDashboard({ slug }: { slug: string }) {
   const [confirmDeleteServiceId, setConfirmDeleteServiceId] = useState<string | null>(null);
   const [bookingQuery, setBookingQuery] = useState("");
   const [bookingFilter, setBookingFilter] = useState<"OPEN" | "ALL" | Booking["status"]>("OPEN");
+
+  const detailsChanged = Boolean(business && JSON.stringify(draft) !== JSON.stringify(detailsDraft(business)));
+  const hoursChanged = Boolean(business && JSON.stringify(hours) !== JSON.stringify(hoursDraft(business)));
+  const galleryChanged = Boolean(business && photoDraft && JSON.stringify(photoDraft) !== JSON.stringify({ photos: business.photos, coverPhoto: business.coverPhoto }));
+  const editedService = business?.services.find((item) => item.id === serviceId);
+  const serviceChanged = Boolean(showServiceForm && (serviceName !== (editedService?.name || "") || servicePrice !== (editedService?.priceFrom === undefined ? "" : String(editedService.priceFrom)) || serviceNote !== (editedService?.note || "") || servicePhoto !== (editedService?.photo || "")));
+  const hasUnsavedChanges = detailsChanged || hoursChanged || galleryChanged || serviceChanged;
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const preventLoss = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    window.addEventListener("beforeunload", preventLoss);
+    return () => window.removeEventListener("beforeunload", preventLoss);
+  }, [hasUnsavedChanges]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -181,33 +216,8 @@ function BusinessDashboard({ slug }: { slug: string }) {
         setBusiness(data);
         setLiveStatus(data.liveStatus || "");
         setOwnedBusinesses(account.businesses || []);
-        setDraft({
-          name: data.name,
-          tagline: data.tagline || "",
-          description: data.description || "",
-          phone: data.phone,
-          whatsapp: data.whatsapp,
-          landmark: data.landmark,
-          address: data.address || "",
-          zone: data.zone,
-          primaryCategory: data.primaryCategory,
-          studentDiscount: data.studentDiscount || "",
-          latitude: data.mapPin ? String(data.mapPin.lat) : "",
-          longitude: data.mapPin ? String(data.mapPin.lng) : "",
-          comradeListingKind: (data.comradeListingKind || "") as "" | "DECLUTTER" | "HUSTLE",
-        });
-        setHours(
-          Object.fromEntries(
-            days.map((day) => [
-              day,
-              data.hours[day] || {
-                open: "08:00",
-                close: "18:00",
-                closed: true,
-              },
-            ]),
-          ),
-        );
+        setDraft(detailsDraft(data));
+        setHours(hoursDraft(data));
         const query = `?businessId=${encodeURIComponent(data.id)}`;
         await Promise.all([
           fetch(`/api/payments${query}`, {
@@ -314,6 +324,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
     );
     setBusiness(updated);
     setStorageRefresh((value) => value + 1);
+    router.refresh();
     return updated;
   }
 
@@ -412,6 +423,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
     );
     setBusiness(updated);
     setStorageRefresh((value) => value + 1);
+    router.refresh();
     return updated;
   }
 
@@ -444,7 +456,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
       setServicePhoto("");
       setShowServiceForm(false);
       return updated;
-    });
+    }, business.status === "ACTIVE" ? "Item and photo saved. Your public listing is up to date." : "Item and photo saved. They will appear publicly after your listing is approved.");
   }
 
   async function refreshCollection(kind: "bookings" | "payments") {
@@ -1249,29 +1261,9 @@ function BusinessDashboard({ slug }: { slug: string }) {
                   </button>
                 </div>
               )}
-              <div className="flex gap-3">
-                <button
-                  disabled={Boolean(busy)}
-                  className={buttonClass}
-                  type="submit"
-                >
-                  {busy === "service"
-                    ? "Saving..."
-                    : serviceId
-                      ? "Save item"
-                      : "Add item"}
-                </button>
-                {(serviceId || showServiceForm) && (
-                  <button
-                    type="button"
-                    onClick={resetService}
-                    className="min-h-11 rounded-xl border border-[#cadbc9] bg-white px-4 py-2 text-sm font-bold text-[#335e41]"
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
             </fieldset>
+            <ListingSaveBar form="catalog-editor" dirty={serviceChanged} busy={Boolean(busy)} label={serviceId ? "Save item" : "Add item"} error={error} onReset={resetService} status="Save your item to attach its photo to your public catalogue." />
+            <button type="button" disabled={Boolean(busy)} onClick={resetService} className="min-h-11 text-sm font-bold text-[#466453] underline underline-offset-4">Cancel editing</button>
           </form>
           )}
           {!visibleServices.length && (
@@ -1361,7 +1353,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
                 return Promise.reject(
                   new Error("Enter both map coordinates or leave both blank."),
                 );
-              return patchBusiness(update as Partial<Business>);
+              return patchBusiness(update as Partial<Business>).then((saved) => { setDraft(detailsDraft(saved)); return saved; });
             });
           }}
           id="business-details-form"
@@ -1541,115 +1533,58 @@ function BusinessDashboard({ slug }: { slug: string }) {
               className={inputClass}
             />
           </label>
-          <button
-            disabled={Boolean(busy)}
-            type="submit"
-            className={buttonClass}
-          >
-            {busy === "details" ? "Saving..." : "Save business information"}
-          </button>
+          <ListingSaveBar form="business-details-form" dirty={detailsChanged} busy={Boolean(busy)} label="Save business information" error={error} status={business.status === "ACTIVE" ? "Saved changes are visible on your public listing." : "Your saved changes will appear after approval."} publicUrl={business.status === "ACTIVE" ? `/b/${business.slug}` : undefined} onReset={() => { setDraft(detailsDraft(business)); setError(""); }} />
         </form>
       )}
 
       {activeTab === "photos" && (
-        <section className={panelClass}>
-          <h2 className="font-display text-xl font-bold">Business photos</h2>
-          <p className="text-sm text-[#667064]">
-            Your shop gallery has room for 8 photos. Photos still used by a
-            product stay in storage until removed from that product too. Product
-            photos are separate. JPEG, PNG or WebP up to 5 MB each,
-            automatically compressed; Free includes 25 MB total and Pro has
-            unlimited total image storage.
-          </p>
+        <form id="listing-photos-form" className={panelClass} onSubmit={(event) => {
+          event.preventDefault();
+          if (!photoDraft || !galleryChanged) return;
+          void runAction("gallery-save", async () => {
+            const saved = await patchBusiness(photoDraft);
+            setPhotoDraft(null);
+            return saved;
+          }, business.status === "ACTIVE" ? "Photos saved. Your public gallery and cover are up to date." : "Photos saved. They will appear publicly after approval.");
+        }}>
+          <div className={flowStyles.sectionHeading}><span className={flowStyles.sectionIcon}><Images size={20} aria-hidden="true" /></span><div><h3>Make a great first impression</h3><p>Add real photos of your space, products or work. Choose the cover students see first.</p></div></div>
+          <div className={flowStyles.note}><ShieldCheck size={17} aria-hidden="true" /><span>Up to 8 public photos. Uploads are added to your draft — choose <strong>Save photos</strong> to update your listing. Product photos can also be edited in your catalogue.</span></div>
           <PhotoUploader
-            label="Add business photos"
-            businessId={business.id}
-            multiple
-            maxFiles={8 - business.photos.length}
-            disabled={
-              Boolean(busy) || storageFull || business.photos.length >= 8
-            }
-            disabledReason={
-              storageFull
-                ? "Your Free storage is full. Remove unused photos or renew Pro to upload more."
-                : business.photos.length >= 8
-                  ? "Your gallery is full. Remove a photo before adding more."
-                  : undefined
-            }
-            onBusyChange={(uploading) => {
-              setBusy(uploading ? "photos" : "");
-              if (!uploading) setStorageRefresh((value) => value + 1);
-            }}
-            onUploaded={(photos) =>
-              patchBusiness({
-                photos: [...business.photos, ...photos],
-                coverPhoto: business.coverPhoto || photos[0],
-              })
-            }
-            readyMessage="Done. Your photos are saved to the business gallery."
+            label="Add business photos" businessId={business.id} multiple camera
+            maxFiles={8 - (photoDraft?.photos || business.photos).length}
+            disabled={Boolean(busy) || storageFull || (photoDraft?.photos || business.photos).length >= 8}
+            disabledReason={storageFull ? "Your Free storage is full. Remove unused photos or renew Pro to upload more." : (photoDraft?.photos || business.photos).length >= 8 ? "Your gallery is full. Remove a photo before adding more." : undefined}
+            onBusyChange={(uploading) => { setBusy(uploading ? "photos" : ""); if (!uploading) setStorageRefresh((value) => value + 1); }}
+            onUploaded={(urls) => setPhotoDraft((current) => ({ photos: [...(current?.photos || business.photos), ...urls], coverPhoto: (current ? current.coverPhoto : business.coverPhoto) || urls[0] }))}
+            readyMessage="Photos uploaded to your draft. Choose Save photos below to publish your changes."
+            saveMessage="Adding photos to your draft…"
           />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {business.photos.map((photo, index) => (
-              <div key={`${photo}-${index}`} className="space-y-2">
-                <Image
-                  unoptimized
-                  width={320}
-                  height={240}
-                  src={photo}
-                  alt={`${business.name} photo ${index + 1}`}
-                  className="h-36 w-full rounded-lg object-cover"
-                />
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={Boolean(busy) || business.coverPhoto === photo}
-                    onClick={() =>
-                      void runAction("cover", () =>
-                        patchBusiness({ coverPhoto: photo }),
-                      )
-                    }
-                    className="text-xs font-bold text-[#335e41] disabled:opacity-50"
-                  >
-                    {business.coverPhoto === photo
-                      ? "Cover photo"
-                      : "Use as cover"}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={Boolean(busy)}
-                    onClick={() =>
-                      void runAction("remove-photo", () => {
-                        const photos = business.photos.filter(
-                          (_, position) => position !== index,
-                        );
-                        return patchBusiness({
-                          photos,
-                          coverPhoto:
-                            business.coverPhoto === photo
-                              ? photos[0] || ""
-                              : business.coverPhoto,
-                        });
-                      })
-                    }
-                    className="text-xs font-bold text-[#a7302d]"
-                  >
-                    {busy === "remove-photo" || busy === "remove-service"
-                      ? "Removing…"
-                      : "Remove"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+          <ListingPhotoGallery photos={photoDraft?.photos || business.photos} coverPhoto={photoDraft ? photoDraft.coverPhoto : business.coverPhoto} disabled={Boolean(busy)}
+            onCover={(url) => setPhotoDraft((current) => ({ photos: current?.photos || business.photos, coverPhoto: url }))}
+            onRemove={(url) => {
+              discardDraftPhoto(url);
+              setPhotoDraft((current) => {
+                const photos = (current?.photos || business.photos).filter((photo) => photo !== url);
+                const cover = current ? current.coverPhoto : business.coverPhoto;
+                return { photos, coverPhoto: cover === url ? photos[0] || "" : cover };
+              });
+            }}
+          />
+          {!(photoDraft?.photos || business.photos).length && <div className="rounded-2xl border border-dashed border-[#cad9c1] bg-[#f7faf2] p-7 text-center"><Images size={32} className="mx-auto mb-3 text-[#7d936f]" /><p className="text-sm font-bold text-[#31503b]">Your gallery starts here</p><p className="mt-2 text-xs leading-6 text-[#617469]">Add a clear photo of your listing or your work. When this gallery is empty, your first product photo becomes the public cover.</p></div>}
+          <ListingSaveBar form="listing-photos-form" dirty={galleryChanged} busy={Boolean(busy)} label="Save photos" error={error} status={business.status === "ACTIVE" ? "Saved photos appear on your public listing." : "Saved photos will appear publicly after approval."} publicUrl={business.status === "ACTIVE" ? `/b/${business.slug}` : undefined} onReset={() => {
+            photoDraft?.photos.forEach(discardDraftPhoto);
+            setPhotoDraft(null); setError("");
+          }} />
+        </form>
       )}
 
       {activeTab === "hours" && (
         <form
+          id="listing-hours-form"
           className={panelClass}
           onSubmit={(event) => {
             event.preventDefault();
-            void runAction("hours", () => patchBusiness({ hours }));
+            void runAction("hours", async () => { const saved = await patchBusiness({ hours }); setHours(hoursDraft(saved)); return saved; });
           }}
         >
           <h2 className="font-display text-xl font-bold">
@@ -1726,13 +1661,7 @@ function BusinessDashboard({ slug }: { slug: string }) {
               </label>
             </div>
           ))}
-          <button
-            disabled={Boolean(busy)}
-            type="submit"
-            className={buttonClass}
-          >
-            Save opening hours
-          </button>
+          <ListingSaveBar form="listing-hours-form" dirty={hoursChanged} busy={Boolean(busy)} label="Save opening hours" error={error} publicUrl={business.status === "ACTIVE" ? `/b/${business.slug}` : undefined} onReset={() => { setHours(hoursDraft(business)); setError(""); }} />
         </form>
       )}
 

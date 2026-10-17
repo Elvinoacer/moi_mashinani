@@ -1,6 +1,7 @@
 import { CATEGORIES, ZONES } from './constants';
 import { CATEGORY_GROUPS } from './categories';
 import type { Business } from './types';
+import { listingCoverPhoto, listingGalleryPhotos } from './listing-media';
 
 // A single canonical origin keeps search engines from splitting the index between
 // Vercel preview / alternate hostnames and the public brand domain.
@@ -515,7 +516,7 @@ export function getBusinessSeoData(business: Business) {
   }
   description += `Call ${business.phone} or order on WhatsApp via Moi Mashinani.`;
 
-  const coverRaw = business.coverPhoto || business.photos?.[0] || '/brand/og-image.png';
+  const coverRaw = listingCoverPhoto(business) || '/brand/og-image.png';
   const coverImage = coverRaw.startsWith('http') ? coverRaw : `${SITE_URL}${coverRaw}`;
 
   const keywords = Array.from(
@@ -608,7 +609,7 @@ export function generateBreadcrumbSchema(items: { name: string; url: string }[])
 /** LocalBusiness Schema for a specific business */
 export function generateLocalBusinessSchema(business: Business) {
   const { schemaType } = getBusinessSeoData(business);
-  const rawPhotos = Array.from(new Set([business.coverPhoto, ...business.photos].filter(Boolean)));
+  const rawPhotos = listingGalleryPhotos(business);
   const photos = rawPhotos.map((p) => (p.startsWith('http') ? p : `${SITE_URL}${p}`));
 
   const schema: Record<string, unknown> = {
@@ -693,7 +694,7 @@ export function generateCategoryItemListSchema(categorySlug: string, businesses:
     description,
     numberOfItems: businesses.length,
     itemListElement: businesses.map((business, index) => {
-      const imgRaw = business.coverPhoto || business.photos?.[0] || '/brand/og-image.png';
+      const imgRaw = listingCoverPhoto(business) || '/brand/og-image.png';
       const img = imgRaw.startsWith('http') ? imgRaw : `${SITE_URL}${imgRaw}`;
       return {
         '@type': 'ListItem',

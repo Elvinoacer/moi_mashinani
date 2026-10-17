@@ -12,10 +12,12 @@ export function ModalFrame({
   title,
   onClose,
   children,
+  wide = false,
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
+  wide?: boolean;
 }) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -39,11 +41,11 @@ export function ModalFrame({
     document.body.style.overflow = "hidden";
     dialogRef.current?.focus();
     function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") closeRef.current();
+      if (event.key === "Escape" && !event.defaultPrevented) closeRef.current();
       if (event.key !== "Tab") return;
-      const elements = dialogRef.current?.querySelectorAll<HTMLElement>(
+      const elements = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
         'a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]',
-      );
+      ) || []).filter((element) => element.getClientRects().length && !element.closest('[hidden], [inert]'));
       if (!elements?.length) return;
       const first = elements[0];
       const last = elements[elements.length - 1];
@@ -81,12 +83,12 @@ export function ModalFrame({
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
-            className="mobile-sheet max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-xl bg-white signboard-border-thick signboard-shadow-lg"
+            className={`mobile-sheet max-h-[92dvh] w-full ${wide ? "max-w-2xl" : "max-w-lg"} overflow-y-auto overscroll-contain rounded-3xl border border-[#dce5d7] bg-[#f8faf5] shadow-[0_30px_100px_#102f2a55] focus:outline-none`}
           >
-            <div className="flex items-center justify-between gap-3 border-b border-[#dfe5d8] bg-[#edf2e5] px-4 py-3">
+            <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-[#e0e8dc] bg-white/95 px-5 py-3 backdrop-blur-md sm:px-6">
               <h2
                 id={titleId}
-                className="font-display text-lg font-bold text-[#243b32]"
+                className="font-display text-sm font-extrabold tracking-tight text-[#243b32]"
               >
                 {title}
               </h2>
@@ -94,7 +96,7 @@ export function ModalFrame({
                 type="button"
                 aria-label="Close dialog"
                 onClick={onClose}
-                className="rounded-full p-2 text-[#243b32] hover:bg-white"
+                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[#e3e9de] bg-[#f5f8f0] text-[#243b32] hover:bg-[#eaf1df] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
               >
                 <X className="h-5 w-5" />
               </button>

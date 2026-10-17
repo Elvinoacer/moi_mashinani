@@ -21,6 +21,7 @@ export async function GET(
     if (!business) throw new ApiError(404, "Business not found");
     const user = await getCurrentUser(req);
     const canManage =
+      req.nextUrl.searchParams.get("public") !== "1" &&
       user &&
       (user.role === "ADMIN" ||
         (user.id === business.ownerId && business.isClaimed));

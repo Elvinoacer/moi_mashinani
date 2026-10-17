@@ -9,11 +9,15 @@ The current two-step flow, hostel-seller evidence and field roles are documented
 
 Each core item can include an optional product photo, with a preview, replacement and removal controls. The second step previews the actual items, photos and prices, collects a landmark or safe hostel meeting point, offers hours presets and delivery, and lets the seller upload public shop/product photos or request a free field visit. Comrade sellers upload a private student ID plus a public product/workspace photo, or request an in-person identity check. A trust badge is awarded from evidence, independently of paid plans.
 
+The free student listing modal on `/market?post=1` follows **Details & photos → Review & submit**. Signed-in students choose a second-hand item or a hustle, enter its price and details, and add up to eight optional public photos with cover selection and removal. The review step previews the cover and price, collects contact and meeting details, and accepts an optional private student ID. Submission saves the images with the listing and queues review; the success screen explains when it becomes public. Both enrollment forms support saving and restoring a draft in the current tab for 24 hours.
+
 ## Media and drafts
 
 Public gallery and product uploads before invitation acceptance use `/api/enrollment/media` and an unpredictable HttpOnly, SameSite cookie. Photos are resized, re-encoded, stripped of metadata and staged for 24 hours, with a combined 16-photo and 25 MB limit (up to eight gallery photos, one photo per product). Enrollment transfers the cookie-bound images to the business ownership ledger in the same transaction; entering an email never grants access to another browser’s uploads. R2 is required for public photo storage. Removing or replacing a product photo releases the unused staged asset. Product photos can also be added from the owner dashboard.
 
 The public business profile displays saved products in their catalogue order, with consistent image cards, names, prices, units, notes and stock status. Items without photos remain visible; catalogues without any product photos use compact cards. Larger catalogues can be searched by name, unit or note.
+
+The dashboard has persistent save controls for listing details, hours, catalogue items and photos. Gallery uploads, cover selection and removals are draft changes until **Save photos** succeeds. Failed saves retain the draft for retry, and **Discard** restores the saved gallery. A listing with product photos but no gallery uses its first product photo in discovery and the public profile. Public profiles refresh their public data on return to the tab; the explicit `?public=1` read applies visitor visibility and strips owner details even for a signed-in owner.
 
 Private student IDs use `/api/enrollment/proof`, separate PostgreSQL storage and authenticated, uncached retrieval. They never become public gallery URLs. Owners and admins can review them; appointed field workers can review a business’s ID while an authorized visit is pending. Abandoned staged proof is removed after the 24-hour window by plan maintenance. Attached evidence remains private and is removed when replaced or when the listing is deleted.
 
@@ -24,7 +28,7 @@ Drafts stay in the current tab for 24 hours. An active staging cookie is require
 1. Sign in as the main administrator and open **Admin → Enroll business** (`/admin/enroll`).
 2. During the visit, collect the owner's name and email, business name/category, description, phone/WhatsApp, area, landmark and opening hours. Add a few products/services and prices. Capture the real location while standing at the shop if desired.
 3. Take or upload up to eight place/product photos (5 MB each), select a cover and assign product photos. The server validates and re-encodes photos as WebP, strips EXIF metadata and uploads them to Cloudflare R2 under the dedicated `moimashinani/photos/` folder in the configured bucket. PostgreSQL stores the photo URLs; existing database-backed photos remain accessible.
-   The shared upload panel shows queued file names, preparation, upload progress, server processing and errors with retry/cancel controls. An uploaded enrollment or product photo still needs the form/item saved; gallery uploads explicitly confirm when the listing save succeeds. Failed gallery saves retry without sending the image again.
+   The shared upload panel shows queued file names, preparation, upload progress, server processing and errors with retry/cancel controls. Uploaded photos need the enrollment form, catalogue item or **Save photos** action to be saved. Gallery save failures retain uploaded photos for retry without uploading them again.
 4. Confirm that the premises were inspected, the public contact details are accurate and the owner authorized publication. Submit. An administrator-enrolled listing is published as field verified, while ownership remains unclaimed until the owner explicitly accepts its invitation. A public self-registration stays pending for administrator review. Duplicate shop submissions are blocked.
 5. The owner receives a one-use email link valid for 24 hours. They set a password (12–128 characters) and are signed into their dashboard. For another business added to an existing account, they enter their existing password.
 6. Owners can update business details, products, photos and hours; set availability/closure; manage customer booking requests; and purchase promotion through IntaSend. Private records and modifications are restricted to that owner or an administrator.
@@ -72,9 +76,12 @@ npm run test:payment-routes
 npx playwright install chromium
 npm run test:browser
 npm run test:onboarding:products:browser
+npm run test:listings:browser
 ```
 
 The product-photo browser check uses the disposable local harness and its storage/email fixtures. It covers optional uploads, retry, replacement, removal, drafts, image ownership on submission, owner acceptance and approval, and responsive public catalogue cards with search and stock status. Screenshots are written to `/tmp/moimashinani-enrollment-products`.
+
+The listing-experience check covers student photo uploads, cover choice, draft restoration and submission, then dashboard save/discard, retry after a save failure, product-photo editing and public card/profile images. It checks mobile save visibility and viewport fit from 320 to 1440 pixels. Screenshots are written to `/tmp/moimashinani-listing-experience`.
 
 Stop the harness with Ctrl+C to remove its database. Browser screenshots are written to `/tmp/moimashinani-browser`. The payment route test calls actual route handlers and PostgreSQL with a mocked provider transport, covering checkout pricing, auth, webhook challenge, invoice mismatches, concurrent delivery and replay. Live IntaSend keys and a registered HTTPS webhook are needed for a real provider delivery test; see [payments.md](payments.md).
 

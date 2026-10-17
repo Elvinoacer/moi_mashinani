@@ -14,7 +14,7 @@ import {
   suggestedEnrollmentCopy,
 } from "@/lib/enrollment-templates";
 import type { Business } from "@/lib/types";
-type Item = { id: string; name: string; price: string };
+type Item = { id: string; name: string; price: string; photo?: string };
 type Details = {
   name: string;
   primaryCategory: string;
@@ -121,6 +121,38 @@ export function BusinessEnrollmentForm({
       { id: crypto.randomUUID(), name, price: "" },
     ]);
   }
+  async function releaseItemPhoto(item: Item) {
+    if (
+      !item.photo ||
+      photos.includes(item.photo) ||
+      items.some((other) => other.id !== item.id && other.photo === item.photo)
+    ) return;
+    const response = await fetch(
+      `/api/enrollment/media?url=${encodeURIComponent(item.photo)}`,
+      { method: "DELETE" },
+    );
+    if (!response.ok && response.status !== 404) {
+      const data = await response.json();
+      throw new Error(data.error || "Could not remove this photo. Please retry.");
+    }
+  }
+  async function setItemPhoto(item: Item, photo?: string) {
+    if (item.photo !== photo) await releaseItemPhoto(item);
+    setItems((current) => current.map((i) => i.id === item.id ? { ...i, photo } : i));
+  }
+  async function removeItemMedia(item: Item, removeItem = false) {
+    if (busy || uploading) return;
+    setUploading(true);
+    setError("");
+    try {
+      await setItemPhoto(item);
+      if (removeItem) setItems((current) => current.filter((i) => i.id !== item.id));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not remove this photo.");
+    } finally {
+      setUploading(false);
+    }
+  }
   function essentialsValid() {
     if (
       !details.name.trim() ||
@@ -217,6 +249,7 @@ export function BusinessEnrollmentForm({
     }
   }
   function restore() {
+    if (busy || uploading) return;
     try {
       const draft = JSON.parse(sessionStorage.getItem(draftKey) || "{}");
       if (!draft.saved || Date.now() - draft.saved > 864e5)
@@ -236,11 +269,11 @@ export function BusinessEnrollmentForm({
   }
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (busy || uploading) return;
     if (step === 1) {
       preview();
       return;
     }
-    if (busy || uploading) return;
     setError("");
     setBusy(true);
     try {
@@ -292,6 +325,7 @@ export function BusinessEnrollmentForm({
               id: i.id,
               name: i.name.trim(),
               priceFrom: Number(i.price),
+              photo: i.photo || undefined,
             })),
             photos,
             coverPhoto: photos[0] || "",
@@ -479,17 +513,16 @@ export function BusinessEnrollmentForm({
             <div className="grid gap-4 sm:grid-cols-2">
               {field("name", "Business name")}
               {field("phone", "Business WhatsApp", "tel")}
-              <div className="min-w-0 space-y-1.5 text-sm font-semibold">
+              <fieldset disabled={busy || uploading} className="min-w-0 space-y-1.5 text-sm font-semibold">
                 <span>Business category</span>
                 <EnrollmentCategoryPicker
                   value={details.primaryCategory}
                   onChange={(value) => {
                     setDetails((d) => ({ ...d, primaryCategory: value }));
-                    setItems([]);
                     setItemQuery("");
                   }}
                 />
-              </div>
+              </fieldset>
               <label className="block text-sm font-semibold">
                 Campus zone
                 <select
@@ -525,7 +558,7 @@ export function BusinessEnrollmentForm({
             </details>
             <div>
               <h3 className="text-lg font-bold">Add core prices</h3>
-              <p className="mt-1 text-sm text-[#667064]">Choose suggested items or add your own. Set a price for each.</p>
+              <p className="mt-1 text-sm text-[#667064]">Choose suggested items or add your own. Set a price for each. Product photos are optional and appear beside the item on your business profile.</p>
             </div>
             <div className="space-y-3">
               <Input
@@ -545,7 +578,7 @@ export function BusinessEnrollmentForm({
                       key={item.name}
                       type="button"
                       variant="secondary"
-                      disabled={items.some((i) => i.name === item.name)}
+                      disabled={busy || uploading || items.some((i) => i.name === item.name)}
                       onClick={() => add(item.name)}
                     >
                       + {item.name}
@@ -556,63 +589,102 @@ export function BusinessEnrollmentForm({
             </div>
             {items.map((item, index) => (
               <div
-                className="grid gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_150px_auto]"
+                className="space-y-3 rounded-xl border border-[#dfe5d8] p-3"
                 key={item.id}
               >
-                <label className="text-sm">
-                  Item {index + 1}
-                  <Input
-                    aria-label={`Product ${index + 1} name`}
-                    value={item.name}
-                    maxLength={150}
-                    onChange={(e) =>
-                      setItems((current) =>
-                        current.map((i) =>
-                          i.id === item.id ? { ...i, name: e.target.value } : i,
-                        ),
-                      )
-                    }
+                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_150px_auto]">
+                  <label className="text-sm">
+                    Item {index + 1}
+                    <Input
+                      aria-label={`Product ${index + 1} name`}
+                      value={item.name}
+                      maxLength={150}
+                      onChange={(e) =>
+                        setItems((current) =>
+                          current.map((i) =>
+                            i.id === item.id ? { ...i, name: e.target.value } : i,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="text-sm">
+                    Price · KES
+                    <Input
+                      aria-label={`Product ${index + 1} price`}
+                      type="number"
+                      min="0"
+                      max="10000000"
+                      step="0.01"
+                      value={item.price}
+                      onChange={(e) =>
+                        setItems((current) =>
+                          current.map((i) =>
+                            i.id === item.id
+                              ? { ...i, price: e.target.value }
+                              : i,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    aria-label={`Remove item ${index + 1}`}
+                    className="w-full sm:self-end"
+                    disabled={busy || uploading}
+                    onClick={() => void removeItemMedia(item, true)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+                {item.photo && (
+                  <div className="flex items-center gap-3 rounded-xl bg-[#f7f8f2] p-3">
+                    <Image
+                      src={item.photo}
+                      alt={item.name || `Product ${index + 1}`}
+                      width={80}
+                      height={80}
+                      unoptimized
+                      className="size-20 shrink-0 rounded-lg object-cover"
+                    />
+                    <div className="min-w-0 text-sm">
+                      <p className="font-semibold text-[#183e35]">Product photo added</p>
+                      <button
+                        type="button"
+                        disabled={busy || uploading}
+                        onClick={() => void removeItemMedia(item)}
+                        aria-label={`Remove photo for product ${index + 1}`}
+                        className="min-h-11 font-semibold text-[#466453] underline underline-offset-4 disabled:opacity-50"
+                      >
+                        Remove photo
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <details>
+                  <summary className="min-h-11 cursor-pointer content-center text-sm font-semibold text-[#335e41]">
+                    {item.photo ? "Change product photo" : "Add product photo (optional)"}
+                  </summary>
+                  <PhotoUploader
+                    enrollment
+                    label={`Product ${index + 1} photo (optional)`}
+                    disabled={busy || uploading}
+                    onBusyChange={setUploading}
+                    saveMessage="Adding photo to this item…"
+                    readyMessage="Photo added. Submit your listing to save it with this product."
+                    onUploaded={async ([url]) => {
+                      if (url) await setItemPhoto(item, url);
+                    }}
                   />
-                </label>
-                <label className="text-sm">
-                  Price · KES
-                  <Input
-                    aria-label={`Product ${index + 1} price`}
-                    type="number"
-                    min="0"
-                    max="10000000"
-                    step="0.01"
-                    value={item.price}
-                    onChange={(e) =>
-                      setItems((current) =>
-                        current.map((i) =>
-                          i.id === item.id
-                            ? { ...i, price: e.target.value }
-                            : i,
-                        ),
-                      )
-                    }
-                  />
-                </label>
-                <Button
-                  variant="secondary"
-                  type="button"
-                  aria-label={`Remove item ${index + 1}`}
-                  className="w-full sm:self-end"
-                  onClick={() =>
-                    setItems((current) =>
-                      current.filter((i) => i.id !== item.id),
-                    )
-                  }
-                >
-                  Remove
-                </Button>
+                </details>
               </div>
             ))}
             <Button
               type="button"
               variant="secondary"
-              disabled={false}
+              disabled={busy || uploading}
               onClick={() => add()}
             >
               Add custom item
@@ -628,9 +700,12 @@ export function BusinessEnrollmentForm({
               </p>
               <ul className="space-y-2">
                 {items.map((i) => (
-                  <li key={i.id} className="flex justify-between gap-3">
-                    <span>{i.name}</span>
-                    <strong>
+                  <li key={i.id} className="flex items-center gap-3 rounded-xl border border-[#dfe5d8] p-3">
+                    {i.photo && (
+                      <Image src={i.photo} alt={i.name} width={64} height={64} unoptimized className="size-16 shrink-0 rounded-lg object-cover" />
+                    )}
+                    <span className="min-w-0 flex-1 break-words">{i.name}</span>
+                    <strong className="shrink-0 text-sm">
                       KES {Number(i.price).toLocaleString("en-KE")}
                     </strong>
                   </li>
@@ -681,7 +756,7 @@ export function BusinessEnrollmentForm({
                 multiple
                 camera
                 maxFiles={8 - photos.length}
-                disabled={uploading || photos.length >= 8}
+                disabled={busy || uploading || photos.length >= 8}
                 label={
                   sellerType === "COMRADE"
                     ? "Product / workspace photos (public)"
@@ -777,6 +852,7 @@ export function BusinessEnrollmentForm({
               <button
                 type="button"
                 onClick={returnToEssentials}
+                disabled={busy || uploading}
                 className="min-h-11 text-sm font-bold text-[#23543f] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
               >
                 Back to details
@@ -785,6 +861,7 @@ export function BusinessEnrollmentForm({
             <button
               type="button"
               onClick={saveDraft}
+              disabled={busy || uploading}
               className="min-h-11 text-sm font-semibold text-[#466453] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
             >
               Save draft
@@ -792,6 +869,7 @@ export function BusinessEnrollmentForm({
             <button
               type="button"
               onClick={restore}
+              disabled={busy || uploading}
               className="min-h-11 text-sm font-semibold text-[#466453] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
             >
               Restore draft

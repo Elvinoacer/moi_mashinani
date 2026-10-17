@@ -69,9 +69,13 @@ async function main() {
     const outsider = randomBytes(32).toString("hex");
     const hash = enrollmentMediaHash(cookie)!;
     const url = "/api/uploads/" + randomUUID();
+    const productUrl = "/api/uploads/" + randomUUID();
     const mediaId = randomUUID();
     await prisma.enrollmentMedia.create({
       data: { id: mediaId, sessionHash: hash, url, bytes: 15000 },
+    });
+    await prisma.enrollmentMedia.create({
+      data: { sessionHash: hash, url: productUrl, bytes: 12000 },
     });
     const listing = {
       ...draft,
@@ -80,13 +84,19 @@ async function main() {
       mapPin: { lat: 0.2825, lng: 35.2912 },
       photos: [url],
       coverPhoto: url,
+      services: draft.services.map((item, index) => ({ ...item, ...(index === 0 ? { photo: productUrl } : {}) })),
     };
     await assert.rejects(
       () => enrollBusiness(listing, false, undefined, outsider),
       (error) => error instanceof ApiError && error.status === 403,
     );
+    await assert.rejects(
+      () => enrollBusiness({ ...listing, photos: [], coverPhoto: "" }, false, undefined, outsider),
+      (error) => error instanceof ApiError && error.status === 403,
+      "a product-only photo must also belong to this browser session",
+    );
     assert.equal(
-      await prisma.businessMedia.count({ where: { url } }),
+      await prisma.businessMedia.count({ where: { url: { in: [url, productUrl] } } }),
       0,
       "wrong session must never claim a photo",
     );
@@ -99,6 +109,14 @@ async function main() {
     createdIds.push(photographed.business!.id);
     assert.equal(photographed.business!.landmark, "Location shown on map");
     assert.equal(photographed.business!.photos[0], url);
+    assert.equal(photographed.business!.services[0].photo, productUrl, "product photo survives enrollment");
+    assert.equal(photographed.business!.services[1].photo, undefined, "product photos remain optional");
+    assert.equal(
+      (await prisma.businessMedia.findUnique({ where: { url: productUrl } }))?.businessId,
+      photographed.business!.id,
+      "product photo is claimed by the same business",
+    );
+    assert.equal(await prisma.enrollmentMedia.count({ where: { url: productUrl } }), 0);
     assert.equal(
       (await prisma.businessMedia.findUnique({ where: { url } }))?.businessId,
       photographed.business!.id,
@@ -108,7 +126,7 @@ async function main() {
       0,
     );
     console.log(
-      "PASS staging sessions prevent image hijacking; map pin substitutes for landmark",
+      "PASS gallery and product photos stay session-scoped and attach together; map pin substitutes for landmark",
     );
     console.log("Onboarding database integrity tests passed.");
   } finally {

@@ -7,11 +7,13 @@ The current two-step flow, hostel-seller evidence and field roles are documented
 
 `/onboard`, `/admin/enroll` and the appointed ambassador field tool share two steps: **Essentials & prices → Preview & trust**. The first step collects the business name, category, WhatsApp, campus zone, owner name and a required owner email, with an optional separate contact phone. Owners select three to five core items and enter prices. Category templates suggest names, not prices or unverified claims. Prices can be edited later in the merchant dashboard.
 
-The second step previews the actual items and prices, collects a landmark or safe hostel meeting point, offers hours presets and delivery, and lets the seller upload public shop/product photos or request a free field visit. Comrade sellers upload a private student ID plus a public product/workspace photo, or request an in-person identity check. A trust badge is awarded from evidence, independently of paid plans.
+Each core item can include an optional product photo, with a preview, replacement and removal controls. The second step previews the actual items, photos and prices, collects a landmark or safe hostel meeting point, offers hours presets and delivery, and lets the seller upload public shop/product photos or request a free field visit. Comrade sellers upload a private student ID plus a public product/workspace photo, or request an in-person identity check. A trust badge is awarded from evidence, independently of paid plans.
 
 ## Media and drafts
 
-Public gallery uploads before invitation acceptance use `/api/enrollment/media` and an unpredictable HttpOnly, SameSite cookie. Photos are resized, re-encoded, stripped of metadata and staged for 24 hours, with file-count and 25 MB limits. Enrollment transfers the cookie-bound images to the business ownership ledger in the same transaction; entering an email never grants access to another browser’s uploads. R2 is required for public gallery storage. Product photos can be added from the owner dashboard.
+Public gallery and product uploads before invitation acceptance use `/api/enrollment/media` and an unpredictable HttpOnly, SameSite cookie. Photos are resized, re-encoded, stripped of metadata and staged for 24 hours, with a combined 16-photo and 25 MB limit (up to eight gallery photos, one photo per product). Enrollment transfers the cookie-bound images to the business ownership ledger in the same transaction; entering an email never grants access to another browser’s uploads. R2 is required for public photo storage. Removing or replacing a product photo releases the unused staged asset. Product photos can also be added from the owner dashboard.
+
+The public business profile displays saved products in their catalogue order, with consistent image cards, names, prices, units, notes and stock status. Items without photos remain visible; catalogues without any product photos use compact cards. Larger catalogues can be searched by name, unit or note.
 
 Private student IDs use `/api/enrollment/proof`, separate PostgreSQL storage and authenticated, uncached retrieval. They never become public gallery URLs. Owners and admins can review them; appointed field workers can review a business’s ID while an authorized visit is pending. Abandoned staged proof is removed after the 24-hour window by plan maintenance. Attached evidence remains private and is removed when replaced or when the listing is deleted.
 
@@ -69,7 +71,10 @@ npm run test:metrics
 npm run test:payment-routes
 npx playwright install chromium
 npm run test:browser
+npm run test:onboarding:products:browser
 ```
+
+The product-photo browser check uses the disposable local harness and its storage/email fixtures. It covers optional uploads, retry, replacement, removal, drafts, image ownership on submission, owner acceptance and approval, and responsive public catalogue cards with search and stock status. Screenshots are written to `/tmp/moimashinani-enrollment-products`.
 
 Stop the harness with Ctrl+C to remove its database. Browser screenshots are written to `/tmp/moimashinani-browser`. The payment route test calls actual route handlers and PostgreSQL with a mocked provider transport, covering checkout pricing, auth, webhook challenge, invoice mismatches, concurrent delivery and replay. Live IntaSend keys and a registered HTTPS webhook are needed for a real provider delivery test; see [payments.md](payments.md).
 

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { ShoppingBag } from "lucide-react";
 import { availabilityLabel } from "@/lib/campus-value";
 import { CampusUtilityDetails } from "@/components/CampusUtilityDetails";
 import { TrustShield } from "@/components/TrustShield";
@@ -181,6 +182,7 @@ export function BusinessProfileClient({
 
   const handleCall = () => trackBusinessEvent(business.id, "call");
   const serviceTerm = serviceFilter.trim().toLowerCase();
+  const hasProductPhotos = business.services.some((service) => service.photo);
   const visibleServices = serviceTerm
     ? business.services.filter((service) =>
         `${service.name} ${service.unit || ""} ${service.note || ""}`
@@ -473,15 +475,18 @@ export function BusinessProfileClient({
               </div>
             </div>
 
-            {/* Services & Price Menu */}
+            {/* Product and service catalogue */}
             {business.services && business.services.length > 0 && (
-              <div id="services-and-prices" className="bg-white signboard-border signboard-shadow-sm rounded-xl p-4 sm:p-5 space-y-4 scroll-mt-20">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-display font-black text-base text-[#243b32] tracking-tight">
-                    Services & Pricing
-                  </h2>
-                  <span className="text-xs text-[#667064]">
-                    Estimated rates
+              <section id="services-and-prices" aria-labelledby="catalogue-heading" className="bg-white signboard-border signboard-shadow-sm rounded-xl p-4 sm:p-5 space-y-4 scroll-mt-20">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 id="catalogue-heading" className="font-display font-black text-lg text-[#243b32] tracking-tight">
+                      Products &amp; services
+                    </h2>
+                    <p className="mt-1 text-xs leading-5 text-[#667064]">Browse items and prices. Ask the seller to confirm details.</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-[#edf2e5] px-3 py-1.5 text-xs font-bold text-[#335e41]">
+                    {business.services.length} {business.services.length === 1 ? "item" : "items"}
                   </span>
                 </div>
 
@@ -501,10 +506,11 @@ export function BusinessProfileClient({
                   </div>
                 )}
 
-                <div className="divide-y divide-[#dfe5d8]">
-                  {visibleServices.length === 0 && (
-                    <p className="py-3 text-sm text-[#667064]">
+                {serviceTerm && <p role="status" className="text-xs text-[#667064]">Showing {visibleServices.length} of {business.services.length} items</p>}
+                {visibleServices.length === 0 ? (
+                    <p className="rounded-xl bg-[#f7f8f2] p-4 text-sm text-[#667064]">
                       No items match “{serviceFilter}”.{" "}
+                      <button type="button" className="min-h-11 font-bold text-[#205443] underline" onClick={() => setServiceFilter("")}>Clear search</button>{" · "}
                       <button
                         type="button"
                         className="font-bold text-[#205443] underline"
@@ -516,55 +522,65 @@ export function BusinessProfileClient({
                         Ask the seller instead
                       </button>
                     </p>
-                  )}
-                  {visibleServices.map((service, idx) => (
-                    <div
-                      key={service.id || idx}
-                      id={`service-${service.id}`}
-                      className="scroll-mt-24 py-3 flex flex-wrap sm:flex-nowrap items-start sm:items-center justify-between gap-2 sm:gap-4"
-                    >
-                      <div>
-                        <span className="font-display font-bold text-sm text-[#243b32] block">
-                          {service.name}
-                          {service.inStock === false ? " · Out of stock" : ""}
-                        </span>
-                        {service.unit && (
-                          <span className="text-xs text-[#667064]">
-                            {service.unit}
-                          </span>
+                ) : (
+                  <ul aria-label="Products and services" className="grid gap-3 sm:grid-cols-2">
+                    {visibleServices.map((service) => (
+                      <li
+                        key={service.id}
+                        id={`service-${service.id}`}
+                        className="flex min-w-0 scroll-mt-24 flex-col overflow-hidden rounded-xl border border-[#dfe5d8] bg-white"
+                      >
+                        {hasProductPhotos && (
+                          <div className="relative flex aspect-[4/3] items-center justify-center border-b border-[#dfe5d8] bg-[#f7f8f2]">
+                            {service.photo ? (
+                              <Image src={service.photo} alt={service.name} fill sizes="(max-width: 639px) 90vw, (max-width: 767px) 44vw, 320px" unoptimized className="object-contain p-3" />
+                            ) : (
+                              <div className="flex flex-col items-center gap-2 text-[#758071]">
+                                <ShoppingBag size={32} strokeWidth={1.5} aria-hidden="true" />
+                                <span className="text-xs">No photo added</span>
+                              </div>
+                            )}
+                          </div>
                         )}
-                        {service.note && (
-                          <span className="block text-xs text-[#667064]">
-                            {service.note}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                        <span className="font-display font-black text-sm text-[#183e35]">
-                          {service.priceFrom !== undefined
-                            ? `KES ${service.priceFrom.toLocaleString()}`
-                            : "Price on inquiry"}
-                        </span>
-                        <button
-                          disabled={
-                            service.inStock === false ||
-                            business.isTemporarilyClosed
-                          }
-                          aria-label="WhatsApp"
-                          onClick={() => {
-                            setBookingService(service.name);
-                            setBookingModalOpen(true);
-                          }}
-                          className="min-h-11 rounded-lg bg-[#243b32] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
-                        >
-                          Ask about this
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                        <div className="flex flex-1 flex-col gap-3 p-4">
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <h3 className="min-w-0 break-words font-display font-bold text-sm leading-5 text-[#243b32]">{service.name}</h3>
+                            {service.inStock === false && <span className="rounded-full bg-[#fce7e1] px-2 py-1 text-[11px] font-bold text-[#8f2424]">Out of stock</span>}
+                          </div>
+                          {service.note && (
+                            <p className="break-words text-xs leading-5 text-[#667064]">
+                              {service.note}
+                            </p>
+                          )}
+                          <p className="mt-auto break-words font-display font-black text-base text-[#183e35]">
+                            {service.priceFrom !== undefined || service.priceTo !== undefined ? (
+                              <>
+                                KES {(service.priceFrom ?? service.priceTo)?.toLocaleString("en-KE")}
+                                {service.priceFrom !== undefined && service.priceTo !== undefined && service.priceTo !== service.priceFrom
+                                  ? ` – ${service.priceTo.toLocaleString("en-KE")}`
+                                  : ""}
+                              </>
+                            ) : "Price on inquiry"}
+                            {service.unit && <span className="mt-1 block text-xs font-normal text-[#667064]">{service.unit}</span>}
+                          </p>
+                          <button
+                            type="button"
+                            disabled={service.inStock === false || business.isTemporarilyClosed}
+                            aria-label={`Ask about ${service.name}`}
+                            onClick={() => {
+                              setBookingService(service.name);
+                              setBookingModalOpen(true);
+                            }}
+                            className="min-h-11 w-full rounded-lg bg-[#243b32] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41] disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Ask about this
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
             )}
           </div>
 

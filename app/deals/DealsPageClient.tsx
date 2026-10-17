@@ -25,6 +25,7 @@ import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
 import { BusinessCard } from "@/components/BusinessCard";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
+import { CampusPushOptIn } from "@/components/CampusPushOptIn";
 import { ZONES } from "@/lib/constants";
 import { useCampusZone } from "@/lib/useCampusZone";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -236,6 +237,12 @@ export function DealsPageClient({
             </div>
           </div>
         </section>
+
+        <CampusPushOptIn
+          variant="deals"
+          zone={zone}
+          keyword={itemSearch.trim() || undefined}
+        />
 
         <FlashDeals compact={false} quietWhenEmpty maxPrice={budget} hideBudgetFilters />
 

@@ -25,6 +25,8 @@ test('email renders escaped content and a button without a visible raw URL', () 
 test('dashboard paths reject external destinations and unsafe paths', () => {
   for (const path of ['//evil.com','https://evil.com','/dashboard\\evil','/dashboard\n','/verify?token=secret']) assert.equal(safeNotificationPath(path),'/dashboard');
   assert.equal(safeNotificationPath('/dashboard/my-business'),'/dashboard/my-business');
+  assert.equal(safeNotificationPath('/search?q=calculator'),'/search?q=calculator');
+  assert.equal(safeNotificationPath('/market'),'/market');
 });
 test('service email carries a stable provider idempotency key and requires acceptance', async () => {
   const previous = {...process.env};

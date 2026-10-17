@@ -7,8 +7,22 @@ export async function GET(req:NextRequest,ctx:{params:Promise<{id:string}>}) {
   const user = await getCurrentUser(req);
   let path: string;
   // Token possession is still required at the action page; never disclose a capability from a public notification ID.
-  if (!user) path = `/login?next=${encodeURIComponent(notificationLink(id))}`;
-  else {
+  if (!user) {
+    const publicNotice = await prisma.notification.findFirst({
+      where: {
+        id,
+        kind: { in: ['DEAL', 'RESTOCK_ALERT', 'REQUEST_REPLY'] },
+      },
+    });
+    if (
+      publicNotice &&
+      /^\/(b|deals|search|requests|market)(\/|$|\?)/.test(publicNotice.path)
+    ) {
+      path = safeNotificationPath(publicNotice.path);
+    } else {
+      path = `/login?next=${encodeURIComponent(notificationLink(id))}`;
+    }
+  } else {
     const notification = await prisma.notification.findFirst({where:{id,accountId:user.id}});
     if (notification) await prisma.notification.updateMany({where:{id,accountId:user.id,readAt:null},data:{readAt:new Date()}});
     path = notification ? safeNotificationPath(notification.path) : user.role === 'ADMIN' ? '/admin':'/dashboard';

@@ -10,6 +10,8 @@ import {
   textField,
 } from "@/lib/api";
 import { rateLimit } from "@/lib/rate-limit";
+import { withNotificationDelivery } from "@/lib/notification-response";
+import { queueCampusBroadcast } from "@/lib/public-push";
 
 const FREE_MONTHLY_REQUEST_REPLIES = 3;
 
@@ -74,6 +76,7 @@ export async function POST(
       }
     }
 
+    let matchedDevices = 0;
     await prisma.$transaction(async (tx) => {
       await tx.businessEvent.create({
         data: {
@@ -82,17 +85,33 @@ export async function POST(
         },
       });
       await Store.recordEvent(business.id, "whatsapp", tx);
+      const broadcast = await queueCampusBroadcast(tx, {
+        excludeAccountId: business.ownerId,
+        eventKey: `request-reply/${request.id}/${business.id}`,
+        content: {
+          kind: "REQUEST_REPLY",
+          title: `${business.name} responded to your request`,
+          body: `A verified campus seller can help with "${request.query.slice(0, 70)}". Tap to view their shop and prices.`,
+          path: `/b/${business.slug}`,
+          button: "View seller",
+        },
+        filter: {
+          requestId: request.id,
+        },
+      });
+      matchedDevices = broadcast.matchedDevices;
     });
 
     const refCode = `#MM-${request.id.slice(-4).toUpperCase()}`;
     const text = `Hi! I run ${business.name}. I saw your request on Moi Mashinani (${refCode}): ${request.query}. Here is my business and price list: ${new URL("/b/" + business.slug, req.url).href}. How can I help?`;
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         url: `https://wa.me/${request.contactPhone.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`,
         refCode,
       },
       { headers: { "Cache-Control": "private, no-store" } },
     );
+    return matchedDevices > 0 ? withNotificationDelivery(response) : response;
   } catch (error) {
     return apiError(error);
   }

@@ -6,6 +6,7 @@ import { TrustShare } from "@/components/TrustShare";
 import { LeadTimeline } from "@/components/LeadTimeline";
 import { RequestBoard } from "@/components/RequestBoard";
 import { CategorySelect } from "@/components/CategorySelect";
+import { CampusPushOptIn } from "@/components/CampusPushOptIn";
 import { DashboardWorkspaceNav, type WorkspaceTab } from "@/components/DashboardWorkspaceNav";
 
 import Image from "next/image";
@@ -584,6 +585,15 @@ function BusinessDashboard({ slug }: { slug: string }) {
           )}
         </div>
       </div>
+
+      <CampusPushOptIn
+        variant="merchant-dashboard"
+        businessId={business.id}
+        businessName={business.name}
+        zone={business.zone}
+        isProSeller={pro || tierActive}
+        compact
+      />
 
       {business.status !== "ACTIVE" && (
         <section aria-label="Listing status notice" className="rounded-2xl border border-[#e4d98a] bg-[#fdfbe9] p-5 text-sm text-[#4e451b] shadow-xs space-y-3">

@@ -7,6 +7,7 @@ import { WhatsAppIcon } from "@/components/icons";
 import { ZONES } from "@/lib/constants";
 import { whatsappUrl, orderMessage } from "@/lib/whatsapp";
 import { ModalFrame } from "@/components/ModalFrame";
+import { CampusPushOptIn } from "@/components/CampusPushOptIn";
 import {
   getSavedStudentContact,
   saveStudentContact,
@@ -167,6 +168,19 @@ export function BookingModal({
               <WhatsAppIcon className="h-5 w-5" /> Continue on WhatsApp
             </a>
           )}
+          <div className="text-left">
+            <CampusPushOptIn
+              variant="booking-submitted"
+              businessId={business.id}
+              businessName={business.name}
+              zone={zone}
+              keyword={
+                selectedService !== "General inquiry"
+                  ? selectedService
+                  : undefined
+              }
+            />
+          </div>
           <button
             type="button"
             onClick={onClose}

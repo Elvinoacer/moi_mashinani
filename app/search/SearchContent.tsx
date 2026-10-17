@@ -22,6 +22,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { BusinessCard } from "@/components/BusinessCard";
 import { CampusZonePicker } from "@/components/CampusZonePicker";
 import { JoinNeighborhoodCard } from "@/components/JoinNeighborhoodCard";
+import { CampusPushOptIn } from "@/components/CampusPushOptIn";
 import { DemandModal } from "@/components/DemandModal";
 import { ModalFrame } from "@/components/ModalFrame";
 import { CATEGORIES, ZONES } from "@/lib/constants";
@@ -661,6 +662,13 @@ export function SearchContent() {
                 </div>
               );
             })()}
+            <CampusPushOptIn
+              variant="search-watch"
+              keyword={queryParam || undefined}
+              zone={zoneParam !== "all" ? zoneParam : storedZone}
+              category={categoryParam || undefined}
+              compact
+            />
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p role="status" className="text-xs text-[#667064]">Showing {Math.min(visibleCount, results.length)} of {results.length} listings</p>
               <button
@@ -691,37 +699,45 @@ export function SearchContent() {
 
         {/* ZERO RESULTS / DEMAND CAPTURE */}
         {!fetching && !error && results.length === 0 && (
-          <div className="bg-white signboard-border signboard-shadow rounded-2xl p-8 sm:p-12 text-center max-w-xl mx-auto space-y-4">
-            <div className="w-14 h-14 bg-[#e9eedf] rounded-full flex items-center justify-center mx-auto text-[#758071]">
-              <Search className="w-7 h-7" />
-            </div>
+          <div className="max-w-2xl mx-auto space-y-5">
+            <CampusPushOptIn
+              variant="search-empty"
+              keyword={queryParam || undefined}
+              zone={zoneParam !== "all" ? zoneParam : storedZone}
+              category={categoryParam || undefined}
+            />
+            <div className="bg-white signboard-border signboard-shadow rounded-2xl p-8 sm:p-10 text-center space-y-4">
+              <div className="w-14 h-14 bg-[#e9eedf] rounded-full flex items-center justify-center mx-auto text-[#758071]">
+                <Search className="w-7 h-7" />
+              </div>
 
-            <div className="space-y-1">
-              <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight">
-                No matching shops found
-              </h2>
-              <p className="text-sm text-[#667064] font-body">
-                We couldn&apos;t find any businesses matching your search.
-                Can&apos;t find what you need around campus? Tell us and we will
-                find a fundi or shop to list!
-              </p>
-            </div>
+              <div className="space-y-1">
+                <h2 className="font-display font-black text-2xl text-[#243b32] uppercase tracking-tight">
+                  No matching shops found
+                </h2>
+                <p className="text-sm text-[#667064] font-body">
+                  We couldn&apos;t find any businesses matching your search.
+                  Can&apos;t find what you need around campus? Tell us and we will
+                  find a fundi or shop to list!
+                </p>
+              </div>
 
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setDemandModalOpen(true)}
-                className="w-full sm:w-auto bg-[#335e41] text-white px-6 py-3 rounded-full font-display font-black text-xs uppercase tracking-tight hover:bg-[#183e35] transition"
-              >
-                Request a Service / Shop
-              </button>
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="w-full sm:w-auto bg-[#f7f8f2] text-[#243b32] border border-[#dfe5d8] px-5 py-3 rounded-full font-bold text-xs uppercase"
-              >
-                Clear Filters
-              </button>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDemandModalOpen(true)}
+                  className="w-full sm:w-auto bg-[#335e41] text-white px-6 py-3 rounded-full font-display font-black text-xs uppercase tracking-tight hover:bg-[#183e35] transition"
+                >
+                  Request a Service / Shop
+                </button>
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="w-full sm:w-auto bg-[#f7f8f2] text-[#243b32] border border-[#dfe5d8] px-5 py-3 rounded-full font-bold text-xs uppercase"
+                >
+                  Clear Filters
+                </button>
+              </div>
             </div>
           </div>
         )}

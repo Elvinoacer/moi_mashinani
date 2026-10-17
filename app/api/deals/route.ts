@@ -13,6 +13,11 @@ import { Store } from "@/lib/store";
 import { requireBusinessAccess } from "@/lib/auth";
 import { ZONES } from "@/lib/constants";
 import { rateLimit } from "@/lib/rate-limit";
+import { withNotificationDelivery } from "@/lib/notification-response";
+import {
+  isEligibleBroadcastPlan,
+  queueCampusBroadcast,
+} from "@/lib/public-push";
 export async function GET() {
   try {
     return NextResponse.json(await activeFlashDeals(), {
@@ -82,18 +87,58 @@ export async function POST(req: NextRequest) {
         throw new ApiError(400, "Enter the per-order delivery fee");
     } else if (body.dropAt || body.deliveryFeeKes !== undefined)
       throw new ApiError(400, "Choose a delivery zone for a drop");
-    const deal = await prisma.flashDeal.create({
-      data: {
-        businessId: business.id,
-        title,
-        priceKes: Number(body.priceKes),
-        endsAt,
-        dropZone: dropZone || null,
-        dropAt,
-        deliveryFeeKes: dropZone ? Number(body.deliveryFeeKes) : null,
-      },
+    const broadcastEligible = isEligibleBroadcastPlan({
+      proEndsAt: business.proEndsAt,
+      featuredUntil: business.tierEndsAt,
+      dealBlastEndsAt: business.dealBlastEndsAt,
+      activeTier: business.activeTier,
     });
-    return NextResponse.json({ id: deal.id }, { status: 201 });
+    const dropZoneName = dropZone
+      ? ZONES.find((z) => z.slug === dropZone)?.name || dropZone
+      : "";
+    const { deal, matchedDevices } = await prisma.$transaction(async (tx) => {
+      const createdDeal = await tx.flashDeal.create({
+        data: {
+          businessId: business.id,
+          title,
+          priceKes: Number(body.priceKes),
+          endsAt,
+          dropZone: dropZone || null,
+          dropAt,
+          deliveryFeeKes: dropZone ? Number(body.deliveryFeeKes) : null,
+        },
+      });
+      let count = 0;
+      if (broadcastEligible) {
+        const res = await queueCampusBroadcast(tx, {
+          excludeAccountId: business.ownerId,
+          eventKey: `flash-deal/${createdDeal.id}`,
+          content: {
+            kind: "DEAL",
+            title: `${business.name}: ${title}`,
+            body: `KES ${Number(body.priceKes).toLocaleString("en-KE")}${dropZoneName ? ` · Delivery drop to ${dropZoneName}` : ""} — tap to claim before it ends.`,
+            path: "/deals",
+            button: "View flash deal",
+          },
+          filter: {
+            zone: dropZone || business.zone,
+            servesZones: business.servesZones,
+            businessId: business.id,
+            category: business.primaryCategory,
+            text: `${business.name} ${title}`,
+          },
+        });
+        count = res.matchedDevices;
+      }
+      return { deal: createdDeal, matchedDevices: count };
+    });
+    const response = NextResponse.json(
+      { id: deal.id, broadcastEligible, matchedDevices },
+      { status: 201 },
+    );
+    return broadcastEligible && matchedDevices > 0
+      ? withNotificationDelivery(response)
+      : response;
   } catch (error) {
     return apiError(error);
   }

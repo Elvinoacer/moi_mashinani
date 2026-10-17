@@ -15,6 +15,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { ReportModal } from "@/components/ReportModal";
 import { ClaimModal } from "@/components/ClaimModal";
 import { BusinessCard } from "@/components/BusinessCard";
+import { CampusPushOptIn } from "@/components/CampusPushOptIn";
 import { Business } from "@/lib/types";
 import { CATEGORIES } from "@/lib/constants";
 import { useNow } from "@/lib/useNow";
@@ -582,6 +583,18 @@ export function BusinessProfileClient({
                 )}
               </section>
             )}
+
+            <CampusPushOptIn
+              variant="business-profile"
+              businessId={business.id}
+              businessName={business.name}
+              zone={business.zone}
+              category={business.primaryCategory}
+              keyword={serviceFilter.trim() || undefined}
+              hasOutOfStock={Boolean(
+                business.services?.some((s) => s.inStock === false),
+              )}
+            />
           </div>
 
           {/* SIDEBAR: Hours & Location Details */}

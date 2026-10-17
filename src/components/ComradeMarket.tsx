@@ -12,6 +12,7 @@ import { BusinessCard } from "./BusinessCard";
 import { MarketPostForm } from "./MarketPostForm";
 import { DemandModal } from "./DemandModal";
 import { ModalFrame } from "./ModalFrame";
+import { CampusPushOptIn } from "./CampusPushOptIn";
 
 const types = [
   { value: "all", label: "All listings" },
@@ -124,6 +125,12 @@ export function ComradeMarket({ initial }: { initial: Business[] }) {
               <CampusZonePicker value={zone} onChange={(value) => { setZone(value); setCount(12); }} />
             </div>
           </div>
+          <CampusPushOptIn
+            variant="market"
+            zone={zone}
+            keyword={keyword.trim() || undefined}
+            compact
+          />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="directory-market-types" role="group" aria-label="Listing type">
               {types.map(({ value, label }) => (

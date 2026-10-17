@@ -208,11 +208,16 @@ export async function deliverNotifications(limit = 20, budgetMs = 18000) {
           result.skipped++;
           continue;
         }
+        const isPublicBroadcast = ["DEAL", "RESTOCK_ALERT", "REQUEST_REPLY"].includes(
+          n.kind,
+        );
         await firebaseMessaging().send({
           token: device.token,
           data: {
             title: n.title,
-            body: "You have an important MoiMashinani update. Open your account to see the details.",
+            body: isPublicBroadcast
+              ? n.body
+              : "You have an important MoiMashinani update. Open your account to see the details.",
             url,
             id: n.id,
           },

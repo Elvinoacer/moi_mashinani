@@ -40,3 +40,75 @@ export async function disablePush(action:'decline'|'disable') {
     await deleteToken(messaging);
   } catch { /* Server binding is already disabled. */ }
 }
+
+export type CampusPushWatchInput = {
+  zone?: string;
+  keyword?: string;
+  businessId?: string;
+  requestId?: string;
+  category?: string;
+  source?: string;
+};
+
+export async function registerCampusPushToken(
+  watch: CampusPushWatchInput = {},
+) {
+  const { messaging, vapidKey } = await messagingClient();
+  const { getToken } = await import('firebase/messaging');
+  await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+    scope: '/',
+  });
+  const serviceWorkerRegistration = await navigator.serviceWorker.ready;
+  const token = await getToken(messaging, {
+    vapidKey,
+    serviceWorkerRegistration,
+  });
+  if (!token)
+    throw new Error('We could not register this device. Please try again.');
+  const response = await fetch('/api/notifications/public', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'register', token, ...watch }),
+  });
+  const data = await response.json();
+  if (!response.ok)
+    throw new Error(
+      data.error || 'Could not save your notification preference.',
+    );
+  return data;
+}
+
+export async function saveCampusPushWatch(watch: CampusPushWatchInput = {}) {
+  const response = await fetch('/api/notifications/public', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'watch', ...watch }),
+  });
+  const data = await response.json();
+  if (!response.ok)
+    throw new Error(data.error || 'Could not save your alert watch.');
+  return data;
+}
+
+export async function disableCampusPush(action: 'decline' | 'disable') {
+  const response = await fetch('/api/notifications/public', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action }),
+  });
+  if (!response.ok)
+    throw new Error(
+      'Could not save your notification preference. Please try again.',
+    );
+  try {
+    const registration = await navigator.serviceWorker.getRegistration('/');
+    const subscription = await registration?.pushManager.getSubscription();
+    if (!subscription) return;
+    await subscription.unsubscribe();
+    const { messaging } = await messagingClient();
+    const { deleteToken } = await import('firebase/messaging');
+    await deleteToken(messaging);
+  } catch {
+    /* Server binding is already disabled. */
+  }
+}

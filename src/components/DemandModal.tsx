@@ -9,6 +9,7 @@ import { ModalFrame } from "./ModalFrame";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { getSavedStudentContact, saveStudentContact } from "@/lib/useCampusZone";
+import { CampusPushOptIn } from "./CampusPushOptIn";
 
 const REQUEST_EXAMPLES = [
   "Need a single room near Stage under KES 4,000",
@@ -37,6 +38,7 @@ export function DemandModal({
   const [handoffs, setHandoffs] = useState<
     Array<{ name: string; businessId: string; url: string; isPro?: boolean }>
   >([]);
+  const [submittedId, setSubmittedId] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -69,6 +71,7 @@ export function DemandModal({
         /* Posting works with storage disabled. */
       }
       if (phone.trim()) saveStudentContact({ phone });
+      setSubmittedId(data.id || "");
       setHandoffs(data.handoffs || []);
       setSubmitted(true);
       onPosted?.();
@@ -90,6 +93,13 @@ export function DemandModal({
             Matching verified sellers are notified. The request expires after
             seven days. You can close it sooner from this browser.
           </p>
+          <CampusPushOptIn
+            variant="request-submitted"
+            keyword={query}
+            zone={zone}
+            category={category || undefined}
+            requestId={submittedId || undefined}
+          />
           {handoffs.length ? (
             <div className="space-y-3">
               <p className="font-bold">

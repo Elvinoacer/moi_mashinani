@@ -6,6 +6,7 @@ import { CATEGORIES, ZONES } from "@/lib/constants";
 import { CampusZonePicker } from "./CampusZonePicker";
 import { ArrowRight, Check, ChevronDown, MapPin, MessageCircle, MessageCircleOff, Plus, Search, X } from "lucide-react";
 import { DemandModal } from "./DemandModal";
+import { CampusPushOptIn } from "./CampusPushOptIn";
 import { Button } from "./ui/Button";
 import { useNow } from "@/lib/useNow";
 import { useCampusZone } from "@/lib/useCampusZone";
@@ -188,6 +189,11 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
               </button>
             </div>
           </div>
+          <CampusPushOptIn
+            variant="request-board"
+            zone={zone}
+            keyword={keyword.trim() || undefined}
+          />
           <div className="requests-filters" role="search" aria-label="Search campus requests">
             <div className="requests-filters-heading">
               <h2>Explore requests</h2>

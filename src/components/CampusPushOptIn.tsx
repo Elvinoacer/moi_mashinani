@@ -272,11 +272,11 @@ export function CampusPushOptIn({
     ctaLabel = "Allow campus deal alerts";
   } else if (variant === "request-submitted") {
     badge = "Live Request Alert";
-    headline = "Get pinged on your phone when a seller replies or stocks this";
+    headline = "Get alerts when sellers respond";
     description = cleanKeyword
-      ? `Turn on phone notifications so we can alert you immediately when a verified seller responds to “${cleanKeyword.slice(0, 50)}” or stocks a matching item.`
-      : "Turn on phone notifications so we can alert you immediately when a verified seller responds to your request.";
-    ctaLabel = "Notify my phone on seller replies";
+      ? "Get notified if a verified seller responds to your request or lists a matching item."
+      : "Get notified if a verified seller responds or lists a matching item.";
+    ctaLabel = "Turn on reply alerts";
   } else if (variant === "request-board") {
     badge = "Real-Time Campus Alerts";
     headline =
@@ -359,9 +359,9 @@ export function CampusPushOptIn({
   return (
     <aside
       aria-label={badge}
-      className={`relative overflow-hidden rounded-2xl border transition-all ${
+      className={`relative @container min-w-0 overflow-hidden rounded-2xl border transition-all ${
         variant === "search-empty" || variant === "request-submitted"
-          ? "border-[#b8d4be] bg-[linear-gradient(135deg,#eef6ea_0%,#ffffff_100%)] p-5 shadow-sm"
+          ? "border-[#b8d4be] bg-[linear-gradient(135deg,#eef6ea_0%,#ffffff_100%)] p-4 sm:p-5 shadow-sm"
           : compact
             ? "border-[#d5e2ce] bg-[#f4f8ef] p-3.5 sm:p-4"
             : "border-[#cfe0c7] bg-[linear-gradient(120deg,#f2f7ec_0%,#ffffff_85%)] p-4 sm:p-5 shadow-xs"
@@ -380,8 +380,8 @@ export function CampusPushOptIn({
           </button>
         )}
 
-      <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3 pr-6 sm:pr-2">
+      <div className="flex min-w-0 flex-col gap-3.5 @2xl:flex-row @2xl:items-center @2xl:justify-between">
+        <div className={`flex min-w-0 flex-1 items-start gap-3 ${variant === "request-submitted" || variant === "search-empty" || variant === "booking-submitted" ? "" : "pr-8 @2xl:pr-0"}`}>
           <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#183e35] text-[#e6f2d9] shadow-xs">
             {isCurrentTargetWatched ? (
               <BellRing className="h-5 w-5" />
@@ -390,14 +390,14 @@ export function CampusPushOptIn({
             )}
           </span>
           <div className="min-w-0 space-y-1">
-            <p className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#335e41]">
+            <p className="flex flex-wrap items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#335e41]">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
               {badge}
             </p>
-            <h3 className="font-display text-sm font-extrabold text-[#183e35] sm:text-base">
+            <h3 className="break-words font-display text-sm font-extrabold leading-snug text-[#183e35] sm:text-base">
               {headline}
             </h3>
-            <p className="text-xs leading-relaxed text-[#4f6456] sm:text-[13px]">
+            <p className="break-words text-xs leading-relaxed text-[#4f6456] sm:text-[13px]">
               {description}
             </p>
             {prefs?.keywords && prefs.keywords.length > 0 && (
@@ -412,9 +412,9 @@ export function CampusPushOptIn({
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+        <div className="flex w-full min-w-0 flex-col items-stretch gap-2 @2xl:w-auto @2xl:shrink-0 @2xl:items-end">
           {isCurrentTargetWatched ? (
-            <span className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-[#b7d3b0] bg-[#e5f1de] px-4 py-2 text-xs font-extrabold text-[#1e4d33]">
+            <span className="inline-flex min-h-10 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl border border-[#b7d3b0] bg-[#e5f1de] px-4 py-2 text-center text-xs font-extrabold text-[#1e4d33] @2xl:w-auto">
               <Check className="h-4 w-4 stroke-[2.5]" />
               {cleanKeyword
                 ? `Alert active for “${cleanKeyword}”`
@@ -425,16 +425,10 @@ export function CampusPushOptIn({
               type="button"
               disabled={busy}
               onClick={() => void handleEnableOrWatch()}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#183e35] px-4 py-2.5 text-xs font-extrabold text-white shadow-xs transition-colors hover:bg-[#285745] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41] disabled:opacity-50 sm:text-sm"
+              className="inline-flex min-h-11 w-full min-w-0 items-center justify-center gap-2 rounded-xl bg-[#183e35] px-4 py-2.5 text-center text-xs font-extrabold leading-snug text-white shadow-xs transition-colors hover:bg-[#285745] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41] disabled:opacity-50 @2xl:w-auto sm:text-sm"
             >
               <BellRing className="h-4 w-4 shrink-0" />
-              <span>
-                {busy
-                  ? "Saving alert…"
-                  : isDeviceSubscribed && (cleanKeyword || businessId || requestId)
-                    ? ctaLabel
-                    : ctaLabel}
-              </span>
+              <span className="min-w-0 break-words">{busy ? "Saving alert…" : ctaLabel}</span>
             </button>
           )}
         </div>

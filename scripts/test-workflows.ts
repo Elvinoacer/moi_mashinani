@@ -197,6 +197,62 @@ async function main() {
     400,
   );
   check(true, "email verification is password validated and single-use");
+  const demandForDeletion = await request(
+    "/api/demand",
+    {
+      method: "POST",
+      body: { query: `Temporary demand request ${testId}`, zone: "all" },
+    },
+    201,
+  );
+  await request(
+    "/api/demand",
+    { method: "DELETE", body: { id: demandForDeletion.data.id } },
+    401,
+  );
+  await request(
+    "/api/demand",
+    {
+      method: "DELETE",
+      cookie: owner.cookie,
+      body: { id: demandForDeletion.data.id },
+    },
+    403,
+  );
+  await request(
+    "/api/demand",
+    {
+      method: "DELETE",
+      cookie: admin.cookie,
+      origin: "https://evil.invalid",
+      body: { id: demandForDeletion.data.id },
+    },
+    403,
+  );
+  await request(
+    "/api/demand",
+    {
+      method: "DELETE",
+      cookie: admin.cookie,
+      body: { id: "nonexistent-demand-request" },
+    },
+    404,
+  );
+  const deletedDemand = await request("/api/demand", {
+    method: "DELETE",
+    cookie: admin.cookie,
+    body: { id: demandForDeletion.data.id },
+  });
+  const remainingDemand = await request("/api/demand", {
+    cookie: admin.cookie,
+  });
+  check(
+    deletedDemand.data.success === true &&
+      !remainingDemand.data.some(
+        (item: { id: string }) => item.id === demandForDeletion.data.id,
+      ),
+    "only same-origin admins can delete demand requests; deleted requests disappear from insights",
+  );
   const mine = (await request("/api/auth/me", { cookie: owner.cookie })).data;
   const auditResult = await request(
     `/api/admin/audit?businessId=${business.id}`,

@@ -160,6 +160,8 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
     (keyword.trim() === "" || (r.query + " " + (ZONES.find((z) => z.slug === r.zone)?.name || "") + " " + categoryName(r.category)).toLowerCase().includes(keyword.toLowerCase().trim()))
   ).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   const shown = compact ? visible.slice(0, 2) : visible.slice(0, showCount);
+  const emptyPrimaryActionClass = "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#183e35] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2b5949] active:bg-[#102f28] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#48785c] sm:w-auto";
+  const emptySecondaryActionClass = "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#c9d8ce] bg-white px-4 py-2.5 text-sm font-bold text-[#183e35] transition-colors hover:border-[#789b86] hover:bg-[#f0f6ef] active:bg-[#e4eee3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#48785c] sm:w-auto";
   return (
     <section className={compact ? "space-y-4" : "requests-board space-y-5"} aria-label="Comrade requests">
       {compact ? (
@@ -303,21 +305,34 @@ export function RequestBoard({ compact = false }: { compact?: boolean }) {
           {[1, 2, 3, 4].map((item) => <div key={item} className="h-36 rounded-2xl bg-[#e8efe5] animate-pulse" />)}
         </div>
       ) : !visible.length ? (
-        <div className={compact ? "ui-card space-y-3" : "requests-empty"}>
-          <span className="requests-empty-icon" aria-hidden="true"><Search size={23} /></span>
-          <h3>{error && !requests.length ? "Requests could not load" : "No matching requests yet"}</h3>
-          <p>{error && !requests.length
+        <div className={compact ? "ui-card flex flex-col items-start gap-3 px-4 py-5 sm:px-6 sm:py-6" : "requests-empty"}>
+          <span
+            className={compact ? "grid size-11 shrink-0 place-items-center rounded-xl bg-[#edf5e9] text-[#34684d]" : "requests-empty-icon"}
+            aria-hidden="true"
+          ><Search size={23} /></span>
+          <h3 className={compact ? "text-base font-extrabold leading-snug text-[#183e35] sm:text-lg" : undefined}>
+            {error && !requests.length ? "Requests could not load" : "No matching requests yet"}
+          </h3>
+          <p className={compact ? "max-w-xl text-sm leading-relaxed text-[#5e7062]" : undefined}>{error && !requests.length
             ? "Check your connection and try again."
             : "Try a different search or campus area. You can also ask the campus for what you need."}</p>
-          <div className="requests-empty-actions">
+          <div className="mt-1 grid w-full grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
             {error && !requests.length ? (
-              <button type="button" onClick={() => { setLoading(true); setRefresh((value) => value + 1); }}>Try again</button>
+              <button type="button" className={emptyPrimaryActionClass} onClick={() => { setLoading(true); setRefresh((value) => value + 1); }}>
+                Try again <ArrowRight className="shrink-0" size={16} aria-hidden="true" />
+              </button>
             ) : (keyword || zone !== "all") ? (
-              <button type="button" onClick={() => { setKeyword(""); setZone("all"); setShowCount(8); }}>Clear filters</button>
+              <button type="button" className={emptyPrimaryActionClass} onClick={() => { setKeyword(""); setZone("all"); setShowCount(8); }}>
+                Clear filters <ArrowRight className="shrink-0" size={16} aria-hidden="true" />
+              </button>
             ) : (
-              <button type="button" onClick={() => setPost(true)}>Post a request <ArrowRight size={15} aria-hidden="true" /></button>
+              <button type="button" className={emptyPrimaryActionClass} onClick={() => setPost(true)}>
+                Post a request <ArrowRight className="shrink-0" size={16} aria-hidden="true" />
+              </button>
             )}
-            <Link href="/search">Explore businesses <ArrowRight size={15} aria-hidden="true" /></Link>
+            <Link href="/search" className={emptySecondaryActionClass}>
+              Explore businesses <ArrowRight className="shrink-0" size={16} aria-hidden="true" />
+            </Link>
           </div>
         </div>
       ) : (

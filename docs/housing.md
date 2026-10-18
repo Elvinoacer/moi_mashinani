@@ -23,4 +23,4 @@ npm run test:housing
 npm run test:housing:browser
 ```
 
-The HTTP tests cover both anonymous post/reply paths, required consent/caution, private feed data, legacy consent, business verification and reply billing, area reference data, post closure and expiry. Browser tests exercise actual posting, responding, location search and closure at mobile and desktop sizes. The tests intercept the final external WhatsApp navigation so no message is sent.
+The HTTP tests cover both anonymous post/reply paths, required consent/caution, private feed data, legacy consent, business verification and reply billing, area reference data, post closure and expiry. Browser tests exercise actual posting, responding, location search and closure at mobile and desktop sizes. The browser tests substitute the external WhatsApp window and verify its destination while using the real posting and reply APIs; no message is sent.

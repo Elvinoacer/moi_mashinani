@@ -45,10 +45,24 @@ async function main() {
 
       // A different, signed-out person sees the caution before either reply type.
       const visitor = await browser.newContext({ baseURL: context.baseUrl, viewport: { width, height: 900 }, extraHTTPHeaders: { "X-Forwarded-For": randomUUID() } });
+      // Keep the external app boundary local. Opening/closing real WhatsApp
+      // popups can leave the browser driver waiting on an unrelated window.
+      // Use plain JS source so tsx cannot inject module helpers into the browser.
+      await visitor.addInitScript({ content: `(() => {
+        let handoffUrl = "";
+        Object.defineProperty(window, "__housingHandoffUrl", { get: () => handoffUrl });
+        window.open = () => ({
+          opener: null,
+          location: { set href(value) { handoffUrl = value; } },
+          close() {},
+        });
+      })();` });
       const visitorPage = await visitor.newPage();
       visitorPage.setDefaultNavigationTimeout(120000);
       visitorPage.setDefaultTimeout(60000);
+      visitorPage.on("pageerror", error => errors.push(error.message));
       await visitorPage.goto("/housing");
+      assert.equal(await visitorPage.evaluate("typeof window.__housingHandoffUrl"), "string");
       await visitorPage.getByRole("button", { name: "Vacancies available", exact: true }).click();
       const card = visitorPage.locator("article").filter({ hasText: vacancyQuery });
       await card.getByRole("button", { name: "Ask about this vacancy" }).click();
@@ -57,15 +71,14 @@ async function main() {
       const continueButton = dialog.getByRole("button", { name: "Continue to WhatsApp — free" });
       await expect(continueButton).toBeDisabled();
       await dialog.getByRole("checkbox").check();
-      // Block the external chat navigation while checking the real API handoff.
-      await visitor.route("https://wa.me/**", route => route.fulfill({ contentType: "text/html", body: "<p>Test WhatsApp handoff</p>" }));
       const handoffResponse = visitorPage.waitForResponse(response => response.url().endsWith(`/api/demand/${published.id}/respond`));
       await continueButton.click();
       const handoff = await handoffResponse;
       assert.equal(handoff.status(), 200);
-      assert.match((await handoff.json()).url, /^https:\/\/wa.me\/254712345678\?/);
+      const handoffData = await handoff.json();
+      assert.match(handoffData.url, /^https:\/\/wa.me\/254712345678\?/);
       await expect(visitorPage.getByRole("dialog")).toHaveCount(0);
-      for (const popup of visitor.pages()) if (popup !== visitorPage) await popup.close();
+      assert.equal(await visitorPage.evaluate(() => (window as unknown as { __housingHandoffUrl: string }).__housingHandoffUrl), handoffData.url);
 
       await page.bringToFront();
       await page.getByRole("button", { name: "I'm looking for a house", exact: true }).click();
@@ -95,7 +108,6 @@ async function main() {
       await dialog.getByRole("button", { name: "Continue to WhatsApp — free" }).click();
       assert.equal((await lookingHandoff).status(), 200);
       await expect(visitorPage.getByRole("dialog")).toHaveCount(0);
-      for (const popup of visitor.pages()) if (popup !== visitorPage) await popup.close();
       await visitorPage.bringToFront();
 
       // The expanded picker is searchable and supports areas outside the named list.

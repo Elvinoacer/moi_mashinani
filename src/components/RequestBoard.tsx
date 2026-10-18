@@ -173,7 +173,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
   const emptyPrimaryActionClass = "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#183e35] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2b5949] active:bg-[#102f28] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#48785c] sm:w-auto";
   const emptySecondaryActionClass = "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#c9d8ce] bg-white px-4 py-2.5 text-sm font-bold text-[#183e35] transition-colors hover:border-[#789b86] hover:bg-[#f0f6ef] active:bg-[#e4eee3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#48785c] sm:w-auto";
   return (
-    <section className={compact ? "space-y-4" : "requests-board space-y-5"} aria-label={housingOnly ? "Community housing board" : "Comrade requests"}>
+    <section className={compact ? "space-y-4" : housingOnly ? "requests-board housing-board space-y-4" : "requests-board space-y-5"} aria-label={housingOnly ? "Community housing board" : "Comrade requests"}>
       {compact ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
@@ -184,29 +184,59 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
         </div>
       ) : (
         <>
-          <div className="requests-hero">
-            <div className="requests-hero-copy">
-              <p className="requests-eyebrow"><span className="requests-eyebrow-dot" aria-hidden="true" />MOI UNIVERSITY · COMMUNITY BOARD</p>
-              <h1 className="requests-hero-title">{housingOnly ? "A place to stay." : "Campus needs."}<br /><span>{housingOnly ? "A way to help." : "Real connections."}</span></h1>
-              <p className="requests-hero-lead">
-                {housingOnly ? "Find a house or rental, list a vacancy, or share a place you know. Posting and replying are free for everyone. No account needed." : "Discover what students around campus are looking for. If you can help, connect directly with them."}
-              </p>
+          {housingOnly ? (
+            <div className="housing-stage">
+              <div className="housing-stage__story">
+                <p className="housing-stage__eyebrow"><span aria-hidden="true" className="housing-stage__signal" /> THE MOI UNIVERSITY HOUSING BOARD</p>
+                <h1 className="housing-stage__title">A place to stay.<br /><span>A way to help.</span></h1>
+                <p className="housing-stage__intro">A better way for comrades to find rooms, share vacancies and help each other move — across Moi University campuses and surrounding areas.</p>
+                <div className="housing-stage__perks" aria-label="Housing board benefits">
+                  <span><Check size={15} aria-hidden="true" /> Free to post</span>
+                  <span><Check size={15} aria-hidden="true" /> No sign-up</span>
+                  <span><Check size={15} aria-hidden="true" /> Direct contact</span>
+                </div>
+              </div>
+              <div className="housing-stage__action-panel">
+                <p className="housing-stage__action-kicker"><span className="housing-stage__action-dot" /> FIND YOUR NEXT MOVE</p>
+                <h2>What brings you here?</h2>
+                <p>Pick a starting point. It only takes a moment to share what you need or know.</p>
+                <div className="housing-stage__buttons">
+                  <button type="button" className="housing-stage__primary" onClick={() => { setPostIntent("LOOKING"); setPost(true); }}>
+                    <span className="housing-stage__button-icon"><Search size={20} aria-hidden="true" /></span>
+                    <span>I'm looking for a house</span>
+                    <ArrowRight size={19} aria-hidden="true" className="ml-auto shrink-0" />
+                  </button>
+                  <button type="button" className="housing-stage__secondary" onClick={() => { setPostIntent("VACANCY"); setPost(true); }}>
+                    <span className="housing-stage__button-icon"><Plus size={20} aria-hidden="true" /></span>
+                    <span>List a vacancy — free</span>
+                    <ArrowRight size={19} aria-hidden="true" className="ml-auto shrink-0" />
+                  </button>
+                </div>
+                <p className="housing-stage__footnote">Have a lead on a room? You can share it even if you are not the landlord.</p>
+              </div>
             </div>
-            <div className="requests-post-card">
-              <p className="requests-post-eyebrow"><Plus size={15} aria-hidden="true" /> {housingOnly ? "FREE COMMUNITY HOUSING" : "FOR PEOPLE LOOKING FOR SOMETHING"}</p>
-              <h2>{housingOnly ? "Looking or letting?" : "Need something?"}</h2>
-              <p>{housingOnly ? "You can post a vacancy even if you are a comrade moving out or simply know of a place." : "Tell the campus what you are looking for. Posting is free and does not require an account."}</p>
-              <button type="button" className="requests-post-button" onClick={() => setPost(true)}>
-                <Plus size={17} aria-hidden="true" /> {housingOnly ? "I'm looking for a house" : "Post a request"} <ArrowRight size={17} aria-hidden="true" />
-              </button>
-              {housingOnly && <button type="button" className="requests-post-button" onClick={() => { setPostIntent("VACANCY"); setPost(true); }}><Plus size={17} aria-hidden="true" /> List a vacancy — free</button>}
+          ) : (
+            <div className="requests-hero">
+              <div className="requests-hero-copy">
+                <p className="requests-eyebrow"><span className="requests-eyebrow-dot" aria-hidden="true" />MOI UNIVERSITY · COMMUNITY BOARD</p>
+                <h1 className="requests-hero-title">Campus needs.<br /><span>Real connections.</span></h1>
+                <p className="requests-hero-lead">Discover what students around campus are looking for. If you can help, connect directly with them.</p>
+              </div>
+              <div className="requests-post-card">
+                <p className="requests-post-eyebrow"><Plus size={15} aria-hidden="true" /> FOR PEOPLE LOOKING FOR SOMETHING</p>
+                <h2>Need something?</h2>
+                <p>Tell the campus what you are looking for. Posting is free and does not require an account.</p>
+                <button type="button" className="requests-post-button" onClick={() => setPost(true)}>
+                  <Plus size={17} aria-hidden="true" /> Post a request <ArrowRight size={17} aria-hidden="true" />
+                </button>
+              </div>
             </div>
-          </div>
-          <nav aria-label="Community boards" className="flex flex-wrap gap-3 text-sm font-bold text-[#205342]">
-            <Link href="/requests" aria-current={!housingOnly ? "page" : undefined} className="underline underline-offset-4">Requests for products & services</Link>
-            <Link href="/housing" aria-current={housingOnly ? "page" : undefined} className="underline underline-offset-4">Housing: vacancies & house seekers</Link>
+          )}
+          <nav aria-label="Community boards" className={housingOnly ? "housing-board-switch" : "flex flex-wrap gap-3 text-sm font-bold text-[#205342]"}>
+            <Link href="/housing" aria-current={housingOnly ? "page" : undefined} className={housingOnly ? "housing-board-switch__active" : "underline underline-offset-4"}>Housing board</Link>
+            <Link href="/requests" aria-current={!housingOnly ? "page" : undefined} className={housingOnly ? "" : "underline underline-offset-4"}>Requests for products &amp; services</Link>
           </nav>
-          {housingOnly ? <HousingSafetyNotice /> : <CampusPushOptIn
+          {!housingOnly && <CampusPushOptIn
             variant="request-board"
             zone={zone}
             keyword={keyword.trim() || undefined}
@@ -247,6 +277,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
               ))}
             </div>}
           </div>
+          {housingOnly && <HousingSafetyNotice compact />}
         </>
       )}
       {!housingOnly && businesses.length > 0 && selectedBiz && (
@@ -294,7 +325,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
       {!compact && (
         <div className="requests-results-header" id="requests-results">
           <div>
-            <p className="requests-section-kicker">FROM AROUND CAMPUS</p>
+            <p className="requests-section-kicker">{housingOnly ? "THE COMMUNITY FEED" : "FROM AROUND CAMPUS"}</p>
             <h2>{housingOnly ? "Latest housing posts" : "Latest requests"}</h2>
             <p className="requests-results-description">Newest first · Posts remain visible for seven days</p>
           </div>
@@ -372,7 +403,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
                       {new Date(r.createdAt).toLocaleString("en-KE", { timeZone: "Africa/Nairobi", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
                     </time>
                   </div>
-                  {r.housingIntent && <p className="text-xs font-bold text-[#315f42]">{r.housingIntent === "VACANCY" ? "VACANCY AVAILABLE" : "LOOKING FOR A HOUSE"} · Free community post · Unverified</p>}
+                  {r.housingIntent && <p className={`housing-intent-tag ${r.housingIntent === "VACANCY" ? "housing-intent-tag--vacancy" : ""}`}>{r.housingIntent === "VACANCY" ? "VACANCY AVAILABLE" : "LOOKING FOR A HOUSE"}</p>}
                   <p className={`request-listing-query ${!expanded && long ? "line-clamp-2" : ""}`}>{r.query}</p>
                   {(owns || categoryName(r.category)) && (
                     <div className="flex flex-wrap gap-1.5">
@@ -417,7 +448,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
                       <span className="request-listing-note"><MessageCircleOff size={15} aria-hidden="true" /> Replies not enabled</span>
                     )}
                   </div>
-                  {r.housingIntent && <p className="text-xs leading-relaxed text-amber-900">Anyone can reply, without an account. Inspect the property and check the person before paying.</p>}
+                  {r.housingIntent && <p className="housing-listing-note">Unverified community post · Inspect before paying</p>}
                 </article>
               );
             })}
@@ -425,7 +456,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
           {!compact && showCount < visible.length && (
             <button type="button" className="directory-load-more"
               onClick={() => setShowCount((count) => count + 8)}>
-              Show more requests ({visible.length - showCount} remaining)
+              Show more {housingOnly ? "housing posts" : "requests"} ({visible.length - showCount} remaining)
             </button>
           )}
         </>

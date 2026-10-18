@@ -1,4 +1,5 @@
 import "../requests/requests.css";
+import "./housing.css";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -13,9 +14,9 @@ export const metadata: Metadata = {
 
 export default function HousingPage() {
   return (
-    <div className="interior-page requests-page">
+    <div className="interior-page requests-page housing-page">
       <Navbar />
-      <main className="requests-page mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 sm:pt-10">
+      <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-5 sm:px-6 sm:pt-8">
         <RequestBoard housingOnly />
       </main>
       <Footer />

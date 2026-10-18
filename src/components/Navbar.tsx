@@ -125,7 +125,7 @@ function NavbarInner() {
 
   return (
     <header className="relative z-50 w-full border-b border-[#e3e7dc] bg-[#f7f8f2]">
-      <div className="mx-auto flex min-h-[64px] md:min-h-[82px] max-w-[1328px] items-center justify-between gap-2 px-3 sm:gap-4 sm:px-8 lg:px-10">
+      <div className="mx-auto flex min-h-[64px] md:min-h-[76px] max-w-[1328px] items-center justify-between gap-2 px-3 sm:gap-4 sm:px-8 lg:px-10">
         <div className="flex min-w-0 items-center gap-2 lg:gap-6">
           <SiteBrand />
           <div className="relative hidden xl:block">
@@ -204,26 +204,7 @@ function NavbarInner() {
           )}
         </form>
 
-        <nav
-          aria-label="Main navigation"
-          className="hidden items-center gap-4 lg:flex xl:gap-6"
-        >
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={
-                pathname === href ||
-                (href === "/dashboard" && pathname.startsWith("/dashboard"))
-                  ? "page"
-                  : undefined
-              }
-              className={`relative inline-flex min-h-11 items-center text-[12px] font-semibold transition-colors hover:text-[#183e35] ${pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard")) ? "text-[#183e35] after:absolute after:bottom-[7px] after:left-0 after:h-[2px] after:w-6 after:bg-[#335e41]" : "text-[#667064]"}`}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
+
 
         <div className="flex items-center gap-2">
           {user ? (
@@ -270,9 +251,7 @@ function NavbarInner() {
                 <Plus size={16} />
                 <span className="hidden sm:inline">List your business</span>
                 <span className="sm:hidden">List free</span>
-                <span className="hidden rounded bg-[#d9f279] px-1.5 py-0.5 text-[9px] font-bold text-[#264b36] lg:inline">
-                  Free
-                </span>
+                
               </button>
             )
           )}
@@ -286,6 +265,26 @@ function NavbarInner() {
             {mobileOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
+      </div>
+
+      {/* A separate navigation rail prevents the logo, area, search and actions
+          from competing for horizontal space on desktop. */}
+      <div className="hidden border-t border-[#e5ebe1] bg-[#fbfcf8] lg:block">
+        <nav aria-label="Main navigation" className="mx-auto flex max-w-[1328px] items-center justify-center gap-2 px-8 py-1.5 xl:gap-5">
+          {navLinks.map(({ href, label }) => {
+            const active = pathname === href || (href === "/dashboard" && pathname.startsWith("/dashboard"));
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={`relative inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg px-3.5 text-[12px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41] ${active ? "bg-[#e7efdf] text-[#184838]" : "text-[#586b5f] hover:bg-[#f0f4e9] hover:text-[#183e35]"}`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
       {chooserOpen && (

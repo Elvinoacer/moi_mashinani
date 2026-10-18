@@ -1,7 +1,7 @@
 import { survivalMatch } from "@/lib/campus-value";
 import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { connection } from "next/server";
 import { Store } from "@/lib/store";
 import { publicBusiness } from "@/lib/business-input";

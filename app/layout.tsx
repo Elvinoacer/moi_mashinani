@@ -1,4 +1,5 @@
 import { NotificationCenter } from '@/components/NotificationCenter';
+import { BusinessImpressions } from '@/components/BusinessImpressions';
 import { PublicMotion } from '@/components/PublicMotion';
 import { Suspense } from 'react';
 import type { Metadata } from "next";
@@ -83,6 +84,7 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className={`${manrope.variable} min-h-full flex flex-col bg-[#f7f8f2] text-[#243b32] antialiased`}>
         {children}
+        <BusinessImpressions />
         <Suspense fallback={null}><PublicMotion /></Suspense>
         <Suspense fallback={null}><NotificationCenter /></Suspense>
       </body>

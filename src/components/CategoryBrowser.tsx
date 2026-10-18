@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/MotionLink';
 import { CATEGORIES, CATEGORY_GROUPS, categorySearchText } from '@/lib/categories';
 import { CategoryIcon } from '@/components/icons';
 import { Search, X } from 'lucide-react';

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { usePathname } from "next/navigation";
 import { Compass, House, MessageCircle, Percent, Store } from "lucide-react";
 

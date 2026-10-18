@@ -3,7 +3,7 @@ import { CATEGORIES, ZONES } from "@/lib/constants";
 
 import { DemandModal } from "@/components/DemandModal";
 import React, { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BottomNav } from "@/components/BottomNav";
@@ -15,6 +15,7 @@ import { Business, Category } from "@/lib/types";
 import { Bike, Search, ShieldCheck, Star, X } from "lucide-react";
 import { CategoryIcon, Store } from "@/components/icons";
 import { useNow } from "@/lib/useNow";
+import { getEffectiveTier } from "@/lib/rank";
 
 interface CategoryPageClientProps {
   categorySlug: string;
@@ -22,6 +23,7 @@ interface CategoryPageClientProps {
   initialBusinesses?: Business[];
   relatedCategories?: Category[];
   popularSearches?: string[];
+  initialNow: number;
 }
 
 export function CategoryPageClient({
@@ -30,8 +32,10 @@ export function CategoryPageClient({
   initialBusinesses,
   relatedCategories = [],
   popularSearches = [],
+  initialNow,
 }: CategoryPageClientProps) {
-  const now = useNow();
+  const clock = useNow();
+  const now = clock || initialNow;
   const [zone, setZone] = useCampusZone();
   const [keyword, setKeyword] = useState("");
   const [openNow, setOpenNow] = useState(false);
@@ -379,10 +383,8 @@ export function CategoryPageClient({
           ) : filteredBusinesses.length > 0 ? (
             (() => {
               const featuredInCat = filteredBusinesses.filter(
-                (b) =>
-                  b.activeTier === "FEATURED" &&
-                  (!b.tierEndsAt || new Date(b.tierEndsAt).getTime() > now),
-              );
+                (b) => getEffectiveTier(b, new Date(now)) === "FEATURED",
+              ).slice(0, 3);
               const otherBusinesses = filteredBusinesses.filter(
                 (b) => !featuredInCat.some((f) => f.id === b.id),
               );
@@ -400,12 +402,12 @@ export function CategoryPageClient({
                           Featured Spotlight
                         </span>
                         <span className="text-xs font-bold text-[#667064]">
-                          Top recommended in {categoryObj.name}
+                          Rotating paid placements
                         </span>
                       </div>
                       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                         {featuredInCat.map((biz) => (
-                          <BusinessCard key={biz.id} business={biz} />
+                          <BusinessCard key={biz.id} business={biz} effectiveTier={getEffectiveTier(biz, new Date(now))} />
                         ))}
                       </div>
                     </div>
@@ -421,7 +423,7 @@ export function CategoryPageClient({
                       )}
                       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                         {otherBusinesses.slice(0, visibleCount).map((biz) => (
-                          <BusinessCard key={biz.id} business={biz} />
+                          <BusinessCard key={biz.id} business={biz} effectiveTier={getEffectiveTier(biz, new Date(now))} />
                         ))}
                       </div>
                       {visibleCount < otherBusinesses.length && (

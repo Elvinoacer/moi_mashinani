@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       businesses = businesses.filter((b) => Boolean(b.studentDiscount));
     }
 
-    // Hidden saved products must not influence public search after Pro expires.
+    // Rank public catalogue data without exposing owner or moderation fields.
     businesses = businesses.map(publicBusiness);
 
     const priceCap = searchParams.get("maxPrice");

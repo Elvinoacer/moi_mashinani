@@ -5,7 +5,7 @@ import Link from "@/components/MotionLink";
 import { ArrowUpRight, BadgeCheck, Bike, MapPin, MessageCircle, Phone, Store } from "lucide-react";
 import { availabilityLabel, confirmedOpen } from "@/lib/campus-value";
 import { CATEGORIES, ZONES } from "@/lib/constants";
-import { comparisonItems } from "@/lib/catalog-plan";
+import { comparisonItems, hasPro } from "@/lib/catalog-plan";
 import { useNow } from "@/lib/useNow";
 import { trackBusinessEvent } from "@/lib/track-business-event";
 import { whatsappUrl } from "@/lib/whatsapp";
@@ -34,10 +34,10 @@ export function BusinessCard({
 }: BusinessCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const now = useNow();
-  const tier = effectiveTier ?? (
-    business.tierEndsAt && now > 0 && Date.parse(business.tierEndsAt) <= now
-      ? "NONE" : business.activeTier
-  );
+  const tier = effectiveTier ?? (hasPro(business, now) && (!business.proStartsAt || Date.parse(business.proStartsAt) <= now)
+    ? "FEATURED" : business.tierStartsAt && Date.parse(business.tierStartsAt) > now
+      ? "NONE" : business.tierEndsAt && now > 0 && Date.parse(business.tierEndsAt) <= now
+        ? "NONE" : business.activeTier);
   const category = CATEGORIES.find((item) => item.slug === business.primaryCategory)?.name ?? "Local business";
   const zone = ZONES.find((item) => item.slug === business.zone)?.name ?? business.zone;
   const matched = comparisonItems(business, query);

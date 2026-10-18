@@ -14,7 +14,7 @@ export async function GET(
     await requireBusinessAccess(req, business);
     return NextResponse.json(
       await prisma.businessEvent.findMany({
-        where: { businessId: business.id },
+        where: { businessId: business.id, type: { not: "impression" } },
         orderBy: { createdAt: "desc" },
         take: 50,
       }),

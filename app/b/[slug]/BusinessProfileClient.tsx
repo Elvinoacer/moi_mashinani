@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { ShoppingBag } from "lucide-react";
 import { availabilityLabel } from "@/lib/campus-value";
 import { CampusUtilityDetails } from "@/components/CampusUtilityDetails";

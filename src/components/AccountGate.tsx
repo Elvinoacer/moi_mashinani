@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { usePathname } from "next/navigation";
 import type { Business } from "@/lib/types";
 

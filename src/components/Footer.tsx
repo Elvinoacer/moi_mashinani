@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { ArrowUpRight, MapPin } from "lucide-react";
 import { ZONES } from "@/lib/constants";
 import { SiteBrand } from "@/components/SiteBrand";

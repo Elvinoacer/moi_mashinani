@@ -1,5 +1,7 @@
 import { publicBusiness } from "@/lib/business-input";
 import { connection } from "next/server";
+import { cookies } from "next/headers";
+import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { CATEGORIES, SEED_BUSINESSES } from "@/lib/constants";
@@ -32,8 +34,9 @@ async function fetchCategoryBusinesses(
   }
   const matching = list.filter(
     (b) => b.status === "ACTIVE" && categoryMatches(b, categorySlug),
-  );
-  const ranked = rankBusinesses(matching, "", "all", categorySlug);
+  ).map(publicBusiness);
+  const sessionId = (await cookies()).get("mashinani_discovery")?.value || randomUUID();
+  const ranked = rankBusinesses(matching, "", "all", categorySlug, undefined, sessionId);
   return ranked.map((c) => c.business);
 }
 
@@ -154,9 +157,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(itemListSchema) }}
       />
       <CategoryPageClient
+        initialNow={Date.now()}
         categorySlug={categorySlug}
         categoryObj={categoryObj}
-        initialBusinesses={businesses.map(publicBusiness)}
+        initialBusinesses={businesses}
         relatedCategories={relatedCategories}
         popularSearches={seo.synonyms.slice(0, 8)}
       />

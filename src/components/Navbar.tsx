@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Award,
@@ -17,6 +17,7 @@ import {
 import { ZONES } from "@/lib/constants";
 import { useCampusZone } from "@/lib/useCampusZone";
 import { SiteBrand } from "@/components/SiteBrand";
+import { beginPublicNavigation } from "@/lib/public-motion";
 
 const navLinks = [
   { href: "/search", label: "Explore" },
@@ -103,7 +104,9 @@ function NavbarInner() {
       const params = new URLSearchParams(searchParams.toString());
       if (zone === "all") params.delete("zone");
       else params.set("zone", zone);
-      router.push(`${pathname}${params.size ? `?${params.toString()}` : ""}`);
+      const href = `${pathname}${params.size ? `?${params.toString()}` : ""}`;
+      beginPublicNavigation(href);
+      router.push(href);
     }
   }
 
@@ -114,7 +117,9 @@ function NavbarInner() {
     if (trimmed) params.set("q", trimmed);
     if (currentZone !== "all") params.set("zone", currentZone);
     setMobileOpen(false);
-    router.push(`/search${params.size ? `?${params.toString()}` : ""}`);
+    const href = `/search${params.size ? `?${params.toString()}` : ""}`;
+    beginPublicNavigation(href);
+    router.push(href);
   }
 
   return (

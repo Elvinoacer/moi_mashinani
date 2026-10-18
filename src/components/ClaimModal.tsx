@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/MotionLink';
 import { ModalFrame } from '@/components/ModalFrame';
 
 export function ClaimModal({ businessSlug, businessName, onClose }: {

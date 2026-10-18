@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/MotionLink';
 import { LogIn, Store } from 'lucide-react';
 
 interface AuthUser {

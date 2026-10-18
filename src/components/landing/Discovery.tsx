@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Form from 'next/form';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/MotionLink';
 import { ArrowRight, ArrowUpRight, BadgeCheck, ChevronDown, GraduationCap, MapPin, Search, Star, Store } from 'lucide-react';
 import type { Business, ServiceItem } from '@/lib/types';
 import styles from './discovery.module.css';

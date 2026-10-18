@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { ArrowRight, Clock3, MessageCircle, TicketPercent } from "lucide-react";
 import type { FlashDeal } from "@/lib/types";
 import { useNow } from "@/lib/useNow";

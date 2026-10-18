@@ -6,6 +6,7 @@ import {
   safeJsonLd,
 } from '@/lib/seo';
 import { SearchContent } from './SearchContent';
+import { PublicPageLoading } from '@/components/PublicPageLoading';
 
 export const metadata: Metadata = {
   title: 'Find Businesses Near Moi University, Kesses',
@@ -55,7 +56,7 @@ export default function SearchPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbsSchema) }}
       />
-      <Suspense fallback={<div className="p-8 text-center text-[#243b32]">Loading campus directory...</div>}>
+      <Suspense fallback={<PublicPageLoading />}>
         <SearchContent />
       </Suspense>
     </>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, Suspense } from 'react';
-import Link from 'next/link';
+import Link from '@/components/MotionLink';
 import { Bike, BookOpen, Bus, House, Landmark, Moon, Star } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Business } from '@/lib/types';

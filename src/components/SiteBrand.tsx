@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/MotionLink';
 
 /** One vector identity shared by the landing page, navigation, and footer. */
 export function SiteBrand({ small = false, className = '' }: { small?: boolean; className?: string }) {

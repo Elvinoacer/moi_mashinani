@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import type { Business, ServiceRequest } from "@/lib/types";
 import { CATEGORIES, ZONES } from "@/lib/constants";
 import { CampusZonePicker } from "./CampusZonePicker";

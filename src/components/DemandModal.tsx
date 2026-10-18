@@ -1,7 +1,7 @@
 "use client";
 import { trackBusinessEvent } from "@/lib/track-business-event";
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { ZONES } from "@/lib/constants";
 import { CategorySelect } from "./CategorySelect";
 import { ArrowRight, CheckCircle2, Lightbulb, Plus } from "lucide-react";

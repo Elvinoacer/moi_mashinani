@@ -82,7 +82,7 @@ export function CampusHero({ zone, onZoneChange, query, onQueryChange, ready }: 
         <div className={styles.atmosphere} aria-hidden="true">
           <span className={styles.orbit} /><span className={styles.orbitInner} />
           <span className={styles.crosshair}>+</span>
-          <span className={styles.coordinate}>0°17′ N / 35°17′ E</span>
+          <span className={styles.coordinate}>EXPLORE / KESSES</span>
         </div>
         <div className={styles.copy}>
           <p className={styles.eyebrow}><span aria-hidden="true" /> YOUR CAMPUS. CONNECTED.</p>

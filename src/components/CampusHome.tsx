@@ -253,9 +253,10 @@ export function CampusHome({
             </p>
           </div>
           <div className="campus-pulse">
-            {live.map((b) => (
+            {rankBusinesses(live, "", zone, undefined, undefined, discoverySession + ":live", new Date(now), new Date(rotationTime)).slice(0, 6).map(({ business: b, effectiveTier }) => (
               <Link href={`/b/${b.slug}`} key={b.id} className="ui-card" data-business-impression={b.id}>
                 <p className="truncate font-bold">{b.name}</p>
+                {effectiveTier !== "NONE" && <span className="text-xs font-semibold text-amber-800">{effectiveTier === "FEATURED" ? "Featured" : "Recommended"} · Ad</span>}
                 <p className="my-2 text-sm">
                   {b.liveStatus || availabilityLabel(b, now)}
                 </p>
@@ -336,14 +337,14 @@ export function CampusHome({
             : "Fresh deals, instant requests and student hustles around Moi."}
         </p>
         <div className="flex flex-wrap gap-3">
-          {contextPicks.map(({ business }) => (
+          {contextPicks.map(({ business, effectiveTier }) => (
             <Link
               className="ui-button ui-button-secondary"
               key={business.id}
               href={`/b/${business.slug}`}
               data-business-impression={business.id}
             >
-              {business.name} · {availabilityLabel(business, now)}
+              {business.name} · {availabilityLabel(business, now)}{effectiveTier !== "NONE" ? " · Ad" : ""}
             </Link>
           ))}
           <Link href="/market" className="underline">

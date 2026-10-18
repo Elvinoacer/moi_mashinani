@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import {
   Activity,
   Bike,
@@ -141,7 +141,7 @@ export function SearchContent() {
     e.preventDefault();
     setFiltersOpen(false);
     updateFilters({ q: searchInput.trim() });
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    resultsRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
   };
 
   const activeZoneObj = ZONES.find((z) => z.slug === zoneParam);
@@ -772,18 +772,19 @@ export function SearchContent() {
               up.
             </p>
             <p>
-              <strong>2. Featured Tier:</strong> Guaranteed top placement in
-              the top block of relevant results with a bright Jua Sun Yellow
-              border.
+              <strong>2. Featured &amp; Pro:</strong> Eligible businesses rotate
+              through reserved top positions in relevant results. Featured cards
+              have a bright Jua Sun Yellow border.
             </p>
             <p>
-              <strong>3. Recommended Tier:</strong> Placed above all free
-              listings with a Deep Teal sticker.
+              <strong>3. Recommended Tier:</strong> Priority in rotating promoted
+              positions, with a Deep Teal sticker.
             </p>
             <p>
-              <strong>4. Fair Rotation:</strong> Paying businesses with equal
-              match scores rotate evenly per session so every local operator
-              gets fair exposure.
+              <strong>4. Fair Rotation:</strong> Relevant paid businesses share
+              positions across visits and time, even when hundreds are eligible.
+              Featured has more prominent opportunities; no business owns a
+              permanent first position.
             </p>
             <p>
               <strong>5. Capped per page:</strong> At least 4 out of 10 slots

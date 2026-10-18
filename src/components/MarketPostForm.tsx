@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { ArrowLeft, ArrowRight, CheckCircle2, ImagePlus, MapPin, Package, ShieldCheck, Sparkles } from "lucide-react";
 import { CATEGORIES, ZONES } from "@/lib/constants";
 import { Button } from "./ui/Button";

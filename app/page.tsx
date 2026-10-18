@@ -1,4 +1,5 @@
 import { survivalMatch } from "@/lib/campus-value";
+import { randomUUID } from "node:crypto";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -46,8 +47,8 @@ export default async function HomePage() {
       </a>
       <Navbar />
       <main className="mx-auto max-w-6xl space-y-4 px-3 pb-28 sm:space-y-7 sm:px-6 md:pb-16">
-        <CampusHome businesses={businesses} />
-        <section aria-labelledby="moi-university-businesses" className="rounded-[20px] border border-[#dce6d8] bg-white px-4 py-5 sm:px-7 sm:py-6">
+        <CampusHome businesses={businesses} initialNow={now} discoverySession={randomUUID()} />
+        <section data-motion="reveal" aria-labelledby="moi-university-businesses" className="rounded-[20px] border border-[#dce6d8] bg-white px-4 py-5 sm:px-7 sm:py-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 id="moi-university-businesses" className="font-display text-lg font-extrabold text-[#183e35] sm:text-2xl">More around Moi University</h2>

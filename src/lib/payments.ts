@@ -21,15 +21,15 @@ export const PROMOTION_PLANS = {
     priceKesWeek: 100,
     badgeColor: "#0B6E70",
     description:
-      "Placed above every free listing in the search and category results you match, with a Recommended badge.",
+      "Priority in rotating promoted positions for matching searches and categories, with a Recommended badge.",
     perks: [
-      "Placed above all free listings in matching search and category results",
+      "Rotating priority positions in matching search and category results",
       "Recommended badge on your listing card",
-      "Shown first in the homepage “Your next local find” section",
-      "3-Lead Value Guarantee: auto-extended 7 days free if you get fewer than 3 contacts",
+      "Rotation through relevant homepage discovery positions",
+      "Value Guarantee: one 7-day extension after a paid run with fewer than 3 tracked contact actions",
       "Unlimited replies to live student requests on the Request Board",
-      "Daily promotion results in your dashboard: times seen, profile views and contacts",
-      "Expiry reminders with a summary of your results",
+      "Promotion results in your dashboard: visible impressions, profile views and contact actions",
+      "Remaining paid time preserved when you renew or upgrade",
     ],
   },
   FEATURED: {
@@ -38,13 +38,13 @@ export const PROMOTION_PLANS = {
     priceKesWeek: 200,
     badgeColor: "#FFC53D",
     description:
-      "The top block of matching results, the homepage spotlight and the top of your category page.",
+      "Rotation through the top promoted positions in matching results, homepage spotlights and category pages.",
     perks: [
-      "Top-3 block of matching search and category results",
-      "Homepage “Featured around campus” spotlight",
-      "“Featured” section at the top of your category page",
+      "Rotation through the reserved top positions in matching results",
+      "Rotation through the homepage spotlight",
+      "Rotation through your category’s Featured section",
       "Featured badge and highlighted listing card",
-      "3-Lead Value Guarantee: auto-extended 7 days free if you get fewer than 3 contacts",
+      "Value Guarantee: one 7-day extension after a paid run with fewer than 3 tracked contact actions",
       "Unlimited Request Board student lead replies",
       "Everything included in Recommended",
     ],
@@ -221,8 +221,8 @@ export function formatKenyanPhone(input: string): string {
 export const PAYMENT_PLAN_LABELS = {
   PRO: "Moi Mashinani Pro",
   DEAL_BLAST: "Deal blast",
-  RECOMMENDED: "Category top spot",
-  FEATURED: "Featured placement",
+  RECOMMENDED: "Recommended promotion",
+  FEATURED: "Featured rotation",
 } as const;
 export const PAYMENT_STATE_LABELS = {
   CREATED: "Checkout created",

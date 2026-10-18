@@ -11,6 +11,7 @@ import type { Business, PaymentRecord } from "@/lib/types";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { Card } from "./ui/Card";
+import { PromotionResults } from "./PromotionResults";
 
 export function BoostCheckout({ business }: { business: Business }) {
   const [plan, setPlan] = useState<PaymentRecord["planId"]>("RECOMMENDED");
@@ -43,7 +44,7 @@ export function BoostCheckout({ business }: { business: Business }) {
       savings: 0,
       badge: "Flash Promo",
       description:
-        "Put your student deal first on Deals for 24 hours; notify opted-in campus accounts.",
+        "Rotate your student deal through promoted Deals positions for 24 hours; notify opted-in campus accounts.",
     },
     {
       id: "RECOMMENDED" as const,
@@ -53,7 +54,7 @@ export function BoostCheckout({ business }: { business: Business }) {
       savings: recQuote.savingsKes,
       badge: isComrade ? "50% Comrade Rate" : "Popular",
       description:
-        "Appear above all free listings in matching category & zone results + Unlimited Request Board replies + 3-Lead Guarantee.",
+        "Rotate through priority positions in matching category, zone and homepage results. Unlimited Request Board replies and a Value Guarantee.",
     },
     {
       id: "FEATURED" as const,
@@ -61,19 +62,19 @@ export function BoostCheckout({ business }: { business: Business }) {
       price: featQuote.chargeKes,
       fullPrice: featQuote.fullPriceKes,
       savings: featQuote.savingsKes,
-      badge: "Top 3 + Homepage",
+      badge: "Priority + Homepage",
       description:
-        "Top-3 search & category placement, Homepage “Featured around campus” spotlight, Unlimited Request Board replies + 3-Lead Guarantee.",
+        "Rotate through reserved top positions and homepage spotlights. Unlimited Request Board replies and a Value Guarantee.",
     },
     {
       id: "PRO" as const,
-      name: "Moi Mashinani Pro (30 Days)",
+      name: "Moi Mashinani Pro (calendar month)",
       price: 250,
       fullPrice: 250,
       savings: 0,
       badge: "Best All-Round",
       description:
-        "A calendar month of featured zone visibility, instant Request Board student lead routing, and daily deal broadcasts.",
+        "A calendar month of rotating featured zone visibility, matching Request Board alerts, unlimited replies, and daily active-deal broadcasts.",
     },
   ];
 
@@ -227,24 +228,36 @@ export function BoostCheckout({ business }: { business: Business }) {
             Plans &amp; Promotion
           </h2>
           <p className="mt-1 text-sm text-[#50675a] leading-relaxed">
-            Compare plans side-by-side. Every paid boost includes our{" "}
-            <strong className="text-[#183e35]">3-Lead Value Guarantee</strong>:
-            get at least 3 customer contacts during your run or we automatically
-            extend your boost by 7 days free.
+            Compare plans side-by-side. Recommended and Featured include our{" "}
+            <strong className="text-[#183e35]">Value Guarantee</strong>:
+            fewer than 3 tracked Call or WhatsApp taps and booking requests by
+            the end of your paid run earns one automatic 7-day extension.
           </p>
         </div>
         <div className="rounded-xl border border-[#dce5d7] bg-[#f7faf5] px-4 py-3 text-right">
           <p className="text-[11px] font-bold uppercase tracking-wider text-[#50675a]">
-            Your Tracked Moi Mashinani ROI
+            Lifetime customer activity
           </p>
           <p className="mt-0.5 text-xl font-bold text-[#183e35]">
-            {totalContacts} direct leads · {business.metrics?.views || 0} views
+            {totalContacts} contact actions · {business.metrics?.views || 0} views
           </p>
           <p className="text-[11px] text-[#335e41]">
-            Calls, WhatsApp orders &amp; bookings attributed to your profile
+            Button taps and booking requests; sales are not measured
           </p>
         </div>
       </div>
+
+      <div className="rounded-xl border border-[#dce5d7] bg-[#f7faf5] px-4 py-3 text-xs leading-relaxed text-[#50675a]">
+        Promoted positions rotate among eligible businesses so a large paid
+        group shares visibility. Placement depends on relevant searches, zone
+        and visitor traffic; a fixed position, number of customers or sales is
+        not promised. The guarantee reviews activity since your latest boost
+        payment after the paid run ends; renewal starts a fresh review window.
+        It applies once per run, including renewed runs, and excludes Pro and
+        deal blasts. Scheduled reviews add seven full days even if delayed.
+      </div>
+
+      <PromotionResults slug={business.slug} />
 
       {isComrade && (
         <div className="rounded-xl border border-[#b7d6c2] bg-[#edf6f0] px-4 py-2.5 text-xs font-semibold text-[#1f4d35]">
@@ -254,9 +267,8 @@ export function BoostCheckout({ business }: { business: Business }) {
       )}
       {isHostel && !isComrade && (
         <div className="rounded-xl border border-[#e3d4a5] bg-[#fdf9ec] px-4 py-2.5 text-xs font-semibold text-[#634b13]">
-          🏠 Hostels &amp; Housing Category: Includes priority placement on the
-          Keja Hunter map, vacancy filters, and high-ticket student booking
-          leads.
+          🏠 Hostels &amp; Housing Category: The displayed quote includes the
+          housing category rate. Promotions rotate in matching housing results.
         </div>
       )}
 
@@ -277,7 +289,7 @@ export function BoostCheckout({ business }: { business: Business }) {
           </h3>
           <p>
             KES {payment.amountKes} · {PAYMENT_PLAN_LABELS[payment.planId]} (
-            {payment.weeks} {payment.weeks === 1 ? "week" : "weeks"})
+            {payment.planId === "PRO" ? "calendar month" : payment.planId === "DEAL_BLAST" ? "24 hours" : `${payment.weeks} ${payment.weeks === 1 ? "week" : "weeks"}`})
           </p>
           <ol className="space-y-3 text-sm">
             <li>

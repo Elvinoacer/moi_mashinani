@@ -1,11 +1,11 @@
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import Image from "next/image";
 import { ArrowUpRight, MapPin, Store } from "lucide-react";
 import styles from "./JoinNeighborhoodCard.module.css";
 
 export function JoinNeighborhoodCard() {
   return (
-    <section aria-labelledby="join-neighborhood-heading" className={styles.card}>
+    <section data-motion="reveal" aria-labelledby="join-neighborhood-heading" className={styles.card}>
       <div className={styles.copy}>
         <p className={styles.eyebrow}>
           <Store size={15} aria-hidden="true" /> For local businesses

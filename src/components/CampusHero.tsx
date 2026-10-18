@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUpRight, BedDouble, MapPin, Printer, Search, Store, UtensilsCrossed, Wrench, X } from "lucide-react";
 import { CampusZonePicker } from "./CampusZonePicker";
@@ -24,11 +25,50 @@ interface CampusHeroProps {
 
 export function CampusHero({ zone, onZoneChange, query, onQueryChange, ready }: CampusHeroProps) {
   const router = useRouter();
+  const sceneRef = useRef<HTMLDivElement>(null);
   const zoneQuery = zone === "all" ? "" : "&zone=" + encodeURIComponent(zone);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const preference = window.matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
+    let frame = 0;
+    let bounds: DOMRect | undefined;
+    function reset() {
+      cancelAnimationFrame(frame);
+      scene!.style.removeProperty("--scene-x");
+      scene!.style.removeProperty("--scene-y");
+      bounds = undefined;
+    }
+    function move(event: PointerEvent) {
+      if (!preference.matches) return;
+      bounds ??= scene!.getBoundingClientRect();
+      const x = ((event.clientX - bounds.left) / bounds.width - .5) * 12;
+      const y = ((event.clientY - bounds.top) / bounds.height - .5) * 8;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        scene!.style.setProperty("--scene-x", `${x}px`);
+        scene!.style.setProperty("--scene-y", `${y}px`);
+      });
+    }
+    scene.addEventListener("pointermove", move, { passive: true });
+    scene.addEventListener("pointerleave", reset);
+    preference.addEventListener("change", reset);
+    window.addEventListener("resize", reset, { passive: true });
+    window.addEventListener("scroll", reset, { passive: true });
+    return () => {
+      reset();
+      scene.removeEventListener("pointermove", move);
+      scene.removeEventListener("pointerleave", reset);
+      preference.removeEventListener("change", reset);
+      window.removeEventListener("resize", reset);
+      window.removeEventListener("scroll", reset);
+    };
+  }, []);
 
   return (
     <section className={styles.hero} aria-labelledby="campus-home-heading">
-      <div className={styles.scene}>
+      <div className={styles.scene} ref={sceneRef}>
         <div className={styles.backdrop} aria-hidden="true">
           <Image
             src="/images/university_gate.webp"
@@ -39,9 +79,14 @@ export function CampusHero({ zone, onZoneChange, query, onQueryChange, ready }: 
             className={styles.photo}
           />
         </div>
+        <div className={styles.atmosphere} aria-hidden="true">
+          <span className={styles.orbit} /><span className={styles.orbitInner} />
+          <span className={styles.crosshair}>+</span>
+          <span className={styles.coordinate}>0°17′ N / 35°17′ E</span>
+        </div>
         <div className={styles.copy}>
           <p className={styles.eyebrow}><span aria-hidden="true" /> YOUR CAMPUS. CONNECTED.</p>
-          <h1 id="campus-home-heading">Less searching.<br /><span>More campus life.</span></h1>
+          <h1 id="campus-home-heading"><span className={styles.titleLine}><span>Less searching.</span></span><span className={`${styles.titleLine} ${styles.titleAccent}`}><span>More campus life.</span></span></h1>
           <p className={styles.intro}>A good meal. A room. A quick fix. Find what you need around Moi, compare prices, and talk to sellers directly.</p>
         </div>
         <p className={styles.location}><MapPin size={14} aria-hidden="true" /><span>Moi University <span className={styles.locationDetail}>· Main Gate, Kesses</span></span></p>

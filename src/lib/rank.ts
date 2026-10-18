@@ -1,5 +1,5 @@
 import { survivalMatch } from "./campus-value";
-import { hasPro } from "./catalog-plan";
+import { comparisonPrice, hasPro } from "./catalog-plan";
 import { CATEGORIES, categoryMatches, categorySearchText } from "./categories";
 import { Business, Tier } from "./types";
 
@@ -24,6 +24,9 @@ export const DEFAULT_RANK_CONFIG: RankConfig = {
   maxPromotedPerPage: 6,
   newListingBoost: 0.05,
 };
+
+// A full timestamp (not the hour of day) keeps yesterday's winners from repeating.
+export const RANK_ROTATION_MS = 60_000;
 
 // Local Kenyan & Campus Synonyms Map (Section 4.4.2 & Appendix A)
 export const SYNONYMS: Record<string, string[]> = {
@@ -291,8 +294,12 @@ export function computeQuality(business: Business, now = Date.now()): number {
 }
 
 export function getEffectiveTier(business: Business, now = new Date()): Tier {
-  if (hasPro(business, now.getTime())) return "FEATURED";
+  if (hasPro(business, now.getTime()) &&
+    (!business.proStartsAt || Date.parse(business.proStartsAt) <= now.getTime()))
+    return "FEATURED";
   if (business.activeTier === "NONE") return "NONE";
+  if (business.tierStartsAt && Date.parse(business.tierStartsAt) > now.getTime())
+    return "NONE";
   if (!business.tierEndsAt) return business.activeTier;
   const endsAt = new Date(business.tierEndsAt);
   if (endsAt.getTime() > now.getTime()) {
@@ -309,9 +316,11 @@ export function rankBusinesses(
   cfg = DEFAULT_RANK_CONFIG,
   sessionId = "anon_session",
   now = new Date(),
+  rotationTime = now,
 ): ScoredCandidate[] {
-  const currentHour = now.getHours();
-  const rotationSeed = `${sessionId}_h${currentHour}`;
+  const rotationWindow = Math.floor(rotationTime.getTime() / RANK_ROTATION_MS);
+  const scope = `${query.trim().toLowerCase()}:${preferredZone}:${targetCategory || ""}`;
+  const rotationSeed = `${sessionId}:${scope}:${rotationWindow}`;
 
   // Filter active and eligible
   const activeListings = businesses.filter(
@@ -353,36 +362,35 @@ export function rankBusinesses(
   // Relevance floor
   const eligible = scored.filter((c) => c.relevance >= cfg.minRelevance);
 
-  const tierRank = (t: Tier) =>
-    t === "FEATURED" ? 2 : t === "RECOMMENDED" ? 1 : 0;
-
   const byBucketThenRotation = (a: ScoredCandidate, b: ScoredCandidate) =>
     b.scoreBucket - a.scoreBucket ||
     fnv1aRotation(a.business.id, rotationSeed) -
-      fnv1aRotation(b.business.id, rotationSeed);
+      fnv1aRotation(b.business.id, rotationSeed) ||
+    a.business.id.localeCompare(b.business.id);
 
-  // Top block: up to topBlockSize Featured listings with relevance >= topBlockMinRelevance
-  const topBlock = eligible
-    .filter(
+  // Paid eligibility is relevance-gated, but lifetime popularity and completeness
+  // must never permanently lock a paying business out of the visible placements.
+  const featured = eligible.filter(
       (c) =>
         c.effectiveTier === "FEATURED" &&
         c.relevance >= cfg.topBlockMinRelevance,
-    )
-    .sort(byBucketThenRotation)
-    .slice(0, cfg.topBlockSize);
+    );
+  const topBlockSize = Math.min(cfg.topBlockSize, cfg.maxPromotedPerPage);
+  const topBlock = rotatePromotions(
+    featured, sessionId, `${scope}:featured`, rotationWindow,
+    Math.max(1, topBlockSize), false,
+  ).slice(0, topBlockSize);
 
   const inTopIds = new Set(topBlock.map((c) => c.business.id));
 
-  // Promoted block: Recommended plus remaining Featured
-  const promoted = eligible
-    .filter((c) => c.effectiveTier !== "NONE" && !inTopIds.has(c.business.id))
-    .sort(
-      (a, b) =>
-        b.scoreBucket - a.scoreBucket ||
-        tierRank(b.effectiveTier) - tierRank(a.effectiveTier) ||
-        fnv1aRotation(a.business.id, rotationSeed) -
-          fnv1aRotation(b.business.id, rotationSeed),
-    );
+  // Keep the complete paid ring stable while the reserved top block rotates.
+  // Excluding those IDs before building the ring would move everyone else's
+  // cursor and could repeatedly skip Recommended listings in a crowded market.
+  const promoted = rotatePromotions(
+    eligible.filter((c) => c.effectiveTier !== "NONE"),
+    sessionId, `${scope}:promoted`, rotationWindow,
+    Math.max(1, cfg.maxPromotedPerPage - topBlock.length), true,
+  ).filter((candidate) => !inTopIds.has(candidate.business.id));
 
   // Organic block: Free listings
   const organic = eligible
@@ -391,6 +399,66 @@ export function rankBusinesses(
 
   // Compose pages with maxPromotedPerPage
   return composePages([...topBlock, ...promoted], organic, cfg);
+}
+
+/**
+ * A deterministic ticket ring, not a fresh lottery. Every contiguous rotation
+ * advances by the number of available slots, so a stable eligible pool gets a
+ * complete turn. Session offsets spread simultaneous visitors across that pool.
+ * Featured/Pro have two tickets in shared slots; Recommended have one. Duplicate
+ * tickets never cause duplicate cards. The separate Featured ring is equal-share.
+ */
+function rotatePromotions(
+  candidates: ScoredCandidate[],
+  sessionId: string,
+  scope: string,
+  rotationWindow: number,
+  stride: number,
+  weighted: boolean,
+): ScoredCandidate[] {
+  const tickets = candidates.flatMap((candidate) =>
+    Array.from(
+      { length: weighted && candidate.effectiveTier === "FEATURED" ? 2 : 1 },
+      (_, ticket) => ({
+        candidate,
+        key: `${candidate.business.id}:${ticket}`,
+        order: fnv1aRotation(`${candidate.business.id}:${ticket}`, scope),
+      }),
+    ),
+  ).sort((a, b) => a.order - b.order || a.key.localeCompare(b.key));
+  if (!tickets.length) return [];
+  const visitorOffset = Math.floor(fnv1aRotation(sessionId, scope) * tickets.length);
+  const start = ((rotationWindow * stride + visitorOffset) % tickets.length + tickets.length) % tickets.length;
+  const seen = new Set<string>();
+  const rotated: ScoredCandidate[] = [];
+  for (let index = 0; index < tickets.length; index++) {
+    const candidate = tickets[(start + index) % tickets.length].candidate;
+    if (!seen.has(candidate.business.id)) {
+      seen.add(candidate.business.id);
+      rotated.push(candidate);
+    }
+  }
+  return rotated;
+}
+
+/** Explicit sorts organize the organic slots without erasing paid rotation or
+ * expanding every Featured business into one unbounded sponsored top block. */
+export function sortRankedBusinesses(
+  ranked: ScoredCandidate[],
+  sort: string,
+  query = "",
+): ScoredCandidate[] {
+  if (!["price", "nearest", "newest", "alphabetical"].includes(sort)) return ranked;
+  const organic = ranked.filter((candidate) => candidate.effectiveTier === "NONE");
+  organic.sort((a, b) => {
+    if (sort === "price")
+      return comparisonPrice(a.business, query) - comparisonPrice(b.business, query);
+    if (sort === "nearest") return b.proximity - a.proximity;
+    if (sort === "newest") return Date.parse(b.business.createdAt) - Date.parse(a.business.createdAt);
+    return a.business.name.localeCompare(b.business.name);
+  });
+  let index = 0;
+  return ranked.map((candidate) => candidate.effectiveTier === "NONE" ? organic[index++] : candidate);
 }
 
 function composePages(

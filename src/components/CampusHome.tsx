@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import Link from "@/components/MotionLink";
 import {
   Activity,
   ArrowRight,
+  RefreshCw,
   ChevronDown,
   SlidersHorizontal,
   Bike,
@@ -27,7 +28,7 @@ import {
   availabilityLabel,
 } from "@/lib/campus-value";
 import { FlashDeals } from "./FlashDeals";
-import { rankBusinesses } from "@/lib/rank";
+import { rankBusinesses, RANK_ROTATION_MS } from "@/lib/rank";
 import { BusinessCard } from "./BusinessCard";
 import { CategoryBrowser } from "./CategoryBrowser";
 import { DemandModal } from "./DemandModal";
@@ -69,8 +70,12 @@ function buildSeeAllHref(zone: string, intent: string): string {
 
 export function CampusHome({
   businesses: initial,
+  initialNow,
+  discoverySession,
 }: {
   businesses: Business[];
+  initialNow: number;
+  discoverySession: string;
 }) {
   const ready = useClientReady();
   const [businesses, setBusinesses] = useState(initial);
@@ -80,7 +85,11 @@ export function CampusHome({
   const [moreFilters, setMoreFilters] = useState(false);
   const [post, setPost] = useState(false);
   const router = useRouter();
-  const now = useNow();
+  const clock = useNow();
+  const now = clock || initialNow;
+  // Keep a customer's current picks steady while they compare or contact sellers.
+  // New visits and explicit refreshes advance fair promotion rotation.
+  const [rotationTime, setRotationTime] = useState(initialNow);
   useEffect(() => {
     const controller = new AbortController();
     let inFlight = false;
@@ -107,9 +116,9 @@ export function CampusHome({
       controller.abort();
     };
   }, []);
-  const nearby = businesses.filter(
+  const nearby = useMemo(() => businesses.filter(
     (b) => zone === "all" || b.zone === zone || b.servesZones.includes(zone),
-  );
+  ), [businesses, zone]);
   const live = nearby.filter(
     (b) =>
       !b.isTemporarilyClosed &&
@@ -117,32 +126,31 @@ export function CampusHome({
       Date.parse(b.availableNowUntil) > now,
   );
   const context = campusContext(now);
-  const filtered = nearby.filter((b) =>
+  const filtered = useMemo(() => nearby.filter((b) =>
     intent === "delivery"
       ? b.serviceModes.includes("delivery")
       : survivalMatch(b, intent, now),
-  );
-  const ranked = rankBusinesses(
+  ), [nearby, intent, now]);
+  const ranked = useMemo(() => rankBusinesses(
     filtered,
     "",
     zone,
     undefined,
     undefined,
-    "campus",
+    discoverySession,
     new Date(now),
-  ).slice(0, 8);
-  const contextPicks =
-    now > 0
-      ? rankBusinesses(
+    new Date(rotationTime),
+  ).slice(0, 8), [filtered, zone, discoverySession, now, rotationTime]);
+  const contextPicks = useMemo(() => rankBusinesses(
           nearby,
           context.query,
           zone,
           undefined,
           undefined,
-          "pulse",
+          discoverySession + ":pulse",
           new Date(now),
-        ).slice(0, 3)
-      : [];
+          new Date(rotationTime),
+        ).slice(0, 3), [nearby, context.query, zone, discoverySession, now, rotationTime]);
   const activeExtraIntent = QUICK_INTENTS.slice(3).find(
     (item) => item.value === intent,
   );
@@ -172,7 +180,7 @@ export function CampusHome({
         ready={ready}
       />
 
-      <section className="campus-home-request" aria-labelledby="campus-request-heading">
+      <section data-motion="reveal" className="campus-home-request" aria-labelledby="campus-request-heading">
         <div className="campus-home-request-icon" aria-hidden="true"><Megaphone size={23} /></div>
         <div className="campus-home-request-copy">
           <h2 id="campus-request-heading"><span className="campus-home-request-title-long">Can’t find it? Ask Mashinani.</span><span className="campus-home-request-title-short">Can’t find it?</span></h2>
@@ -183,7 +191,7 @@ export function CampusHome({
         </button>
       </section>
 
-      <section className="campus-home-discovery" aria-label="Explore campus listings">
+      <section data-motion="reveal" className="campus-home-discovery" aria-label="Explore campus listings">
         <div className="campus-home-filter-heading">
           <div>
             <h2>Discover around you</h2>
@@ -237,7 +245,7 @@ export function CampusHome({
         </div>
       </section>
       {live.length > 0 && (
-        <section className="space-y-3" aria-label="Live seller updates">
+        <section data-motion="reveal" className="space-y-3" aria-label="Live seller updates">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-xl font-bold">Live on campus now</h2>
             <p className="text-xs text-stone-600">
@@ -246,7 +254,7 @@ export function CampusHome({
           </div>
           <div className="campus-pulse">
             {live.map((b) => (
-              <Link href={`/b/${b.slug}`} key={b.id} className="ui-card">
+              <Link href={`/b/${b.slug}`} key={b.id} className="ui-card" data-business-impression={b.id}>
                 <p className="truncate font-bold">{b.name}</p>
                 <p className="my-2 text-sm">
                   {b.liveStatus || availabilityLabel(b, now)}
@@ -290,13 +298,11 @@ export function CampusHome({
           </Link>
         </div>
         {ranked.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ranked.map(({ business, effectiveTier }) => (
-              <BusinessCard
-                key={business.id}
-                business={business}
-                effectiveTier={effectiveTier}
-              />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" key={`${zone}:${intent}:${rotationTime}`}>
+            {ranked.map(({ business, effectiveTier }, index) => (
+              <div key={business.id} data-motion="reveal" data-motion-delay={String((index % 3) * 65)}>
+                <BusinessCard business={business} effectiveTier={effectiveTier} />
+              </div>
             ))}
           </div>
         ) : (
@@ -311,8 +317,16 @@ export function CampusHome({
             </Link>
           </Card>
         )}
+        {ranked.length > 0 && (
+          <div className="campus-home-discovery-footer">
+            <p>Paid placements are labelled. Explore a fresh mix of local sellers.</p>
+            <button type="button" className="campus-home-refresh" onClick={() => setRotationTime((time) => time + RANK_ROTATION_MS)}>
+              <RefreshCw size={15} aria-hidden="true" /> Refresh picks
+            </button>
+          </div>
+        )}
       </section>
-      <section className="ui-card space-y-3">
+      <section data-motion="reveal" className="ui-card space-y-3">
         <h2 className="text-2xl font-bold">
           {now ? context.title : "Your campus pulse"}
         </h2>
@@ -327,6 +341,7 @@ export function CampusHome({
               className="ui-button ui-button-secondary"
               key={business.id}
               href={`/b/${business.slug}`}
+              data-business-impression={business.id}
             >
               {business.name} · {availabilityLabel(business, now)}
             </Link>
@@ -338,7 +353,7 @@ export function CampusHome({
       </section>
       <FlashDeals compact />
       <RequestBoard compact />
-      <details className="ui-card">
+      <details data-motion="reveal" className="ui-card">
         <summary className="cursor-pointer text-lg font-bold">
           Browse business categories
         </summary>

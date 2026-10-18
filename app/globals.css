@@ -938,3 +938,14 @@
   .campus-home-request-action { font-size: .71rem; }
 }
 @media (prefers-reduced-motion: reduce) { .campus-home-shortcuts a { transition: none; } }
+
+.campus-home-discovery-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
+.campus-home-discovery-footer p { font-size: .72rem; color: #667064; }
+.campus-home-refresh { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .6rem .9rem; border: 1px solid #ccdac4; border-radius: 100px; background: #edf3e6; color: #244e3f; font-size: .75rem; font-weight: 800; cursor: pointer; }
+.campus-home-refresh:focus-visible { outline: 3px solid #51804d; outline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .campus-home-refresh svg { transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+  .campus-home-refresh:hover svg { transform: rotate(90deg); }
+  .campus-home-filter-chip { transition: transform .2s ease, background-color .2s ease, border-color .2s ease, color .2s ease; }
+  .campus-home-filter-chip:active { transform: scale(.96); }
+}

@@ -102,3 +102,13 @@
   .card:hover { transform: none; }
   .card:hover .cover { transform: none; }
 }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .card { transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .2s ease, box-shadow .3s ease; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 16px 30px -12px #183e3538; }
+  .cover { transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+  .card:hover .cover { transform: scale(1.065); }
+  .details svg { transition: transform .25s ease; }
+  .details:hover svg { transform: translate(2px, -2px); }
+  .whatsapp:active, .details:active, .call:active { transform: scale(.96); }
+}

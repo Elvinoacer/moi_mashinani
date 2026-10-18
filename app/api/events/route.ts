@@ -21,12 +21,12 @@ export async function POST(req: NextRequest) {
     )
       throw new ApiError(400, "Invalid event type");
     if (type === "impression" && Array.isArray(body.businessIds)) {
-      const ids = body.businessIds
+      const ids = [...new Set(body.businessIds
         .filter(
-          (x: unknown): x is string => typeof x === "string" && x.length > 0,
-        )
+          (x: unknown): x is string => typeof x === "string" && x.length > 0 && x.length <= 100,
+        ))]
         .slice(0, 30);
-      await Store.recordImpressions(ids);
+      await prisma.$transaction((tx) => Store.recordImpressions(ids, tx));
       return NextResponse.json({ success: true });
     }
     const id = textField(body.businessId, "Business ID", 100, true);
@@ -37,11 +37,15 @@ export async function POST(req: NextRequest) {
       typeof body.zone === "string" && ZONES.some((z) => z.slug === body.zone)
         ? body.zone
         : null;
-    await prisma.businessEvent.create({ data: { businessId: id, type, zone } });
-    await Store.recordEvent(
-      id,
-      type as "view" | "call" | "whatsapp" | "directions" | "impression",
-    );
+    // Event history and counters either both commit or both roll back.
+    await prisma.$transaction(async (tx) => {
+      await tx.businessEvent.create({ data: { businessId: id, type, zone } });
+      await Store.recordEvent(
+        id,
+        type as "view" | "call" | "whatsapp" | "directions" | "impression",
+        tx,
+      );
+    });
     return NextResponse.json({ success: true });
   } catch (error) {
     return apiError(error);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/MotionLink";
 import { ArrowUpRight, BadgeCheck, Bike, MapPin, MessageCircle, Phone, Store } from "lucide-react";
 import { availabilityLabel, confirmedOpen } from "@/lib/campus-value";
 import { CATEGORIES, ZONES } from "@/lib/constants";
@@ -67,7 +67,7 @@ export function BusinessCard({
     : business.serviceModes.includes("delivery") ? "Delivery offered"
     : business.utilities?.hasWifi ? "Wi-Fi" : "";
   return (
-    <article className={styles.card} data-tier={tier}>
+    <article className={styles.card} data-tier={tier} data-business-impression={business.id}>
       <div className={styles.main}>
         <Link href={profileUrl} className={styles.media} aria-label={`Explore ${business.name} profile and prices`}>
           {photo && !imageFailed ? (

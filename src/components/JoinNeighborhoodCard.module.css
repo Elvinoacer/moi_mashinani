@@ -190,3 +190,10 @@
 @media (prefers-reduced-motion: reduce) {
   .primaryAction, .secondaryAction { transition: none; }
 }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .photo { transition: transform 1s cubic-bezier(.2,.8,.2,1); }
+  .card:hover .photo { transform: scale(1.035); }
+  .primaryAction svg { transition: transform .3s ease; }
+  .primaryAction:hover svg { transform: translate(3px, -3px); }
+}

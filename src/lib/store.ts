@@ -844,11 +844,15 @@ export const Store = {
       30,
     );
     if (!validIds.length) return;
-    for (const id of validIds) {
-      await db.$executeRaw`
+    // One bounded write for the batch; inactive/nonexistent listings never earn exposure.
+    const recorded = await db.$queryRaw<Array<{ id: string }>>`
         UPDATE "Business" SET "metrics" = jsonb_set("metrics"::jsonb, '{impressions}',
-          to_jsonb(COALESCE(("metrics"->>'impressions')::int, 0) + 1)), "updatedAt" = NOW() WHERE "id" = ${id}`;
-    }
+          to_jsonb(COALESCE(("metrics"->>'impressions')::int, 0) + 1))
+        WHERE "id" IN (${Prisma.join(validIds)}) AND "status" = 'ACTIVE'
+        RETURNING "id"`;
+    if (recorded.length) await db.businessEvent.createMany({
+      data: recorded.map(({ id }) => ({ businessId: id, type: "impression" })),
+    });
   },
 
   async toggleAvailableNow(

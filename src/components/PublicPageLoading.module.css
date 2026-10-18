@@ -1,0 +1,22 @@
+.page { width: min(100% - 2rem, 1152px); margin: 2rem auto; padding-bottom: 5rem; }
+.status { display: flex; align-items: center; gap: .6rem; color: #526936; font-size: .8rem; font-weight: 700; margin-bottom: 1.2rem; }
+.status span { width: 8px; height: 8px; border-radius: 50%; background: #729e43; }
+.hero { padding: clamp(1.5rem, 5vw, 3.5rem); border: 1px solid #dce5d7; border-radius: 24px; background: #edf2e5; }
+.eyebrow, .title, .subtitle, .search, .photo { background: #dce5d7; border-radius: 8px; }
+.eyebrow { width: 100px; height: 12px; margin-bottom: 1.4rem; }
+.title { width: min(85%, 470px); height: 32px; }
+.subtitle { width: min(65%, 330px); height: 14px; margin-top: 1rem; }
+.search { width: min(100%, 600px); height: 50px; margin-top: 1.7rem; background: #f8faf5; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 1.6rem; }
+.card { overflow: hidden; border-radius: 20px; background: white; border: 1px solid #e1e7dd; }
+.photo { aspect-ratio: 1.8; border-radius: 0; background: #e9eedf; }
+.body { padding: 1rem; }
+.body .title { height: 18px; }
+.body .subtitle { height: 12px; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero, .card { animation: breathe 1.7s ease-in-out 5 alternate; }
+  .card:nth-child(2) { animation-delay: 120ms; }
+  .card:nth-child(3) { animation-delay: 240ms; }
+}
+@keyframes breathe { from { opacity: .6; } to { opacity: 1; } }
+@media (max-width: 639px) { .grid { grid-template-columns: 1fr; } .card:nth-child(n+2) { display: none; } }

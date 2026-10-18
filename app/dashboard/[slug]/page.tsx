@@ -932,12 +932,12 @@ function BusinessDashboard({ slug }: { slug: string }) {
             ))}
           </div>
 
-          {/* Performance & ROI Transparency Breakdown */}
+          {/* Lifetime customer actions, separate from paid-period results. */}
           <div className="rounded-xl border border-[#dfe5d8] bg-white p-5 signboard-shadow-sm space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h3 className="font-display text-base font-bold text-[#243b32]">
-                  Customer Engagement & Conversion Rate
+                  Customer activity
                 </h3>
                 <p className="text-xs text-[#667064]">
                   Track interest in your shop from profile visits and contact
@@ -945,32 +945,31 @@ function BusinessDashboard({ slug }: { slug: string }) {
                 </p>
               </div>
               <span className="rounded-full bg-[#edf2e5] px-3 py-1 text-xs font-bold text-[#335e41]">
-                Transparent ROI
+                  Lifetime totals
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
-                <p className="text-xs text-[#667064]">Search impressions</p>
+                <p className="text-xs text-[#667064]">Listing impressions</p>
                 <p className="font-display text-2xl font-bold text-[#243b32]">
                   {business.metrics.impressions ?? 0}
                 </p>
                 <p className="text-[11px] text-[#667064] mt-1">
-                  Times your shop appeared in campus searches
+                  Visible listing cards across campus discovery pages
                 </p>
               </div>
               <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
                 <p className="text-xs text-[#667064]">
-                  Direct customer contacts
+                  Contact actions
                 </p>
                 <p className="font-display text-2xl font-bold text-[#243b32]">
                   {business.metrics.calls +
                     business.metrics.whatsapp +
-                    business.metrics.directions +
                     business.metrics.bookingRequests}
                 </p>
                 <p className="text-[11px] text-[#667064] mt-1">
-                  Calls, WhatsApp (#MM-XXXX tagged), directions &amp; bookings
+                  Call and WhatsApp taps &amp; booking requests; sales are not measured
                 </p>
               </div>
               <div className="rounded-lg bg-[#f7f8f2] p-3 border border-[#dfe5d8]">
@@ -979,11 +978,11 @@ function BusinessDashboard({ slug }: { slug: string }) {
                 </p>
                 <p className="font-display text-2xl font-bold text-[#335e41]">
                   {business.metrics.views > 0
-                    ? `${Math.round(((business.metrics.calls + business.metrics.whatsapp + business.metrics.directions + business.metrics.bookingRequests) / business.metrics.views) * 100)}%`
-                    : "0%"}
+                    ? Math.round(((business.metrics.calls + business.metrics.whatsapp + business.metrics.bookingRequests) / business.metrics.views) * 100)
+                    : "—"}
                 </p>
                 <p className="text-[11px] text-[#667064] mt-1">
-                  Repeat contact taps may come from the same visitor
+                  Includes card taps and repeat visitors; not a sales conversion rate
                 </p>
               </div>
             </div>
@@ -1004,8 +1003,8 @@ function BusinessDashboard({ slug }: { slug: string }) {
                 </p>
                 <p className="mt-1 text-xs text-[#667064]">
                   {tierActive
-                    ? "Protected by our 3-Lead Value Guarantee: if your boost run finishes with fewer than 3 customer contacts, we automatically extend it by 7 days free."
-                    : "Upgrade to Recommended, Featured, or Pro for priority search placement, unlimited Request Board leads, and our 3-Lead Value Guarantee."}
+                    ? "Value Guarantee: fewer than 3 tracked Call or WhatsApp taps and booking requests by the end of your paid run earns one automatic 7-day extension. Renewing starts a fresh review window."
+                    : "Recommended and Featured include rotating priority visibility, unlimited Request Board replies and a one-time Value Guarantee extension per paid run. Pro has its own visibility and deal-broadcast benefits."}
                 </p>
               </div>
               <Link

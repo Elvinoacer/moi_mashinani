@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Store } from "@/lib/store";
 import { comparisonPrice } from "@/lib/catalog-plan";
 import { survivalMatch } from "@/lib/campus-value";
-import { rankBusinesses } from "@/lib/rank";
+import { rankBusinesses, sortRankedBusinesses } from "@/lib/rank";
+import { randomUUID } from "node:crypto";
 import { getCurrentUser, requireAdmin } from "@/lib/auth";
 import { apiError, assertSameOrigin, jsonBody } from "@/lib/api";
 import { publicBusiness } from "@/lib/business-input";
@@ -22,7 +23,9 @@ export async function GET(req: NextRequest) {
     const verifiedOnly = searchParams.get("verified") === "true";
     const hasDiscountsOnly = searchParams.get("discount") === "true";
     const sort = searchParams.get("sort") || "best_match";
-    const sessionId = searchParams.get("sessionId") || "session_client";
+    const existingSession = req.cookies.get("mashinani_discovery")?.value;
+    const suppliedSession = searchParams.get("sessionId")?.slice(0, 128);
+    const sessionId = suppliedSession || existingSession || randomUUID();
 
     let businesses = await Store.getBusinesses();
 
@@ -82,43 +85,9 @@ export async function GET(req: NextRequest) {
       sessionId,
     );
 
-    // If explicit sort selected, preserve paid tier guarantees (top-block Featured and Recommended priority)
-    let finalCandidates = ranked;
-    if (
-      sort === "nearest" ||
-      sort === "newest" ||
-      sort === "alphabetical" ||
-      sort === "price"
-    ) {
-      const topBlock = ranked.filter(
-        (c) => c.effectiveTier === "FEATURED" && c.relevance >= 0.5,
-      );
-      const topBlockIds = new Set(topBlock.map((c) => c.business.id));
-      const promoted = ranked.filter(
-        (c) => c.effectiveTier !== "NONE" && !topBlockIds.has(c.business.id),
-      );
-      const organic = ranked.filter((c) => c.effectiveTier === "NONE");
-
-      const sortFn =
-        sort === "price"
-          ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
-              comparisonPrice(a.business, q) - comparisonPrice(b.business, q)
-          : sort === "nearest"
-            ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
-                b.proximity - a.proximity
-            : sort === "newest"
-              ? (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
-                  new Date(b.business.createdAt).getTime() -
-                  new Date(a.business.createdAt).getTime()
-              : (a: (typeof ranked)[0], b: (typeof ranked)[0]) =>
-                  a.business.name.localeCompare(b.business.name);
-
-      finalCandidates = [
-        ...[...topBlock].sort(sortFn),
-        ...[...promoted].sort(sortFn),
-        ...[...organic].sort(sortFn),
-      ];
-    }
+    // Sorting must not turn hundreds of Featured listings into a permanent
+    // wall above Recommended businesses and all organic results.
+    const finalCandidates = sortRankedBusinesses(ranked, sort, q);
 
     const results = finalCandidates.map((c) => ({
       ...publicBusiness(c.business),
@@ -128,19 +97,26 @@ export async function GET(req: NextRequest) {
       totalRankScore: c.totalScore,
     }));
 
-    // Track impressions for top-returned listings asynchronously
-    if (results.length > 0) {
-      const topIds = results.slice(0, 10).map((r) => r.id);
-      void Store.recordImpressions(topIds).catch(() => {});
-    }
-
-    return NextResponse.json({
+    // A response is not an impression. Public cards report actual viewport
+    // exposure through /api/events, including cards discovered after scrolling.
+    const response = NextResponse.json({
       results,
       total: results.length,
       query: q,
       zone,
       category,
     });
+    response.headers.set("Cache-Control", "private, no-store");
+    if (!suppliedSession && !existingSession) {
+      response.cookies.set("mashinani_discovery", sessionId, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 86_400,
+      });
+    }
+    return response;
   } catch (error) {
     return apiError(error);
   }

@@ -149,3 +149,56 @@
 @media (prefers-reduced-motion: reduce) {
   .hero *, .hero *::before, .hero *::after { transition: none; }
 }
+
+/* A short, layered arrival; all moving surfaces use compositor-friendly transforms. */
+.titleLine { display: block; overflow: clip; padding-bottom: .09em; margin-bottom: -.09em; }
+.titleLine > span { display: block; transform-origin: left bottom; }
+.copy h1 > .titleLine { color: #fffdf2; }
+.copy h1 > .titleAccent { color: #d9f279; }
+.atmosphere { position: absolute; z-index: -1; inset: 0; overflow: clip; pointer-events: none; border-radius: 25px 25px 0 0; }
+.orbit, .orbitInner { position: absolute; top: -110px; right: -80px; width: 480px; aspect-ratio: 1; border: 1px solid #efffc34a; border-radius: 50%; }
+.orbit::after { content: ""; position: absolute; top: 64px; left: 64px; width: 8px; height: 8px; border-radius: 50%; background: #d9f279; box-shadow: 0 0 0 7px #d9f27917; }
+.orbitInner { top: -68px; right: -38px; width: 396px; border-style: dashed; border-color: #efffc324; }
+.crosshair { position: absolute; top: 43px; right: 41px; color: #eaffb7b3; font-size: 28px; font-weight: 200; }
+.coordinate { position: absolute; right: 44px; top: 85px; color: #f5ffdfb0; font-size: 8px; letter-spacing: .18em; }
+.search { transition: border-color .2s ease, box-shadow .2s ease; }
+.submit { position: relative; overflow: clip; }
+.submit::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 20%, #ffffff26 48%, transparent 75%); transform: translateX(-120%); pointer-events: none; }
+.submit svg, .shortcutIcon, .shortcutArrow, .ownerNudge svg, .dockHeading svg { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .photo { transform: translate3d(var(--scene-x, 0px), var(--scene-y, 0px), 0) scale(1.045); transition: transform .65s cubic-bezier(.2,.8,.2,1); }
+  .atmosphere { transform: translate3d(calc(var(--scene-x, 0px) * -1), calc(var(--scene-y, 0px) * -1), 0); transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+  .submit:hover::after { transform: translateX(120%); transition: transform .65s ease; }
+  .submit:hover svg { transform: translateX(3px); }
+  .shortcuts > a:hover .shortcutIcon { transform: translateY(-2px) rotate(-9deg) scale(1.12); }
+  .shortcuts > a:hover .shortcutArrow, .ownerNudge a:hover svg, .dockHeading a:hover svg { transform: translate(2px, -2px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .titleLine > span { animation: hero-line-arrive .8s cubic-bezier(.16,1,.3,1) both; }
+  .titleAccent > span { animation-delay: .1s; }
+  .eyebrow { animation: hero-detail-arrive .65s .05s both; }
+  .intro { animation: hero-detail-arrive .7s .18s both; }
+  .location { animation: hero-detail-arrive .7s .3s both; }
+  .dock { animation: hero-dock-arrive .75s .14s cubic-bezier(.16,1,.3,1) both; }
+  .shortcuts > a { animation: hero-detail-arrive .55s .25s both; }
+  .shortcuts > a:nth-child(2) { animation-delay: .31s; }
+  .shortcuts > a:nth-child(3) { animation-delay: .37s; }
+  .shortcuts > a:nth-child(4) { animation-delay: .43s; }
+  .orbit { animation: hero-orbit-arrive 1.5s cubic-bezier(.16,1,.3,1) both; }
+  .orbitInner { animation: hero-orbit-arrive 1.7s .1s cubic-bezier(.16,1,.3,1) both; }
+  .eyebrow > span { animation: hero-beacon 1.6s .6s 2; }
+  .submit:active, .shortcuts > a:active { scale: .97; }
+}
+@keyframes hero-line-arrive { from { transform: translateY(110%) rotate(2deg); } to { transform: translateY(0) rotate(0); } }
+@keyframes hero-detail-arrive { from { opacity: .01; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+@keyframes hero-dock-arrive { from { opacity: .4; translate: 0 18px; } to { opacity: 1; translate: 0 0; } }
+@keyframes hero-orbit-arrive { from { opacity: 0; transform: rotate(-32deg) scale(.88); } to { opacity: 1; transform: rotate(0) scale(1); } }
+@keyframes hero-beacon { 50% { opacity: .5; transform: scale(.75); } }
+@media (max-width: 639px) {
+  .orbit { width: 245px; top: -95px; right: -45px; }
+  .orbitInner { width: 205px; top: -75px; right: -25px; }
+  .crosshair, .coordinate { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero *, .hero *::before, .hero *::after { animation: none !important; transition: none !important; }
+}

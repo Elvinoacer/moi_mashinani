@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "@/components/MotionLink";
 import type { Business, ServiceRequest } from "@/lib/types";
 import { CATEGORIES, ZONES } from "@/lib/constants";
@@ -16,6 +17,22 @@ import { ModalFrame } from "./ModalFrame";
 type PublicRequest = Omit<ServiceRequest, "contactPhone"> & {
   canRespond?: boolean;
 };
+/** Open a requested posting flow on arrival, even for same-page client navigation. */
+function HousingPostDeepLink({ onOpen }: { onOpen: (intent: HousingIntent) => void }) {
+  const searchParams = useSearchParams();
+  const requestedPost = searchParams.get("post");
+  useEffect(() => {
+    if (requestedPost !== "vacancy" && requestedPost !== "looking") return;
+    onOpen(requestedPost === "vacancy" ? "VACANCY" : "LOOKING");
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("post") === requestedPost) {
+      url.searchParams.delete("post");
+      window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    }
+  }, [requestedPost, onOpen]);
+  return null;
+}
+
 export function RequestBoard({ compact = false, housingOnly = false }: { compact?: boolean; housingOnly?: boolean }) {
   const now = useNow();
   const [requests, setRequests] = useState<PublicRequest[]>([]);
@@ -24,6 +41,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
   const [zone, setZone] = useCampusZone();
   const [post, setPost] = useState(false);
   const [postIntent, setPostIntent] = useState<HousingIntent>("LOOKING");
+  const startHousingPost = useCallback((intent: HousingIntent) => { setPostIntent(intent); setPost(true); }, []);
   const [housingFilter, setHousingFilter] = useState<"all" | HousingIntent>("all");
   const [housingReply, setHousingReply] = useState<PublicRequest | null>(null);
   const [safetyAcknowledged, setSafetyAcknowledged] = useState(false);
@@ -174,6 +192,7 @@ export function RequestBoard({ compact = false, housingOnly = false }: { compact
   const emptySecondaryActionClass = "inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#c9d8ce] bg-white px-4 py-2.5 text-sm font-bold text-[#183e35] transition-colors hover:border-[#789b86] hover:bg-[#f0f6ef] active:bg-[#e4eee3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#48785c] sm:w-auto";
   return (
     <section className={compact ? "space-y-4" : housingOnly ? "requests-board housing-board space-y-4" : "requests-board space-y-5"} aria-label={housingOnly ? "Community housing board" : "Comrade requests"}>
+      {housingOnly && <Suspense fallback={null}><HousingPostDeepLink onOpen={startHousingPost} /></Suspense>}
       {compact ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">

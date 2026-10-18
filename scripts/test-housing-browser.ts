@@ -25,6 +25,13 @@ async function main() {
       await page.goto("/housing");
       await expect(page.getByRole("heading", { name: /A place to stay/ })).toBeVisible();
       await expect(page.getByLabel("Housing scam caution")).toBeVisible();
+      // The global listing chooser deep-link opens the existing vacancy form.
+      await page.goto("/housing?post=vacancy");
+      await expect(page.getByRole("dialog").getByRole("radio", { name: "Vacancy available / I know a place" })).toBeChecked();
+      await page.getByRole("dialog").getByRole("button", { name: "Close dialog" }).click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(page).toHaveURL(/\/housing$/);
+
       // Listing does not require login, business ownership, or checkout.
       await page.getByRole("button", { name: "List a vacancy — free", exact: true }).click();
       let dialog = page.getByRole("dialog");

@@ -13,11 +13,13 @@ export function ModalFrame({
   onClose,
   children,
   wide = false,
+  className = "",
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
   wide?: boolean;
+  className?: string;
 }) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -83,7 +85,7 @@ export function ModalFrame({
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
-            className={`mobile-sheet max-h-[92dvh] w-full ${wide ? "max-w-2xl" : "max-w-lg"} overflow-y-auto overscroll-contain rounded-3xl border border-[#dce5d7] bg-[#f8faf5] shadow-[0_30px_100px_#102f2a55] focus:outline-none`}
+            className={`mobile-sheet max-h-[92dvh] w-full ${wide ? "max-w-2xl" : "max-w-lg"} ${className} overflow-y-auto overscroll-contain rounded-3xl border border-[#dce5d7] bg-[#f8faf5] shadow-[0_30px_100px_#102f2a55] focus:outline-none`}
           >
             <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-[#e0e8dc] bg-white/95 px-5 py-3 backdrop-blur-md sm:px-6">
               <h2

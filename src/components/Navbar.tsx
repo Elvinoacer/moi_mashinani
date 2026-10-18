@@ -13,10 +13,15 @@ import {
   ShieldAlert,
   X,
   MapPin,
+  Store,
+  ShoppingBag,
+  HousePlus,
+  ArrowRight,
 } from "lucide-react";
 import { ZONES } from "@/lib/constants";
 import { useCampusZone } from "@/lib/useCampusZone";
 import { SiteBrand } from "@/components/SiteBrand";
+import { ModalFrame } from "@/components/ModalFrame";
 import { beginPublicNavigation } from "@/lib/public-motion";
 
 const navLinks = [
@@ -57,15 +62,6 @@ function NavbarInner() {
   } | null>(null);
   const [signingOut, setSigningOut] = useState(false);
   const [accountError, setAccountError] = useState("");
-
-  useEffect(() => {
-    if (!chooserOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setChooserOpen(false);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [chooserOpen]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -249,8 +245,8 @@ function NavbarInner() {
                 className="inline-flex min-h-11 items-center gap-1.5 rounded-[9px] bg-[#183e35] px-2.5 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#2c5141] sm:px-4"
               >
                 <Plus size={16} />
-                <span className="hidden sm:inline">List your business</span>
-                <span className="sm:hidden">List free</span>
+                <span className="hidden sm:inline">Post or list</span>
+                <span className="sm:hidden">Post</span>
                 
               </button>
             )
@@ -288,63 +284,34 @@ function NavbarInner() {
       </div>
 
       {chooserOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="listing-chooser-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setChooserOpen(false)}
-        >
-          <div
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <h2 id="listing-chooser-title" className="text-lg font-bold text-[#183e35]">
-                What would you like to list?
-              </h2>
-              <button
-                type="button"
-                aria-label="Close"
-                onClick={() => setChooserOpen(false)}
-                className="rounded-full p-1.5 text-[#667064] hover:bg-[#edf2e5]"
-              >
-                <X size={18} />
-              </button>
+        <ModalFrame title="Create a listing" onClose={() => setChooserOpen(false)} wide>
+          <div className="p-4 sm:p-6">
+            <div className="relative overflow-hidden rounded-[20px] bg-[#103e31] px-5 py-6 text-white sm:px-7">
+              <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 size-52 rounded-full border-[26px] border-[#d9f279]/10" />
+              <p className="relative text-[10px] font-extrabold tracking-[.18em] text-[#dcf59c]">YOUR SPACE ON MOI MASHINANI</p>
+              <h3 className="relative mt-2 max-w-sm text-2xl font-extrabold tracking-[-.045em] sm:text-[28px]">What would you like to share?</h3>
+              <p className="relative mt-2 max-w-md text-sm leading-relaxed text-[#d6e7d9]">Reach comrades with a business, something to sell, or a place to stay. Choose where to begin.</p>
             </div>
-            <p className="text-xs text-[#667064]">
-              Choose whether you are setting up a campus shop or selling second-hand goods.
-            </p>
-            <div className="grid gap-3 pt-1">
-              <Link
-                href="/onboard"
-                onClick={() => setChooserOpen(false)}
-                className="flex items-start gap-3 rounded-xl border border-[#dfe5d8] p-4 transition-colors hover:border-[#335e41] hover:bg-[#f7faf5]"
-              >
-                <span className="text-2xl shrink-0" aria-hidden="true">🏪</span>
-                <div>
-                  <strong className="block text-sm text-[#183e35]">Register a Campus Business / Shop</strong>
-                  <span className="text-xs text-[#667064] leading-relaxed block mt-0.5">
-                    For shops, food kibandas, printing cybers, salons, pharmacies or hostels around campus.
-                  </span>
-                </div>
+            <div className="mt-4 grid gap-2.5">
+              <Link href="/onboard" onClick={() => setChooserOpen(false)} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-[#d9e5d8] bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8daf98] hover:bg-[#f8fbf6] hover:shadow-[0_9px_20px_#173b3110] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]">
+                <span className="grid size-12 shrink-0 place-items-center rounded-[13px] bg-[#e7f1df] text-[#205a42]"><Store size={23} aria-hidden="true" /></span>
+                <span className="min-w-0 flex-1"><strong className="block text-sm font-extrabold text-[#153e31] sm:text-base">List a business or service</strong><small className="mt-1 block text-xs leading-relaxed text-[#66796b]">Create your campus storefront for food, salons, shops, repairs and more.</small></span>
+                <ArrowRight size={18} aria-hidden="true" className="shrink-0 text-[#527360] transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link
-                href="/market?post=1"
-                onClick={() => setChooserOpen(false)}
-                className="flex items-start gap-3 rounded-xl border border-[#dfe5d8] p-4 transition-colors hover:border-[#335e41] hover:bg-[#f7faf5]"
-              >
-                <span className="text-2xl shrink-0" aria-hidden="true">🎒</span>
-                <div>
-                  <strong className="block text-sm text-[#183e35]">Sell a Second-Hand Item / Student Hustle</strong>
-                  <span className="text-xs text-[#667064] leading-relaxed block mt-0.5">
-                    Instant free Comrade Market post for second-hand items, declutter, electronics, textbooks or student skills.
-                  </span>
-                </div>
+              <Link href="/market?post=1" onClick={() => setChooserOpen(false)} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-[#d9e5d8] bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8daf98] hover:bg-[#f8fbf6] hover:shadow-[0_9px_20px_#173b3110] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]">
+                <span className="grid size-12 shrink-0 place-items-center rounded-[13px] bg-[#fff3db] text-[#8d622a]"><ShoppingBag size={23} aria-hidden="true" /></span>
+                <span className="min-w-0 flex-1"><strong className="block text-sm font-extrabold text-[#153e31] sm:text-base">Sell an item or student hustle</strong><small className="mt-1 block text-xs leading-relaxed text-[#66796b]">Post second-hand items, books, electronics or what you make.</small></span>
+                <ArrowRight size={18} aria-hidden="true" className="shrink-0 text-[#527360] transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link href="/housing?post=vacancy" onClick={() => setChooserOpen(false)} className="group flex min-h-[92px] items-center gap-4 rounded-2xl border border-[#a8cbb2] bg-[#eff7eb] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[#4c8c69] hover:bg-[#e7f4e2] hover:shadow-[0_9px_20px_#173b3110] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]">
+                <span className="grid size-12 shrink-0 place-items-center rounded-[13px] bg-[#164d39] text-[#d9f279]"><HousePlus size={23} aria-hidden="true" /></span>
+                <span className="min-w-0 flex-1"><span className="flex flex-wrap items-center gap-2"><strong className="block text-sm font-extrabold text-[#153e31] sm:text-base">List a housing vacancy</strong><span className="rounded-full bg-[#d7efc3] px-2 py-0.5 text-[10px] font-extrabold text-[#236043]">FREE</span></span><small className="mt-1 block text-xs leading-relaxed text-[#567462]">Know an empty room or moving out? Share a place. No account needed.</small></span>
+                <ArrowRight size={18} aria-hidden="true" className="shrink-0 text-[#527360] transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
+            <p className="mt-4 text-center text-xs leading-relaxed text-[#62796a]">Looking for somewhere to stay instead? <Link href="/housing?post=looking" onClick={() => setChooserOpen(false)} className="font-extrabold text-[#1a5840] underline underline-offset-4">Post a housing search</Link></p>
           </div>
-        </div>
+        </ModalFrame>
       )}
       {accountError && (
         <p

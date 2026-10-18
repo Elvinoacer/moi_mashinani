@@ -25,6 +25,13 @@ async function main() {
       await page.goto("/housing");
       await expect(page.getByRole("heading", { name: /A place to stay/ })).toBeVisible();
       await expect(page.getByLabel("Housing scam caution")).toBeVisible();
+      // Header shortcut should select a vacancy without a second choice or login.
+      await page.getByRole("button", { name: width < 640 ? "Post" : "Post or list", exact: true }).click();
+      await page.getByRole("dialog").getByRole("link", { name: /List a housing vacancy/ }).click();
+      await expect(page.getByRole("dialog").getByRole("radio", { name: "Vacancy available / I know a place" })).toBeChecked();
+      await page.getByRole("dialog").getByRole("button", { name: "Close dialog" }).click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+
       // The global listing chooser deep-link opens the existing vacancy form.
       await page.goto("/housing?post=vacancy");
       await expect(page.getByRole("dialog").getByRole("radio", { name: "Vacancy available / I know a place" })).toBeChecked();

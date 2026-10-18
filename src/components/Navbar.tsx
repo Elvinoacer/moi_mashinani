@@ -23,6 +23,7 @@ const navLinks = [
   { href: "/search", label: "Explore" },
   { href: "/deals", label: "Student deals" },
   { href: "/requests", label: "Requests" },
+  { href: "/housing", label: "Housing" },
   { href: "/market", label: "Comrade Market" },
   { href: "/dashboard", label: "Merchant hub" },
 ];

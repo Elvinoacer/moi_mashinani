@@ -40,7 +40,7 @@ import { JoinNeighborhoodCard } from "./JoinNeighborhoodCard";
 const QUICK_INTENTS = [
   { value: "open", label: "Open right now", icon: Activity },
   { value: "delivery", label: "Hostel delivery", icon: Bike },
-  { value: "hostels", label: "Verified rooms", icon: House },
+  { value: "hostels", label: "Houses & vacancies", icon: House },
   { value: "backup", label: "Blackout mode", icon: Zap },
   { value: "wifi", label: "Live Wi-Fi", icon: Wifi },
   { value: "water", label: "Water available", icon: Droplets },
@@ -156,9 +156,13 @@ export function CampusHome({
   );
   const activeZoneName =
     zone === "all"
-      ? "All Kesses"
+      ? "All Moi campuses & areas"
       : ZONES.find((z) => z.slug === zone)?.name || zone;
   function choose(value: string) {
+    if (value === "hostels") {
+      router.push("/housing");
+      return;
+    }
     if (value === "deals") {
       router.push("/deals");
       return;

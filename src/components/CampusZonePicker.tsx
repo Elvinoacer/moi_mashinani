@@ -98,7 +98,7 @@ export function CampusZonePicker({ value, onChange, disabled = false }: CampusZo
                 if (event.key === "Enter" && results[active]) { event.preventDefault(); choose(results[active].slug); }
                 if (event.key === "Escape") { event.preventDefault(); setOpen(false); triggerRef.current?.focus(); }
               }}
-              placeholder="Search Stage, Soweto, Talai…"
+              placeholder="Search campus, CHS, Mabs, Chebarus…"
             />
             {query && <button type="button" aria-label="Clear area search" className="campus-zone-clear" onClick={() => { setQuery(""); setActive(0); searchRef.current?.focus(); }}><X size={16} /></button>}
           </div>
@@ -121,7 +121,7 @@ export function CampusZonePicker({ value, onChange, disabled = false }: CampusZo
                 </span>
                 {zone.slug === selected.slug && <Check size={18} aria-hidden="true" />}
               </button>
-            )) : <p className="campus-zone-empty" role="status">No matching area. Try another landmark or choose All Kesses.</p>}
+            )) : <p className="campus-zone-empty" role="status">No matching area. Try another landmark, or <button type="button" className="underline" onClick={() => choose("other-campus")}>choose Other Moi campus / area</button>.</p>}
           </div>
           <p className="campus-zone-keyboard">Type to filter · Use ↑ ↓ and Enter to choose</p>
         </div>

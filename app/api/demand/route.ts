@@ -18,6 +18,7 @@ import {
 import { phoneField } from "@/lib/business-input";
 import { ZONES, CATEGORIES } from "@/lib/constants";
 import { rateLimit } from "@/lib/rate-limit";
+import { HOUSING_CATEGORY, isHousingIntent } from "@/lib/housing";
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser(req);
@@ -27,7 +28,10 @@ export async function GET(req: NextRequest) {
     );
     return NextResponse.json(
       user?.role === "ADMIN"
-        ? requests
+        ? requests.map((request) => ({
+            ...request,
+            canRespond: Boolean(request.contactPhone && request.contactConsent),
+          }))
         : live.map(({ contactPhone, ...safe }) => ({
             ...safe,
             canRespond: Boolean(contactPhone && safe.contactConsent),
@@ -45,6 +49,15 @@ export async function POST(req: NextRequest) {
     const body = await jsonBody(req);
     const zone = textField(body.zone, "Zone", 100) || "all";
     const category = textField(body.category, "Category", 100);
+    if (body.housingIntent !== undefined && !isHousingIntent(body.housingIntent))
+      throw new ApiError(400, "Choose looking for a house or vacancy available.");
+    const housingIntent = isHousingIntent(body.housingIntent) ? body.housingIntent : undefined;
+    if (housingIntent && category && category !== HOUSING_CATEGORY)
+      throw new ApiError(400, "Housing posts must use the housing category.");
+    if (housingIntent && body.safetyAcknowledged !== true)
+      throw new ApiError(400, "Read and acknowledge the housing scam caution before posting.");
+    if (housingIntent && (!body.contactPhone || body.contactConsent !== true))
+      throw new ApiError(400, "Provide a WhatsApp number and allow community members to reply to your housing post.");
     if (zone !== "all" && !ZONES.some((z) => z.slug === zone))
       throw new ApiError(400, "Unknown zone");
     if (category && !CATEGORIES.some((c) => c.slug === category))
@@ -52,14 +65,15 @@ export async function POST(req: NextRequest) {
     if (body.contactPhone && body.contactConsent !== true)
       throw new ApiError(
         400,
-        "Allow verified sellers to respond on WhatsApp, or leave your phone blank.",
+        housingIntent ? "Allow community members to reply to your housing post." : "Allow verified sellers to respond on WhatsApp, or leave your phone blank.",
       );
     const manageToken = randomBytes(32).toString("hex");
     const created = await Store.createServiceRequest(
       {
         query: textField(body.query, "Service needed", 500, true),
         zone,
-        category,
+        category: housingIntent ? HOUSING_CATEGORY : category,
+        housingIntent,
         contactPhone: body.contactPhone
           ? phoneField(body.contactPhone)
           : undefined,
@@ -69,6 +83,11 @@ export async function POST(req: NextRequest) {
     );
     const { contactPhone, ...safe } = created;
     void contactPhone;
+    if (housingIntent) {
+      return withNotificationDelivery(
+        NextResponse.json({ ...safe, manageToken, handoffs: [] }, { status: 201 }),
+      );
+    }
     const now = Date.now();
     const refCode = `#MM-${created.id.slice(-4).toUpperCase()}`;
     const tierWeight = (b: Awaited<ReturnType<typeof Store.getBusinesses>>[number]) => {

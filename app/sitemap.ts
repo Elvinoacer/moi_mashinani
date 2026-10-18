@@ -30,6 +30,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Core static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
+      url: `${SITE_URL}/housing`,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/market`,
       changeFrequency: "daily",
       priority: 0.9,

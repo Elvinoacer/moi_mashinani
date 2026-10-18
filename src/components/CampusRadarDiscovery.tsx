@@ -66,7 +66,7 @@ const ZONE_FILTERS = [
   { id: 'all', label: 'All Kesses' },
   { id: 'main-gate', label: 'Moi Main Gate' },
   { id: 'kesses-centre', label: 'Kesses Centre' },
-  { id: 'stage', label: 'Stage Terminus' },
+  { id: 'stage', label: 'Stage & surroundings' },
   { id: 'soweto', label: 'Soweto' },
   { id: 'cheboiywo', label: 'Cheboiywo' },
   { id: 'talai', label: 'Talai' },

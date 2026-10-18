@@ -220,6 +220,13 @@ export function CategoryPageClient({
           </div>
         </section>
 
+        {categorySlug === "hostels-rooms" && (
+          <section className="rounded-2xl border border-[#bed0bd] bg-[#f0f6eb] p-5 text-[#183e35]">
+            <h2 className="font-bold">Looking for a rental, or know a vacancy?</h2>
+            <p className="mt-1 text-sm leading-relaxed">Use the community housing board. Posting and replying are free, without an account. Community posts are unverified: visit and check before paying.</p>
+            <Link href="/housing" className="mt-3 inline-flex min-h-11 items-center font-bold underline underline-offset-4">Browse vacancies & house seekers →</Link>
+          </section>
+        )}
         {/* Interactive In-category Search & Zone Filter Bar */}
         <section
           className="bg-white border border-[#dfe5d8] shadow-[0_6px_20px_#243b320a] rounded-2xl p-4 md:p-5 space-y-3.5"

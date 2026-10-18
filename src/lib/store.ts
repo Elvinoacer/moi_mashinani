@@ -207,6 +207,7 @@ export function mapPrismaServiceRequest(
     id: sr.id,
     query: sr.query,
     category: sr.category || undefined,
+    housingIntent: sr.housingIntent || undefined,
     contactConsent: sr.contactConsent,
     closedAt: sr.closedAt?.toISOString(),
     zone: sr.zone,
@@ -1263,16 +1264,19 @@ export const Store = {
             contactPhone: payload.contactPhone || null,
             manageTokenHash: managementHash || null,
             category: payload.category || null,
+            housingIntent: payload.housingIntent || null,
             contactConsent: Boolean(payload.contactConsent),
           },
         });
         await queueAdmins(tx, `request/${id}`, {
           kind: "SERVICE_REQUEST",
-          title: "New service request or suggestion",
-          body: `Someone is looking for: ${created.query}. Area: ${created.zone}. Open the admin dashboard to review and follow up.`,
+          title: created.housingIntent ? "New community housing post" : "New service request or suggestion",
+          body: `${created.housingIntent === "VACANCY" ? "Vacancy available" : "Someone is looking for"}: ${created.query}. Area: ${created.zone}. Open the admin dashboard to review and follow up.`,
           path: "/admin?queue=demand",
           button: "View request",
         });
+        // Housing is a free community exchange, outside merchant lead billing/actions.
+        if (created.housingIntent) return created;
         const businesses = await tx.business.findMany({
           where: {
             status: "ACTIVE",

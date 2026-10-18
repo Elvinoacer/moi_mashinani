@@ -12,6 +12,8 @@ import {
 import { rateLimit } from "@/lib/rate-limit";
 import { withNotificationDelivery } from "@/lib/notification-response";
 import { queueCampusBroadcast } from "@/lib/public-push";
+import { HOUSING_SAFETY_NOTICE, isHousingIntent } from "@/lib/housing";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 const FREE_MONTHLY_REQUEST_REPLIES = 3;
 
@@ -22,9 +24,32 @@ export async function POST(
   try {
     assertSameOrigin(req);
     await rateLimit(req, "request-response", 30);
-    const user = await requireUser(req);
     const { id } = await props.params;
     const body = await jsonBody(req);
+    const request = await prisma.serviceRequest.findUnique({ where: { id } });
+    if (
+      !request ||
+      request.closedAt ||
+      request.createdAt.getTime() < Date.now() - 7 * 864e5
+    )
+      throw new ApiError(404, "This request has ended.");
+    if (!request.contactPhone || !request.contactConsent)
+      throw new ApiError(409, "This student has not enabled WhatsApp replies.");
+
+    // Only explicitly opted-in housing posts allow anonymous, free replies.
+    // Legacy housing-category requests retain their verified-seller consent.
+    if (isHousingIntent(request.housingIntent)) {
+      if (body.safetyAcknowledged !== true)
+        throw new ApiError(400, "Read and acknowledge the housing scam caution before responding.");
+      const refCode = `#MM-${request.id.slice(-4).toUpperCase()}`;
+      const text = `Hi! I saw your ${request.housingIntent === "VACANCY" ? "vacancy" : "house search"} on Moi Mashinani (${refCode}): ${request.query}. ${request.housingIntent === "VACANCY" ? "Is it still available, and can I arrange a viewing?" : "I know of a possible vacancy. Let's confirm the details and arrange a viewing."} Safety reminder: these are unverified community posts. Inspect the property and confirm who you are dealing with before paying.`;
+      return NextResponse.json(
+        { url: whatsappUrl(request.contactPhone, text), refCode, safetyNotice: HOUSING_SAFETY_NOTICE },
+        { headers: { "Cache-Control": "private, no-store" } },
+      );
+    }
+
+    const user = await requireUser(req);
     const business = await prisma.business.findFirst({
       where: {
         id: textField(body.businessId, "Business", 100, true),
@@ -40,16 +65,6 @@ export async function POST(
         403,
         "Respond using an active, verified business that you own.",
       );
-    const request = await prisma.serviceRequest.findUnique({ where: { id } });
-    if (
-      !request ||
-      request.closedAt ||
-      request.createdAt.getTime() < Date.now() - 7 * 864e5
-    )
-      throw new ApiError(404, "This request has ended.");
-    if (!request.contactPhone || !request.contactConsent)
-      throw new ApiError(409, "This student has not enabled WhatsApp replies.");
-
     const now = new Date();
     const isProActive = Boolean(business.proEndsAt && business.proEndsAt > now);
     const isBoostActive = Boolean(

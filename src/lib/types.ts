@@ -169,6 +169,7 @@ export interface PaymentRecord {
 }
 
 export interface ServiceRequest {
+  housingIntent?: "LOOKING" | "VACANCY";
   category?: string;
   contactConsent?: boolean;
   closedAt?: string;

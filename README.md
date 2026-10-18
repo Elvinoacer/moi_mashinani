@@ -2,6 +2,8 @@
 
 Live campus deals, delivery drops, instant requests, verified student hustles and business storefronts with WhatsApp handoff.
 
+The [community housing board](docs/housing.md) supports free, account-free vacancy listings and house searches, with scam cautions before posting and responding.
+
 Read the [campus habit implementation and rollout guide](docs/habit-strategy.md) for the completed value-creation strategy, phone sign-in and daily merchant workflows.
 
 Read the [complete platform user guide](docs/platform-user-guide.md) for all student/customer, admin and business actions, daily workflows, payments and troubleshooting.

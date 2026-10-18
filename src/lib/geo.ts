@@ -37,8 +37,8 @@ export const CAMPUS_ANCHORS: CampusAnchor[] = [
   },
   {
     id: 'stage',
-    name: 'Stage Terminus',
-    shortName: 'Stage',
+    name: 'Stage & surroundings',
+    shortName: 'Stage & surroundings',
     coords: { lat: 0.2808, lng: 35.2932 },
     landmark: 'Matatu stage, Bata, Stage complex',
     description: 'Transport terminus and main commercial hub',

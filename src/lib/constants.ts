@@ -4,9 +4,9 @@ export const ZONES: Zone[] = [
   {
     id: 'all',
     slug: 'all',
-    name: 'All Kesses',
-    landmarkHint: 'Main Campus & Environs',
-    description: 'Across all surrounding campus centers',
+    name: 'All Moi campuses & areas',
+    landmarkHint: 'Main Campus, other Moi campuses & surroundings',
+    description: 'Across Moi University campuses and surrounding communities',
     center: { lat: 0.2831, lng: 35.2905 },
     walkTimeFromGate: '0–12 min walk',
     distanceFromGateMeters: 0,
@@ -34,7 +34,7 @@ export const ZONES: Zone[] = [
   {
     id: 'stage',
     slug: 'stage',
-    name: 'Stage',
+    name: 'Stage & surroundings',
     landmarkHint: 'Matatu stage, Bata, Stage complex',
     description: 'Transport terminus, bus stop, and primary commercial hub',
     center: { lat: 0.2808, lng: 35.2932 },
@@ -80,6 +80,38 @@ export const ZONES: Zone[] = [
     center: { lat: 0.5143, lng: 35.2698 },
     walkTimeFromGate: '35 km (Town)',
     distanceFromGateMeters: 35000,
+  },
+  {
+    id: 'campus-interior', slug: 'campus-interior',
+    name: 'Campus interior / hostels',
+    landmarkHint: 'Inside Main Campus, university hostels and halls',
+    description: 'Housing, services and student spaces inside Moi Main Campus',
+  },
+  {
+    id: 'engineering-aerospace', slug: 'engineering-aerospace',
+    name: 'School of Engineering / Aerospace & surroundings',
+    landmarkHint: 'Engineering, Aerospace and nearby residences',
+    description: 'The Engineering and Aerospace area and surrounding community',
+  },
+  {
+    id: 'mabs', slug: 'mabs', name: 'Mabs',
+    landmarkHint: 'Mabs and surrounding residences',
+    description: 'Community housing and businesses around Mabs',
+  },
+  {
+    id: 'chebarus', slug: 'chebarus', name: 'Chebarus',
+    landmarkHint: 'Chebarus and surrounding residences',
+    description: 'Community housing and businesses around Chebarus',
+  },
+  {
+    id: 'chs', slug: 'chs', name: 'CHS / College of Health Sciences',
+    landmarkHint: 'Health Sciences, medical campus and surrounding residences',
+    description: 'Moi University Health Sciences community and nearby housing',
+  },
+  {
+    id: 'other-campus', slug: 'other-campus', name: 'Other Moi campus / area',
+    landmarkHint: 'Your area is welcome — include your campus and landmark in the details',
+    description: 'Any other Moi University campus or surrounding area',
   },
 ];
 

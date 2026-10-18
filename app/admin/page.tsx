@@ -1141,11 +1141,10 @@ function AdminConsoleContent() {
         <div className="bg-white signboard-border rounded-xl p-5 md:p-6 signboard-shadow space-y-4">
           <div>
             <h2 className="font-display font-bold text-xl text-[#243b32] uppercase">
-              Unmet Student Demands (Zero-Result Searches)
+              Community requests & housing posts
             </h2>
             <p className="text-xs text-[#667064]">
-              What students searched for but could not find. Guide your field
-              ambassadors to onboard these!
+              Review product and service requests, house searches and shared vacancies. Remove misleading or suspicious community posts.
             </p>
           </div>
 
@@ -1161,6 +1160,7 @@ function AdminConsoleContent() {
                   className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0">
+                    {req.housingIntent && <p className="mb-1 text-xs font-bold text-[#335e41]">{req.housingIntent === "VACANCY" ? "Housing · Vacancy available" : "Housing · Looking for a house"} · Unverified community post</p>}
                     <div className="font-display font-bold text-base text-[#243b32] break-words">
                       &ldquo;{req.query}&rdquo;
                     </div>

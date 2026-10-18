@@ -149,12 +149,18 @@ model PaymentRecord {
   @@index([state])
 }
 
+enum HousingIntent {
+  LOOKING
+  VACANCY
+}
+
 model ServiceRequest {
   id           String    @id
   query        String
   zone         String    @default("all")
   contactPhone String?
   category     String?
+  housingIntent HousingIntent?
   contactConsent Boolean @default(false)
   closedAt DateTime?
   manageTokenHash String?

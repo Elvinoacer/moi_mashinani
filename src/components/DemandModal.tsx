@@ -10,9 +10,11 @@ import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
 import { getSavedStudentContact, saveStudentContact } from "@/lib/useCampusZone";
 import { CampusPushOptIn } from "./CampusPushOptIn";
+import { HOUSING_CATEGORY, type HousingIntent } from "@/lib/housing";
+import { HousingSafetyNotice } from "./HousingSafetyNotice";
 
 const REQUEST_EXAMPLES = [
-  "Need a single room near Stage under KES 4,000",
+  "Need a reliable fundi near Stage today",
   "Looking for a laptop charger (HP) today",
   "Need someone to fix a cracked phone screen",
   "Printing & binding 50 pages tonight",
@@ -21,18 +23,23 @@ export function DemandModal({
   initialQuery = "",
   initialCategory = "",
   initialZone = "all",
+  initialHousingIntent,
   onClose,
   onPosted,
 }: {
   initialQuery?: string;
   initialCategory?: string;
   initialZone?: string;
+  initialHousingIntent?: HousingIntent;
   onClose: () => void;
   onPosted?: () => void;
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [zone, setZone] = useState(initialZone);
-  const [category, setCategory] = useState(initialCategory);
+  const [category, setCategory] = useState(initialHousingIntent ? HOUSING_CATEGORY : initialCategory);
+  const [housingIntent, setHousingIntent] = useState<HousingIntent>(initialHousingIntent || "LOOKING");
+  const [safetyAcknowledged, setSafetyAcknowledged] = useState(false);
+  const housing = category === HOUSING_CATEGORY;
   const [phone, setPhone] = useState(() => getSavedStudentContact().phone);
   const [consent, setConsent] = useState(false);
   const [handoffs, setHandoffs] = useState<
@@ -57,6 +64,7 @@ export function DemandModal({
           category,
           contactPhone: phone || undefined,
           contactConsent: consent,
+          ...(housing ? { housingIntent, safetyAcknowledged } : {}),
         }),
       });
       const data = await response.json();
@@ -82,7 +90,7 @@ export function DemandModal({
     }
   }
   return (
-    <ModalFrame title="Post a comrade request" onClose={onClose}>
+    <ModalFrame title={housing ? "Post to the housing board" : "Post a comrade request"} onClose={onClose}>
       {submitted ? (
         <div className="space-y-4 p-4 sm:p-6">
           <div role="status" className="flex items-start gap-3 rounded-xl border border-[#d1e4d0] bg-[#edf5e9] p-4 text-[#183e35]">
@@ -92,20 +100,20 @@ export function DemandModal({
               aria-hidden="true"
             />
             <div className="min-w-0">
-              <h3 className="text-lg font-bold leading-snug">Your request is live</h3>
+              <h3 className="text-lg font-bold leading-snug">{housing ? "Your housing post is live" : "Your request is live"}</h3>
               <p className="mt-1 text-sm leading-relaxed text-[#456550]">
                 Posted to the campus board for seven days. Close it sooner anytime from this browser.
               </p>
             </div>
           </div>
 
-          <CampusPushOptIn
+          {housing ? <HousingSafetyNotice /> : <CampusPushOptIn
             variant="request-submitted"
             keyword={query}
             zone={zone}
             category={category || undefined}
             requestId={submittedId || undefined}
-          />
+          />}
 
           {handoffs.length > 0 ? (
             <details className="group rounded-xl border border-[#dce5d7] bg-white">
@@ -142,19 +150,19 @@ export function DemandModal({
                 ))}
               </div>
             </details>
-          ) : (
+          ) : !housing ? (
             <p className="text-sm leading-relaxed text-[#526d59]">
               No matching seller yet. You can share the request with your campus WhatsApp group.
             </p>
-          )}
+          ) : <p className="text-sm text-[#526d59]">Anyone can reply on WhatsApp without an account. Treat every reply as unverified and check the property and person before paying.</p>}
 
           <div className="flex flex-col gap-2 border-t border-[#e3ebe0] pt-4 sm:flex-row">
             <Link
-              href="/requests"
+              href={housing ? "/housing" : "/requests"}
               className="ui-button ui-button-primary min-h-11 w-full justify-center text-center sm:flex-1"
               onClick={onClose}
             >
-              View request board <ArrowRight size={16} aria-hidden="true" />
+              {housing ? "View housing board" : "View request board"} <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <Button
               type="button"
@@ -166,12 +174,12 @@ export function DemandModal({
             </Button>
           </div>
           <a
-            href={`https://wa.me/?text=${encodeURIComponent(`Can anyone help? ${query}. Zone: ${zone}. Find verified sellers and post requests on Moi Mashinani: ${typeof window === "undefined" ? "" : window.location.origin}/requests`)}`}
+            href={`https://wa.me/?text=${encodeURIComponent(`${housing ? (housingIntent === "VACANCY" ? "Vacancy available" : "Looking for a house") : "Can anyone help?"} ${query}. Area: ${ZONES.find(z => z.slug === zone)?.name || zone}. ${housing ? "Unverified community housing post — inspect before paying." : "Find verified sellers and post requests on Moi Mashinani."} ${typeof window === "undefined" ? "" : window.location.origin}/${housing ? "housing" : "requests"}`)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-9 items-center text-sm font-semibold text-[#275d47] underline underline-offset-4 hover:text-[#183e35] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335e41]"
           >
-            Share request on WhatsApp
+            Share {housing ? "housing post" : "request"} on WhatsApp
           </a>
         </div>
       ) : (
@@ -181,15 +189,33 @@ export function DemandModal({
               <Lightbulb size={20} aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <p className="font-bold text-[#1a4033]">A clear request gets better replies.</p>
+              <p className="font-bold text-[#1a4033]">{housing ? "Find a place or help someone find one." : "A clear request gets better replies."}</p>
               <p className="mt-1 text-sm leading-relaxed text-[#526c5b]">
-                Describe what you need, your budget and when you need it. No account required.
+                {housing ? "Looking for a rental, moving out, or know an empty room? Both kinds of housing post and all replies are free. No account required." : "Describe what you need, your budget and when you need it. No account required."}
               </p>
             </div>
           </div>
+          {!housing && (
+            <button type="button" className="w-full rounded-xl border border-[#bed0bd] bg-white p-3 text-left text-sm font-bold text-[#244638] underline underline-offset-4" onClick={() => { setCategory(HOUSING_CATEGORY); setConsent(false); setSafetyAcknowledged(false); }}>
+              House or rental? Post a housing search or vacancy — free
+            </button>
+          )}
+          {housing && (
+            <>
+              <fieldset className="space-y-2">
+                <legend className="mb-2 text-sm font-bold text-[#244638]">What would you like to post?</legend>
+                {([['LOOKING', 'Looking for a house / rental'], ['VACANCY', 'Vacancy available / I know a place']] as const).map(([value, label]) => (
+                  <label key={value} className="flex items-center gap-3 rounded-xl border border-[#bed0bd] bg-white p-3 text-sm font-semibold text-[#244638]">
+                    <input type="radio" name="housing-intent" value={value} checked={housingIntent === value} onChange={() => setHousingIntent(value)} />{label}
+                  </label>
+                ))}
+              </fieldset>
+              <HousingSafetyNotice />
+            </>
+          )}
           <div>
             <label htmlFor="request-description" className="mb-2 block text-sm font-bold text-[#244638]">
-              Describe what you need <span className="text-[#ab3d2d]">*</span>
+              {housing ? "Housing details" : "Describe what you need"} <span className="text-[#ab3d2d]">*</span>
             </label>
             <textarea
               id="request-description"
@@ -198,7 +224,7 @@ export function DemandModal({
               rows={3}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="e.g. Looking for an HP charger under KES 1,200 near Stage today"
+              placeholder={housing ? housingIntent === "VACANCY" ? "e.g. Single room at Chebarus, KES 3,500/month, available now. Include the landmark, deposit and viewing details." : "e.g. Looking for a bedsitter near Mabs, budget KES 5,000/month, moving in next month." : "e.g. Looking for an HP charger under KES 1,200 near Stage today"}
               aria-describedby="request-description-hint"
               className="min-h-28 w-full resize-y rounded-xl border border-[#bed0bd] bg-white px-3.5 py-3 text-base leading-relaxed text-[#183e35] outline-none placeholder:text-[#7a8d80] focus-visible:border-[#528b5d] focus-visible:ring-2 focus-visible:ring-[#a2c995]/60"
             />
@@ -206,7 +232,7 @@ export function DemandModal({
               <span>Do not include your phone number or private details here.</span>
               <span>{query.length}/500</span>
             </div>
-            {!query.trim() && (
+            {!query.trim() && !housing && (
               <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Example requests">
                 {REQUEST_EXAMPLES.map((example) => (
                   <button
@@ -223,8 +249,8 @@ export function DemandModal({
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="min-w-0">
-              <p className="mb-2 text-sm font-bold text-[#244638]">Business category <span className="font-normal text-[#728274]">(optional)</span></p>
-              <CategorySelect value={category} onChange={setCategory} className="ui-input min-h-12 bg-white text-sm" />
+              <p className="mb-2 text-sm font-bold text-[#244638]">{initialHousingIntent ? "Post category" : "Business category"} {!initialHousingIntent && <span className="font-normal text-[#728274]">(optional)</span>}</p>
+              {initialHousingIntent ? <p className="ui-input min-h-12 bg-white text-sm">Housing · free community posts</p> : <CategorySelect value={category} onChange={(value) => { setCategory(value); setConsent(false); setSafetyAcknowledged(false); }} className="ui-input min-h-12 bg-white text-sm" />}
             </div>
             <div className="min-w-0">
               <label htmlFor="request-zone" className="mb-2 block text-sm font-bold text-[#244638]">
@@ -240,19 +266,20 @@ export function DemandModal({
                   <option key={z.slug} value={z.slug}>{z.name}</option>
                 ))}
               </select>
-              <p className="mt-2 text-xs leading-relaxed text-[#657a69]">Choose where you want to find it.</p>
+              <p className="mt-2 text-xs leading-relaxed text-[#657a69]">{zone === "other-campus" ? "Include your campus, area and nearby landmark in the details above." : housing && housingIntent === "VACANCY" ? "Choose where the vacancy is located." : "Choose where you want to find it."}</p>
             </div>
           </div>
           <div className="rounded-xl border border-[#e1e9dd] bg-[#fafcf8] p-4">
             <label htmlFor="request-whatsapp" className="mb-1 block text-sm font-bold text-[#244638]">
-              Your WhatsApp number <span className="font-normal text-[#728274]">(optional)</span>
+              Your WhatsApp number <span className="font-normal text-[#728274]">{housing ? "(required for replies)" : "(optional)"}</span>
             </label>
             <p className="mb-3 text-xs leading-relaxed text-[#627566]">
-              Only provide this if you want eligible sellers to contact you directly.
+              {housing ? "Community members can access your number when they choose to respond, even without an account. It is hidden from the public board." : "Only provide this if you want eligible sellers to contact you directly."}
             </p>
             <Input
               id="request-whatsapp"
               type="tel"
+              required={housing}
               maxLength={20}
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
@@ -269,10 +296,16 @@ export function DemandModal({
                   onChange={(event) => setConsent(event.target.checked)}
                   className="mt-1 h-5 w-5 shrink-0"
                 />
-                I agree to share this number privately with active, verified sellers responding to my request.
+                {housing ? "I agree to share my WhatsApp number with anyone responding to this housing post, including people without an account. Responders are not verified." : "I agree to share this number privately with active, verified sellers responding to my request."}
               </label>
             )}
           </div>
+          {housing && (
+            <label className="flex items-start gap-3 text-sm leading-relaxed text-amber-950">
+              <input type="checkbox" required checked={safetyAcknowledged} onChange={(event) => setSafetyAcknowledged(event.target.checked)} className="mt-1 h-5 w-5 shrink-0" />
+              I have read the housing scam caution. I understand that posts and replies are unverified and I must check the property and person before paying.
+            </label>
+          )}
           {error && (
             <p role="alert" className="text-red-800">
               {error}
@@ -280,7 +313,7 @@ export function DemandModal({
           )}
           <div className="flex flex-col-reverse gap-3 border-t border-[#e3ebe0] pt-4 sm:flex-row sm:justify-end">
             <Button type="button" variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button>
-            <Button type="submit" disabled={busy} className="min-h-12"><Plus size={18} aria-hidden="true" /> {busy ? "Posting request…" : "Publish request"} <ArrowRight size={17} aria-hidden="true" /></Button>
+            <Button type="submit" disabled={busy} className="min-h-12"><Plus size={18} aria-hidden="true" /> {busy ? "Posting…" : housing ? "Publish housing post — free" : "Publish request"} <ArrowRight size={17} aria-hidden="true" /></Button>
           </div>
         </form>
       )}

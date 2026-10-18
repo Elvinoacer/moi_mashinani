@@ -42,6 +42,8 @@
     "test:value:browser": "tsx scripts/test-value-browser.ts",
     "test:request-modal:browser": "tsx scripts/test-request-success-modal-browser.ts",
     "test:value:unit": "tsx --test scripts/test-campus-value.ts",
+    "test:housing": "tsx scripts/test-housing.ts",
+    "test:housing:browser": "tsx scripts/test-housing-browser.ts",
     "test:habit": "tsx scripts/test-habit-strategy.ts",
     "test:habit:unit": "tsx --test scripts/test-habit-strategy-unit.ts",
     "test:habit:browser": "tsx scripts/test-habit-strategy-browser.ts"

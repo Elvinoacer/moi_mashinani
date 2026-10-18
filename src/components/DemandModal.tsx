@@ -5,7 +5,7 @@ import "./demand-modal.css";
 import Link from "@/components/MotionLink";
 import { ZONES } from "@/lib/constants";
 import { CategorySelect } from "./CategorySelect";
-import { ArrowRight, Check, CheckCircle2, HousePlus, Lightbulb, MapPin, MessageCircle, Plus, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, HousePlus, MapPin, MessageCircle, Plus, ShieldCheck, Sparkles } from "lucide-react";
 import { ModalFrame } from "./ModalFrame";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
@@ -268,7 +268,7 @@ export function DemandModal({
               )}
               <div className="demand-form__detail-grid">
                 <div className="demand-form__field">
-                  <label htmlFor="request-category" className="demand-form__label">{housing ? "Post category" : "Business category"} {!housing && <span className="demand-form__optional">(optional)</span>}</label>
+                  <p className="demand-form__label">{housing ? "Post category" : "Business category"} {!housing && <span className="demand-form__optional">(optional)</span>}</p>
                   {housing ? (
                     <div id="request-category" className="demand-form__fixed-category"><HousePlus size={17} aria-hidden="true" /> Housing · free community post</div>
                   ) : (
